@@ -118,6 +118,9 @@ TRANSLATIONS = {
         "status_scanning_graphics": "Paso 3/4: Descubriendo Gráficos (StanHash)...",
         "status_scanning_audio": "Paso 4/4: Indexando Audio Engine (Sappy)...",
         "status_scan_complete": "Análisis ROM completado con éxito.",
+        "crash_detected_title": "Reporte de Error Detectado",
+        "crash_detected_msg": "Se ha detectado un cierre inesperado previo. ¿Deseas enviar el log de error al desarrollador para su revisión?",
+        "crash_report_subject": "Reporte de Error - FoMT Studio",
     },
     "en": {
         "menu_file": "File",
@@ -237,6 +240,9 @@ TRANSLATIONS = {
         "status_scanning_graphics": "Step 3/4: Discovering Graphics (StanHash)...",
         "status_scanning_audio": "Step 4/4: Indexing Audio Engine (Sappy)...",
         "status_scan_complete": "ROM Analysis completed successfully.",
+        "crash_detected_title": "Crash Report Detected",
+        "crash_detected_msg": "A previous unexpected closure was detected. Would you like to send the error log to the developer for review?",
+        "crash_report_subject": "Error Report - FoMT Studio",
     },
     "jp": {
         "menu_file": "ファイル",
@@ -356,6 +362,9 @@ TRANSLATIONS = {
         "status_scanning_graphics": "ステップ 3/4: グラフィックのスキャン...",
         "status_scanning_audio": "ステップ 4/4: オーディオエンジンの索引...",
         "status_scan_complete": "ROM分析が正常に完了しました。",
+        "crash_detected_title": "エラーレポートが検出されました",
+        "crash_detected_msg": "予期しない終了が検出されました。レビューのために開発者にエラーログを送信しますか？",
+        "crash_report_subject": "エラーレポート - FoMT Studio",
     }
 }
 

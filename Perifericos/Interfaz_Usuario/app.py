@@ -1,12 +1,13 @@
 import os
+import sys
 import re
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
     QTabWidget, QSplitter, QTreeView, QMenuBar, QMenu,
     QStatusBar, QFileDialog, QMessageBox, QLabel
 )
-from PyQt6.QtCore import Qt, QSettings, QThread, pyqtSignal
-from PyQt6.QtGui import QAction, QStandardItemModel, QStandardItem
+from PyQt6.QtCore import Qt, QSettings, QThread, pyqtSignal, QUrl
+from PyQt6.QtGui import QAction, QStandardItemModel, QStandardItem, QDesktopServices
 
 from Perifericos.Interfaz_Usuario.themes import get_light_theme, get_dark_theme, get_matrix_theme
 from Perifericos.Traducciones.i18n import tr
@@ -113,6 +114,9 @@ class FoMTStudioApp(QMainWindow):
         # Atajos Globales (Navegación de Eventos)
         QShortcut(QKeySequence("Ctrl+P"), self, self._on_shortcut_event_up)
         QShortcut(QKeySequence("Ctrl+O"), self, self._on_shortcut_event_down)
+        
+        # Revisar si hay algún reporte de error pendiente de sesiones anteriores
+        self._check_for_crash_report()
         
     def _setup_ui(self):
         # Main layout
@@ -551,3 +555,51 @@ class FoMTStudioApp(QMainWindow):
         lay.addWidget(help_content)
         
         dialog.exec()
+
+    def _check_for_crash_report(self):
+        """Busca el archivo de log y pregunta al usuario si desea enviarlo (si está PENDING)."""
+        root_dir = os.path.dirname(os.path.abspath(sys.argv[0])) # Usar sys.argv[0] para main.py
+        log_path = os.path.join(root_dir, "fomt_studio_error.log")
+        
+        if not os.path.exists(log_path):
+            return
+
+        try:
+            with open(log_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            
+            if "[STATUS: PENDING]" not in content:
+                return
+
+            # Preguntar al usuario
+            reply = QMessageBox.question(
+                self, 
+                tr("crash_detected_title", self.current_lang),
+                tr("crash_detected_msg", self.current_lang),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+
+            if reply == QMessageBox.StandardButton.Yes:
+                self._send_error_report(content)
+
+            # Marcar como HANDLED re-escribiendo el archivo
+            new_content = content.replace("[STATUS: PENDING]", "[STATUS: HANDLED]")
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+                
+        except Exception as e:
+            print(f"Error al procesar el log de fallos: {e}")
+
+    def _send_error_report(self, log_text):
+        """Abre el cliente de correo con el log codificado."""
+        email = "fomtstudio.logs@gmail.com" # Placeholder solicitado
+        subject = tr("crash_report_subject", self.current_lang)
+        
+        # Limpiar el texto para el mailto (escapar caracteres especiales)
+        # Solo enviamos el contenido útil (después del tag)
+        body = log_text.replace("[STATUS: PENDING]", "").strip()
+        
+        from urllib.parse import quote
+        mailto_url = f"mailto:{email}?subject={quote(subject)}&body={quote(body)}"
+        
+        QDesktopServices.openUrl(QUrl(mailto_url))

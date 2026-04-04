@@ -1,0 +1,9 @@
+[STATUS: PENDING]
+=== FoMT Studio Crash Report - 2026-04-04 14:13:00 ===
+Traceback (most recent call last):
+  File "main.py", line 42, in <module>
+    main()
+  File "main.py", line 38, in main
+    window = FoMTStudioApp()
+ZeroDivisionError: division by zero
+========================================
