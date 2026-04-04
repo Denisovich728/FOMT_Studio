@@ -1,0 +1,2 @@
+class DecompileError(Exception):
+    pass
