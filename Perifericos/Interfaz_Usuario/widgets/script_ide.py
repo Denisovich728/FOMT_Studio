@@ -1,9 +1,10 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTextEdit,
-    QPushButton, QLabel, QSplitter, QListWidget, QListWidgetItem
+    QPushButton, QLabel, QSplitter, QListWidget, QListWidgetItem,
+    QCompleter
 )
-from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QFontDatabase, QPainter, QTextFormat
-from PyQt6.QtCore import Qt, QRect, QSize
+from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QFontDatabase, QPainter, QTextFormat, QTextCursor
+from PyQt6.QtCore import Qt, QRect, QSize, QStringListModel
 
 from Perifericos.Interfaz_Usuario.themes import get_highlighter_colors
 from Perifericos.Traducciones.i18n import tr
@@ -31,6 +32,71 @@ class CodeEditor(QPlainTextEdit):
         self.cursorPositionChanged.connect(self.highlight_current_line)
 
         self.update_line_number_area_width(0)
+        self._completer = None
+
+    def setCompleter(self, completer):
+        if self._completer:
+            self._completer.activated.disconnect()
+        self._completer = completer
+        if not self._completer:
+            return
+        self._completer.setWidget(self)
+        self._completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        self._completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self._completer.activated.connect(self.insertCompletion)
+
+    def completer(self):
+        return self._completer
+
+    def insertCompletion(self, completion):
+        if self._completer.widget() is not self:
+            return
+        tc = self.textCursor()
+        extra = len(completion) - len(self._completer.completionPrefix())
+        tc.movePosition(QTextCursor.MoveOperation.Left)
+        tc.movePosition(QTextCursor.MoveOperation.EndOfWord)
+        tc.insertText(completion[-extra:])
+        self.setTextCursor(tc)
+
+    def textUnderCursor(self):
+        tc = self.textCursor()
+        tc.select(QTextCursor.SelectionType.WordUnderCursor)
+        return tc.selectedText()
+
+    def focusInEvent(self, e):
+        if self._completer:
+            self._completer.setWidget(self)
+        super().focusInEvent(e)
+
+    def keyPressEvent(self, e):
+        if self._completer and self._completer.popup() and self._completer.popup().isVisible():
+            if e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return, Qt.Key.Key_Escape, Qt.Key.Key_Tab, Qt.Key.Key_Backtab):
+                e.ignore()
+                return
+
+        isShortcut = ((e.modifiers() & Qt.KeyboardModifier.ControlModifier) and e.key() == Qt.Key.Key_E) 
+        if not self._completer or not isShortcut:
+            super().keyPressEvent(e)
+
+        ctrlOrShift = e.modifiers() & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)
+        if not self._completer or (ctrlOrShift and not e.text()):
+            return
+
+        hasModifier = (e.modifiers() != Qt.KeyboardModifier.NoModifier) and not ctrlOrShift
+        completionPrefix = self.textUnderCursor()
+
+        if not isShortcut and (hasModifier or not e.text() or len(completionPrefix) < 1):
+            self._completer.popup().hide()
+            return
+
+        if completionPrefix != self._completer.completionPrefix():
+            self._completer.setCompletionPrefix(completionPrefix)
+            self._completer.popup().setCurrentIndex(self._completer.completionModel().index(0, 0))
+
+        cr = self.cursorRect()
+        cr.setWidth(self._completer.popup().sizeHintForColumn(0)
+                    + self._completer.popup().verticalScrollBar().sizeHint().width())
+        self._completer.complete(cr)
 
     def line_number_area_width(self):
         digits = 1
@@ -63,7 +129,6 @@ class CodeEditor(QPlainTextEdit):
         if not self.isReadOnly():
             selection = QTextEdit.ExtraSelection()
             line_color = QColor(Qt.GlobalColor.darkGreen).lighter(160)
-            # Adaptar según el tema si es posible, pero por ahora algo sutil
             selection.format.setBackground(line_color)
             selection.format.setProperty(QTextFormat.Property.FullWidthSelection, True)
             selection.cursor = self.textCursor()
@@ -73,7 +138,6 @@ class CodeEditor(QPlainTextEdit):
 
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
-        # Fondo del margen (ligeramente distinto al fondo del editor)
         painter.fillRect(event.rect(), QColor("#1e1e1e").lighter(120))
 
         block = self.firstVisibleBlock()
@@ -181,6 +245,19 @@ class ScriptIDEWidget(QWidget):
         
         self.highlighter = FoMTHighlighter(self.editor.document())
         self.highlighter.update_colors("light")
+        
+        # Configurar Intellisense
+        commands = [
+            "Call", "Jump", "Exit", "End", "Branch", "Option", 
+            "Message", "TalkMessage", "FacePlayer", "SetEntity", 
+            "PlaySound", "GiveItem", "HasItem", "IncVar", "DecVar",
+            "SetFlag", "ClearFlag", "CheckFlag", "Warp", "Yield",
+            "Wait", "AddMoney", "SubMoney", "SetWeather"
+        ]
+        completer = QCompleter(commands, self)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        completer.setWrapAround(False)
+        self.editor.setCompleter(completer)
         
         self.editor.setPlainText("// Load a script to start editing...")
         

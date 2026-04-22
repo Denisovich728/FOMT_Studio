@@ -138,9 +138,25 @@ class NpcDetailDialog(QDialog):
         super().__init__(parent)
         name = npc.name_str.strip('\x00')
         self.setWindowTitle(f"Perfil de Personalidad: {name}")
-        self.resize(500, 400)
+        self.resize(600, 500)
         
-        layout = QVBoxLayout(self)
+        self.layout_main = QHBoxLayout(self)
+        
+        # LADO IZQUIERDO: Visualización (Retrato) v1.3.0
+        self.side_graphics = QVBoxLayout()
+        self.lbl_portrait = QLabel()
+        self.lbl_portrait.setFixedSize(128, 128)
+        self.lbl_portrait.setStyleSheet("background-color: #222; border: 1px solid #444;")
+        self.lbl_portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.side_graphics.addWidget(self.lbl_portrait)
+        self.side_graphics.addStretch()
+        self.layout_main.addLayout(self.side_graphics)
+        
+        # LADO DERECHO: Datos
+        layout = QVBoxLayout()
+        self.layout_main.addLayout(layout)
+        
+        self._load_npc_portrait(npc, parent)
         
         # Cabecera
         app = parent.window() if parent else None
@@ -174,8 +190,53 @@ class NpcDetailDialog(QDialog):
             
         self.txt_data.setPlainText(base_info)
         layout.addWidget(self.txt_data)
-        
-        lang = getattr(parent.window(), 'current_lang', 'es')
+
+        # Botón de Cierre
         btn_close = QPushButton(tr('btn_close_viewer', lang))
         btn_close.clicked.connect(self.close)
         layout.addWidget(btn_close)
+        
+    def _load_npc_portrait(self, npc, parent):
+        """Intenta extraer y mostrar el retrato del NPC usando la SuperLib."""
+        try:
+            from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.codec_tiles import decode_oam_attributes, assemble_sprite
+            from PyQt6.QtGui import QImage, QPixmap
+            
+            project = parent.project
+            # Heurística: El ID del retrato suele coincidir con el ID del NPC (a veces con un offset)
+            p_offset = project.super_lib.get_portrait_data(npc.index)
+            
+            # Buscamos en el banco si ya existe
+            # info = project.super_lib.data_banks.get(p_offset)
+            
+            # Por ahora, asumiendo que el retrato es un bloque LZ77 de 64x64 (32 tiles 4bpp)
+            # En un sistema real buscaríamos el puntero. Para la v1.3.0 usamos el offset directo.
+            raw_data = project.decompress(p_offset)
+            if not raw_data: return
+            
+            # Ensamblaje simulado de retrato (64x64 = 8x8 tiles)
+            # OAM ficticio para retrato estándar 64x64
+            oam = {
+                "w": 64, "h": 64, "tile_id": 0, "is_8bpp": False,
+                "palette_bank": 0 # TODO: Buscar paleta real
+            }
+            
+            canvas = assemble_sprite(raw_data, oam)
+            
+            # Usar la paleta de previsualización de la SuperLib si existe
+            # O una por defecto
+            pal = [(i*16, i*16, i*16) for i in range(16)]
+            
+            img = QImage(64, 64, QImage.Format.Format_RGB32)
+            for y in range(64):
+                for x in range(64):
+                    c = pal[canvas[y][x]]
+                    img.setPixel(x, y, (c[0] << 16) | (c[1] << 8) | c[2])
+            
+            pix = QPixmap.fromImage(img).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
+            self.lbl_portrait.setPixmap(pix)
+        except:
+            self.lbl_portrait.setText("No Portrait")
+
+    def _on_close(self):
+        self.close()

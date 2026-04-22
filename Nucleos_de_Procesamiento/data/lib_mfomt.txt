@@ -1,0 +1,751 @@
+
+
+
+// ? 0x000 Unk000(/* ... */) // unreferenced
+// ? 0x001 Unk001(/* ... */) // unreferenced
+proc 0x002 SetEntityPosition(arg_1, arg_2, arg_3, arg_4)
+func 0x003 GetEntityX(arg_1)
+func 0x004 GetEntityY(arg_1)
+proc 0x005 SetEntityFacing(arg_1, arg_2)
+func 0x006 GetEntityFacing(arg_1)
+proc 0x007 Proc007(arg_1, arg_2)
+proc 0x008 Proc008(arg_1, arg_2, arg_3)
+proc 0x009 Proc009(arg_1, arg_2, arg_3)
+proc 0x00A Proc00A(arg_1, arg_2, arg_3)
+proc 0x00B Proc00B(arg_1, arg_2, arg_3)
+proc 0x00C Proc00C(arg_1)
+proc 0x00D SetEntityAnim(arg_1, arg_2)
+// ? 0x00E Unk00E(/* ... */) // unreferenced
+proc 0x00F Proc00F(arg_1)
+proc 0x010 Proc010(arg_1, arg_2)
+proc 0x011 Proc011(arg_1, arg_2, arg_3)
+proc 0x012 Proc012(arg_1)
+func 0x013 GetOppositeFacing(arg_1)
+func 0x014 GetEntityLocation(arg_1)
+proc 0x015 Proc015(arg_1, arg_2, arg_3)
+proc 0x016 Proc016(arg_1, arg_2, arg_3)
+proc 0x017 Proc017(arg_1, arg_2, arg_3)
+proc 0x018 Proc018()
+proc 0x019 PlayBGM(arg_1, arg_2)
+proc 0x01A StopBGM()
+proc 0x01B PlaySong(arg_1, arg_2)
+proc 0x01C StopAllSongs()
+proc 0x01D FadeOutBGM()
+// ? 0x01E Unk01E(/* ... */) // unreferenced
+proc 0x01F TalkOpen()
+proc 0x020 Proc020()
+proc 0x021 TalkClose()
+proc 0x022 TalkMessage(arg_1: string)
+proc 0x023 TalkMessageSlow(arg_1: string)
+proc 0x024 Proc024(arg_1: string)
+func 0x025 Func025(arg_1: string, arg_2: string, arg_3: string)
+// ? 0x026 Unk026(/* ... */) // unreferenced
+func 0x027 Func027(arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string)
+func 0x028 TalkChoice2(arg_1: string, arg_2: string)
+func 0x029 TalkChoice3(arg_1: string, arg_2: string, arg_3: string)
+func 0x02A TalkChoice4(arg_1: string, arg_2: string, arg_3: string, arg_4: string)
+func 0x02B TalkChoice5(arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string)
+func 0x02C TalkChoice6(arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string, arg_6: string)
+proc 0x02D Proc02D(arg_1)
+proc 0x02E Proc02E(arg_1: string)
+proc 0x02F Proc02F()
+proc 0x030 Proc030(arg_1)
+proc 0x031 Proc031()
+proc 0x032 Proc032(arg_1)
+proc 0x033 Proc033()
+proc 0x034 Proc034(arg_1, arg_2)
+proc 0x035 Proc035(arg_1, arg_2)
+proc 0x036 Proc036(arg_1, arg_2)
+proc 0x037 Proc037(arg_1)
+proc 0x038 Proc038(arg_1)
+proc 0x039 Proc039(arg_1, arg_2)
+proc 0x03A Proc03A(arg_1, arg_2, arg_3)
+proc 0x03B Proc03B(arg_1, arg_2: string)
+// ? 0x03C Unk03C(/* ... */) // unreferenced
+func 0x03D Func03D(arg_1, arg_2)
+func 0x03E Func03E(arg_1)
+proc 0x03F Proc03F(arg_1, arg_2)
+func 0x040 Func040()
+func 0x041 Func041()
+func 0x042 Func042()
+func 0x043 Func043()
+func 0x044 Func044()
+func 0x045 Func045()
+proc 0x046 Proc046()
+proc 0x047 Proc047()
+proc 0x048 Proc048(arg_1)
+proc 0x049 Proc049(arg_1)
+proc 0x04A Proc04A(arg_1)
+proc 0x04B Proc04B(arg_1)
+func 0x04C Func04C()
+func 0x04D Func04D()
+proc 0x04E Proc04E()
+func 0x04F Func04F()
+func 0x050 Func050()
+proc 0x051 Proc051(arg_1, arg_2)
+proc 0x052 Proc052()
+func 0x053 Func053(arg_1)
+func 0x054 Func054(arg_1)
+proc 0x055 Proc055(arg_1)
+func 0x056 Func056()
+func 0x057 Func057()
+func 0x058 Func058(arg_1, arg_2)
+func 0x059 Func059(arg_1, arg_2)
+func 0x05A Func05A(arg_1, arg_2)
+proc 0x05B Proc05B(arg_1)
+proc 0x05C Proc05C(arg_1, arg_2)
+func 0x05D Func05D()
+func 0x05E Func05E(arg_1)
+// ? 0x05F Unk05F(/* ... */) // unreferenced
+func 0x060 Func060(arg_1)
+proc 0x061 Proc061(arg_1)
+proc 0x062 Proc062()
+proc 0x063 Proc063()
+func 0x064 Func064()
+proc 0x065 Proc065()
+proc 0x066 Proc066()
+proc 0x067 Proc067()
+proc 0x068 Proc068()
+func 0x069 Func069()
+proc 0x06A Proc06A()
+proc 0x06B Proc06B()
+proc 0x06C Proc06C()
+func 0x06D Func06D()
+func 0x06E Func06E()
+func 0x06F Func06F()
+// ? 0x070 Unk070(/* ... */) // unreferenced
+func 0x071 Func071(arg_1)
+// ? 0x072 Unk072(/* ... */) // unreferenced
+proc 0x073 Proc073()
+func 0x074 Func074()
+proc 0x075 Proc075()
+// ? 0x076 Unk076(/* ... */) // unreferenced
+proc 0x077 Proc077(arg_1)
+func 0x078 Func078()
+proc 0x079 Proc079(arg_1)
+func 0x07A Func07A(arg_1)
+func 0x07B Func07B(arg_1)
+proc 0x07C Proc07C(arg_1)
+proc 0x07D Proc07D(arg_1)
+func 0x07E Func07E(arg_1)
+func 0x07F Func07F(arg_1)
+proc 0x080 Proc080(arg_1, arg_2)
+proc 0x081 Proc081(arg_1, arg_2)
+func 0x082 Func082(arg_1)
+proc 0x083 Proc083(arg_1)
+func 0x084 Func084(arg_1)
+func 0x085 Func085(arg_1)
+func 0x086 Func086(arg_1)
+proc 0x087 Proc087(arg_1)
+func 0x088 Func088(arg_1)
+func 0x089 Func089(arg_1)
+proc 0x08A Proc08A(arg_1, arg_2)
+// ? 0x08B Unk08B(/* ... */) // unreferenced
+proc 0x08C Proc08C(arg_1, arg_2)
+proc 0x08D Proc08D(arg_1)
+proc 0x08E Proc08E()
+proc 0x08F Proc08F(arg_1)
+proc 0x090 Proc090()
+proc 0x091 Proc091()
+proc 0x092 Proc092()
+proc 0x093 Proc093()
+proc 0x094 Proc094()
+proc 0x095 Proc095()
+proc 0x096 Proc096()
+proc 0x097 Proc097()
+proc 0x098 Proc098()
+proc 0x099 Proc099()
+proc 0x09A Proc09A()
+proc 0x09B Proc09B(arg_1)
+proc 0x09C Proc09C()
+proc 0x09D Proc09D()
+proc 0x09E Proc09E()
+proc 0x09F Proc09F()
+proc 0x0A0 Proc0A0()
+proc 0x0A1 Proc0A1()
+proc 0x0A2 Proc0A2()
+proc 0x0A3 Proc0A3()
+proc 0x0A4 Proc0A4()
+func 0x0A5 Func0A5()
+proc 0x0A6 Proc0A6(arg_1, arg_2)
+// ? 0x0A7 Unk0A7(/* ... */) // unreferenced in MFoMT
+proc 0x0A8 Proc0A8()
+proc 0x0A9 Proc0A9(arg_1)
+func 0x0AA Func0AA(arg_1)
+proc 0x0AB Proc0AB()
+proc 0x0AC Proc0AC(arg_1)
+proc 0x0AD Proc0AD()
+proc 0x0AE Proc0AE()
+proc 0x0AF Proc0AF()
+proc 0x0B0 Proc0B0()
+proc 0x0B1 Proc0B1()
+proc 0x0B2 Proc0B2()
+func 0x0B3 Func0B3()
+func 0x0B4 Func0B4(arg_1)
+func 0x0B5 Func0B5()
+proc 0x0B6 Proc0B6(arg_1)
+func 0x0B7 Func0B7(arg_1)
+proc 0x0B8 Proc0B8(arg_1)
+func 0x0B9 Func0B9()
+func 0x0BA Func0BA(arg_1)
+proc 0x0BB Proc0BB(arg_1)
+proc 0x0BC Proc0BC(arg_1)
+func 0x0BD Func0BD(arg_1)
+func 0x0BE Func0BE()
+func 0x0BF Func0BF(arg_1)
+func 0x0C0 Func0C0(arg_1)
+func 0x0C1 Func0C1(arg_1)
+proc 0x0C2 Proc0C2(arg_1)
+proc 0x0C3 Proc0C3()
+func 0x0C4 Func0C4()
+func 0x0C5 Func0C5(arg_1)
+func 0x0C6 Func0C6(arg_1)
+proc 0x0C7 Proc0C7()
+proc 0x0C8 Proc0C8()
+func 0x0C9 Func0C9()
+proc 0x0CA Proc0CA(arg_1)
+proc 0x0CB Proc0CB(arg_1)
+proc 0x0CC Proc0CC()
+proc 0x0CD Proc0CD()
+func 0x0CE Func0CE(arg_1)
+func 0x0CF Func0CF(arg_1)
+func 0x0D0 Func0D0(arg_1, arg_2)
+func 0x0D1 Func0D1(arg_1)
+// ? 0x0D2 Unk0D2(/* ... */) // unreferenced
+proc 0x0D3 Proc0D3(arg_1, arg_2, arg_3)
+proc 0x0D4 Proc0D4(arg_1)
+func 0x0D5 Func0D5(arg_1)
+func 0x0D6 Func0D6(arg_1)
+func 0x0D7 Func0D7(arg_1)
+func 0x0D8 Func0D8(arg_1)
+func 0x0D9 Func0D9()
+func 0x0DA Func0DA(arg_1)
+proc 0x0DB Proc0DB(arg_1)
+proc 0x0DC Proc0DC()
+func 0x0DD Func0DD(arg_1)
+proc 0x0DE Proc0DE()
+proc 0x0DF Proc0DF()
+func 0x0E0 Func0E0()
+func 0x0E1 Func0E1()
+func 0x0E2 Func0E2()
+proc 0x0E3 Proc0E3(arg_1)
+proc 0x0E4 Proc0E4()
+proc 0x0E5 Proc0E5()
+func 0x0E6 Func0E6()
+func 0x0E7 Func0E7()
+func 0x0E8 Func0E8()
+func 0x0E9 Func0E9()
+func 0x0EA Func0EA()
+func 0x0EB Func0EB()
+func 0x0EC Func0EC()
+func 0x0ED Func0ED()
+// ? 0x0EE Unk0EE(/* ... */) // unreferenced
+func 0x0EF Func0EF()
+proc 0x0F0 Proc0F0(arg_1)
+proc 0x0F1 Proc0F1(arg_1)
+proc 0x0F2 Proc0F2()
+proc 0x0F3 Proc0F3()
+func 0x0F4 Func0F4()
+func 0x0F5 Func0F5()
+func 0x0F6 Func0F6()
+proc 0x0F7 Proc0F7(arg_1, arg_2)
+func 0x0F8 Func0F8(arg_1)
+func 0x0F9 Func0F9(arg_1)
+proc 0x0FA Proc0FA(arg_1)
+proc 0x0FB Proc0FB(arg_1)
+func 0x0FC Func0FC()
+func 0x0FD Func0FD()
+func 0x0FE Func0FE(arg_1: string)
+proc 0x0FF Proc0FF(arg_1)
+proc 0x100 Proc100()
+proc 0x101 Proc101()
+func 0x102 Func102(arg_1, arg_2)
+proc 0x103 Proc103(arg_1, arg_2, arg_3, arg_4, arg_5)
+proc 0x104 Proc104(arg_1, arg_2)
+proc 0x105 GetAnimalName(arg_1, arg_2, arg_3)
+func 0x106 Func106()
+func 0x107 HasAnimalBeenTalkedTo(arg_1, arg_2)
+proc 0x108 SetAnimalTalkedTo(arg_1, arg_2)
+proc 0x109 Proc109(arg_1, arg_2, arg_3)
+func 0x10A Func10A(arg_1, arg_2)
+func 0x10B GetAnimalAge(arg_1, arg_2)
+func 0x10C Func10C(arg_1, arg_2)
+func 0x10D Func10D(arg_1, arg_2)
+// ? 0x10E Unk10E(/* ... */) // unreferenced
+func 0x10F Func10F(arg_1, arg_2)
+func 0x110 Func110(arg_1, arg_2)
+func 0x111 Func111(arg_1)
+func 0x112 Func112(arg_1, arg_2)
+proc 0x113 Proc113()
+proc 0x114 Proc114()
+proc 0x115 Proc115()
+proc 0x116 Proc116()
+func 0x117 Func117(arg_1)
+func 0x118 Func118()
+func 0x119 Func119()
+func 0x11A Func11A()
+proc 0x11B Proc11B(arg_1, arg_2)
+proc 0x11C Proc11C(arg_1)
+func 0x11D Func11D(arg_1)
+proc 0x11E Proc11E(arg_1)
+func 0x11F Func11F()
+func 0x120 Func120()
+func 0x121 Func121()
+func 0x122 Func122()
+// ? 0x123 Unk123(/* ... */) // unreferenced
+func 0x124 Func124()
+func 0x125 Func125()
+func 0x126 Func126()
+func 0x127 Func127()
+func 0x128 Func128()
+proc 0x129 Proc129(arg_1: string)
+proc 0x12A Proc12A()
+proc 0x12B Proc12B(arg_1, arg_2, arg_3)
+proc 0x12C Proc12C()
+proc 0x12D Proc12D()
+proc 0x12E Proc12E(arg_1)
+proc 0x12F Proc12F()
+func 0x130 Func130(arg_1)
+proc 0x131 Proc131()
+proc 0x132 Proc132(arg_1, arg_2, arg_3, arg_4)
+proc 0x133 Proc133()
+proc 0x134 Proc134()
+proc 0x135 Proc135()
+proc 0x136 Proc136()
+func 0x137 Func137()
+proc 0x138 Proc138(arg_1, arg_2)
+proc 0x139 Proc139()
+func 0x13A Func13A(arg_1)
+func 0x13B Func13B(arg_1)
+func 0x13C Func13C(arg_1)
+proc 0x13D Proc13D(arg_1, arg_2, arg_3, arg_4, arg_5)
+proc 0x13E Proc13E(arg_1)
+func 0x13F Func13F(arg_1)
+// ? 0x140 Unk140(/* ... */) // unreferenced
+// ? 0x141 Unk141(/* ... */) // unreferenced
+proc 0x142 Proc142(arg_1, arg_2, arg_3, arg_4, arg_5)
+proc 0x143 Proc143(arg_1, arg_2, arg_3)
+proc 0x144 Proc144(arg_1, arg_2, arg_3)
+proc 0x145 Proc145(arg_1)
+proc 0x146 Proc146(arg_1)
+proc 0x147 Proc147(arg_1, arg_2, arg_3)
+proc 0x148 Proc148(arg_1, arg_2)
+func 0x149 Func149()
+proc 0x14A Proc14A()
+	// ==========================================
+// Porpurri Constants Library: MFoMT
+// ==========================================
+// Integrar manualmente a lib_mfomt.txt
+// ==========================================
+
+// --- RAM: Variables de Estado y Jugador ---
+const RAM_PLAYER_GOLD             = 0x02004090
+const RAM_PLAYER_STAMINA          = 0x02004205
+const RAM_PLAYER_FATIGUE          = 0x02004206
+const RAM_RUCKSACK_LEVEL          = 0x02004234 // 0=Chica, 1=Mediana, 2=Grande
+const RAM_RUCKSACK_ITEMS_START    = 0x0200422C // Offset inicial slots Items
+const RAM_RUCKSACK_TOOLS_START    = 0x02004244 // Offset inicial slots Tools
+
+// --- RAM: Almacenamiento y Casa ---
+const RAM_STORAGE_FRIDGE          = 0x020025D8 // Refrigerador
+const RAM_STORAGE_CABINET         = 0x02002618 // Estantería
+const RAM_STORAGE_TOOLBOX         = 0x02002958 // Caja de Herramientas
+const RAM_HOUSE_SIZE              = 0x020027CC // 0=Sucia, 1=Pequeña, 2=Mediana, 3=Grande
+const RAM_LUMBER_COUNT            = 0x020025EC // Madera acumulada
+
+// --- RAM: Clima, Tiempo y Calendario ---
+const RAM_TIME_DAY                = 0x020025E8
+const RAM_TIME_SEASON             = 0x020025E9 // 0: Prim, 1: Ver, 2: Oto, 3: Inv
+const RAM_TIME_YEAR               = 0x020025EA
+const RAM_TIME_HOURS              = 0x020025E5
+const RAM_TIME_MINUTES            = 0x020025E4
+const RAM_WEATHER                 = 0x020025E0 // 00: Soleado, 01: Lluvia, 02: Nieve, 03: Tormenta
+
+// --- RAM: Animales (Afecto y Offsets) ---
+const RAM_AFFECTION_HORSE         = 0x02002618
+const RAM_AFFECTION_DOG           = 0x02004272
+const RAM_ANIMAL_CHICKEN_START    = 0x02002A1E // +0x30 por gallina
+const RAM_ANIMAL_CATTLE_START     = 0x02002C12 // +0x3C por vaca/oveja
+// Embarazo = Offset del animal + 0x18
+
+// --- RAM: Afecto de Personajes y NPCs ---
+const RAM_LOVE_RICK               = 0x02004354
+const RAM_LOVE_CLIFF              = 0x02004394
+const RAM_LOVE_GRAY               = 0x020043D4
+const RAM_LOVE_DOCTOR             = 0x02004414
+const RAM_LOVE_KAI                = 0x02004454
+const RAM_FRIENDSHIP_NPC_START    = 0x020044A0
+
+// ==========================================
+// IDs: Herramientas (Tools) [8-bit]
+// ==========================================
+const TOOL_SICKLE               = 0x00
+const TOOL_COPPER_SICKLE        = 0x01	
+const TOOL_SILVER_SICKLE        = 0x02
+const TOOL_GOLD_SICKLE          = 0x03
+const TOOL_MYSTRILE_SICKLE      = 0x04
+const TOOL_CURSED_SICKLE        = 0x05
+const TOOL_BLESSED_SICKLE       = 0x06
+const TOOL_MYTHIC_SICKLE        = 0x07
+
+const TOOL_HOE                  = 0x08
+const TOOL_COPPER_HOE           = 0x09
+const TOOL_SILVER_HOE           = 0x0A
+const TOOL_GOLD_HOE             = 0x0B
+const TOOL_MYSTRILE_HOE         = 0x0C
+const TOOL_CURSED_HOE           = 0x0D
+const TOOL_BLESSED_HOE          = 0x0E
+const TOOL_MYTHIC_HOE           = 0x0F
+
+const TOOL_AXE                  = 0x10
+const TOOL_COPPER_AXE           = 0x11
+const TOOL_SILVER_AXE           = 0x12
+const TOOL_GOLD_AXE             = 0x13
+const TOOL_MYSTRILE_AXE         = 0x14
+const TOOL_CURSED_AXE           = 0x15
+const TOOL_BLESSED_AXE          = 0x16
+const TOOL_MYTHIC_AXE           = 0x17
+
+const TOOL_HAMMER               = 0x18
+const TOOL_COPPER_HAMMER        = 0x19
+const TOOL_SILVER_HAMMER        = 0x1A
+const TOOL_GOLD_HAMMER          = 0x1B
+const TOOL_MYSTRILE_HAMMER      = 0x1C
+const TOOL_CURSED_HAMMER        = 0x1D
+const TOOL_BLESSED_HAMMER       = 0x1E
+const TOOL_MYTHIC_HAMMER        = 0x1F
+
+const TOOL_WATERING_CAN         = 0x20
+const TOOL_COPPER_WATERING_CAN  = 0x21
+const TOOL_SILVER_WATERING_CAN  = 0x22
+const TOOL_GOLD_WATERING_CAN    = 0x23
+const TOOL_MYSTRILE_WATERING_CAN = 0x24
+const TOOL_CURSED_WATERING_CAN  = 0x25
+const TOOL_BLESSED_WATERING_CAN = 0x26
+const TOOL_MYTHIC_WATERING_CAN  = 0x27
+
+const TOOL_FISHING_ROD          = 0x28
+const TOOL_COPPER_FISHING_ROD   = 0x29
+const TOOL_SILVER_FISHING_ROD   = 0x2A
+const TOOL_GOLD_FISHING_ROD     = 0x2B
+const TOOL_MYSTRILE_FISHING_ROD = 0x2C
+const TOOL_CURSED_FISHING_ROD   = 0x2D
+const TOOL_BLESSED_FISHING_ROD  = 0x2E
+const TOOL_MYTHIC_FISHING_ROD   = 0x2F
+
+const TOOL_COW_POTION           = 0x30
+const TOOL_SHEEP_POTION         = 0x31
+
+const TOOL_SEED_TURNIP          = 0x32
+const TOOL_SEED_POTATO          = 0x33
+const TOOL_SEED_CUCUMBER        = 0x34
+const TOOL_SEED_STRAWBERRY      = 0x35
+const TOOL_SEED_CABBAGE         = 0x36
+const TOOL_SEED_TOMATO          = 0x37
+const TOOL_SEED_CORN            = 0x38
+const TOOL_SEED_ONION           = 0x39
+const TOOL_SEED_PUMPKIN         = 0x3A
+const TOOL_SEED_PINEAPPLE       = 0x3B
+const TOOL_SEED_EGGPLANT        = 0x3C
+const TOOL_SEED_CARROT          = 0x3D
+const TOOL_SEED_SWEET_POTATO    = 0x3E
+const TOOL_SEED_SPINACH         = 0x3F
+const TOOL_SEED_GREEN_PEPPER    = 0x40
+const TOOL_SEED_GRASS           = 0x41
+const TOOL_SEED_MOON_DROP       = 0x42
+const TOOL_SEED_PINK_CAT        = 0x43
+const TOOL_SEED_MAGIC           = 0x44
+const TOOL_SEED_TOY_FLOWER      = 0x45
+
+const TOOL_BRUSH                = 0x46
+const TOOL_MILKER               = 0x47
+const TOOL_SHEARS               = 0x48
+const TOOL_BELL                 = 0x49
+const TOOL_ANIMAL_MEDICINE      = 0x4A
+const TOOL_BLUE_FEATHER         = 0x4B
+const TOOL_PEDOMETER            = 0x4C
+const TOOL_TELEPORT_STONE       = 0x4D
+const TOOL_GEM_GODDESS          = 0x4E
+const TOOL_GEM_KAPPA            = 0x4F
+const TOOL_GEM_TRUTH            = 0x50
+
+// ==========================================
+// IDs: Ítems (Items) [16-bit Codebreaker Format]
+// ==========================================
+const ITEM_TURNIP               = 0x0000
+const ITEM_POTATO               = 0x0100
+const ITEM_CUCUMBER             = 0x0200
+const ITEM_STRAWBERRY           = 0x0300
+const ITEM_CABBAGE              = 0x0400
+const ITEM_TOMATO               = 0x0500
+const ITEM_CORN                 = 0x0600
+const ITEM_ONION                = 0x0700
+const ITEM_PUMPKIN              = 0x0800
+const ITEM_PINEAPPLE            = 0x0900
+const ITEM_EGGPLANT             = 0x0A00
+const ITEM_CARROT               = 0x0B00
+const ITEM_SWEET_POTATO         = 0x0C00
+const ITEM_SPINACH              = 0x0D00
+const ITEM_GREEN_PEPPER         = 0x0E00
+
+const ITEM_EGG_REGULAR          = 0x0F00
+const ITEM_EGG_GOOD             = 0x1000
+const ITEM_EGG_HIGH             = 0x1100
+const ITEM_EGG_GOLDEN           = 0x1200
+const ITEM_EGG_P                = 0x1300
+const ITEM_EGG_X                = 0x1400
+const ITEM_EGG_SPA_BOILED       = 0x1500
+
+const ITEM_MAYO_S               = 0x1600
+const ITEM_MAYO_M               = 0x1700
+const ITEM_MAYO_L               = 0x1800
+const ITEM_MAYO_G               = 0x1900
+const ITEM_MAYO_P               = 0x1A00
+const ITEM_MAYO_X               = 0x1B00
+
+const ITEM_MILK_S               = 0x1C00
+const ITEM_MILK_M               = 0x1D00
+const ITEM_MILK_L               = 0x1E00
+const ITEM_MILK_G               = 0x1F00
+const ITEM_MILK_P               = 0x2000
+const ITEM_MILK_X               = 0x2100
+
+const ITEM_CHEESE_S             = 0x2200
+const ITEM_CHEESE_M             = 0x2300
+const ITEM_CHEESE_L             = 0x2400
+const ITEM_CHEESE_G             = 0x2500
+const ITEM_CHEESE_P             = 0x2600
+const ITEM_CHEESE_X             = 0x2700
+
+const ITEM_APPLE                = 0x2800
+const ITEM_HONEY                = 0x2900
+const ITEM_BAMBOO_SHOOT         = 0x2A00
+const ITEM_WILD_GRAPES          = 0x2B00
+const ITEM_MUSHROOM             = 0x2C00
+const ITEM_POISONOUS_MUSHROOM   = 0x2D00
+const ITEM_TRUFFLE              = 0x2E00
+
+const ITEM_BLUE_GRASS           = 0x2F00
+const ITEM_GREEN_GRASS          = 0x3000
+const ITEM_RED_GRASS            = 0x3100
+const ITEM_YELLOW_GRASS         = 0x3200
+const ITEM_ORANGE_GRASS         = 0x3300
+const ITEM_PURPLE_GRASS         = 0x3400
+const ITEM_INDIGO_GRASS         = 0x3500
+const ITEM_BLACK_GRASS          = 0x3600
+const ITEM_WHITE_GRASS          = 0x3700
+
+const ITEM_QUEEN_OF_NIGHT       = 0x3800
+const ITEM_BODIGIZER            = 0x3900
+const ITEM_BODIGIZER_XL         = 0x3A00
+const ITEM_TURBOJOLT            = 0x3B00
+const ITEM_TURBOJOLT_XL         = 0x3C00
+const ITEM_WINE                 = 0x3D00
+const ITEM_GRAPE_JUICE          = 0x3E00
+const ITEM_RICE_BALL            = 0x3F00
+const ITEM_BREAD                = 0x4000
+const ITEM_OIL                  = 0x4100
+const ITEM_FLOWER               = 0x4200
+const ITEM_CURRY_POWDER         = 0x4300
+const ITEM_MUFFIN_MIX           = 0x4400
+const ITEM_CHOCOLATE            = 0x4500
+const ITEM_RELAXATION_TEA_LEAVES= 0x4600
+const ITEM_SUGDW_APPLE          = 0x4700
+const ITEM_HMSGB_APPLE          = 0x4800
+const ITEM_AEPFE_APPLE          = 0x4900
+const ITEM_BUCKWHEAT_FLOUR      = 0x4A00
+const ITEM_WILD_GRAPE_WINE      = 0x4B00
+
+const ITEM_SALAD                = 0x4C00
+const ITEM_CURRY_RICE           = 0x4D00
+const ITEM_STEW                 = 0x4E00
+const ITEM_MISO_SOUP            = 0x4F00
+const ITEM_STIR_FRY             = 0x5000
+const ITEM_FRIED_RICE           = 0x5100
+const ITEM_SAVORY_PANCAKE       = 0x5200
+const ITEM_SANDWICH             = 0x5300
+const ITEM_FRUIT_JUICE          = 0x5400
+const ITEM_VEGETABLE            = 0x5500
+const ITEM_MIXED_JUICE          = 0x5600
+const ITEM_FRUIT_LATTE          = 0x5700
+const ITEM_VEGETABLE_LATTE      = 0x5800
+const ITEM_MIXED_LATTE          = 0x5900
+const ITEM_STRAWBERRY_SMOOTHIE  = 0x5A00
+const ITEM_STRAWBERRY_JAM       = 0x5B00
+const ITEM_TOMATO_JUICE         = 0x5C00
+const ITEM_PICKLED_TURNIP       = 0x5D00
+const ITEM_FRENCH_FRIES         = 0x5E00
+const ITEM_PICKLES              = 0x5F00
+const ITEM_KETCHUP              = 0x6000
+const ITEM_POPCORN              = 0x6100
+const ITEM_CORN_FLAKES          = 0x6200
+const ITEM_BAKED_CORN           = 0x6300
+const ITEM_PINEAPPLE_JUICE      = 0x6400
+const ITEM_PUMPKIN_PUDDING      = 0x6500
+const ITEM_PUMPKIN_STEW         = 0x6600
+const ITEM_HAPPY_EGGPLANT       = 0x6700
+const ITEM_SWEET_POTATOES       = 0x6800
+const ITEM_BAKED_SWEET_POTATO   = 0x6900
+const ITEM_GREENS               = 0x6A00
+const ITEM_SCRAMBLED_EGGS       = 0x6B00
+const ITEM_OMELET               = 0x6C00
+const ITEM_OMELET_RICE          = 0x6D00
+const ITEM_BOILED_EGG           = 0x6E00
+const ITEM_HOT_MILK             = 0x6F00
+const ITEM_BUTTER               = 0x7000
+const ITEM_CHEESE_CAKE          = 0x7100
+const ITEM_CHEESE_FONDUE        = 0x7200
+const ITEM_APPLE_PIE            = 0x7300
+const ITEM_APPLE_JAM            = 0x7400
+const ITEM_APPLE_SOUFFLE        = 0x7500
+const ITEM_MUSHROOM_RICE        = 0x7600
+const ITEM_BAMBOO_RICE          = 0x7700
+const ITEM_TRUFFLE_RICE         = 0x7800
+const ITEM_SUSHI                = 0x7900
+const ITEM_JAM_BUN              = 0x7A00
+const ITEM_DINNER_ROLL          = 0x7B00
+const ITEM_RAISIN_BREAD         = 0x7C00
+const ITEM_GRAPE_JAM            = 0x7D00
+const ITEM_CURRY_BREAD          = 0x7E00
+const ITEM_SASHIMI              = 0x7F00
+const ITEM_GRILLED_FISH         = 0x8000
+const ITEM_SASHIMI_MIX          = 0x8100
+const ITEM_PIZZA                = 0x8200
+const ITEM_NOODLES              = 0x8300
+const ITEM_CURRY_NOODLES        = 0x8400
+const ITEM_TEMPURA_NOODLES      = 0x8500
+const ITEM_FRIED_NOODLES        = 0x8600
+const ITEM_BUCKWHEAT_NOODLES    = 0x8700
+const ITEM_TEMP_BUCK_NOODLES    = 0x8800
+const ITEM_FRIED_NOODLES_ALT    = 0x8900
+const ITEM_BUCKWHEAT_CHIPS      = 0x8A00
+const ITEM_COOKIES              = 0x8B00
+const ITEM_CHOCOLATE_COOKIES    = 0x8C00
+const ITEM_TEMPURA              = 0x8D00
+const ITEM_ICE_CREAM            = 0x8E00
+const ITEM_CAKE                 = 0x8F00
+const ITEM_CHOCOLATE_CAKE       = 0x9000
+const ITEM_RELAXATION_TEA       = 0x9100
+const ITEM_TOAST                = 0x9200
+const ITEM_FRENCH_TOAST         = 0x9300
+const ITEM_PUDDING              = 0x9400
+const ITEM_MOUNTAIN_STEW        = 0x9500
+const ITEM_MOON_DUMPLINGS       = 0x9600
+const ITEM_RICE_CAKE            = 0x9700
+const ITEM_ROASTED_RICE_CAKE    = 0x9800
+const ITEM_ELLI_LEAVES          = 0x9900
+
+const ITEM_SMALL_FISH           = 0xA000
+const ITEM_MEDIUM_FISH          = 0xA100
+const ITEM_LARGE_FISH           = 0xA200
+const ITEM_TOASTED_RICE_BALL    = 0xA300
+const ITEM_TEMPURA_RICE         = 0xA400
+const ITEM_EGG_OVER_RICE        = 0xA500
+const ITEM_RICE_GRUEL           = 0xA600
+const ITEM_PANCAKES             = 0xA700
+const ITEM_FISH_STICKS          = 0xA800
+const ITEM_CANDIED_POTATO       = 0xA900
+const ITEM_POTATO_PANCAKES      = 0xAA00
+
+const ITEM_MOON_DROP_GRASS      = 0x0001
+const ITEM_PINK_CAT_GRASS       = 0x0101
+const ITEM_BLUE_MAGIC_GRASS     = 0x0201
+const ITEM_RED_MAGIC_GRASS      = 0x0301
+const ITEM_TOY_FLOWER           = 0x0401
+
+const ITEM_WOOL_S               = 0x0501
+const ITEM_WOOL_M               = 0x0601
+const ITEM_WOOL_L               = 0x0701
+const ITEM_WOOL_G               = 0x0801
+const ITEM_WOOL_P               = 0x0901
+const ITEM_WOOL_X               = 0x0A01
+
+const ITEM_YARN_S               = 0x0B01
+const ITEM_YARN_M               = 0x0C01
+const ITEM_YARN_L               = 0x0D01
+const ITEM_YARN_G               = 0x0E01
+const ITEM_YARN_P               = 0x0F01
+const ITEM_YARN_X               = 0x1001
+
+const ITEM_JUNK_ORE             = 0x1101
+const ITEM_COPPER_ORE           = 0x1201
+const ITEM_SILVER_ORE           = 0x1301
+const ITEM_GOLD_ORE             = 0x1401
+const ITEM_MITHRIL_ORE          = 0x1501
+const ITEM_ORICHALC_ORE         = 0x1601
+const ITEM_ADAMANTITE_ORE       = 0x1701
+
+const ITEM_MOON_STONE           = 0x1801
+const ITEM_SAND_ROSE            = 0x1901
+const ITEM_PINK_DIAMOND         = 0x1A01
+const ITEM_ALEXANDRITE          = 0x1B01
+const ITEM_MYTHIC_STONE         = 0x1C01
+const ITEM_DIAMOND              = 0x1D01
+const ITEM_EMERALD              = 0x1E01
+const ITEM_RUBY                 = 0x1F01
+const ITEM_TOPAZ                = 0x2001
+const ITEM_PERIDOT              = 0x2101
+const ITEM_FLUORITE             = 0x2201
+const ITEM_AGATE                = 0x2301
+const ITEM_AMETHYST             = 0x2401
+
+const ITEM_HARVEST_GODDESS_JEWEL= 0x2501
+const ITEM_KAPPA_JEWEL          = 0x2601
+const ITEM_JEWEL_OF_TRUTH       = 0x2701
+
+const ITEM_BRACELET             = 0x2C01
+const ITEM_NECKLACE             = 0x2D01
+const ITEM_EARRINGS             = 0x2E01
+const ITEM_BROACH               = 0x2F01
+
+const ITEM_WEEDS                = 0x3001
+const ITEM_STONES               = 0x3101
+const ITEM_BRANCHES             = 0x3201
+
+const ITEM_RECIPE_FRENCH_FRIES  = 0x3301
+const ITEM_RECIPE_KETCHUP       = 0x3401
+
+const ITEM_BALL                 = 0x3501
+const ITEM_PIRATE_TREASURE      = 0x3601
+const ITEM_FOSSIL_ANCIENT_FISH  = 0x3701
+const ITEM_EMPTY_CAN            = 0x3801
+const ITEM_BOOTS                = 0x3901
+const ITEM_FISH_BONES           = 0x3A01
+
+const ITEM_KARENS_WINE          = 0x3B01
+const ITEM_POPURIS_MUD_BALL     = 0x3C01
+const ITEM_ANNS_MUSIC_BOX       = 0x3D01
+const ITEM_MARYS_GREAT_BOOK     = 0x3E01
+const ITEM_ELLIS_PRESSED_FLOWER = 0x3F01
+
+const ITEM_ALBUM_1              = 0x4001
+const ITEM_ALBUM_2              = 0x4101
+const ITEM_ALBUM_3              = 0x4201
+const ITEM_ALBUM_4              = 0x4301
+const ITEM_ALBUM_5              = 0x4401
+const ITEM_ALBUM_6              = 0x4501
+const ITEM_ALBUM_7              = 0x4601
+const ITEM_ALBUM_8              = 0x4701
+const ITEM_ALBUM_9              = 0x4801
+const ITEM_ALBUM_10             = 0x4901
+
+const ITEM_BAND_AID             = 0x4F01
+const ITEM_BOOK_HARVEST_GODDESS = 0x5001
+const ITEM_PERFUME              = 0x5101
+const ITEM_PHOTO                = 0x5201
+const ITEM_PLANT_ENCYCLOPEDIA   = 0x5301
+const ITEM_INVITATION           = 0x5401
+const ITEM_DRESS                = 0x5501
+const ITEM_FACIAL_PACK          = 0x5601
+const ITEM_SKIN_LOTION          = 0x5701
+const ITEM_SUNBLOCK             = 0x5801
+const ITEM_LUMBER               = 0x5901
+const ITEM_GOLDEN_LUMBER        = 0x5A01
+const ITEM_ANIMAL_FODDER        = 0x5B01
+const ITEM_CHICKEN_FEED         = 0x5C01
+const ITEM_CERTIFICATE          = 0x5D01
+const ITEM_FRISBEE              = 0x5E01
+// ==========================================
+// Fin de la definición
+// ==========================================
+

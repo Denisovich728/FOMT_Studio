@@ -84,7 +84,7 @@ class ProjectLoaderThread(QThread):
 class FoMTStudioApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("FoMT Studio - The Master Suite")
+        self.setWindowTitle("FoMT Studio v1.5.0 - The Mineral Town Expansion")
         self.resize(1024, 768)
         
         self.project = None
@@ -333,6 +333,8 @@ class FoMTStudioApp(QMainWindow):
         """Inicializa la estructura de la UI al detectar la ROM (Paso 2)."""
         self.tabs.clear()
         self.tree_model.clear()
+        self.tile_viewer = None
+        self.audio_viewer = None
         proj_label = tr("explorer_proj", self.current_lang).format(name=self.project.name)
         self.tree_model.setHorizontalHeaderLabels([proj_label])
         
@@ -381,6 +383,7 @@ class FoMTStudioApp(QMainWindow):
         self.tabs.addTab(self.visual_maker, tr("tab_visual", self.current_lang))
         
         self.map_editor = MapEditorWidget(self)
+        self.map_editor.project = self.project
         self.tabs.addTab(self.map_editor, tr("tab_maps", self.current_lang))
 
         # Conectar navegación
@@ -448,12 +451,34 @@ class FoMTStudioApp(QMainWindow):
 
         elif step == 4: # Audio (Sappy)
             self.cat_audio.removeRows(0, self.cat_audio.rowCount())
-            for i, song in enumerate(self.project.songs):
-                name = song.get('name', f"Song_{i}")
-                item = QStandardItem(f"[{i:03d}] {name}")
+            
+            # Cargar nombres de sonidos para el árbol
+            import json as _json
+            _snd_names = {}
+            _snd_path = "Nucleos_de_Procesamiento/Listas_de_Nombres/sonidos.json"
+            if os.path.exists(_snd_path):
+                with open(_snd_path, 'r', encoding='utf-8') as _f:
+                    _snd_names = _json.load(_f)
+            
+            sappy = self.project.sappy_engine
+            cat_icons = {
+                "BGM": "🎵", "AMBIENT": "🌧", "UNUSED": "⚠",
+                "SFX": "🔊", "TITLE": "🎬", "UNKNOWN": "❓",
+            }
+            
+            for song in self.project.songs:
+                sid = song['id']
+                cat = song.get('category', 'UNKNOWN')
+                icon = cat_icons.get(cat, "")
+                s_name = _snd_names.get(str(sid), song.get('name', f"Song_{sid}"))
+                item = QStandardItem(f"[{sid:03d}] {icon} {s_name}")
                 item.setData("AUDIO", Qt.ItemDataRole.UserRole + 1)
-                item.setData(i, Qt.ItemDataRole.UserRole)
+                item.setData(sid, Qt.ItemDataRole.UserRole)
                 self.cat_audio.appendRow(item)
+            
+            total = len(self.project.songs)
+            unused = len(sappy.get_songs_by_category("UNUSED"))
+            self.cat_audio.setText(f"{tr('tab_audio', self.current_lang)} ({total} tracks, {unused} unused)")
             
             # Inicializar Visor de Audio si no existe
             if not self.audio_viewer:
@@ -490,11 +515,14 @@ class FoMTStudioApp(QMainWindow):
             
         elif type == "MAP":
             map_id = val
-            map_header = self.project.map_parser.maps[map_id]
-            if self.map_editor:
+            # Buscar por map_id (no usar como índice directo)
+            map_header = self.project.map_parser.get_map_by_id(map_id)
+            if map_header and self.map_editor:
+                self.map_editor.project = self.project
                 self.map_editor.load_map(map_header)
                 self.tabs.setCurrentWidget(self.map_editor)
-                self.status.showMessage(f"Map Loaded: {map_id:03d}")
+                m_name = self.project.super_lib.get_map_name_hint(map_id)
+                self.status.showMessage(f"Mapa {map_id:03d} cargado — {m_name}")
                 
         elif type == "GRAPHIC":
             offset = val
@@ -504,11 +532,16 @@ class FoMTStudioApp(QMainWindow):
                 self.status.showMessage(f"Graphic Bank Loaded: 0x{offset:06X}")
                 
         elif type == "AUDIO":
-            song_idx = val
+            song_id = val
             if self.audio_viewer:
                 self.tabs.setCurrentWidget(self.audio_viewer)
-                self.audio_viewer.song_list.setCurrentRow(song_idx)
-                self.status.showMessage(f"Audio Track Selected: {song_idx:03d}")
+                # Buscar el item correcto en la lista filtrada por song_id
+                for row in range(self.audio_viewer.song_list.count()):
+                    item = self.audio_viewer.song_list.item(row)
+                    if item and item.data(Qt.ItemDataRole.UserRole) == song_id:
+                        self.audio_viewer.song_list.setCurrentRow(row)
+                        break
+                self.status.showMessage(f"Audio Track Selected: 0x{song_id:02X} (dec: {song_id})")
 
     def _on_shortcut_event_up(self):
         self._navigate_event(-1)

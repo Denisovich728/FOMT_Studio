@@ -10,7 +10,6 @@ from Nucleos_de_Procesamiento.Nucleo_de_Eventos.npcs import NpcParser
 from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.tiendas import ShopParser
 from Nucleos_de_Procesamiento.Nucleo_de_Eventos.horarios import ScheduleParser
 from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.mapas import MapParser
-from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.descompresor import descomprimir_rom
 from Nucleos_de_Procesamiento.Nucleo_de_Sonido.motor_sappy import SappyParser
 from Nucleos_de_Procesamiento.Nucleo_de_Datos.gestor_memoria import MemoryManager
 
@@ -89,11 +88,9 @@ class FoMTProject:
         return len(self.songs)
 
     def create_new(self, rom_path, proj_dir):
-        """Legacy wrapper - ahora redirige a los steps."""
+        """Inicialización de un nuevo proyecto.
+        Delega los escaneos pesados al ProjectLoaderThread para evitar congelamiento de UI."""
         self.step_1_detect_rom(rom_path, proj_dir)
-        self.step_2_scan_events()
-        self.step_3_scan_graphics()
-        self.step_4_scan_audio()
         self.save()
 
     def load(self, fsp_path):
@@ -160,15 +157,26 @@ class FoMTProject:
 
     def write_patch(self, offset, data: bytes):
         """Registra un cambio en la memoria virtual del proyecto .fsp."""
-        # Se guarda entero en el diccionario, la compilacion lo volcará a la ROM.
         self.patches[offset] = data
-        
-    def decompress(self, offset):
-        """Usa el nuevo Nucleo de Imagenes / Descompresor centralizado."""
-        return descomprimir_rom(self, offset)
+
+    # write_bytes es el alias esperado por save_warps_to_rom y MapHeader
+    def write_bytes(self, offset: int, data: bytes):
+        """
+        Escribe bytes en la capa virtual de parches.
+        Los cambios no tocan la ROM base hasta que se llama compile_to_rom().
+        """
+        self.patches[offset] = data
+
+    def decompress(self, offset: int) -> bytes:
+        """
+        Descomprime desde la ROM usando el motor BlueSpider (LZ77/Popuri).
+        Reemplaza al viejo descomprimir_rom que producía basura.
+        """
+        from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.mapas import decompress_auto
+        return decompress_auto(self.base_rom_data, offset)
 
     def compile_to_rom(self, export_path):
-        """Aplica todos los parches virtuales a la ROM base y exporta un nuevo archivo GBA"""
+        """Aplica todos los parches virtuales a la ROM base y exporta un archivo GBA."""
         shutil.copy2(self.base_rom_path, export_path)
         with open(export_path, "r+b") as f:
             for offset, patch_data in self.patches.items():

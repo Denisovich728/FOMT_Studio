@@ -3,11 +3,11 @@ from Perifericos.Traducciones.i18n import tr
 
 # Intenta importar el núcleo copiado de porpurri (siendo ya una suite nativa y modular)
 try:
-    from fomt_studio.core.parsers.porpurri_engine.bytecode.decoder import decode_script, disassemble, get_code_jumps
-    from fomt_studio.core.parsers.porpurri_engine.ir import *
-    from fomt_studio.core.parsers.porpurri_engine.decompiler.ins_decompiler import decompile_instructions
-    from fomt_studio.core.parsers.porpurri_engine.decompiler.formatter import format_script
-    from fomt_studio.core.parsers.porpurri_engine.decompiler.decorator import decorate_stmts_with_strings
+    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.porpurri_engine.bytecode.decoder import decode_script, disassemble, get_code_jumps
+    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.porpurri_engine.ir import *
+    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.porpurri_engine.decompiler.ins_decompiler import decompile_instructions
+    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.porpurri_engine.decompiler.formatter import format_script
+    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.porpurri_engine.decompiler.decorator import decorate_stmts_with_strings
 except ImportError as e:
     # Fallback o Dummy temporal en caso de no correr en un módulo correctamente linkeado
     pass
@@ -95,11 +95,12 @@ class FoMTEventParser:
             if event_id is not None:
                 self.scanned_sizes[event_id] = riff_len
             
+            lib_name = "lib_mfomt.txt" if self.project.is_mfomt else "lib_fomt.txt"
             output = [
                 f"// Porpurri Core Decompiler Output",
                 f"// Offset: 0x{script_off:08X} | Hint: {hint or 'Unknown'}",
                 f"// =========================================\n",
-                f"#include \"lib_fomt.txt\"\n",
+                f"#include \"{lib_name}\"\n",
                 f"script {event_id if event_id is not None else 'ROM'} {hint or 'Script'} {{"
             ]
             

@@ -31,6 +31,7 @@ class Npc:
         bachelors = ["Cliff", "Doctor", "Kai", "Gray", "Rick"]
         sprites = ["Chef", "Nappy", "Hoggy", "Bold", "Staid", "Aqua", "Timmid"]
         
+        suffix = " (MFoMT)" if is_mfomt else " (FoMT)"
         if any(b.lower() in name.lower() for b in bachelorettes):
             return "role_bachelorette" if not is_mfomt else "role_rival"
         if any(b.lower() in name.lower() for b in bachelors):
@@ -56,14 +57,22 @@ class Npc:
 
     def get_translated_role(self, lang='es'):
         """ Returns the translated role based on the current language. """
-        return tr(self.role_key, lang)
+        is_mfomt = self.parser.project.is_mfomt
+        suffix = " (MFoMT)" if is_mfomt else " (FoMT)"
+        base_role = tr(self.role_key, lang)
+        # Avoid double suffix if the UI uses get_translated_role
+        if suffix not in base_role:
+            return base_role + suffix
+        return base_role
 
 class NpcParser:
     """ Parser minimalista que sigue la lógica de punteros por delimitación. """
     def __init__(self, project):
         self.project = project
         self.npcs = []
-        self.npc_table_off = 0x104270 # Tabla principal de personajes
+        is_mfomt = getattr(self.project, 'is_mfomt', False)
+        delta = 0 if not is_mfomt else 0x2BD58
+        self.npc_table_off = 0x104270 + delta # Tabla principal de personajes
         
     def scan_npcs(self):
         self.npcs = []
