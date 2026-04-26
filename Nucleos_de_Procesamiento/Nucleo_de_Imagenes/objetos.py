@@ -19,18 +19,20 @@ class BaseItem:
         if not hasattr(self, 'name_ptr') or self.name_ptr == 0:
             return
             
-        real_offset = self.name_ptr & 0x01FFFFFF
-        max_len = len(self.name_str.encode('windows-1252', errors='replace'))
-        encoded = new_name.encode('windows-1252', errors='ignore')
+        # Codificar nuevo nombre
+        encoded = new_name.encode('windows-1252', errors='replace') + b'\x00'
         
-        if len(encoded) > max_len:
-            encoded = encoded[:max_len]
-        else:
-            # Rellenar con nulos si es más corto para no dejar rastros del nombre anterior
-            encoded += b'\x00' * (max_len - len(encoded))
-            
-        self.parser.project.write_patch(real_offset, encoded)
-        self.name_str = encoded.decode('windows-1252').strip('\x00')
+        # Paso 1: Asignar espacio libre alineado a 4 bytes de forma centralizada
+        new_offset = self.parser.project.allocate_free_space(len(encoded))
+        self.parser.project.write_patch(new_offset, encoded)
+        
+        # Paso 2: Actualizar el puntero en la estructura del Item (Capa Virtual)
+        # El name_ptr es el primer campo (4 bytes) en GenericItem y FoodItem
+        gba_ptr = struct.pack("<I", new_offset | 0x08000000)
+        self.parser.project.write_patch(self.base_offset, gba_ptr)
+        
+        self.name_str = new_name
+        self.name_ptr = new_offset | 0x08000000
         
     def save_sell_price(self, new_price):
         if not self.product_offset: return
@@ -144,7 +146,7 @@ class ItemParser:
         return table_idx & 0x01FFFFFF
 
     def _anchor_hunt_item_tables(self):
-        """ Escáner principal estilo Porpurri Dinámico """
+        """ Escáner principal estilo SlipSpace_Engine Dinámico """
         # Tool ID 0 es siempre Iron Sickle
         tools_found = self._find_table_anchor(b"Iron Sickle\0", 12)
         if tools_found: self.tools_off = tools_found

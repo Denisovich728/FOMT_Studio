@@ -10,6 +10,16 @@ from PyQt6.QtWidgets import QApplication
 from Perifericos.Interfaz_Usuario.app import FoMTStudioApp
 
 def main():
+    # Evitar bucle infinito en versión compilada:
+    # Si detectamos argumentos del monitor, ejecutamos el monitor y salimos.
+    if len(sys.argv) > 1 and ("monitor.py" in sys.argv[1] or "--pid" in sys.argv):
+        from Perifericos.Gestor_Errores.monitor import main as monitor_main
+        # Ajustar sys.argv para que argparse en monitor.py funcione correctamente
+        if "monitor.py" in sys.argv[1]:
+            sys.argv.pop(1)
+        monitor_main()
+        return
+
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     

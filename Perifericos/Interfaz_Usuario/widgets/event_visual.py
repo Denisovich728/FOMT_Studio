@@ -8,7 +8,7 @@ from Perifericos.Traducciones.i18n import tr
 class VisualEventMaker(QWidget):
     """
     VisualEventMaker proporciona una representación visual en formato "RPG Maker XP".
-    Traduce el C++ puro extraído del Engine Porpurri a bloques apilados,
+    Traduce el C++ puro extraído del Engine SlipSpace_Engine a bloques apilados,
     usando colores semánticos pedidos por el usuario.
     """
     def __init__(self, project, parent=None):
@@ -52,9 +52,9 @@ class VisualEventMaker(QWidget):
             if widget:
                 widget.setParent(None)
                 
-        # Dependemos de fomt_studio.core.parsers.porpurri_engine.decompiler.formatter para el text-pass
+        # Dependemos de fomt_studio.core.parsers.SlipSpace_Script_Engine.decompiler.formatter para el text-pass
         try:
-            from fomt_studio.core.parsers.porpurri_engine.decompiler.formatter import format_script
+            from fomt_studio.core.parsers.SlipSpace_Script_Engine.decompiler.formatter import format_script
             c_code = format_script(stmts)
         except Exception as e:
             err = QLabel(f"Error generando visual: {e}")

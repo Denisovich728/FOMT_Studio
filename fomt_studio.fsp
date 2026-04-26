@@ -1,0 +1,8 @@
+{
+    "name": "fomt_studio",
+    "base_rom": "D:/Repositorios/Modded_FoMT2.gba",
+    "version": "Harvest Moon FoMT",
+    "is_mfomt": false,
+    "next_free_space": 7717460,
+    "patches": {}
+}

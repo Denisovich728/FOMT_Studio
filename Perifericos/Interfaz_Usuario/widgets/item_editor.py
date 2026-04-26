@@ -34,6 +34,12 @@ class ItemEditorWidget(QWidget):
         self.combo_filter.addItem(tr("cat_article", lang), "Artículo/Semilla")
         self.combo_filter.currentTextChanged.connect(self.filter_data)
         
+        from PyQt6.QtWidgets import QLineEdit
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText(tr("hint_search_item", lang))
+        self.search_bar.textChanged.connect(self.filter_data)
+        self.search_bar.setMinimumWidth(200)
+        
         self.btn_refresh = QPushButton(tr('btn_reload', lang))
         self.btn_refresh.clicked.connect(self.load_data)
         
@@ -43,6 +49,7 @@ class ItemEditorWidget(QWidget):
         
         toolbar.addWidget(self.lbl)
         toolbar.addWidget(self.combo_filter)
+        toolbar.addWidget(self.search_bar) # Nueva barra de búsqueda
         toolbar.addStretch()
         toolbar.addWidget(self.btn_refresh)
         toolbar.addWidget(self.btn_save)
@@ -56,8 +63,8 @@ class ItemEditorWidget(QWidget):
         
         # Opciones visuales
         self.table.setAlternatingRowColors(True)
-        # Asignar delegado para conteo de nombres
-        self.delegate = NameEditDelegate(self)
+        # Asignar delegado SIN LÍMITE para ítems (como pidió el usuario)
+        self.delegate = NameEditDelegate(self, max_limit=None)
         self.table.setItemDelegateForColumn(2, self.delegate)
         
         layout.addWidget(self.table)
@@ -80,15 +87,22 @@ class ItemEditorWidget(QWidget):
             tr('col_stamina', lang), tr('col_fatigue', lang), tr('col_icon', lang)
         ])
         
-        # Obtener el data (key interno) del combo
+        # Filtros
         idx = self.combo_filter.currentIndex()
-        filtro = self.combo_filter.itemData(idx)
+        filtro_cat = self.combo_filter.itemData(idx)
+        search_text = self.search_bar.text().lower()
         
         for i, itm in enumerate(self.items):
-            if filtro and itm.category != filtro:
+            # Filtro por categoría
+            if filtro_cat and itm.category != filtro_cat:
                 continue
-                
+            
             stats = getattr(itm, "read_stats", lambda c: {})(itm.category)
+            nombre = stats.get('Nombre', '').strip('\x00')
+            
+            # Filtro por búsqueda de texto
+            if search_text and search_text not in nombre.lower():
+                continue
             
             # Mapeo de categorías para mostrar traducidas
             cat_map = {
@@ -107,7 +121,6 @@ class ItemEditorWidget(QWidget):
             c_name = QStandardItem(clean_name)
             # ¡Habilitar edición de nombre!
             c_name.setEditable(True)
-            c_name.setData(stats.get('max_len', 10), Qt.ItemDataRole.UserRole + 2) # Guardar limite para el delegado
             
             # Solo artículos y comidas cruzaron con product_info para tener precios:
             price = stats.get('Preción (G)', 0)

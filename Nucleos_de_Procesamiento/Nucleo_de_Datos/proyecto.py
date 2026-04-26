@@ -29,6 +29,7 @@ class FoMTProject:
         
         # Virtual Memory Patches: keys are ROM addresses, values are bytes
         self.patches = {}
+        self.next_free_space = 0x75C254 # Inicio del espacio libre verificado en FoMT (Después de Thomas)
         
         self.super_lib = None
         self.memory = MemoryManager(self) 
@@ -50,6 +51,8 @@ class FoMTProject:
             
         with open(self.base_rom_path, "rb") as f:
             self.base_rom_data = f.read()
+            # Memoria Virtual: Un buffer que contiene la ROM + parches aplicados
+            self.virtual_rom = bytearray(self.base_rom_data)
             
         header = self.base_rom_data[0:0xC0]
         game_name = header[0xA0:0xAC]
@@ -64,6 +67,11 @@ class FoMTProject:
             
         self.super_lib = SuperLibrary(self.is_mfomt)
         self.memory = MemoryManager(self)
+        
+        # Aplicar parches existentes (si estamos cargando un .fsp)
+        for offset, data in self.patches.items():
+            self.virtual_rom[offset : offset + len(data)] = data
+            
         return self.game_version
 
     def step_2_scan_events(self):
@@ -88,31 +96,57 @@ class FoMTProject:
         return len(self.songs)
 
     def create_new(self, rom_path, proj_dir):
-        """Inicialización de un nuevo proyecto.
-        Delega los escaneos pesados al ProjectLoaderThread para evitar congelamiento de UI."""
-        self.step_1_detect_rom(rom_path, proj_dir)
+        """
+        Inicialización de un nuevo proyecto con aislamiento.
+        Crea una copia de la ROM (volcado) en la carpeta del proyecto.
+        Cualquier cambio posterior se guarda en el .fsp (capa virtual).
+        """
+        if not os.path.exists(proj_dir):
+            os.makedirs(proj_dir)
+            
+        # 1. Volcado entero del hex (Copia de seguridad local)
+        self.name = os.path.basename(proj_dir)
+        local_rom_name = "source.gba"
+        local_rom_path = os.path.join(proj_dir, local_rom_name)
+        
+        shutil.copy2(rom_path, local_rom_path)
+        
+        # 2. Configurar el proyecto para usar esta copia local
+        self.project_dir = proj_dir
+        self.base_rom_path = local_rom_path
+        
+        # 3. Identificación y carga inicial
+        self.step_1_detect_rom(local_rom_path, proj_dir)
+        
+        # 4. Guardar archivo de proyecto inicial (.fsp)
         self.save()
 
     def load(self, fsp_path):
-        """Carga básica del proyecto sin escaneos pesados inmediatos."""
-        import json
+        """Carga el proyecto desde un archivo .fsp."""
         with open(fsp_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
         self.name = data.get("name", "UnknownPatch")
-        self.base_rom_path = data.get("base_rom", "")
+        # Priorizamos la ROM local si existe
         self.project_dir = os.path.dirname(fsp_path)
+        local_rom_path = os.path.join(self.project_dir, "source.gba")
+        
+        if os.path.exists(local_rom_path):
+            self.base_rom_path = local_rom_path
+        else:
+            self.base_rom_path = data.get("base_rom", "")
+            
         self.game_version = data.get("version", "Unknown")
         self.is_mfomt = data.get("is_mfomt", False)
         
         saved_patches = data.get("patches", {})
         self.patches = {int(k): bytes.fromhex(v) for k,v in saved_patches.items()}
+        self.next_free_space = data.get("next_free_space", 0x75C244)
         
         if not os.path.exists(self.base_rom_path):
-            raise FileNotFoundError(f"No se encontró la ROM base original: {self.base_rom_path}")
+            raise FileNotFoundError(f"No se encontró la ROM base del proyecto: {self.base_rom_path}")
             
-        # El resto de la carga se hace vía steps para permitir barra de progreso
-        return self.step_1_detect_rom(self.base_rom_path)
+        return self.step_1_detect_rom(self.base_rom_path, self.project_dir)
 
     def save(self):
         fsp_path = os.path.join(self.project_dir, f"{self.name}.fsp")
@@ -125,6 +159,7 @@ class FoMTProject:
             "base_rom": self.base_rom_path,
             "version": self.game_version,
             "is_mfomt": self.is_mfomt,
+            "next_free_space": self.next_free_space,
             "patches": serial_patches
         }
         
@@ -132,40 +167,22 @@ class FoMTProject:
             json.dump(data, f, indent=4)
             
     def read_rom(self, offset, size):
-        """
-        Lee bytes del proyecto. Si hay un parche VIRTUAL allí, retorna el parche, 
-        de lo contrario lee de la Base ROM.
-        """
-        # Para simplificar en esta v1, si alguna parte de [offset : offset+size] está cacheada,
-        # ensamblamos la mezcla.
-        with open(self.base_rom_path, "rb") as f:
-            f.seek(offset)
-            base_data = bytearray(f.read(size))
-            
-        # Overlap pathes
-        for p_offset, p_bytes in self.patches.items():
-            if p_offset >= offset and p_offset < offset + size:
-                rel = p_offset - offset
-                p_len = min(len(p_bytes), size - rel)
-                base_data[rel : rel + p_len] = p_bytes[:p_len]
-            elif p_offset < offset and p_offset + len(p_bytes) > offset:
-                rel = offset - p_offset
-                w_len = min(len(p_bytes) - rel, size)
-                base_data[0 : w_len] = p_bytes[rel : rel + w_len]
-                
-        return bytes(base_data)
+        """Lee directamente del buffer de memoria virtual (Base + Parches)."""
+        if not hasattr(self, 'virtual_rom'):
+            return self.base_rom_data[offset : offset + size]
+        return bytes(self.virtual_rom[offset : offset + size])
 
     def write_patch(self, offset, data: bytes):
-        """Registra un cambio en la memoria virtual del proyecto .fsp."""
+        """Registra un cambio en la memoria virtual del proyecto."""
+        # 1. Guardar en la lista de parches (para el JSON del .fsp)
         self.patches[offset] = data
+        # 2. Sincronizar el buffer de memoria virtual para lecturas inmediatas
+        if hasattr(self, 'virtual_rom'):
+            self.virtual_rom[offset : offset + len(data)] = data
 
     # write_bytes es el alias esperado por save_warps_to_rom y MapHeader
     def write_bytes(self, offset: int, data: bytes):
-        """
-        Escribe bytes en la capa virtual de parches.
-        Los cambios no tocan la ROM base hasta que se llama compile_to_rom().
-        """
-        self.patches[offset] = data
+        self.write_patch(offset, data)
 
     def decompress(self, offset: int) -> bytes:
         """
@@ -177,8 +194,45 @@ class FoMTProject:
 
     def compile_to_rom(self, export_path):
         """Aplica todos los parches virtuales a la ROM base y exporta un archivo GBA."""
+        # Evitar copiar sobre sí mismo si el usuario elige source.gba por error
+        if os.path.abspath(self.base_rom_path) == os.path.abspath(export_path):
+            # No necesitamos copiar, solo escribir los parches (aunque es peligroso)
+            # Pero para seguridad del usuario, lanzamos error
+            raise PermissionError("No puedes exportar sobre la ROM base del proyecto (source.gba). Elige otro nombre.")
+            
         shutil.copy2(self.base_rom_path, export_path)
         with open(export_path, "r+b") as f:
             for offset, patch_data in self.patches.items():
                 f.seek(offset)
                 f.write(patch_data)
+
+    def allocate_free_space(self, size):
+        """
+        Asigna un bloque de memoria alineado a 4 bytes.
+        Retorna el offset de inicio alineado.
+        """
+        # Asegurar que el inicio esté alineado a 4 bytes (multiplo de 4)
+        start_offset = (self.next_free_space + 3) & ~3
+        # El puntero del proyecto se mueve al final del bloque asignado, también alineado
+        self.next_free_space = start_offset + ((size + 3) & ~3)
+        return start_offset
+
+    def overwrite_rom_directly(self, offset: int, data: bytes):
+        """
+        ¡PELIGRO!: Escribe directamente en el archivo ROM base.
+        Útil para pruebas rápidas cuando el juego no está comprimido.
+        También actualiza el buffer en memoria para consistencia.
+        """
+        # 1. Escribir en el archivo físico
+        with open(self.base_rom_path, "r+b") as f:
+            f.seek(offset)
+            f.write(data)
+            
+        # 2. Sincronizar buffer en memoria
+        if self.base_rom_data:
+            # Los bytes en Python son inmutables, reconstruimos el buffer
+            ba = bytearray(self.base_rom_data)
+            ba[offset : offset + len(data)] = data
+            self.base_rom_data = bytes(ba)
+            
+        print(f"Direct Overwrite: 0x{offset:08X} -> {len(data)} bytes escritos en la ROM base.")

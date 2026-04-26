@@ -1,0 +1,310 @@
+Type,Hex_ID,Decimal_ID,Name,Arguments
+proc,0x002,2,Set_Entity_Position,"which_entity, x, y, facing"
+func,0x003,3,Get_Entity_X,which_entity
+func,0x004,4,Get_Entity_Y,which_entity
+proc,0x005,5,Set_Entit_y_Facing,"which_entity, facing"
+func,0x006,6,Get_Entity_Facing,which_entity
+proc,0x007,7,Proc007,"arg_1, arg_2"
+proc,0x008,8,Proc008,"arg_1, arg_2, arg_3"
+proc,0x009,9,Proc009,"arg_1, arg_2, arg_3"
+proc,0x00A,10,Proc00A,"arg_1, arg_2, arg_3"
+proc,0x00B,11,Proc00B,"arg_1, arg_2, arg_3"
+proc,0x00C,12,Proc00C,arg_1
+proc,0x00D,13,SetEntityAnim,"which_entity, arg_2"
+proc,0x00F,15,Proc00F,arg_1
+proc,0x010,16,Proc010,"arg_1, arg_2"
+proc,0x011,17,Proc011,"arg_1, arg_2, arg_3"
+proc,0x012,18,Proc012,arg_1
+func,0x013,19,GetOppositeFacing,facing
+func,0x014,20,GetEntityLocation,arg_1
+proc,0x015,21,Proc015,"arg_1, arg_2, arg_3"
+proc,0x016,22,Proc016,"arg_1, arg_2, arg_3"
+proc,0x017,23,Proc017,"arg_1, arg_2, arg_3"
+proc,0x018,24,Proc018,
+proc,0x019,25,PlayBGM,"arg_1, arg_2"
+proc,0x01A,26,StopBGM,
+proc,0x01B,27,PlaySong,"arg_1, arg_2"
+proc,0x01C,28,StopAllSongs,
+proc,0x01D,29,FadeOutBGM,
+proc,0x01F,31,TalkOpen,
+proc,0x020,32,TalkClose,
+proc,0x021,33,TalkMessage,arg_1: string
+proc,0x022,34,TalkMessageSlow,arg_1: string
+proc,0x023,35,Print_Message,arg_1: string
+func,0x024,36,Func025,"arg_1: string, arg_2: string, arg_3: string"
+func,0x026,38,Func027,"arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string"
+func,0x027,39,TalkChoice2,"arg_1: string, arg_2: string"
+func,0x028,40,TalkChoice3,"arg_1: string, arg_2: string, arg_3: string"
+func,0x029,41,TalkChoice4,"arg_1: string, arg_2: string, arg_3: string, arg_4: string"
+func,0x02A,42,TalkChoice5,"arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string"
+func,0x02B,43,TalkChoice6,"arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string, arg_6: string"
+proc,0x02C,44,Proc02D,arg_1
+proc,0x02D,45,Proc02E,arg_1: string
+proc,0x02E,46,Proc02F,
+proc,0x02F,47,Proc030,arg_1
+proc,0x030,48,Proc031,
+proc,0x031,49,Proc032,arg_1
+proc,0x033,51,Proc034,"arg_1, arg_2"
+proc,0x034,52,Proc035,"arg_1, arg_2"
+proc,0x035,53,Proc036,"arg_1, arg_2"
+proc,0x036,54,Proc037,arg_1
+proc,0x037,55,Proc038,arg_1
+proc,0x038,56,Proc039,"arg_1, arg_2"
+proc,0x039,57,Proc03A,"arg_1, arg_2, arg_3"
+proc,0x03A,58,Proc03B,"arg_1, arg_2: string"
+func,0x03C,60,Func03D,"arg_1, arg_2"
+func,0x03D,61,Check_Flag,arg_1
+proc,0x03E,62,Set_Flag,"Flag_Dir, Valor_NVO"
+func,0x03F,63,Inventory_Check,
+func,0x040,64,Func041,
+func,0x041,65,Func042,
+func,0x042,66,Func043,
+func,0x043,67,Func044,
+func,0x044,68,Func045,
+proc,0x045,69,Proc046,
+proc,0x046,70,Proc047,
+proc,0x047,71,Proc048,arg_1
+proc,0x048,72,Give_Item,arg_1
+proc,0x049,73,Proc04A,arg_1
+proc,0x04A,74,Proc04B,arg_1
+func,0x04B,75,Func04C,
+func,0x04C,76,Func04D,
+proc,0x04D,77,Proc04E,
+func,0x04E,78,Func04F,
+func,0x04F,79,Func050,
+proc,0x050,80,Proc051,"arg_1, arg_2"
+proc,0x051,81,Proc052,
+func,0x052,82,Func053,arg_1
+func,0x053,83,Func054,arg_1
+proc,0x054,84,Proc055,arg_1
+func,0x055,85,Func056,
+func,0x056,86,Func057,
+func,0x058,88,Func059,"arg_1, arg_2"
+func,0x059,89,Func05A,"arg_1, arg_2"
+proc,0x05A,90,Proc05B,arg_1
+proc,0x05B,91,Proc05C,"arg_1, arg_2"
+func,0x05C,92,Func05D,
+func,0x05D,93,Func05E,arg_1
+func,0x05F,95,Func060,arg_1
+proc,0x060,96,Proc061,arg_1
+proc,0x061,97,Proc062,
+proc,0x062,98,Proc063,
+func,0x063,99,Func064,
+proc,0x064,100,Proc065,
+proc,0x065,101,Proc066,
+proc,0x066,102,Proc067,
+proc,0x067,103,Proc068,
+func,0x068,104,Func069,
+proc,0x069,105,Proc06A,
+proc,0x06A,106,Proc06B,
+proc,0x06B,107,Proc06C,
+func,0x06C,108,Func06D,
+func,0x06D,109,Func06E,
+func,0x06E,110,Func06F,
+func,0x070,112,Func071,arg_1
+proc,0x072,114,Proc073,
+func,0x073,115,Func074,
+proc,0x074,116,Proc075,
+proc,0x076,118,Proc077,arg_1
+func,0x077,119,Func07A,arg_1
+func,0x078,120,Func07B,arg_1
+proc,0x079,121,Proc07C,arg_1
+proc,0x07A,122,Proc07D,arg_1
+func,0x07B,123,Func07E,arg_1
+func,0x07C,124,Chek_Friendship_Points,arg_1
+proc,0x07D,125,Proc080,"arg_1, arg_2"
+proc,0x07E,126,Proc081,"arg_1, arg_2"
+func,0x07F,127,Func082,arg_1
+proc,0x080,128,Proc083,arg_1
+func,0x081,129,Func084,arg_1
+func,0x082,130,Func085,arg_1
+func,0x083,131,Func086,arg_1
+proc,0x084,132,Proc087,arg_1
+func,0x085,133,Func088,arg_1
+func,0x086,134,Chek_Love_Points,arg_1
+proc,0x087,135,Give_Love_Points,"direccion, cantidad"
+proc,0x089,137,Proc08C,"arg_1, arg_2"
+proc,0x08A,138,Proc08D,arg_1
+proc,0x08B,139,Proc08E,
+proc,0x08C,140,Proc08F,arg_1
+proc,0x08D,141,Proc090,
+proc,0x08E,142,Proc091,
+proc,0x08F,143,Proc092,
+proc,0x090,144,Proc093,
+proc,0x091,145,Proc094,
+proc,0x092,146,Proc095,
+proc,0x093,147,Proc096,
+proc,0x094,148,Proc097,
+proc,0x095,149,Proc098,
+proc,0x096,150,Proc099,
+proc,0x097,151,Proc09A,
+proc,0x098,152,Proc09B,arg_1
+proc,0x099,153,Proc09C,
+proc,0x09A,154,Proc09D,
+proc,0x09B,155,Proc09E,
+proc,0x09C,156,Proc09F,
+proc,0x09D,157,Proc0A0,
+proc,0x09E,158,Proc0A1,
+proc,0x09F,159,Proc0A2,
+proc,0x0A0,160,Proc0A3,
+proc,0x0A1,161,Proc0A4,
+func,0x0A2,162,Func0A5,
+proc,0x0A3,163,Proc0A6,"arg_1, arg_2"
+proc,0x0A4,164,Proc0A7,
+proc,0x0A5,165,Proc0A8,
+proc,0x0A6,166,Proc0A9,arg_1
+func,0x0A7,167,Func0AA,arg_1
+proc,0x0A8,168,Proc0AB,
+proc,0x0A9,169,Proc0AC,arg_1
+proc,0x0AA,170,Proc0AD,
+proc,0x0AB,171,Proc0AE,
+proc,0x0AC,172,Proc0AF,
+proc,0x0AD,173,Proc0B0,
+proc,0x0AE,174,Proc0B1,
+proc,0x0AF,175,Proc0B2,
+func,0x0B0,176,Func0B3,
+func,0x0B1,177,Func0B4,arg_1
+func,0x0B2,178,Func0B5,
+proc,0x0B3,179,Proc0B6,arg_1
+func,0x0B4,180,Func0B7,arg_1
+proc,0x0B5,181,Proc0B8,arg_1
+func,0x0B6,182,Func0B9,
+func,0x0B7,183,Func0BA,arg_1
+proc,0x0B8,184,Proc0BB,arg_1
+proc,0x0B9,185,Proc0BC,arg_1
+func,0x0BA,186,Func0BD,arg_1
+func,0x0BB,187,Func0BE,
+func,0x0BC,188,Func0BF,arg_1
+func,0x0BD,189,Func0C0,arg_1
+func,0x0BE,190,Func0C1,arg_1
+proc,0x0BF,191,Proc0C2,arg_1
+proc,0x0C0,192,Proc0C3,
+func,0x0C1,193,Func0C4,
+func,0x0C2,194,Func0C5,arg_1
+func,0x0C3,195,Func0C6,arg_1
+proc,0x0C4,196,Proc0C7,
+proc,0x0C5,197,Proc0C8,
+func,0x0C6,198,Func0C9,
+proc,0x0C7,199,Proc0CA,arg_1
+proc,0x0C8,200,Proc0CB,arg_1
+proc,0x0C9,201,Proc0CC,
+proc,0x0CA,202,Proc0CD,
+func,0x0CB,203,Func0CE,arg_1
+func,0x0CC,204,Func0CF,arg_1
+func,0x0CD,205,Func0D0,"arg_1, arg_2"
+func,0x0CE,206,Func0D1,arg_1
+proc,0x0D0,208,Proc0D3,"arg_1, arg_2, arg_3"
+proc,0x0D1,209,Proc0D4,arg_1
+func,0x0D2,210,Func0D5,arg_1
+func,0x0D3,211,Func0D6,arg_1
+func,0x0D4,212,Func0D7,arg_1
+func,0x0D5,213,Func0D8,arg_1
+func,0x0D6,214,Func0D9,
+func,0x0D7,215,Func0DA,arg_1
+proc,0x0D8,216,Proc0DB,arg_1
+proc,0x0D9,217,Proc0DC,
+func,0x0DA,218,Func0DD,arg_1
+proc,0x0DB,219,Proc0DE,
+proc,0x0DC,220,Proc0DF,
+func,0x0DD,221,Func0E0,
+func,0x0DE,222,Chek_Envio,
+func,0x0DF,223,Func0E2,
+proc,0x0E0,224,Proc0E3,arg_1
+proc,0x0E1,225,Proc0E4,
+proc,0x0E2,226,Proc0E5,
+func,0x0E3,227,Func0E6,
+func,0x0E4,228,Func0E7,
+func,0x0E5,229,Func0E8,
+func,0x0E6,230,Func0E9,
+func,0x0E7,231,Func0EA,
+func,0x0E8,232,Func0EB,
+func,0x0E9,233,Func0EC,
+func,0x0EA,234,Func0ED,
+func,0x0EC,236,Check_Money,
+proc,0x0ED,237,Proc0F0,arg_1
+proc,0x0EE,238,Proc0F1,arg_1
+proc,0x0EF,239,Proc0F2,
+proc,0x0F0,240,Proc0F3,
+func,0x0F1,241,Func0F4,
+func,0x0F2,242,Func0F5,
+func,0x0F3,243,Func0F6,
+proc,0x0F4,244,Proc0F7,"arg_1, arg_2"
+func,0x0F5,245,Func0F8,arg_1
+func,0x0F6,246,Func0F9,arg_1
+proc,0x0F7,247,Proc0FA,arg_1
+proc,0x0F8,248,Proc0FB,arg_1
+func,0x0F9,249,Func0FC,
+func,0x0FA,250,Func0FD,
+func,0x0FB,251,Func0FE,arg_1: string
+proc,0x0FC,252,Proc0FF,arg_1
+proc,0x0FD,253,Proc100,
+proc,0x0FE,254,Proc101,
+func,0x0FF,255,Func102,"arg_1, arg_2"
+proc,0x100,256,Proc103,"arg_1, arg_2, arg_3, arg_4, arg_5"
+proc,0x101,257,Proc104,"arg_1, arg_2"
+proc,0x102,258,GetAnimalName,"string_slot, arg_2, arg_3"
+func,0x103,259,Func106,
+func,0x104,260,HasAnimalBeenTalkedTo,"arg_1, arg_2"
+proc,0x105,261,SetAnimalTalkedTo,"arg_1, arg_2"
+proc,0x106,262,Proc109,"arg_1, arg_2, arg_3"
+func,0x107,263,Func10A,"arg_1, arg_2"
+func,0x108,264,GetAnimalAge,"arg_1, arg_2"
+func,0x109,265,Func10C,"arg_1, arg_2"
+func,0x10A,266,Func10D,"arg_1, arg_2"
+func,0x10C,268,Func10F,"arg_1, arg_2"
+func,0x10D,269,Func110,"arg_1, arg_2"
+func,0x10E,270,Func111,arg_1
+func,0x10F,271,Func112,"arg_1, arg_2"
+proc,0x110,272,Proc113,
+proc,0x111,273,Proc114,
+proc,0x112,274,Proc115,
+proc,0x113,275,Proc116,
+func,0x114,276,Func117,arg_1
+func,0x115,277,Func118,
+func,0x116,278,Func119,
+func,0x117,279,Func11A,
+proc,0x118,280,Proc11B,"arg_1, arg_2"
+proc,0x119,281,Proc11C,arg_1
+func,0x11A,282,Func11D,arg_1
+proc,0x11B,283,Proc11E,arg_1
+func,0x11C,284,Func11F,
+func,0x11D,285,Func120,
+func,0x11E,286,Func121,
+func,0x11F,287,Func122,
+func,0x120,288,Func124,
+func,0x121,289,Func125,
+func,0x122,290,Func126,
+func,0x123,291,Func127,
+func,0x124,292,Func128,
+proc,0x125,293,Proc129,arg_1: string
+proc,0x126,294,Proc12A,
+proc,0x127,295,Proc12B,"arg_1, arg_2, arg_3"
+proc,0x128,296,Proc12C,
+proc,0x129,297,Proc12D,
+proc,0x12A,298,Proc12E,arg_1
+proc,0x12B,299,Proc12F,
+func,0x12C,300,Func130,arg_1
+proc,0x12D,301,Proc131,
+proc,0x12E,302,Proc132,"arg_1, arg_2, arg_3, arg_4"
+proc,0x12F,303,Proc133,
+proc,0x130,304,Proc134,
+proc,0x131,305,Proc135,
+proc,0x132,306,Proc136,
+func,0x133,307,Func137,
+proc,0x134,308,Proc138,"arg_1, arg_2"
+proc,0x135,309,Proc139,
+func,0x136,310,Func13A,arg_1
+func,0x137,311,Func13B,arg_1
+func,0x138,312,Func13C,arg_1
+proc,0x139,313,Proc13D,"arg_1, arg_2, arg_3, arg_4, arg_5"
+proc,0x13A,314,Proc13E,arg_1
+func,0x13B,315,Func13F,arg_1
+proc,0x13E,318,Proc142,"arg_1, arg_2, arg_3, arg_4, arg_5"
+proc,0x13F,319,Proc143,"arg_1, arg_2, arg_3"
+proc,0x140,320,Proc144,"arg_1, arg_2, arg_3"
+proc,0x141,321,Proc145,arg_1
+proc,0x142,322,Proc146,arg_1
+proc,0x143,323,Proc147,"arg_1, arg_2, arg_3"
+proc,0x144,324,Proc148,"arg_1, arg_2"
+func,0x145,325,Func149,
+proc,0x146,326,Proc14A,

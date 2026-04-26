@@ -607,7 +607,7 @@ class MapParser:
     Implementa el algoritmo get_map_headers de BlueSpider.
     """
     # Offsets verificados de la tabla maestra USA (@USATH confirmado)
-    KNOWN_OFFSETS_USA   = [0x106E74, 0x11776C, 0x10FF2C, 0x10FF14]
+    KNOWN_OFFSETS_USA   = [0x105EDC, 0x106E74, 0x11776C, 0x10FF2C, 0x10FF14]
     KNOWN_OFFSETS_EUR   = [0x127048, 0x117A00, 0x110200]
     KNOWN_OFFSETS_MFOMT = [0x10FF14, 0x110200]
 

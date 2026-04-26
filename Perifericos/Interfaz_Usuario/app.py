@@ -4,7 +4,7 @@ import re
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
     QTabWidget, QSplitter, QTreeView, QMenuBar, QMenu,
-    QStatusBar, QFileDialog, QMessageBox, QLabel
+    QStatusBar, QFileDialog, QMessageBox, QLabel, QLineEdit
 )
 from PyQt6.QtCore import Qt, QSettings, QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QAction, QStandardItemModel, QStandardItem, QDesktopServices
@@ -22,6 +22,7 @@ from Perifericos.Interfaz_Usuario.widgets.map_editor import MapEditorWidget
 from Perifericos.Interfaz_Usuario.widgets.tile_viewer import TileViewerWidget
 from Perifericos.Interfaz_Usuario.widgets.help_widget import HelpWidget
 from Perifericos.Interfaz_Usuario.componentes.visor_sonido import SappyAudioViewer
+from Perifericos.Interfaz_Usuario.componentes.visor_sprites import VisorSprites
 from PyQt6.QtGui import QAction, QShortcut, QKeySequence
 
 class ProjectLoaderThread(QThread):
@@ -84,7 +85,7 @@ class ProjectLoaderThread(QThread):
 class FoMTStudioApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("FoMT Studio v1.5.0 - The Mineral Town Expansion")
+        self.setWindowTitle("FoMT Studio v2.0.0 - The Shiao_Fujikawa Update")
         self.resize(1024, 768)
         
         self.project = None
@@ -96,6 +97,7 @@ class FoMTStudioApp(QMainWindow):
         self.map_editor = None
         self.tile_viewer = None
         self.audio_viewer = None
+        self.sprite_viewer = None
         self.cat_events_item = None # Para navegación rápida
         
         # Configuraciones Persistentes
@@ -129,11 +131,22 @@ class FoMTStudioApp(QMainWindow):
         main_layout.addWidget(splitter)
         
         # Left Panel (Project Explorer)
+        left_panel = QVBoxLayout()
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText(tr("search_placeholder", self.current_lang))
+        self.search_bar.textChanged.connect(self.on_search_text_changed)
+        
         self.tree_view = QTreeView()
         self.tree_model = QStandardItemModel()
         self.tree_model.setHorizontalHeaderLabels([tr("explorer_header", self.current_lang)])
         self.tree_view.setModel(self.tree_model)
-        splitter.addWidget(self.tree_view)
+        
+        left_panel.addWidget(self.search_bar)
+        left_panel.addWidget(self.tree_view)
+        
+        left_widget = QWidget()
+        left_widget.setLayout(left_panel)
+        splitter.addWidget(left_widget)
         
         # Right Panel (Tabbed Editors)
         self.tabs = QTabWidget()
@@ -208,7 +221,23 @@ class FoMTStudioApp(QMainWindow):
         en_action.triggered.connect(lambda: self.apply_language("en"))
         jp_action = QAction(tr("lang_jp", lang), self)
         jp_action.triggered.connect(lambda: self.apply_language("jp"))
-        lang_menu.addActions([es_action, en_action, jp_action])
+        
+        ru_action = QAction(tr("lang_ru", lang), self)
+        ru_action.triggered.connect(lambda: self.apply_language("ru"))
+        
+        de_action = QAction(tr("lang_de", lang), self)
+        de_action.triggered.connect(lambda: self.apply_language("de"))
+        
+        zh_action = QAction(tr("lang_zh", lang), self)
+        zh_action.triggered.connect(lambda: self.apply_language("zh"))
+        
+        hi_action = QAction(tr("lang_hi", lang), self)
+        hi_action.triggered.connect(lambda: self.apply_language("hi"))
+        
+        pt_action = QAction(tr("lang_pt", lang), self)
+        pt_action.triggered.connect(lambda: self.apply_language("pt"))
+        
+        lang_menu.addActions([es_action, en_action, jp_action, ru_action, de_action, zh_action, hi_action, pt_action])
         
         # Ayuda
         help_menu = menubar.addMenu(tr("menu_help", lang))
@@ -251,7 +280,22 @@ class FoMTStudioApp(QMainWindow):
         # Actualizar nombres de categorías en el árbol sin recargar todo
         pass # Implementado dentro de _on_project_loaded por ahora
         
+    def _check_close_project(self) -> bool:
+        """Muestra un diálogo de confirmación si ya hay un proyecto cargado."""
+        if self.project:
+            ret = QMessageBox.warning(
+                self, 
+                tr("title_close_project", self.current_lang),
+                tr("msg_close_project", self.current_lang),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            return ret == QMessageBox.StandardButton.Yes
+        return True
+            
     def action_new_project(self):
+        if not self._check_close_project():
+            return
+            
         path, _ = QFileDialog.getOpenFileName(self, tr("menu_new", self.current_lang), self.last_rom_dir, "GBA ROM (*.gba)")
         if not path: return
         
@@ -264,6 +308,9 @@ class FoMTStudioApp(QMainWindow):
         self._start_async_load('new', path, proj_dir)
             
     def action_load_project(self):
+        if not self._check_close_project():
+            return
+            
         path, _ = QFileDialog.getOpenFileName(self, tr("menu_load", self.current_lang), "", "FoMT Studio Project (*.fsp *.json)")
         if not path: return
         self._start_async_load('load', None, path)
@@ -290,7 +337,9 @@ class FoMTStudioApp(QMainWindow):
 
     def _on_project_step_finished(self, step):
         """Puebla la UI conforme terminan los pasos de fondo."""
-        if not self.project and self.loader_thread:
+        if self.loader_thread:
+            # Siempre actualizamos la referencia al proyecto, incluso si ya existía uno
+            # Esto corrige el bug donde al cargar una nueva ROM se mantenían datos viejos.
             self.project = self.loader_thread.project
             
         if step == 2:
@@ -319,6 +368,9 @@ class FoMTStudioApp(QMainWindow):
         try:
             self.project.save()
             self.status.showMessage("Progreso guardado en el archivo de proyecto.")
+        except PermissionError:
+             QMessageBox.critical(self, "Error de Permisos", 
+                "No se pudo guardar el proyecto. El archivo .fsp está siendo utilizado por otro proceso.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error guardando: {e}")
             
@@ -326,8 +378,15 @@ class FoMTStudioApp(QMainWindow):
         if not self.project: return
         dest, _ = QFileDialog.getSaveFileName(self, "Exportar ROM Compilada", "Modded_FoMT.gba", "GBA ROM (*.gba)")
         if dest:
-            self.project.compile_to_rom(dest)
-            self.status.showMessage(f"ROM parcheada y exportada a {dest}!")
+            try:
+                self.project.compile_to_rom(dest)
+                self.status.showMessage(f"ROM parcheada y exportada a {dest}!")
+            except PermissionError:
+                QMessageBox.critical(self, "Error de Acceso", 
+                    "No se puede escribir en el archivo de destino.\n\n"
+                    "Asegúrate de que no esté abierto en un emulador o en otro programa.")
+            except Exception as e:
+                QMessageBox.critical(self, "Error de Compilación", f"Ocurrió un fallo durante la exportación:\n{e}")
 
     def _on_project_loaded(self):
         """Inicializa la estructura de la UI al detectar la ROM (Paso 2)."""
@@ -335,33 +394,23 @@ class FoMTStudioApp(QMainWindow):
         self.tree_model.clear()
         self.tile_viewer = None
         self.audio_viewer = None
+        self.sprite_viewer = None
         proj_label = tr("explorer_proj", self.current_lang).format(name=self.project.name)
         self.tree_model.setHorizontalHeaderLabels([proj_label])
         
         root = self.tree_model.invisibleRootItem()
         
-        # Categorías persistentes para población incremental
+        # Solo NPCs, Items, Eventos y Mapas en el árbol izquierdo
+        # Audio y Sprites tienen sus listados DENTRO de sus pestañas
         self.cat_npcs = QStandardItem(tr("cat_npcs", self.current_lang))
         self.cat_items = QStandardItem(tr("cat_items", self.current_lang))
         self.cat_events = QStandardItem(tr("cat_events", self.current_lang))
         self.cat_maps = QStandardItem(tr("cat_maps", self.current_lang))
-        self.cat_graphics = QStandardItem("Gráficos")
-        self.cat_audio = QStandardItem(tr("tab_audio", self.current_lang))
-        
-        # Sub-estructuras para gráficos
-        self.cat_tilesets = QStandardItem("Tilesets")
-        self.cat_palettes = QStandardItem("Paletas")
-        self.cat_layouts = QStandardItem("Layouts")
-        self.cat_graphics.appendRow(self.cat_tilesets)
-        self.cat_graphics.appendRow(self.cat_palettes)
-        self.cat_graphics.appendRow(self.cat_layouts)
         
         root.appendRow(self.cat_npcs)
         root.appendRow(self.cat_items)
         root.appendRow(self.cat_events)
         root.appendRow(self.cat_maps)
-        root.appendRow(self.cat_graphics)
-        root.appendRow(self.cat_audio)
 
         # Poblar NPCs y Eventos (Paso 2 ya terminó en el thread)
         self._populate_ui_step(2)
@@ -399,7 +448,7 @@ class FoMTStudioApp(QMainWindow):
         if not self.project: return
         
         if step == 2: # NPCs, Eventos y Mapas
-            # NPCs
+            # NPCs (sin estrellita — la candidatura se ve en el editor)
             self.cat_npcs.removeRows(0, self.cat_npcs.rowCount())
             for i, npc in enumerate(self.project.npc_parser.npcs):
                 name = npc.name_str.strip('\x00')
@@ -411,7 +460,7 @@ class FoMTStudioApp(QMainWindow):
             # Eventos
             self.cat_events.removeRows(0, self.cat_events.rowCount())
             self.cat_events.setText(f"{tr('cat_events', self.current_lang)} ({self.project.event_parser.get_event_count()})")
-            for i in range(self.project.event_parser.get_event_count()):
+            for i in range(1, self.project.event_parser.get_event_count() + 1):
                 display_name = self.project.super_lib.get_baptized_name(i, "")
                 ev_item = QStandardItem(display_name)
                 ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
@@ -430,57 +479,13 @@ class FoMTStudioApp(QMainWindow):
             
             self.tree_view.expand(self.cat_events.index())
 
-        elif step == 3: # Gráficos (StanHash)
-            self.cat_tilesets.removeRows(0, self.cat_tilesets.rowCount())
-            self.cat_palettes.removeRows(0, self.cat_palettes.rowCount())
-            self.cat_layouts.removeRows(0, self.cat_layouts.rowCount())
-            
-            for offset, info in self.project.super_lib.data_banks.items():
-                item = QStandardItem(f"[{offset:06X}] {info['name']}")
-                item.setData("GRAPHIC", Qt.ItemDataRole.UserRole + 1)
-                item.setData(offset, Qt.ItemDataRole.UserRole)
-                
-                if info['type'] == "TILESET": self.cat_tilesets.appendRow(item)
-                elif info['type'] == "PALETTE": self.cat_palettes.appendRow(item)
-                else: self.cat_layouts.appendRow(item)
-            
-            # Inicializar Visor de Gráficos si no existe
-            if not self.tile_viewer:
-                self.tile_viewer = TileViewerWidget(self.project, self)
-                self.tabs.addTab(self.tile_viewer, "Visor de Gráficos")
+        elif step == 3: # Sprites (listado interno en pestaña)
+            if not self.sprite_viewer:
+                self.sprite_viewer = VisorSprites(self)
+                self.sprite_viewer.set_project(self.project)
+                self.tabs.addTab(self.sprite_viewer, "🎨 Sprites & Portraits")
 
-        elif step == 4: # Audio (Sappy)
-            self.cat_audio.removeRows(0, self.cat_audio.rowCount())
-            
-            # Cargar nombres de sonidos para el árbol
-            import json as _json
-            _snd_names = {}
-            _snd_path = "Nucleos_de_Procesamiento/Listas_de_Nombres/sonidos.json"
-            if os.path.exists(_snd_path):
-                with open(_snd_path, 'r', encoding='utf-8') as _f:
-                    _snd_names = _json.load(_f)
-            
-            sappy = self.project.sappy_engine
-            cat_icons = {
-                "BGM": "🎵", "AMBIENT": "🌧", "UNUSED": "⚠",
-                "SFX": "🔊", "TITLE": "🎬", "UNKNOWN": "❓",
-            }
-            
-            for song in self.project.songs:
-                sid = song['id']
-                cat = song.get('category', 'UNKNOWN')
-                icon = cat_icons.get(cat, "")
-                s_name = _snd_names.get(str(sid), song.get('name', f"Song_{sid}"))
-                item = QStandardItem(f"[{sid:03d}] {icon} {s_name}")
-                item.setData("AUDIO", Qt.ItemDataRole.UserRole + 1)
-                item.setData(sid, Qt.ItemDataRole.UserRole)
-                self.cat_audio.appendRow(item)
-            
-            total = len(self.project.songs)
-            unused = len(sappy.get_songs_by_category("UNUSED"))
-            self.cat_audio.setText(f"{tr('tab_audio', self.current_lang)} ({total} tracks, {unused} unused)")
-            
-            # Inicializar Visor de Audio si no existe
+        elif step == 4: # Audio (listado interno en pestaña)
             if not self.audio_viewer:
                 self.audio_viewer = SappyAudioViewer(self.project, self)
                 self.tabs.addTab(self.audio_viewer, tr("tab_audio", self.current_lang))
@@ -505,8 +510,7 @@ class FoMTStudioApp(QMainWindow):
         elif type == "NPC":
             npc_id = val
             if not self.npc_editor or not self.script_ide: return
-            self.tabs.setCurrentWidget(self.npc_editor)
-            # Pasamos los datos del NPC al visor de rutinas
+            
             npc_data = self.project.npc_parser.npcs[npc_id]
             code, pseudo = self.project.schedule_parser.decode_npc_schedule(npc_data)
             self.script_ide.editor.setPlainText(code)
@@ -515,7 +519,6 @@ class FoMTStudioApp(QMainWindow):
             
         elif type == "MAP":
             map_id = val
-            # Buscar por map_id (no usar como índice directo)
             map_header = self.project.map_parser.get_map_by_id(map_id)
             if map_header and self.map_editor:
                 self.map_editor.project = self.project
@@ -523,25 +526,6 @@ class FoMTStudioApp(QMainWindow):
                 self.tabs.setCurrentWidget(self.map_editor)
                 m_name = self.project.super_lib.get_map_name_hint(map_id)
                 self.status.showMessage(f"Mapa {map_id:03d} cargado — {m_name}")
-                
-        elif type == "GRAPHIC":
-            offset = val
-            if self.tile_viewer:
-                self.tile_viewer.load_graphic(offset)
-                self.tabs.setCurrentWidget(self.tile_viewer)
-                self.status.showMessage(f"Graphic Bank Loaded: 0x{offset:06X}")
-                
-        elif type == "AUDIO":
-            song_id = val
-            if self.audio_viewer:
-                self.tabs.setCurrentWidget(self.audio_viewer)
-                # Buscar el item correcto en la lista filtrada por song_id
-                for row in range(self.audio_viewer.song_list.count()):
-                    item = self.audio_viewer.song_list.item(row)
-                    if item and item.data(Qt.ItemDataRole.UserRole) == song_id:
-                        self.audio_viewer.song_list.setCurrentRow(row)
-                        break
-                self.status.showMessage(f"Audio Track Selected: 0x{song_id:02X} (dec: {song_id})")
 
     def _on_shortcut_event_up(self):
         self._navigate_event(-1)
@@ -636,3 +620,28 @@ class FoMTStudioApp(QMainWindow):
         mailto_url = f"mailto:{email}?subject={quote(subject)}&body={quote(body)}"
         
         QDesktopServices.openUrl(QUrl(mailto_url))
+
+    def on_search_text_changed(self, text):
+        """Filtra el árbol de eventos según el texto ingresado."""
+        text = text.lower()
+        for i in range(self.tree_model.rowCount()):
+            parent_item = self.tree_model.item(i)
+            self._filter_item_recursive(parent_item, text)
+
+    def _filter_item_recursive(self, item, text):
+        """Oculta/Muestra items recursivamente según el filtro."""
+        has_visible_child = False
+        for i in range(item.rowCount()):
+            child = item.child(i)
+            if self._filter_item_recursive(child, text):
+                has_visible_child = True
+        
+        match = text in item.text().lower()
+        visible = match or has_visible_child
+        
+        index = item.index()
+        if index.isValid():
+            parent_index = index.parent()
+            self.tree_view.setRowHidden(index.row(), parent_index, not visible)
+        
+        return visible

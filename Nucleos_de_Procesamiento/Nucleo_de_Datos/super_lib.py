@@ -70,6 +70,8 @@ class SuperLibrary:
         "MASTER_TABLE_OFFSET": 0x0F89D4,
         "EVENT_LIMIT": 1329,
         "ITEMS_LIMIT": 101,
+        "NPC_TABLE_OFFSET": 0x104260,
+        "NPC_LIMIT": 42,
         "GFoodInfo_OFFSET": 0x08111B90,
         "GToolInfo_OFFSET": 0x081116A8,
     }
@@ -78,6 +80,8 @@ class SuperLibrary:
         "MASTER_TABLE_OFFSET": 0x1014BC,
         "EVENT_LIMIT": 1416, 
         "ITEMS_LIMIT": 101,
+        "NPC_TABLE_OFFSET": 0x104260 + 0x2BD58,
+        "NPC_LIMIT": 42,
         "GFoodInfo_OFFSET": 0x0813D8E8,
         "GToolInfo_OFFSET": 0x0813D3A8,
     }
@@ -105,9 +109,34 @@ class SuperLibrary:
         # Cargar mapeos externos (Editables por el usuario)
         self.custom_event_names = {}
         self.custom_map_names = {}
+        self._load_extraction_pointers()
         self._load_custom_names()
         
         self._parse_mary_bible()
+
+    def _load_extraction_pointers(self):
+        import csv
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        csv_path = os.path.join(root_dir, "data", "Punteros de extraccion.csv")
+        
+        if os.path.exists(csv_path):
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    t = row.get('type')
+                    if t == 'PunterosScript':
+                        base_offset = int(row['ofsetini'], 16)
+                        end_offset = int(row['ofsetfin'], 16)
+                        delta = 0x2BD58 if self.is_mfomt else 0
+                        self.cfg["MASTER_TABLE_OFFSET"] = base_offset + delta
+                        self.cfg["EVENT_LIMIT"] = ((end_offset - base_offset) // 4) + 1
+                    elif t == 'npcs':
+                        base_offset = int(row['ofsetini'], 16)
+                        end_offset = int(row['ofsetfin'], 16)
+                        delta = 0x2BD58 if self.is_mfomt else 0
+                        self.cfg["NPC_TABLE_OFFSET"] = base_offset + delta
+                        # Cada entrada NPC ocupa 8 bytes (puntero + script/flags)
+                        self.cfg["NPC_LIMIT"] = ((end_offset - base_offset + 1) // 8)
 
     def _load_custom_names(self):
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
@@ -125,31 +154,52 @@ class SuperLibrary:
                 except: pass
 
     def _parse_mary_bible(self):
-        filename = "lib_mfomt.txt" if self.is_mfomt else "lib_fomt.txt"
-        lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", filename)
-        if not os.path.exists(lib_path): return
+        import csv
+        filename = "lib_mfomt.csv" if self.is_mfomt else "lib_fomt.csv"
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # Intentar en data y en docs
+        lib_path = os.path.join(root_dir, "data", filename)
+        if not os.path.exists(lib_path):
+            lib_path = os.path.join(root_dir, "docs", filename)
+            
+        if not os.path.exists(lib_path): 
+            print(f"Alerta: No se encontró la librería {filename} en data ni en docs.")
+            return
             
         try:
-            from fomt_studio.core.parsers.porpurri_engine.compiler.lexer import Lexer
-            from fomt_studio.core.parsers.porpurri_engine.compiler.parser import Parser, ParseError
-            from fomt_studio.core.parsers.porpurri_engine.compiler.emitter import ConstScope
-            from fomt_studio.core.parsers.porpurri_engine.ast import NameRefFunc, NameRefProc
-            from fomt_studio.core.parsers.porpurri_engine.ir import CallId, CallableShape, ValueType
-        except ImportError: return
+            from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.ir import CallId, CallableShape, ValueType
+        except ImportError as e:
+            print(f"Error de importación en SuperLibrary: {e}")
+            return
             
-        scope = ConstScope()
         with open(lib_path, 'r', encoding='utf-8') as f:
-            code = f.read()
-            
-        lexer = Lexer(code)
-        parser = Parser(lexer)
-        try:
-            parser.parse_program(scope, allow_scripts=False)
-        except ParseError: pass
-            
-        for name, ref in scope.names.items():
-            if isinstance(ref, NameRefFunc) or isinstance(ref, NameRefProc):
-                self.known_callables[ref.call_id] = (name, ref.shape)
+            reader = csv.DictReader(f)
+            for row in reader:
+                t = row.get('Type', '').strip()
+                if t not in ('proc', 'func'):
+                    continue
+                
+                hex_id_str = row.get('Hex_ID', '').strip()
+                name = row.get('Name', '').strip()
+                args_str = row.get('Arguments', '').strip()
+                
+                try:
+                    call_id_val = int(hex_id_str, 16)
+                except ValueError:
+                    continue
+                
+                # Para SlipSpace_Engine, determinamos la forma
+                args_count = 0 if not args_str else len([a for a in args_str.split(',') if a.strip()])
+                param_types = [ValueType.integer() for _ in range(args_count)]
+                
+                if t == 'func':
+                    shape = CallableShape.new_func(param_types)
+                else:
+                    shape = CallableShape.new_proc(param_types)
+                    
+                call_id = CallId(call_id_val)
+                self.known_callables[call_id] = (name, shape)
 
     def scan_data_banks(self, rom_data: bytes):
         """
@@ -242,3 +292,7 @@ class SuperLibrary:
     def event_limit(self): return self.cfg["EVENT_LIMIT"]
     @property
     def item_limit(self): return self.cfg["ITEMS_LIMIT"]
+    @property
+    def npc_table_offset(self): return self.cfg["NPC_TABLE_OFFSET"]
+    @property
+    def npc_limit(self): return self.cfg["NPC_LIMIT"]

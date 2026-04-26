@@ -1,0 +1,92 @@
+{
+  "functions": {
+    "change_portrait_event": {
+      "pattern": "23 {id} 21",
+      "description": "Cambia el retrato durante un evento.",
+      "parameters": {
+        "id": "ID hexadecimal del retrato"
+      }
+    },
+    "change_portrait_talk": {
+      "pattern": "22 {id} 00",
+      "description": "Cambia el retrato en diálogos normales (no eventos).",
+      "parameters": {
+        "id": "ID hexadecimal del retrato"
+      }
+    },
+    "force_portrait_patch": {
+      "address": "0x08050ADC",
+      "original_value": "0x0D1C",
+      "patch_pattern": "0x{id}25",
+      "description": "Fuerza un retrato específico al hablar con cualquier PNJ."
+    },
+    "walk_through_walls": {
+      "address": "0x080AC110",
+      "original_value": "0x0120",
+      "patch_value": "0x0020",
+      "description": "Permite atravesar paredes."
+    }
+  },
+  "ids": {
+    "portraits": {
+      "Thomas": {
+        "Neutral": "0x75",
+        "Feliz": "0x76",
+        "Enojado": "0x77",
+        "Triste": "0x78"
+      },
+      "Ann": {
+        "Neutral": "0x57",
+        "Feliz": "0x58",
+        "Enojada": "0x59",
+        "Triste": "0x5A"
+      }
+    },
+    "bgm": {
+      "Spring Farm": "0x01",
+      "Summer Farm": "0x02",
+      "Autumn Farm": "0x03",
+      "Winter Farm": "0x04",
+      "Unused_8": "0x08",
+      "Rain Noise": "0x0A",
+      "Storm_Blizzard": "0x0B",
+      "Sea Noise": "0x0C",
+      "Town Theme": "0x0D",
+      "Night Noises": "0x0E",
+      "Unused_12": "0x12",
+      "Unused_13": "0x13",
+      "Unused_14": "0x14",
+      "Unused_15": "0x15",
+      "Unused_16": "0x16",
+      "Unused_17": "0x17",
+      "Unused_18": "0x18",
+      "Unused_19": "0x19",
+      "Unused_1A": "0x1A"
+    },
+    "scripts": {
+      "Debug Menu": "0x080E",
+      "Wedding Cutscene (HG)": "0x06A0",
+      "Calendar (Default)": "0x020B"
+    },
+    "items": {
+      "Band-Aid": {
+        "description": "Objeto de HM:BTN, otorga 800 afecto.",
+        "unused": true
+      },
+      "Queen of the Night": {
+        "description": "Florece en noches de verano, otorga 800 afecto.",
+        "unused": true
+      },
+      "Plant Encyclopedia": {
+        "description": "Libro de la biblioteca, otorga 800 afecto.",
+        "unused": true
+      }
+    }
+  },
+  "offsets": {
+    "empty_space_start": "0x75C244",
+    "npc_names_start": "0x104128",
+    "dialogue_scripts_start": "0x1004E0",
+    "map_pointer_table": "0x8105EDC"
+  }
+}

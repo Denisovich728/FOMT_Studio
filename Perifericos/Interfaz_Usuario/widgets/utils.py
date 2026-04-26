@@ -3,15 +3,17 @@ from PyQt6.QtWidgets import QStyledItemDelegate, QLineEdit, QLabel, QVBoxLayout,
 from PyQt6.QtCore import Qt, QPoint, QTimer
 
 class NameEditDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, max_limit=10):
         super().__init__(parent)
         self.bubble = None
+        self.max_limit = max_limit
 
     def createEditor(self, parent, option, index):
         editor = QLineEdit(parent)
-        # Obtener max_len guardado en los metadatos del item
-        max_len = index.data(Qt.ItemDataRole.UserRole + 2) or 20
-        editor.setMaxLength(max_len)
+        
+        # Si max_limit es None o 0, no forzar maxLength pero la burbuja mostrará el conteo
+        if self.max_limit:
+            editor.setMaxLength(self.max_limit)
         
         # Estilo del editor para que resalte
         editor.setStyleSheet("border: 2px solid #00FF41; background-color: #000000; color: #00FF41;")
@@ -30,10 +32,11 @@ class NameEditDelegate(QStyledItemDelegate):
         """)
         self.bubble.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         
-        self._update_bubble(editor.text(), max_len, editor)
+        limit_val = self.max_limit or 50 # Default para visualización si no hay límite
+        self._update_bubble(editor.text(), limit_val, editor)
         self.bubble.show()
         
-        editor.textChanged.connect(lambda t: self._update_bubble(t, max_len, editor))
+        editor.textChanged.connect(lambda t: self._update_bubble(t, limit_val, editor))
         editor.destroyed.connect(self._hide_bubble)
         
         return editor

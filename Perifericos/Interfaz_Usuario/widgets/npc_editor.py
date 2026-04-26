@@ -52,7 +52,7 @@ class NpcEditorWidget(QWidget):
         self.table.doubleClicked.connect(self.show_npc_details)
         
         # Asignar delegado para conteo de nombres
-        self.delegate = NameEditDelegate(self)
+        self.delegate = NameEditDelegate(self, max_limit=10)
         self.table.setItemDelegateForColumn(1, self.delegate)
         
         layout.addWidget(self.table)
@@ -83,16 +83,14 @@ class NpcEditorWidget(QWidget):
             c_id.setEditable(False)
             
             c_name = QStandardItem(stats.get('Nombre', 'Desconocido'))
-            c_name.setEditable(True) # Permitir editar el nombre limitadamente
+            c_name.setEditable(True) 
             c_name.setData(i, Qt.ItemDataRole.UserRole)
-            c_name.setData(stats.get('max_len', 10), Qt.ItemDataRole.UserRole + 2) # Guardar limite para el delegado
             
             c_role = QStandardItem(stats.get('Rol', '-'))
             c_role.setEditable(False)
             
             c_ptr = QStandardItem(stats.get('Ptr_Personalidad', '0x00000000'))
             c_ptr.setEditable(False)
-            # Decoración simulando link
             c_ptr.setForeground(Qt.GlobalColor.blue)
             font = c_ptr.font()
             font.setUnderline(True)
@@ -105,7 +103,6 @@ class NpcEditorWidget(QWidget):
         
         cambios = 0
         for row in range(self.model.rowCount()):
-            # La columna 1 es Nombre, su DataRole guarda el indice en self.npcs
             idx = self.model.item(row, 1).data(Qt.ItemDataRole.UserRole)
             if idx is None: continue
             
@@ -122,7 +119,7 @@ class NpcEditorWidget(QWidget):
         QMessageBox.information(self, tr('btn_save_names', lang), f"{msg}\n{note}")
 
     def show_npc_details(self, index):
-        if index.column() != 3: # Solo abrir si se cliquea el Puntero (Columna 3)
+        if index.column() != 3:
             return
             
         row = index.row()
@@ -142,7 +139,7 @@ class NpcDetailDialog(QDialog):
         
         self.layout_main = QHBoxLayout(self)
         
-        # LADO IZQUIERDO: Visualización (Retrato) v1.3.0
+        # LADO IZQUIERDO: Visualización (Retrato)
         self.side_graphics = QVBoxLayout()
         self.lbl_portrait = QLabel()
         self.lbl_portrait.setFixedSize(128, 128)
@@ -165,19 +162,15 @@ class NpcDetailDialog(QDialog):
         header = QLabel(f"<h2>{name}</h2><b>{role_label}</b><br>ID Motor: [{npc.index:03d}]")
         layout.addWidget(header)
         
-        # Puntero simulando el hipervínculo interno del engine
         ptr_str = f"0x{getattr(npc, 'personality_ptr', 0):08X}"
         lbl_ptr = QLabel(f"<b>{tr('ptr_rom', lang)}</b> <span style='color:blue;'><u>{ptr_str}</u></span>")
         lbl_ptr.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         layout.addWidget(lbl_ptr)
         
-        # Bloque de notas o simulación de descifrado individual
         self.txt_data = QTextEdit()
         self.txt_data.setReadOnly(True)
         
-        # Invocar a la librería de Rutinas (Stan Heuristic IA)
         schedule_parser = getattr(parent.project, 'schedule_parser', None)
-        
         if schedule_parser:
             cpp, pseudo = schedule_parser.decode_npc_schedule(npc)
             base_info = f"{tr('lbl_routine', lang)}\n\n"
@@ -191,52 +184,58 @@ class NpcDetailDialog(QDialog):
         self.txt_data.setPlainText(base_info)
         layout.addWidget(self.txt_data)
 
-        # Botón de Cierre
         btn_close = QPushButton(tr('btn_close_viewer', lang))
         btn_close.clicked.connect(self.close)
         layout.addWidget(btn_close)
         
     def _load_npc_portrait(self, npc, parent):
-        """Intenta extraer y mostrar el retrato del NPC usando la SuperLib."""
+        """Intenta extraer y mostrar el retrato o sprite del NPC usando el motor RAW."""
         try:
-            from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.codec_tiles import decode_oam_attributes, assemble_sprite
+            import struct
+            from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.codec_tiles import assemble_sprite
             from PyQt6.QtGui import QImage, QPixmap
             
             project = parent.project
-            # Heurística: El ID del retrato suele coincidir con el ID del NPC (a veces con un offset)
-            p_offset = project.super_lib.get_portrait_data(npc.index)
+            p_offset = npc.portrait_offset
             
-            # Buscamos en el banco si ya existe
-            # info = project.super_lib.data_banks.get(p_offset)
+            # Motor RAW: cargamos 2KB directamente
+            raw_data = project.read_rom(p_offset, 2048)
+            if not raw_data: 
+                self.lbl_portrait.setText("No ROM Data")
+                return
             
-            # Por ahora, asumiendo que el retrato es un bloque LZ77 de 64x64 (32 tiles 4bpp)
-            # En un sistema real buscaríamos el puntero. Para la v1.3.0 usamos el offset directo.
-            raw_data = project.decompress(p_offset)
-            if not raw_data: return
+            # Cargar Paleta Maestra (0x58B3E0)
+            pal_raw = project.read_rom(npc.parser.master_palette_off, 32)
+            pal = []
+            if pal_raw:
+                for i in range(16):
+                    c16 = struct.unpack_from('<H', pal_raw, i*2)[0]
+                    r = (c16 & 0x1F) << 3
+                    g = ((c16 >> 5) & 0x1F) << 3
+                    b = ((c16 >> 10) & 0x1F) << 3
+                    pal.append((r, g, b))
+            else:
+                pal = [(i*16, i*16, i*16) for i in range(16)] # Fallback grayscale
             
-            # Ensamblaje simulado de retrato (64x64 = 8x8 tiles)
-            # OAM ficticio para retrato estándar 64x64
+            size = 64
             oam = {
-                "w": 64, "h": 64, "tile_id": 0, "is_8bpp": False,
-                "palette_bank": 0 # TODO: Buscar paleta real
+                "w": size, "h": size, "tile_id": 0, "is_8bpp": False,
+                "palette_bank": 0
             }
             
             canvas = assemble_sprite(raw_data, oam)
             
-            # Usar la paleta de previsualización de la SuperLib si existe
-            # O una por defecto
-            pal = [(i*16, i*16, i*16) for i in range(16)]
-            
-            img = QImage(64, 64, QImage.Format.Format_RGB32)
-            for y in range(64):
-                for x in range(64):
+            img = QImage(size, size, QImage.Format.Format_RGB32)
+            for y in range(size):
+                for x in range(size):
                     c = pal[canvas[y][x]]
                     img.setPixel(x, y, (c[0] << 16) | (c[1] << 8) | c[2])
             
             pix = QPixmap.fromImage(img).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
             self.lbl_portrait.setPixmap(pix)
-        except:
-            self.lbl_portrait.setText("No Portrait")
+        except Exception as e:
+            print(f"Portrait Error: {e}")
+            self.lbl_portrait.setText("Render Error")
 
     def _on_close(self):
         self.close()

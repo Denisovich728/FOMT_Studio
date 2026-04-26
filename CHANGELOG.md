@@ -1,24 +1,45 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
+## Versión 2.0.0 "The Shiao_Fujikawa Update"
+**Fecha:** 2026-04-26
+**Estado:** Estable / Nueva Generación
+
+### Nuevo Núcleo de Scripting Ahora Llamado (SlipSpace Engine)
+**Motivo del Cambio:** Mejora Significativa en la descompresion y recompresion de scripts..
+- **Escapes Legibles:** Implementación de `\BRK` (0x05) y `\WAIT_CLICK` (0x0C) para una edición intuitiva.
+- **Buscador Inteligente:** Sistema de búsqueda multihilo que localiza diálogos instantáneamente sin bloquear la UI.
+- **Autocompletado:** Añadido sistema de sugerencias de funciones y comandos en el IDE.
+- **Decoración de Ítems:** Sustitución dinámica de IDs hexadecimales por nombres de objetos (ej. `GiveItem(0x27)` -> `GiveItem(Jewel of Truth)`).
+
+### Gráficos y Visualización
+- **Depuración de Motor:** Se eliminó por completo el motor gráfico anterior por su ineficiencia.
+- **Editor de Sprites:** Implementación del nuevo editor de sprites con soporte para visualización dinámica.
+- **Colaboración Externa:** Integración de offsets y paletas maestras gracias al dump del usuario de Reddit **u/MelodyCrystel**, permitiendo una reconstrucción fiel de los personajes.
+- **Descompresión GBA-GE:** Montaje de la lógica de descompresión gráfica basada en el estándar GBA-GE.
+
+### Gestión de Memoria y Repunteo
+- **Buscador de Espacio Libre:** Nuevo sistema que localiza bloques vacíos en la ROM para inserciones seguras.
+- **Reciclaje de Bancos:** Al mover o repuntear un evento, la dirección anterior se marca como disponible para reciclaje, optimizando el uso de la ROM.
+- **Alineación de 4 Bytes:** Inserción de datos respetando siempre direcciones múltiplos de 4 para evitar desalineación de instrucciones y crasheos en el hardware real/emuladores de GBA.
+- **Master Table Scanning:** Mejora en el escaneo de NPCs y eventos basada en punteros de la Tabla Maestra.
+
+### Internacionalización (i18n)
+- **Soporte Global:** Expansión a 8 idiomas (ES, EN, JP, RU, DE, ZH, HI, PT).
+- **Localización Nativa:** Corrección de términos en Japonés (Harvest Moon nativo) y expansión técnica en Ruso.
+- **Cobertura:** 127 llaves de traducción verificadas y sincronizadas por idioma.
+
+---
+
 ## Versión 1.5.0 "The Mineral Town Expansion"
 **Fecha:** 2026-04-22
-**Estado:** Estable
+**Estado:** Antigua
 
-### Nuevas Características
-- **Compatibilidad con MFoMT (More Friends of Mineral Town):**
-    - Implementación de detección dinámica de ROM para la versión femenina (Girl version).
-    - Soporte completo para el offset de la tabla de canciones de MFoMT (`0x144FF4`).
-    - Adaptación del descompilador de scripts para eventos exclusivos de la versión MFoMT.
-- **Rediseño del Motor de Audio:**
-    - Migración de `QMediaPlayer` a `winsound` nativo para eliminar bloqueos de archivos y errores de códecs en Windows.
-    - Implementación de un sistema de pre-procesamiento de audio más rápido que genera vistas previas WAV sin latencia.
-### Mejoras y Optimizaciones
-- **Carga Asíncrona de Proyectos:** Los proyectos ahora se escanean en segundo plano usando hilos (`QThread`), permitiendo que la UI responda durante el análisis de ROMs grandes.
-- **Limpieza Automática de Sesión:** Al cambiar de proyecto o ROM, todos los paneles se reinician correctamente, evitando datos fantasma de la sesión anterior.
-- **Estabilidad del Descompilador:** Se han añadido protecciones contra instrucciones desconocidas que anteriormente causaban cierres inesperados (Catastrophic Failures).
+### Características de la v1.5
+- **Compatibilidad con MFoMT:** Detección dinámica para la versión femenina.
+- **Motor de Audio:** Migración a sistema nativo para evitar bloqueos de archivos.
+- **Carga Asíncrona:** Uso de `QThread` para escaneo de ROMs.
+- **Estabilidad:** Protecciones básicas contra instrucciones desconocidas.
 
-### Errores Corregidos
-- Corregido el fallo donde la lista de audios no se poblaba al cargar MFoMT después de FoMT.
-- Solucionado el error de descriptor de archivo (OSError [Errno 9]) al cerrar archivos de log de audio.
-- Eliminados los bloqueos de archivos WAV temporales que impedían la reproducción múltiple.
-
+---
+### Errores Conocidos
+- Algunos fallos menores al reproducir audio en pistas mudas (trabajo en proceso).
