@@ -8,6 +8,8 @@ import os
 import csv
 import struct
 import io
+import sys
+from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.rutas import get_data_path
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QListWidget,
     QListWidgetItem, QLabel, QComboBox, QPushButton, QGroupBox,
@@ -295,18 +297,11 @@ class VisorSprites(QWidget):
         """Carga sprite_data.csv con soporte para múltiples formatos y secciones."""
         self._sprites = []
         
-        # Intentar encontrar la carpeta data en el root (4 niveles arriba desde componentes)
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        data_dir = os.path.join(base_dir, "Nucleos_de_Procesamiento", "data")
+        # Usar la utilidad de rutas para encontrar el CSV
+        csv_path = get_data_path("sprite_data.csv")
         
-        csv_path = os.path.join(data_dir, "sprite_data.csv")
-        
-        # Fallback: si no existe en la ruta calculada, buscar en el CWD actual
         if not os.path.exists(csv_path):
-            csv_path = os.path.join("Nucleos_de_Procesamiento", "data", "sprite_data.csv")
-            
-        if not os.path.exists(csv_path):
-            print(f"⚠️ [VisorSprites] sprite_data.csv no encontrado en {csv_path}")
+            print(f"⚠️ [VisorSprites] sprite_data.csv no encontrado")
             return
 
         try:

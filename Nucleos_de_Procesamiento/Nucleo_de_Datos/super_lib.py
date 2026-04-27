@@ -1,4 +1,6 @@
 import os
+import sys
+from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.rutas import get_data_path, get_resource_path
 import re
 import struct
 import json
@@ -116,8 +118,7 @@ class SuperLibrary:
 
     def _load_extraction_pointers(self):
         import csv
-        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        csv_path = os.path.join(root_dir, "data", "Punteros de extraccion.csv")
+        csv_path = get_data_path("Punteros de extraccion.csv")
         
         if os.path.exists(csv_path):
             with open(csv_path, 'r', encoding='utf-8') as f:
@@ -139,15 +140,13 @@ class SuperLibrary:
                         self.cfg["NPC_LIMIT"] = ((end_offset - base_offset + 1) // 8)
 
     def _load_custom_names(self):
-        data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-        
-        mapas_path = os.path.join(data_dir, "mapas.json")
+        mapas_path = get_data_path("mapas.json")
         if os.path.exists(mapas_path):
             with open(mapas_path, 'r', encoding='utf-8') as f:
                 try: self.custom_map_names = json.load(f)
                 except: pass
                 
-        eventos_path = os.path.join(data_dir, "eventos.json")
+        eventos_path = get_data_path("eventos.json")
         if os.path.exists(eventos_path):
             with open(eventos_path, 'r', encoding='utf-8') as f:
                 try: self.custom_event_names = json.load(f)
@@ -156,12 +155,11 @@ class SuperLibrary:
     def _parse_mary_bible(self):
         import csv
         filename = "lib_mfomt.csv" if self.is_mfomt else "lib_fomt.csv"
-        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         
         # Intentar en data y en docs
-        lib_path = os.path.join(root_dir, "data", filename)
+        lib_path = get_data_path(filename)
         if not os.path.exists(lib_path):
-            lib_path = os.path.join(root_dir, "docs", filename)
+            lib_path = get_resource_path(os.path.join("docs", filename))
             
         if not os.path.exists(lib_path): 
             print(f"Alerta: No se encontró la librería {filename} en data ni en docs.")

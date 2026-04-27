@@ -12,6 +12,8 @@ from Perifericos.Traducciones.i18n import tr
 import re
 import json
 import os
+import sys
+from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.rutas import get_resource_path, get_data_path
 
 class LineNumberArea(QWidget):
     def __init__(self, editor):
@@ -349,7 +351,7 @@ class ScriptIDEWidget(QWidget):
         self.highlighter.update_colors("light")
         
         # Cargar diccionario de conocimientos
-        knowledge_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "fomt_knowledge.json")
+        knowledge_path = get_resource_path("fomt_knowledge.json")
         knowledge_data = {}
         if os.path.exists(knowledge_path):
             try:
@@ -364,8 +366,7 @@ class ScriptIDEWidget(QWidget):
         
         # 1. Cargar Opcodes Dinámicos desde lib_*.csv
         lib_name = "lib_mfomt.csv" if self.project.is_mfomt else "lib_fomt.csv"
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        lib_path = os.path.join(root_dir, "Nucleos_de_Procesamiento", "data", lib_name)
+        lib_path = get_data_path(lib_name)
         
         if os.path.exists(lib_path):
             import csv

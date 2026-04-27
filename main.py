@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+import multiprocessing
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 if root_dir not in sys.path:
@@ -10,6 +11,9 @@ from PyQt6.QtWidgets import QApplication
 from Perifericos.Interfaz_Usuario.app import FoMTStudioApp
 
 def main():
+    # Soporte para multiprocesamiento en versiones congeladas (EXE)
+    multiprocessing.freeze_support()
+    
     # Evitar bucle infinito en versión compilada:
     # Si detectamos argumentos del monitor, ejecutamos el monitor y salimos.
     if len(sys.argv) > 1 and ("monitor.py" in sys.argv[1] or "--pid" in sys.argv):

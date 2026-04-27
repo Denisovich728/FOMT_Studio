@@ -1,5 +1,7 @@
 import struct
 import os
+import sys
+from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.rutas import get_resource_path
 import wave
 import math
 class SappyParser:
@@ -296,12 +298,8 @@ class SappyParser:
         if not os.path.exists(export_dir):
             os.makedirs(export_dir)
             
-        ripper_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "gba-mus-ripper")
+        ripper_dir = get_resource_path("gba-mus-ripper")
         ripper_exe = os.path.join(ripper_dir, "gba_mus_ripper.exe")
-        
-        if not os.path.exists(ripper_exe):
-            ripper_exe = r"j:\Repositorios\fomt_studio\gba-mus-ripper\gba_mus_ripper.exe"
-            ripper_dir = os.path.dirname(ripper_exe)
             
         rom_path = self.proyecto.base_rom_path
         
@@ -330,13 +328,8 @@ class SappyParser:
         import subprocess
         
         # Paths
-        ripper_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "gba-mus-ripper")
-        if not os.path.exists(ripper_dir):
-            ripper_dir = r"j:\Repositorios\fomt_studio\gba-mus-ripper"
-            
-        fluid_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "fluidsynth_bin", "bin")
-        if not os.path.exists(fluid_dir):
-            fluid_dir = r"j:\Repositorios\fomt_studio\fluidsynth_bin\bin"
+        ripper_dir = get_resource_path("gba-mus-ripper")
+        fluid_dir = get_resource_path(os.path.join("fluidsynth_bin", "bin"))
             
         song_ripper = os.path.join(ripper_dir, "song_ripper.exe")
         sf2_ripper = os.path.join(ripper_dir, "sound_font_ripper.exe")
