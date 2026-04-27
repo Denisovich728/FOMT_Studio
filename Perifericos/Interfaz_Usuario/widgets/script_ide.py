@@ -364,7 +364,9 @@ class ScriptIDEWidget(QWidget):
         
         # 1. Cargar Opcodes Dinámicos desde lib_*.csv
         lib_name = "lib_mfomt.csv" if self.project.is_mfomt else "lib_fomt.csv"
-        lib_path = os.path.join("Nucleos_de_Procesamiento", "data", lib_name)
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        lib_path = os.path.join(root_dir, "Nucleos_de_Procesamiento", "data", lib_name)
+        
         if os.path.exists(lib_path):
             import csv
             try:

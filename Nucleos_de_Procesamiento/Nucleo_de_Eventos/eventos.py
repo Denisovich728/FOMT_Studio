@@ -141,7 +141,11 @@ class FoMTEventParser:
         if not self._lib_scope:
             self._lib_scope = ConstScope()
             lib_name = "lib_mfomt.csv" if self.project.is_mfomt else "lib_fomt.csv"
-            lib_path = os.path.join("Nucleos_de_Procesamiento", "data", lib_name)
+            
+            # Usar ruta absoluta basada en la ubicación de este archivo (eventos.py)
+            # subimos 2 niveles: Nucleo_de_Eventos -> Nucleos_de_Procesamiento -> Raíz
+            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            lib_path = os.path.join(base_dir, "Nucleos_de_Procesamiento", "data", lib_name)
             
             if os.path.exists(lib_path):
                 # Leer la librería como un script de declaraciones (KW_FUNC/KW_PROC)
