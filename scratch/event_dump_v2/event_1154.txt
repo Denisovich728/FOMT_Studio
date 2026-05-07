@@ -1,0 +1,41 @@
+#include "lib_fomt.csv"
+
+script 1154 Unknown_Event_1154 {
+const MESSAGE_0 = "This year's competition was \r\ngreat, don't you think?\BRK";
+const MESSAGE_1 = "Yeah, \xFF% \r\nwas particularly strong. \BRK";
+const MESSAGE_2 = "Sorry you didn't win. \r\nAll the other Chickens were\r\nvery strong, though. \BRK";
+
+var var_0;
+
+var_0 = Func11A(3);
+GetAnimalName(0, 3, var_0);
+if ((Func083(2) == 0)) {
+    Free_Event_Entity("Rick");
+}
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag("Flag_0x197") == 0)) {
+    TalkOpen();
+    Set_Portrait("Rick_Neutral");
+    Set_Name_Window("Rick");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag("Flag_0x199") == 1)) {
+        TalkOpen();
+        Set_Portrait("Rick_Happy");
+        Set_Name_Window("Rick");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Rick_Neutral");
+    Set_Name_Window("Rick");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Rick") == 0)) {
+    Give_Friendship_Points("Rick", 5);
+}
+Free_Event_Entity("Rick");
+SetEntityFacing(2, 2);
+exit;
+}

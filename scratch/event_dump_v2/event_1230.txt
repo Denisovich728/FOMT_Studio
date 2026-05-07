@@ -1,0 +1,24 @@
+#include "lib_fomt.csv"
+
+script 1230 Unknown_Event_1230 {
+const MESSAGE_0 = "I brought some Jam. \r\nI hope it adds a \r\ngood flavor to the stew!\BRK";
+
+if ((Func083(0x13) == 0)) {
+    Free_Event_Entity("Karen");
+}
+SetEntityFacing(0x13, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Karen_Neutral");
+if (!((((((((Check_Flag("Popuri_Marriage_State") == 2) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Elli_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Flag_0x75") == 2)) || (Check_Flag("Rival_Karen_Rick_Event_1") == 2)) || (Check_Flag("Rival_Karen_Rick_Event_2") == 2))) {
+    Set_Hearth_Anim("Karen");
+}
+Set_Name_Window("Karen");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Karen") == 0)) {
+    Give_Friendship_Points("Karen", 5);
+}
+SetEntityFacing(0x13, 3);
+Free_Event_Entity("Karen");
+exit;
+}

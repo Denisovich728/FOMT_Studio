@@ -1,0 +1,28 @@
+#include "lib_fomt.csv"
+
+script 1137 Unknown_Event_1137 {
+const MESSAGE_0 = "I look forward to Beach Day\r\nall the more since they \r\nbegan the Frisbee \BRK\r\nTournament. I know all \r\nthe Dogs because I see them\r\nwhen I\x81fm working. \BRK\WAIT_CLICKSo, I'm glad whoever wins!\BRK";
+const MESSAGE_1 = "Good luck to all people \r\nand canines! \BRK";
+
+if ((Func083(0x1C) == 0)) {
+    Free_Event_Entity("Zack");
+}
+SetEntityFacing(0x1C, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+if ((Check_Flag("Flag_0x193") == 0)) {
+    Set_Portrait("Zack_Happy");
+    Set_Name_Window("Zack");
+    TalkMessage(0);
+} else {
+    Set_Portrait("Zack_Happy");
+    Set_Name_Window("Zack");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Zack") == 0)) {
+    Give_Friendship_Points("Zack", 5);
+}
+Free_Event_Entity("Zack");
+SetEntityFacing(0x1C, 0);
+exit;
+}

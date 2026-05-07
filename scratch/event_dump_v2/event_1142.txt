@@ -1,0 +1,35 @@
+#include "lib_fomt.csv"
+
+script 1142 Unknown_Event_1142 {
+const MESSAGE_0 = "Better luck next time. \r\n\xFF# was fun \r\nto watch, though!\BRK";
+const MESSAGE_1 = "Congratulations, \r\n\xFF!. \r\nI thought you'd win \BRK\r\nall the time!\BRK";
+const MESSAGE_2 = "That was fun. \r\nThis is my favorite of all\r\nthe Festivals! \BRK";
+
+if ((Func083(0xD) == 0)) {
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+if ((Check_Flag("Flag_0x193") == 1)) {
+    if ((Check_Flag("Flag_0x195") == 0)) {
+        Set_Portrait("Thomas_Afraid");
+        Set_Name_Window("Huachito");
+        TalkMessage(0);
+    } else {
+        Set_Portrait("Thomas_Happy");
+        Set_Name_Window("Huachito");
+        TalkMessage(1);
+    }
+} else {
+    Set_Portrait("Thomas_Happy");
+    Set_Name_Window("Huachito");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Huachito") == 0)) {
+    Give_Friendship_Points("Huachito", 5);
+}
+Free_Event_Entity("Huachito");
+SetEntityFacing(0xD, 3);
+exit;
+}

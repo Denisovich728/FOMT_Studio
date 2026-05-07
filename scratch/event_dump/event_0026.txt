@@ -1,0 +1,18 @@
+#include "lib_fomt.csv"
+
+script 26 Unknown_Event_0026 {
+const MESSAGE_0 = "I can't wait! \r\nI wonder when Dad will be\r\ndone with work? \BRK";
+
+if ((Check_Flag(0x49) == 1)) {
+}
+SetEntityFacing(0x13, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Karen_Happy");
+Set_Name_Window("Karen");
+Set_Hearth_Anim("Karen");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x13, 0);
+Free_Event_Entity("Karen");
+exit;
+}

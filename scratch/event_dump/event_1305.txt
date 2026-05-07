@@ -1,0 +1,76 @@
+#include "lib_fomt.csv"
+
+script 1305 Unknown_Event_1305 {
+const MESSAGE_0 = "Thanks for coming. \BRK";
+const MESSAGE_1 = "Hello! \r\nCome on in! \BRK";
+const MESSAGE_2 = "Mary invited you, eh?\r\nI hope you enjoy yourself.\BRK\WAIT_CLICKDo you want to hear about\r\nthe plants I'm researching?\BRK";
+const MESSAGE_3 = "Dad! Don't bore \r\n\xFF!!\BRK";
+const MESSAGE_4 = "In that case, I want to \r\nhear about the farm!\BRK";
+const MESSAGE_5 = "Spending the Starry Night \r\nFestival with Mary's family\r\nsure was fun! \BRK";
+
+Warp_Player("Basil_House_Floor_01", 0x78, 0xA0);
+PlayBGM(1, 7);
+Spawn_Item_On_Grid(0, 0x70, 0x70, 1, Get_Item_Sprite_ID(0x8F));
+Spawn_Item_On_Grid(1, 0x80, 0x70, 1, Get_Item_Sprite_ID("Invitation"));
+SetEntityPosition(0, 0x78, 0xD0, 1);
+SetEntityPosition(0xC, 0x54, 0x80, 3);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0xB, 0x70, 0x60, 0);
+SetEntityAnim("Anna", "Anna_Stop_Base");
+SetEntityPosition(0xA, 0x80, 0x60, 0);
+SetEntityAnim("Basil", "Basil_Stop_Base");
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0xA0, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityFacing(0xC, 0);
+Make_Delay(0xA);
+TalkOpen();
+Set_Name_Window("Mary");
+Set_Portrait("Mary_Happy");
+Set_Hearth_Anim("Mary");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Anna");
+Set_Portrait("Anna_Happy");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Basil");
+Set_Portrait("Basil_Happy");
+TalkMessage(2);
+TalkClose();
+SetEntityFacing(0xB, 3);
+TalkOpen();
+Set_Name_Window("Anna");
+Set_Portrait("Anna_Angry");
+TalkMessage(3);
+Set_Name_Window("Anna");
+Set_Portrait("Anna_Happy");
+TalkMessage(4);
+TalkClose();
+Give_Love_Points("Mary", 0x7D0);
+Give_Friendship_Points("Mary", 0x1E);
+Give_Friendship_Points("Basil", 0x1E);
+Give_Friendship_Points("Anna", 0x1E);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(5);
+TalkClose();
+Despawn_Map_Item(0);
+Despawn_Map_Item(1);
+Set_Flag(0x1CC, 2);
+Set_Flag(0x1C2, 0);
+Execute_Script(0x3DC);
+exit;
+}

@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 842 Unknown_Event_0842 {
+const MESSAGE_0 = "Ta-daaaa!\r\nYou've reached B100.\BRK\WAIT_CLICKThat's all.\r\nThere are more to go.\r\nGood luck.  Bye.\BRK";
+
+Set_Flag("Flag_0x16D", 1);
+Tick_Overnight_Engine(1, 0);
+Tick_Overnight_Engine(1, 0);
+Fade_Out(1, 1);
+PlaySong(0, 0xBE);
+TalkOpen();
+Set_Name_Window("H. Goddess");
+Set_Portrait("H_Goddes_Happy");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("H. Goddess");
+Give_Love_Points("H. Goddess", 0xBB8);
+Set_Flag("Flag_0x16D", 2);
+Fade_In(1, 1);
+exit;
+}

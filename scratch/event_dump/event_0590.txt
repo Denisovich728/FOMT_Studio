@@ -1,0 +1,41 @@
+#include "lib_fomt.csv"
+
+script 590 Unknown_Event_0590 {
+const MESSAGE_0 = "Here you are, \xFF).\r\nFrom me to you...\BRK";
+const MESSAGE_1 = "I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK";
+
+SetEntityFacing(3, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Hearth_Anim("Popuri");
+Set_Name_Window("Popuri");
+if (Inventory_Check()) {
+    Set_Portrait("Popuri_Happy");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityAnim("Popuri", "Popuri_Hands_Middle_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Popuri", "Popuri_Stop_Base");
+    PlaySong(0, 0x6A);
+    SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+    Give_Item(Func122());
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+    Make_Delay(0x3C);
+    Set_Flag(0xAA, 2);
+    Refresh_Map_Entities();
+    Proc08A(3);
+    if ((Check_Flag(0xC8) == 2)) {
+        Proc08A(0x23);
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Farm_House_1", 0x147, 0x70);
+    SetEntityPosition(0, 0x147, 0x70, 2);
+    Fade_In(2, 1);
+} else {
+    Set_Portrait("Popuri_Neutral");
+    TalkMessage(1);
+    TalkClose();
+}
+Free_Event_Entity("Popuri");
+SetEntityFacing(3, 0);
+exit;
+}

@@ -1,0 +1,678 @@
+#include "lib_fomt.csv"
+
+script 1026 Unknown_Event_1026 {
+const MESSAGE_0 = "I don't think I've seen you\r\naround here before. \BRK\WAIT_CLICKOh, you're at the farm, \r\nare you? Welcome to the \r\nboonies.\BRK\WAIT_CLICKThe name's Gray. \BRK";
+const MESSAGE_1 = "Wow! What a surprise!\BRK\WAIT_CLICKWhat's a classy guy like you\r\ndoing in a place like this?\BRK";
+const MESSAGE_2 = "Thanks! I like having\r\nclassy friends like you.\BRK";
+const MESSAGE_3 = "Thanks a lot!\r\nAnytime you want to give\r\nme something, I'm ready to\BRK\r\nreceive!\BRK";
+const MESSAGE_4 = "Thanks.\BRK";
+const MESSAGE_5 = "I'll take this off your\r\nhands, but you don't need to\r\ngive it to me again, OK?\BRK";
+const MESSAGE_6 = "What a jerk! \r\nDon't give that to me!\BRK";
+const MESSAGE_7 = "You're kind of funny, if you\r\nthink that's a big deal. \BRK";
+const MESSAGE_8 = "G-get that away from\r\nme...Now!\BRK";
+const MESSAGE_9 = "Did gramps make this?\BRK\WAIT_CLICKThanks. It's not like I get\r\nto see his work or\r\nanything...\BRK";
+const MESSAGE_10 = "That's very nice! \r\nI think I'll send it to \r\nmy mom. \BRK";
+const MESSAGE_11 = "This is a good present for a\r\ngirl, isn't it?\BRK";
+const MESSAGE_12 = "You don't know me if you \r\nthink I'll like that!\r\nWell, maybe...\BRK";
+const MESSAGE_13 = "Something you want to \r\ntell me?\BRK";
+const MESSAGE_14 = "Tell about job.";
+const MESSAGE_15 = "Don't tell about job.";
+const MESSAGE_16 = "Ha! If I got a job somewhere\r\nelse, gramps would \r\ntan my hide!\BRK";
+const MESSAGE_17 = "How is Mary doing?\BRK";
+const MESSAGE_18 = "Tell her hi for me. \BRK";
+const MESSAGE_19 = "I hate it around here.\r\nThere's nothing to do.\r\nDon't you think so too?\BRK";
+const MESSAGE_20 = "I just get so bored in this \r\ntown. I want to go back to\r\nthe city!\BRK";
+const MESSAGE_21 = "Hey, \xFF!, what \r\ndo you think of the girl\r\nwho works in the Library?\BRK";
+const MESSAGE_22 = "I go to the Library a lot\r\nthese days. I like reading\r\nbooks all the sudden.\BRK";
+const MESSAGE_23 = "I had no idea books were\r\nso much fun!\BRK";
+const MESSAGE_24 = "Did you know Mary writes \r\nnovels! That's amazing. \BRK\WAIT_CLICKI hope one day I can craft\r\nsomething, too.\BRK";
+const MESSAGE_25 = "Working hard, I see. \BRK";
+const MESSAGE_26 = "Lately I've been getting \r\nalong better with gramps. \BRK\WAIT_CLICKI'm enjoying working as a \r\nblacksmith more and more.\BRK";
+const MESSAGE_27 = "Mary's different from the \r\nother girls. \BRK\WAIT_CLICKI want her to like me!\BRK";
+const MESSAGE_28 = "All I can do is try my best\r\nto learn the blacksmith \r\ntrade, and read lots of \BRK\r\nbooks. \BRK\WAIT_CLICKHopefully, she'll notice!\BRK";
+const MESSAGE_29 = "I hear neat stories from\r\nMary's father alll the time. \BRK";
+const MESSAGE_30 = "I like books, too, but\r\nI'm never to give up \r\non being a blacksmith.\BRK";
+const MESSAGE_31 = "My grampa is so hard on \r\nme for every little thing!\r\nI can hardly stand it!\BRK";
+const MESSAGE_32 = "I wonder how old my \r\ngrandfather is...\BRK\WAIT_CLICKHow can he still be so \r\nstrong!?...\BRK";
+const MESSAGE_33 = "Hi there. \r\nDo you need something?\BRK";
+const MESSAGE_34 = "Shouldn't you be getting \r\nback to the farm around now?\BRK";
+const MESSAGE_35 = "Mary's parents are both\r\nso nice to me. \BRK";
+const MESSAGE_36 = "My grandfather doens't seem\r\nto have much energy, lately.\r\nHe doesn't even yell at me!\BRK";
+const MESSAGE_37 = "I'm going to get that old \r\nman to praise me, no matter\r\nwhat!\BRK";
+const MESSAGE_38 = "No matter how hard I try,\r\nmy grandfather never praises\r\nanything I make or do!\BRK";
+const MESSAGE_39 = "I hear interesting stories \r\nfrom Mary's father \r\nall the time.\BRK";
+const MESSAGE_40 = "Books have some really\r\ninteresting stories, \r\nyou know.\BRK";
+const MESSAGE_41 = "Mary always suggests such\r\ngreat books for me to read.\BRK";
+const MESSAGE_42 = "Gramps always makes me go\r\nhiking on vacation days. He\r\nsays it's practice for \BRK\r\nconcentrating.\BRK";
+const MESSAGE_43 = "...Concentrate....\r\n...Concentrate...\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+
+SetEntityAnim("Gray", "Gray_Stop_Base");
+var_3 = GetEntityFacing(7);
+SetEntityFacing(7, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Gray");
+if ((Func083(7) == 0)) {
+    Set_Portrait("Gray_Neutral");
+    TalkMessage(0);
+    Free_Event_Entity("Gray");
+} else {
+    if (((((Inventory_Check() || ((Check_Flag("Flag_0x58") == 1) || (Check_Flag("Flag_0x82") == 1))) || ((Check_Flag("Flag_0x61") == 1) || (Check_Flag("Mary_Heart_Black") == 1))) || ((Check_Flag("Flag_0x100") == 1) || (Check_Flag("Flag_0x102") == 1))) || (Check_Flag("Flag_0xFD") == 1))) {
+        var_0 = 6;
+    } else {
+        switch (Compare_Gift()) {
+            case 0:
+                switch (Search_Food_Gift_Address()) {
+                    case "Bodigizer XL":
+                    case "Turbojolt XL":
+                    case "Chocolate":
+                    case "Curry Rice":
+                    case "Fried Rice":
+                    case "Savory Pancake":
+                    case "French Fries":
+                    case "Baked Corn":
+                    case "Sweet Potatoes":
+                    case "Baked Sweet Potato":
+                    case "Omelet Rice":
+                    case "Cheese Cake":
+                    case "Apple Pie":
+                    case "Curry Bread":
+                    case "Fried Noodles":
+                    case "Ice Cream":
+                    case "Cake":
+                    case "Chocolate Cake":
+                    case "Pudding":
+                    case "Pancakes":
+                    case "Candied Potato":
+                        var_0 = 1;
+                        break;
+                    case "Potato":
+                    case "Tomato":
+                    case "Corn":
+                    case "Regular Quality Egg":
+                    case "Good Quality Egg":
+                    case "High Quality Egg":
+                    case "Golden Egg":
+                    case "P Egg":
+                    case "X Egg":
+                    case "Mayonnaise (S)":
+                    case "Mayonnaise (M)":
+                    case "Mayonnaise (L)":
+                    case "Mayonnaise (G)":
+                    case "Mayonnaise (P)":
+                    case "Mayonnaise (X)":
+                    case "Cheese (S)":
+                    case "Cheese (M)":
+                    case "Cheese (L)":
+                    case "Cheese (G)":
+                    case "Cheese (P)":
+                    case "Cheese (X)":
+                    case "Wine":
+                    case "Bread":
+                    case "Wild Grape Juice":
+                    case "Stew":
+                    case "Ketchup":
+                    case "Popcorn":
+                    case "Corn Flakes":
+                    case "Scrambled Eggs":
+                    case "Cheese Fondue":
+                    case "Dinner Role":
+                    case "Pizza":
+                    case "Curry Noodles":
+                    case "Fried Noodles":
+                    case "Toast":
+                    case "Moon Dumplings":
+                    case "Rice Cake":
+                    case "Roasted Rice Cake":
+                    case "Large Fish":
+                    case "Egg Over Rice":
+                    case "Potato Pancakes":
+                        var_0 = 2;
+                        break;
+                    case "Cucumber":
+                    case "Strawberry":
+                    case "Cabbage":
+                    case "Onion":
+                    case "Pumpkin":
+                    case "Pineapple":
+                    case "Eggplant":
+                    case "Sweet Potato":
+                    case "Spinach":
+                    case "Milk (S)":
+                    case "Milk (M)":
+                    case "Milk (L)":
+                    case "Milk (G)":
+                    case "Milk (P)":
+                    case "Milk (X)":
+                    case "Apple":
+                    case "Honey":
+                    case "Wild Grapes":
+                    case "Mushroom":
+                    case "Truffle":
+                    case "Blue Grass":
+                    case "Green Grass":
+                    case "Orange Grass":
+                    case "Purple Grass":
+                    case "Indigo Grass":
+                    case "Black Grass":
+                    case "White Grass":
+                    case "Bodigizer":
+                    case "Turbojolt":
+                    case "Grape Juice":
+                    case "Rice Ball":
+                    case "Oil":
+                    case "Flower":
+                    case "Curry Powder":
+                    case "Relax Tea Leaves":
+                    case "SUGDW Apple":
+                    case "HMSGB Apple":
+                    case "AEPFE Apple":
+                    case "Salad":
+                    case "Miso Soup":
+                    case "Stir Fry":
+                    case "Sandwich":
+                    case "Fruit Juice":
+                    case "Vegetable Juice":
+                    case "Mixed Juice":
+                    case "Fruit Latte":
+                    case "Vegetable Latte":
+                    case "Mixed Latte":
+                    case "Strawberry Milk":
+                    case "Strawberry Jam":
+                    case "Pineapple Juice":
+                    case "Pumpkin Pudding":
+                    case "Pumpkin Stew":
+                    case "Omelet":
+                    case "Boiled Egg":
+                    case "Hot Milk":
+                    case "Butter":
+                    case "Apple Jam":
+                    case "Apple Souffl?":
+                    case "Mushroom Rice":
+                    case "Truffle Rice":
+                    case "Sushi":
+                    case "Jam Bun":
+                    case "Raisin Bread":
+                    case "Grape Jam":
+                    case "Sashimi":
+                    case "Grilled Fish":
+                    case "Chirashi Sushi":
+                    case "Noodles":
+                    case "Tempura Noodles":
+                    case "Buckwheat Noodles":
+                    case "Noodles w/ Tempura":
+                    case "Cookies":
+                    case "Chocolate Cookies":
+                    case "Tempura":
+                    case "Relaxation Tea":
+                    case "French Toast":
+                    case "Elli Leaves":
+                    case "Small Fish":
+                    case "Medium Fish":
+                    case "Toasted Rice Ball":
+                    case "Tempura Rice":
+                    case "Rice Gruel":
+                    case "Fish Sticks":
+                        var_0 = 3;
+                        break;
+                    case "Turnip":
+                    case "Carrot":
+                    case "Green Pepper":
+                    case "Spa-Boiled Egg":
+                    case "Bamboo Shoot":
+                    case "Yellow Grass":
+                    case "Muffin Mix":
+                    case "Buckwheat Flour":
+                    case "Tomato Juice":
+                    case "Bamboo Rice":
+                    case "Buckwheat Chips":
+                    case "Mountain Stew":
+                        var_0 = 4;
+                        break;
+                    case "Poisonous Mushroom":
+                    case "Red Grass":
+                    case "Pickled Turnip":
+                    case "Pickles":
+                    case "Happy Eggplant":
+                    case "Greens":
+                    case "Failed Dish":
+                    case "Failed Drink":
+                    case "Failed Pot Dish":
+                    case "Failed Dessert":
+                    case "Failed Bread":
+                    case "Failed Noodles":
+                        var_0 = 5;
+                        break;
+                }
+                break;
+            case 1:
+                switch (Search_Item_Gift_Address()) {
+                    case "Copper":
+                    case "Silver":
+                    case "Gold":
+                    case "Mystrile":
+                    case "Orichalc":
+                    case "Adamantite":
+                    case "Moon Stone":
+                    case "Sand Rose":
+                    case "Pink Diamond":
+                    case "Alexandrite":
+                    case "Diamond":
+                    case "Emerald":
+                    case "Ruby":
+                    case "Topaz":
+                    case "Peridot":
+                    case "Fluorite":
+                    case "Agate":
+                    case "Amethyst":
+                        var_0 = 1;
+                        break;
+                    case "Branches":
+                    case "Ball":
+                    case "Lumber":
+                        var_0 = 2;
+                        break;
+                    case "Moon Drop Grass":
+                    case "Pink Cat Grass":
+                    case "Blue Magic Grass":
+                    case "Red Magic Grass":
+                    case "Toy Flower":
+                    case "Wool (S)":
+                    case "Wool (M)":
+                    case "Wool (L)":
+                    case "Wool (G)":
+                    case "Wool (P)":
+                    case "Wool (P)":
+                    case "Yarn (S)":
+                    case "Yarn (M)":
+                    case "Yarn (L)":
+                    case "Yarn (G)":
+                    case "Yarn (P)":
+                    case "Yarn (X)":
+                    case "The Spring Sun":
+                    case "The Summer Sun":
+                    case "The Autumn Sun":
+                    case "The Winter Sun":
+                    case "Lithograph":
+                        var_0 = 3;
+                        break;
+                    case "Junk Ore":
+                    case "Mythic Stone":
+                        var_0 = 4;
+                        break;
+                    case "Weeds":
+                    case "Stones":
+                    case "Message in a Bottle":
+                    case "Pirate Treasure":
+                    case "Fossil of Fish":
+                    case "Empty Can":
+                    case "Boots":
+                    case "Fish Bones":
+                    case "Golden Lumber":
+                    case "Animal Fodder":
+                    case "Chicken Feed":
+                        var_0 = 5;
+                        break;
+                    case "Harvest Goddess Jewel":
+                    case "Kappa Jewel":
+                    case "Jewel of Truth":
+                    case "Karen's Wine":
+                    case "Popuri's Mud Ball":
+                    case "Ann's Music Box":
+                    case "Mary's Great Book":
+                    case "Elli's Pressed Flwr":
+                    case "Album 1":
+                    case "Album 2":
+                    case "Album 3":
+                    case "Album 4":
+                    case "Album 5":
+                    case "Album 6":
+                    case "Album 7":
+                    case "Album 8":
+                    case "Album 9":
+                    case "Album 10":
+                    case "Album 11":
+                    case "Album 12":
+                    case "Album 13":
+                    case "Album 14":
+                    case "Album 15":
+                    case "Book":
+                    case "Photo":
+                    case "Invitation":
+                    case "Lottery":
+                    case "Frisbee":
+                        var_0 = 6;
+                        break;
+                    case "Bracelet":
+                    case "Necklace":
+                    case "Earrings":
+                    case "Broach":
+                        var_0 = 9;
+                        break;
+                    case "Dress":
+                    case "Facial Pack":
+                    case "Skin Lotion":
+                    case "Sunblock":
+                        var_0 = 0xA;
+                        break;
+                    case "Perfume":
+                        var_0 = 0xB;
+                        break;
+                }
+                break;
+            case 4:
+                var_0 = 6;
+                break;
+            case 2:
+                var_0 = 7;
+                break;
+            case 3:
+                var_0 = 7;
+                break;
+        }
+    }
+    if ((var_0 != 6)) {
+        if (((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) && Is_NPC_Birthday("Gray"))) {
+            Set_Portrait("Gray_Ruborized");
+            TalkMessage(1);
+        } else {
+            switch (var_0) {
+                case 1:
+                    Set_Portrait("Gray_Happy");
+                    TalkMessage(2);
+                    break;
+                case 2:
+                    Set_Portrait("Gray_Happy");
+                    TalkMessage(3);
+                    break;
+                case 3:
+                    Set_Portrait("Gray_Happy");
+                    TalkMessage(4);
+                    break;
+                case 4:
+                    Set_Portrait("Gray_Neutral");
+                    TalkMessage(5);
+                    break;
+                case 5:
+                    Set_Portrait("Gray_Angry");
+                    TalkMessage(6);
+                    break;
+                case 7:
+                    Set_Portrait("Gray_Happy");
+                    TalkMessage(7);
+                    break;
+                case 8:
+                    Set_Portrait("Gray_Ruborized");
+                    TalkMessage(8);
+                    break;
+                case 9:
+                    Set_Portrait("Gray_Neutral");
+                    TalkMessage(9);
+                    break;
+                case 0xA:
+                    Set_Portrait("Gray_Neutral");
+                    TalkMessage(10);
+                    break;
+                case 0xB:
+                    Set_Portrait("Gray_Happy");
+                    TalkMessage(11);
+                    break;
+            }
+        }
+        if ((Has_NPC_Talked_Today_2("Gray") == 0)) {
+            switch (var_0) {
+                case 1:
+                    var_1 = 9;
+                    break;
+                case 2:
+                    var_1 = 3;
+                    break;
+                case 3:
+                    var_1 = 1;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 1;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = 9;
+                    break;
+                case 0xA:
+                    var_1 = 9;
+                    break;
+                case 0xB:
+                    var_1 = 3;
+                    break;
+            }
+        } else {
+            switch (var_0) {
+                case 1:
+                    var_1 = 3;
+                    break;
+                case 2:
+                    var_1 = 1;
+                    break;
+                case 3:
+                    var_1 = 0;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 0;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = 3;
+                    break;
+                case 0xA:
+                    var_1 = 3;
+                    break;
+                case 0xB:
+                    var_1 = 1;
+                    break;
+            }
+        }
+        if (Is_NPC_Birthday("Gray")) {
+            var_1 *= 5;
+        }
+        if (Is_Item_Wrapped()) {
+            var_1 = (var_1 + (var_1 / 4));
+        }
+        Give_Friendship_Points("Gray", var_1);
+        TalkClose();
+        if (((((((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) || (var_0 == 4)) || (var_0 == 5)) || (var_0 == 9)) || (var_0 == 0xA)) || (var_0 == 0xB))) {
+            Drop_Held_Item();
+        }
+        Warp_Entity_To_Map("South_Side_Town");
+        goto LBL_0003;
+    }
+    if (Func05C(0)) {
+        switch (Check_Equped_Tool()) {
+            case "Blue Feather":
+                Set_Portrait("Gray_Surprised");
+                TalkMessage(12);
+                break;
+        }
+        goto LBL_0003;
+    }
+    if (((((((Check_Flag("System_TotalShipments") == 1) && (Check_Flag("System_Season") == 2)) && (Check_Flag("System_DayOfMonth") == 0xE)) && (Check_Flag("Flag_0xF3") == 2)) && (Check_Flag("Flag_0xF5") == 0)) && (Check_Flag("Flag_0xF4") == 0))) {
+        Set_Portrait("Gray_Happy");
+        TalkMessage(13);
+        var_2 = TalkChoice2(0xE, 0xF);
+        switch (var_2) {
+            case 1:
+                Set_Portrait("Gray_Angry");
+                TalkMessage(16);
+                Set_Flag("Flag_0xF5", 1);
+                break;
+            case 2:
+                break;
+        }
+        goto LBL_0003;
+    }
+    switch (GetEntityLocation(7)) {
+        case "North_Side_Town":
+        case "Rose_Square":
+        case "South_Side_Town":
+        case "Doug_Inn_Floor_02":
+            if (((Check_Flag("System_Hour") >= 6) && (Check_Flag("System_Hour") < 0xC))) {
+                if ((Check_Flag("Mary_Marriage_State") == 2)) {
+                    if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                        Set_Portrait("Gray_Neutral");
+                        TalkMessage(17);
+                    } else {
+                        Set_Portrait("Gray_Happy");
+                        TalkMessage(18);
+                    }
+                } else {
+                    if ((Check_Flag("Flag_0x8A") == 0)) {
+                        if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                            Set_Portrait("Gray_Neutral");
+                            TalkMessage(19);
+                        } else {
+                            Set_Portrait("Gray_Neutral");
+                            TalkMessage(20);
+                        }
+                    } else {
+                        if (((Check_Flag("Flag_0x8A") == 2) && (Check_Flag("Rival_Mary_Gray_Event_1") == 0))) {
+                            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                                Set_Portrait("Gray_Neutral");
+                                TalkMessage(21);
+                            } else {
+                                Set_Portrait("Gray_Happy");
+                                TalkMessage(22);
+                            }
+                        } else {
+                            if (((Check_Flag("Rival_Mary_Gray_Event_1") == 2) && (Check_Flag("Rival_Mary_Gray_Event_2") == 0))) {
+                                if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                                    Set_Portrait("Gray_Neutral");
+                                    TalkMessage(23);
+                                } else {
+                                    Set_Portrait("Gray_Happy");
+                                    TalkMessage(24);
+                                }
+                            } else {
+                                if (((Check_Flag("Rival_Mary_Gray_Event_2") == 2) && (Check_Flag("Rival_Mary_Gray_Event_3") == 0))) {
+                                    if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                                        Set_Portrait("Gray_Neutral");
+                                        TalkMessage(25);
+                                    } else {
+                                        Set_Portrait("Gray_Happy");
+                                        TalkMessage(26);
+                                    }
+                                } else {
+                                    if ((((Check_Flag("Rival_Mary_Gray_Event_3") == 2) && (Check_Flag("Rival_Mary_Gray_Event_4") == 0)) && (Check_Flag("Rival_Mary_Gray_Married") == 0))) {
+                                        if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                                            Set_Portrait("Gray_Surprised");
+                                            TalkMessage(27);
+                                        } else {
+                                            Set_Portrait("Gray_Happy");
+                                            TalkMessage(28);
+                                        }
+                                    } else {
+                                        if (((Check_Flag("Rival_Mary_Gray_Event_4") == 2) || (Check_Flag("Rival_Mary_Gray_Married") == 2))) {
+                                            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                                                Set_Portrait("Gray_Happy");
+                                                TalkMessage(29);
+                                            } else {
+                                                Set_Portrait("Gray_Neutral");
+                                                TalkMessage(30);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                goto LBL_00D4;
+            }
+            if (((Check_Flag("System_Hour") >= 0xC) && (Check_Flag("System_Hour") < 0x11))) {
+                if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                    Set_Portrait("Gray_Neutral");
+                    TalkMessage(31);
+                } else {
+                    Set_Portrait("Gray_Neutral");
+                    TalkMessage(32);
+                }
+                goto LBL_00DE;
+            }
+            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                Set_Portrait("Gray_Ruborized");
+                TalkMessage(33);
+                goto LBL_00E2;
+            }
+            Set_Portrait("Gray_Timid");
+            TalkMessage(34);
+            break;
+        case "Basil_House_Floor_01":
+            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                Set_Portrait("Gray_Happy");
+                TalkMessage(35);
+                goto LBL_00E7;
+            }
+            Set_Portrait("Gray_Timid");
+            TalkMessage(36);
+            break;
+        case "Saibara_House":
+            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                Set_Portrait("Gray_Angry");
+                TalkMessage(37);
+                goto LBL_00EC;
+            }
+            Set_Portrait("Gray_Afraid");
+            TalkMessage(38);
+            break;
+        case "Mary_Library_Floor_01":
+            if (((Check_Flag("Rival_Mary_Gray_Event_4") == 2) || (Check_Flag("Rival_Mary_Gray_Married") == 2))) {
+                if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                    Set_Portrait("Gray_Happy");
+                    TalkMessage(39);
+                } else {
+                    Set_Portrait("Gray_Neutral");
+                    TalkMessage(30);
+                }
+                goto LBL_00F7;
+            }
+            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                Set_Portrait("Gray_Happy");
+                TalkMessage(40);
+                goto LBL_00FB;
+            }
+            Set_Portrait("Gray_Happy");
+            TalkMessage(41);
+            break;
+        case "Mothers_Hill_Top":
+            if ((Has_NPC_Talked_Today("Gray") == 0)) {
+                Set_Portrait("Gray_Afraid");
+                TalkMessage(42);
+                goto LBL_0100;
+            }
+            Set_Portrait("Gray_Neutral");
+            TalkMessage(43);
+            break;
+    }
+    Free_Event_Entity("Gray");
+}
+TalkClose();
+SetEntityFacing(7, var_3);
+exit;
+}

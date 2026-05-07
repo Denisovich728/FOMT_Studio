@@ -1,0 +1,140 @@
+#include "lib_fomt.csv"
+
+script 685 Unknown_Event_0685 {
+const MESSAGE_0 = "\xFF), wake up!\r\nIt's an emergency!\BRK";
+const MESSAGE_1 = "When I woke up this morning,\r\n\xFF* had fallen \r\nout of bed and gotten hurt.\BRK\r\nWe have to help him!...\BRK";
+const MESSAGE_2 = "Waaa...!!!!\BRK";
+const MESSAGE_3 = "He'll be fine!";
+const MESSAGE_4 = "Let's go to the Clinic.";
+const MESSAGE_5 = "What are you talking about!?\r\nWhat if he's injured!?\BRK";
+const MESSAGE_6 = "I'm going to the Clinic now.\r\nI don't care what time \r\nit is!\BRK\WAIT_CLICKCome on, \xFF*!\BRK";
+const MESSAGE_7 = "Don't worry, it's only \r\na scratch. \BRK";
+const MESSAGE_8 = "Thank goodness!\BRK";
+const MESSAGE_9 = "He's OK this time, but you\r\nhave to be especially\r\nwatchful at this age.\BRK";
+const MESSAGE_10 = "I understand. \r\nI'm sorry, \xFF*.\BRK";
+const MESSAGE_11 = "Da-!\BRK";
+
+var var_0;
+
+PlayBGM(1, 0x11);
+Warp_Player("Farm_House_1", 0x190, 0x64);
+SetEntityPosition(0, 0x190, 0x64, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x19, 0x1C2, 0x64, 2);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+SetEntityPosition(0x23, 0x1B0, 0x64, 2);
+if ((Check_Flag(0x2F) == 1)) {
+    SetEntityAnim("", "Baby_Stop_Base");
+} else {
+    SetEntityAnim("", "Baby_Sit_Base");
+}
+TalkOpen();
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Afraid");
+Set_Hearth_Anim("Ann");
+TalkMessage(0);
+TalkClose();
+Fade_In(2, 1);
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Afraid");
+Set_Hearth_Anim("Ann");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Name_Window("");
+Set_Portrait("Baby_Crying");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(3, 4);
+switch (var_0) {
+    case 1:
+        Give_Love_Points("Ann", -0x7D0);
+        Give_Friendship_Points("", -0xA);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Angry");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(5);
+        TalkClose();
+        SetEntityFacing(0x19, 0);
+        TalkOpen();
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Angry");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(6);
+        TalkClose();
+        Free_Event_Entity("Ann");
+        Free_Event_Entity("");
+        Set_Flag(0xD8, 2);
+        Fade_Out(2, 1);
+        Execute_Script(0x3DC);
+        break;
+    case 2:
+        Give_Love_Points("Ann", 0xBB8);
+        Give_Friendship_Points("", 0x14);
+        Give_Friendship_Points("Doctor", 0x14);
+        TalkClose();
+        Fade_Out(2, 1);
+        Warp_Player("Mineral_Clinic_Floor_01", 0xE4, 0x94);
+        PlayBGM(1, 0x11);
+        SetEntityPosition(0, 0xE4, 0x7C, 3);
+        if (Inventory_Check()) {
+            SetEntityAnim("Player", "Player_Stop_Base");
+            goto LBL_0009;
+        }
+        SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        SetEntityPosition(0x19, 0xE4, 0x94, 3);
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        SetEntityPosition(0x14, 0x106, 0x7C, 2);
+        SetEntityAnim("Doctor", 0x320);
+        SetEntityPosition(0x23, 0x106, 0x94, 2);
+        if ((Check_Flag(0x2F) == 1)) {
+            SetEntityAnim("", "Baby_Stop_Base");
+            goto LBL_000D;
+        }
+        SetEntityAnim("", "Baby_Sit_Base");
+        Fade_In(2, 1);
+        TalkOpen();
+        Set_Portrait("Doctor_Neutral");
+        Set_Name_Window("Doctor");
+        TalkMessage(7);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Happy");
+        TalkMessage(8);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Doctor_Neutral");
+        Set_Name_Window("Doctor");
+        TalkMessage(9);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Happy");
+        TalkMessage(10);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("");
+        Set_Portrait("Baby_Happy");
+        TalkMessage(11);
+        TalkClose();
+        Free_Event_Entity("Ann");
+        Free_Event_Entity("");
+        Free_Event_Entity("Doctor");
+        Set_Flag(0xD8, 2);
+        Fade_Out(2, 1);
+        Execute_Script(0x3DC);
+        break;
+}
+exit;
+}

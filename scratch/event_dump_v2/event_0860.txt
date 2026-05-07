@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 860 Unknown_Event_0860 {
+const MESSAGE_0 = "Goo-goo. \BRK";
+
+if ((Check_Flag("Flag_0x17A") == 2)) {
+    if ((Check_Flag("Baby_Age_Days") >= 0x3C)) {
+        SetEntityFacing(0x23, GetOppositeFacing(GetEntityFacing(0)));
+        TalkOpen();
+        Set_Name_Window("");
+        Set_Portrait("Baby_Neutral");
+        TalkMessage(0);
+        TalkClose();
+        Free_Event_Entity("");
+        SetEntityFacing(0x23, 0);
+    } else {
+        exit;
+    }
+}
+exit;
+}

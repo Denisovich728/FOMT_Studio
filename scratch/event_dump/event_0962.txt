@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 962 Unknown_Event_0962 {
+const MESSAGE_0 = "We may not look like it, but\r\nthe Doctor and I are \r\nthe same age. \BRK\WAIT_CLICKWe used to play together...\BRK";
+const MESSAGE_1 = "We used to say how we wanted\r\nto help the people of this \r\ntown somehow. \BRK";
+
+if ((Func083(0xE) == 0)) {
+    Free_Event_Entity("Harris");
+}
+if ((Has_NPC_Talked_Today("Harris") == 0)) {
+    SetEntityFacing(0xE, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Harris_Neutral");
+    Set_Name_Window("Harris");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0xE, 3);
+    Free_Event_Entity("Harris");
+} else {
+    SetEntityFacing(0xE, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Harris_Happy");
+    Set_Name_Window("Harris");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0xE, 3);
+    Free_Event_Entity("Harris");
+}
+exit;
+}

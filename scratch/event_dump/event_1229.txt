@@ -1,0 +1,28 @@
+#include "lib_fomt.csv"
+
+script 1229 Unknown_Event_1229 {
+const MESSAGE_0 = "It doesn't matter what it \r\ntastes like! \BRK\WAIT_CLICKNot eating it would be a \r\nwaste. \BRK\WAIT_CLICKHave you finished yours, \r\n\xFF!? \BRK";
+const MESSAGE_1 = "Now that I'm stuffed, I've \r\ngot to get back to work. \BRK";
+
+if ((Func083(0x1B) == 0)) {
+    Free_Event_Entity("Gotz");
+}
+SetEntityFacing(0x1B, GetOppositeFacing(GetEntityFacing(0)));
+if ((Has_Spoken_To_NPC_Today("Gotz") == 0)) {
+    Give_Friendship_Points("Gotz", 5);
+}
+TalkOpen();
+Set_Name_Window("Gotz");
+if ((Check_Flag(0x1A5) == 1)) {
+    Set_Portrait("Gotz_Neutral");
+    TalkMessage(0);
+    TalkClose();
+} else {
+    Set_Portrait("Gotz_Neutral");
+    TalkMessage(1);
+    TalkClose();
+}
+Free_Event_Entity("Gotz");
+SetEntityFacing(0x1B, 2);
+exit;
+}

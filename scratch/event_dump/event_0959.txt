@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 959 Unknown_Event_0959 {
+const MESSAGE_0 = "Elli, you are such a \r\nbeautiful bride...!\BRK\WAIT_CLICKYou've only thought about \r\nme and Stu, but now you \r\nhave to concentrate on your\BRK\r\nnew family. \BRK";
+const MESSAGE_1 = "Watching Elli get married\r\nhas made me determined to\r\nlive to see Stu married! \BRK";
+
+if ((Func083(0xF) == 0)) {
+    Free_Event_Entity("Ellen");
+}
+if ((Has_NPC_Talked_Today("Ellen") == 0)) {
+    SetEntityFacing(0xF, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Ellen_Neutral");
+    Set_Name_Window("Ellen");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0xF, 0);
+    Free_Event_Entity("Ellen");
+} else {
+    SetEntityFacing(0xF, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Ellen_Happy");
+    Set_Name_Window("Ellen");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0xF, 0);
+    Free_Event_Entity("Ellen");
+}
+exit;
+}

@@ -5,22 +5,22 @@ func,0x004,4,GetEntityY,arg_1
 proc,0x005,5,SetEntityFacing,"arg_1, arg_2"
 func,0x006,6,GetEntityFacing,arg_1
 proc,0x007,7,Proc007,"arg_1, arg_2"
-proc,0x008,8,Proc008,"arg_1, arg_2, arg_3"
-proc,0x009,9,Proc009,"arg_1, arg_2, arg_3"
-proc,0x00A,10,Proc00A,"arg_1, arg_2, arg_3"
+proc,0x008,8,Set_Vector_X,"arg_1, arg_2, arg_3"
+proc,0x009,9,Set_Camera_Position,"arg_1, arg_2, arg_3"
+proc,0x00A,10,Set_Vector_Y,"arg_1, arg_2, arg_3"
 proc,0x00B,11,Proc00B,"arg_1, arg_2, arg_3"
-proc,0x00C,12,Proc00C,arg_1
+proc,0x00C,12,Execute_Movement,arg_1
 proc,0x00D,13,SetEntityAnim,"arg_1, arg_2"
-proc,0x00F,15,Proc00F,arg_1
-proc,0x010,16,Proc010,"arg_1, arg_2"
-proc,0x011,17,Proc011,"arg_1, arg_2, arg_3"
-proc,0x012,18,Proc012,arg_1
+proc,0x00F,15,Hide_Entity,arg_1
+proc,0x010,16,Spawn_Event_Entity,"entity_id, arg_2"
+proc,0x011,17,Show_Emote,"arg_1, arg_2, arg_3"
+proc,0x012,18,Wait_For_Animation,arg_1
 func,0x013,19,GetOppositeFacing,arg_1
 func,0x014,20,GetEntityLocation,arg_1
-proc,0x015,21,Proc015,"arg_1, arg_2, arg_3"
-proc,0x016,22,Proc016,"arg_1, arg_2, arg_3"
-proc,0x017,23,Proc017,"arg_1, arg_2, arg_3"
-proc,0x018,24,Proc018,
+proc,0x015,21,Entity_Action,"entity_id, action_id, value"
+proc,0x016,22,Warp_Player,"arg_1, arg_2, arg_3"
+proc,0x017,23,Pan_Camera_To,"X, Y, Speed"
+proc,0x018,24,Wait_Camera_Stop,
 proc,0x019,25,PlayBGM,"arg_1, arg_2"
 proc,0x01A,26,StopBGM,
 proc,0x01B,27,PlaySong,"arg_1, arg_2"
@@ -31,284 +31,284 @@ proc,0x020,32,Proc020,
 proc,0x021,33,TalkClose,
 proc,0x022,34,TalkMessage,arg_1: string
 proc,0x023,35,TalkMessageSlow,arg_1: string
-proc,0x024,36,Proc024,arg_1: string
-func,0x025,37,Func025,"arg_1: string, arg_2: string, arg_3: string"
-func,0x027,39,Func027,"arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string"
+proc,0x024,36,Print_Message,arg_1: string
+func,0x025,37,Show_Tre_Option_Menu,"arg_1: string, arg_2: string, arg_3: string"
+func,0x027,39,Draw_Menu_With_Header,"Msg_Title, Msg_Opt1, Msg_Opt2, Msg_Opt3, Msg_Opt4, Msg_Opt5"
 func,0x028,40,TalkChoice2,"arg_1: string, arg_2: string"
 func,0x029,41,TalkChoice3,"arg_1: string, arg_2: string, arg_3: string"
 func,0x02A,42,TalkChoice4,"arg_1: string, arg_2: string, arg_3: string, arg_4: string"
 func,0x02B,43,TalkChoice5,"arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string"
 func,0x02C,44,TalkChoice6,"arg_1: string, arg_2: string, arg_3: string, arg_4: string, arg_5: string, arg_6: string"
-proc,0x02D,45,Proc02D,arg_1
-proc,0x02E,46,Proc02E,arg_1: string
-proc,0x02F,47,Proc02F,
-proc,0x030,48,Proc030,arg_1
-proc,0x031,49,Proc031,
-proc,0x032,50,Proc032,arg_1
+proc,0x02D,45,Set_Name_Window,arg_1
+proc,0x02E,46,Create_Select_List,arg_1: string
+proc,0x02F,47,Make_Store_Error,
+proc,0x030,48,Set_Portrait,arg_1
+proc,0x031,49,Talk_Mini_Close,
+proc,0x032,50,Set_Hearth_Anim,arg_1
 proc,0x033,51,Proc033,
-proc,0x034,52,Proc034,"arg_1, arg_2"
-proc,0x035,53,Proc035,"arg_1, arg_2"
-proc,0x036,54,Proc036,"arg_1, arg_2"
-proc,0x037,55,Proc037,arg_1
-proc,0x038,56,Proc038,arg_1
-proc,0x039,57,Proc039,"arg_1, arg_2"
-proc,0x03A,58,Proc03A,"arg_1, arg_2, arg_3"
-proc,0x03B,59,Proc03B,"arg_1, arg_2: string"
-func,0x03D,61,Func03D,"arg_1, arg_2"
+proc,0x034,52,Fade_Out,"arg_1, arg_2"
+proc,0x035,53,Fade_In,"arg_1, arg_2"
+proc,0x036,54,Tick_Overnight_Engine,"save_mode, day_type"
+proc,0x037,55,Make_Delay,arg_1
+proc,0x038,56,Execute_Script,arg_1
+proc,0x039,57,Set_Text_Buffer_Int,"arg_1, arg_2"
+proc,0x03A,58,Set_Text_Buffer_Int_Formatted,"buffer_id, value, digits"
+proc,0x03B,59,Check_Date,"arg_1, arg_2"
+func,0x03D,61,RNG_Generator,"Min, Max"
 func,0x03E,62,Func03E,arg_1
-proc,0x03F,63,Proc03F,"arg_1, arg_2"
+proc,0x03F,63,Set_Flag,"Flag_Dir, Valor_NVO"
 func,0x040,64,Func040,
-func,0x041,65,Func041,
-func,0x042,66,Func042,
-func,0x043,67,Func043,
-func,0x044,68,Func044,
-func,0x045,69,Func045,
-proc,0x046,70,Proc046,
-proc,0x047,71,Proc047,
-proc,0x048,72,Proc048,arg_1
-proc,0x049,73,Proc049,arg_1
-proc,0x04A,74,Proc04A,arg_1
-proc,0x04B,75,Proc04B,arg_1
-func,0x04C,76,Func04C,
-func,0x04D,77,Func04D,
-proc,0x04E,78,Proc04E,
-func,0x04F,79,Func04F,
-func,0x050,80,Func050,
-proc,0x051,81,Proc051,"arg_1, arg_2"
-proc,0x052,82,Proc052,
-func,0x053,83,Func053,arg_1
-func,0x054,84,Func054,arg_1
-proc,0x055,85,Proc055,arg_1
-func,0x056,86,Func056,
-func,0x057,87,Func057,
+func,0x041,65,Compare_Gift,
+func,0x042,66,Is_Item_Wrapped,
+func,0x043,67,Search_Food_Gift_Address,
+func,0x044,68,Search_Item_Gift_Address,
+func,0x045,69,Func044,
+proc,0x046,70,Destroy_Hand_Item,arg_1
+proc,0x047,71,Proc046,
+proc,0x048,72,Give_Food,arg_1
+proc,0x049,73,Give_Item,arg_1
+proc,0x04A,74,Receive_Gift_ID,item_id
+proc,0x04B,75,Proc04A,arg_1
+func,0x04C,76,Func04B,
+func,0x04D,77,Func04C,
+proc,0x04E,78,Proc04D,
+func,0x04F,79,Check_Equped_Tool,
+func,0x050,80,Check_Tool_TBox_Space,
+proc,0x051,81,Give_Tool_In_ToolBox,"arg_1, arg_2"
+proc,0x052,82,Remove_Equipped_Item,
+func,0x053,83,Func052,arg_1
+func,0x054,84,Has_Met_NPC,which_npc
+proc,0x055,85,Proc054,arg_1
+func,0x056,86,Check_Tool_Inventory_Space,
+func,0x057,87,Func056,
 func,0x058,88,Func058,"arg_1, arg_2"
-func,0x059,89,Func059,"arg_1, arg_2"
-func,0x05A,90,Func05A,"arg_1, arg_2"
-proc,0x05B,91,Proc05B,arg_1
-proc,0x05C,92,Proc05C,"arg_1, arg_2"
-func,0x05D,93,Func05D,
-func,0x05E,94,Func05E,arg_1
-func,0x060,96,Func060,arg_1
-proc,0x061,97,Proc061,arg_1
-proc,0x062,98,Proc062,
-proc,0x063,99,Proc063,
-func,0x064,100,Func064,
-proc,0x065,101,Proc065,
-proc,0x066,102,Proc066,
-proc,0x067,103,Proc067,
-proc,0x068,104,Proc068,
-func,0x069,105,Func069,
-proc,0x06A,106,Proc06A,
-proc,0x06B,107,Proc06B,
-proc,0x06C,108,Proc06C,
-func,0x06D,109,Func06D,
-func,0x06E,110,Func06E,
-func,0x06F,111,Func06F,
-func,0x071,113,Func071,arg_1
-proc,0x073,115,Proc073,
-func,0x074,116,Func074,
-proc,0x075,117,Proc075,
-proc,0x077,119,Proc077,arg_1
+func,0x059,89,Func058,"arg_1, arg_2"
+func,0x05A,90,Give_Tool_In_Inventory,"Item_ID, Quantity"
+proc,0x05B,91,Animation_Tool_Give,arg_j1
+proc,0x05C,92,Set_Global_RNG_Modifier,"Target, Value"
+func,0x05D,93,Anim_Player_Drop_Arms,
+func,0x05E,94,Func05D,arg_1
+func,0x060,96,Func05F,arg_1
+proc,0x061,97,Proc060,arg_1
+proc,0x062,98,Proc061,
+proc,0x063,99,Proc062,
+func,0x064,100,Func063,
+proc,0x065,101,Activate_Hot_Spring_Healing,
+proc,0x066,102,Kill_NPC,arg_1
+proc,0x067,103,Wait_Screen_Effect,
+proc,0x068,104,Proc067,
+func,0x069,105,Last_Sleep_Location_Check,
+proc,0x06A,106,Unlock_Player_Input,
+proc,0x06B,107,Lock_Player_Input,
+proc,0x06C,108,Resume_Tick_Engine,
+func,0x06D,109,Func06C,
+func,0x06E,110,Func06D,
+func,0x06F,111,Func06E,
+func,0x071,113,Func070,arg_1
+proc,0x073,115,Proc072,
+func,0x074,116,Func073,
+proc,0x075,117,Proc074,
+proc,0x077,119,Set_Goddess_Appearance_Flash,state
 func,0x078,120,Func078,
 proc,0x079,121,Proc079,arg_1
-func,0x07A,122,Func07A,arg_1
-func,0x07B,123,Func07B,arg_1
-proc,0x07C,124,Proc07C,arg_1
-proc,0x07D,125,Proc07D,arg_1
-func,0x07E,126,Func07E,arg_1
-func,0x07F,127,Func07F,arg_1
-proc,0x080,128,Proc080,"arg_1, arg_2"
-proc,0x081,129,Proc081,"arg_1, arg_2"
-func,0x082,130,Func082,arg_1
-proc,0x083,131,Proc083,arg_1
-func,0x084,132,Func084,arg_1
-func,0x085,133,Func085,arg_1
-func,0x086,134,Func086,arg_1
-proc,0x087,135,Proc087,arg_1
-func,0x088,136,Func088,arg_1
-func,0x089,137,Func089,arg_1
-proc,0x08A,138,Proc08A,"arg_1, arg_2"
-proc,0x08C,140,Proc08C,"arg_1, arg_2"
-proc,0x08D,141,Proc08D,arg_1
-proc,0x08E,142,Proc08E,
-proc,0x08F,143,Proc08F,arg_1
-proc,0x090,144,Proc090,
-proc,0x091,145,Proc091,
-proc,0x092,146,Proc092,
-proc,0x093,147,Proc093,
-proc,0x094,148,Proc094,
-proc,0x095,149,Proc095,
-proc,0x096,150,Proc096,
-proc,0x097,151,Proc097,
-proc,0x098,152,Proc098,
-proc,0x099,153,Proc099,
-proc,0x09A,154,Proc09A,
-proc,0x09B,155,Proc09B,arg_1
-proc,0x09C,156,Proc09C,
-proc,0x09D,157,Proc09D,
-proc,0x09E,158,Proc09E,
-proc,0x09F,159,Proc09F,
-proc,0x0A0,160,Proc0A0,
-proc,0x0A1,161,Proc0A1,
-proc,0x0A2,162,Proc0A2,
-proc,0x0A3,163,Proc0A3,
-proc,0x0A4,164,Proc0A4,
-func,0x0A5,165,Func0A5,
-proc,0x0A6,166,Proc0A6,"arg_1, arg_2"
-proc,0x0A8,168,Proc0A8,
-proc,0x0A9,169,Proc0A9,arg_1
-func,0x0AA,170,Func0AA,arg_1
-proc,0x0AB,171,Proc0AB,
-proc,0x0AC,172,Proc0AC,arg_1
-proc,0x0AD,173,Proc0AD,
-proc,0x0AE,174,Proc0AE,
-proc,0x0AF,175,Proc0AF,
-proc,0x0B0,176,Proc0B0,
-proc,0x0B1,177,Proc0B1,
-proc,0x0B2,178,Proc0B2,
-func,0x0B3,179,Func0B3,
-func,0x0B4,180,Func0B4,arg_1
-func,0x0B5,181,Func0B5,
-proc,0x0B6,182,Proc0B6,arg_1
-func,0x0B7,183,Func0B7,arg_1
-proc,0x0B8,184,Proc0B8,arg_1
-func,0x0B9,185,Func0B9,
-func,0x0BA,186,Func0BA,arg_1
-proc,0x0BB,187,Proc0BB,arg_1
-proc,0x0BC,188,Proc0BC,arg_1
-func,0x0BD,189,Func0BD,arg_1
-func,0x0BE,190,Func0BE,
-func,0x0BF,191,Func0BF,arg_1
-func,0x0C0,192,Func0C0,arg_1
-func,0x0C1,193,Func0C1,arg_1
-proc,0x0C2,194,Proc0C2,arg_1
-proc,0x0C3,195,Proc0C3,
-func,0x0C4,196,Func0C4,
-func,0x0C5,197,Func0C5,arg_1
-func,0x0C6,198,Func0C6,arg_1
-proc,0x0C7,199,Proc0C7,
-proc,0x0C8,200,Proc0C8,
-func,0x0C9,201,Func0C9,
-proc,0x0CA,202,Proc0CA,arg_1
-proc,0x0CB,203,Proc0CB,arg_1
-proc,0x0CC,204,Proc0CC,
-proc,0x0CD,205,Proc0CD,
-func,0x0CE,206,Func0CE,arg_1
-func,0x0CF,207,Func0CF,arg_1
-func,0x0D0,208,Func0D0,"arg_1, arg_2"
-func,0x0D1,209,Func0D1,arg_1
-proc,0x0D3,211,Proc0D3,"arg_1, arg_2, arg_3"
-proc,0x0D4,212,Proc0D4,arg_1
-func,0x0D5,213,Func0D5,arg_1
-func,0x0D6,214,Func0D6,arg_1
-func,0x0D7,215,Func0D7,arg_1
-func,0x0D8,216,Func0D8,arg_1
-func,0x0D9,217,Func0D9,
-func,0x0DA,218,Func0DA,arg_1
-proc,0x0DB,219,Proc0DB,arg_1
-proc,0x0DC,220,Proc0DC,
-func,0x0DD,221,Func0DD,arg_1
-proc,0x0DE,222,Proc0DE,
-proc,0x0DF,223,Proc0DF,
-func,0x0E0,224,Func0E0,
-func,0x0E1,225,Func0E1,
-func,0x0E2,226,Func0E2,
-proc,0x0E3,227,Proc0E3,arg_1
-proc,0x0E4,228,Proc0E4,
-proc,0x0E5,229,Proc0E5,
-func,0x0E6,230,Func0E6,
-func,0x0E7,231,Func0E7,
-func,0x0E8,232,Func0E8,
-func,0x0E9,233,Func0E9,
-func,0x0EA,234,Func0EA,
-func,0x0EB,235,Func0EB,
-func,0x0EC,236,Func0EC,
-func,0x0ED,237,Func0ED,
-func,0x0EF,239,Func0EF,
-proc,0x0F0,240,Proc0F0,arg_1
-proc,0x0F1,241,Proc0F1,arg_1
-proc,0x0F2,242,Proc0F2,
-proc,0x0F3,243,Proc0F3,
-func,0x0F4,244,Func0F4,
-func,0x0F5,245,Func0F5,
-func,0x0F6,246,Func0F6,
-proc,0x0F7,247,Proc0F7,"arg_1, arg_2"
-func,0x0F8,248,Func0F8,arg_1
-func,0x0F9,249,Func0F9,arg_1
-proc,0x0FA,250,Proc0FA,arg_1
-proc,0x0FB,251,Proc0FB,arg_1
-func,0x0FC,252,Func0FC,
-func,0x0FD,253,Func0FD,
-func,0x0FE,254,Func0FE,arg_1: string
-proc,0x0FF,255,Proc0FF,arg_1
-proc,0x100,256,Proc100,
-proc,0x101,257,Proc101,
-func,0x102,258,Func102,"arg_1, arg_2"
-proc,0x103,259,Proc103,"arg_1, arg_2, arg_3, arg_4, arg_5"
-proc,0x104,260,Proc104,"arg_1, arg_2"
+func,0x07A,122,Func077,arg_1
+func,0x07B,123,Func078,arg_1
+proc,0x07C,124,GameCube_Link_Command,action_id
+proc,0x07D,125,Proc07A,arg_1
+func,0x07E,126,Is_NPC_Birthday,arg_1
+func,0x07F,127,Chek_Friendship_Points,arg_1
+proc,0x080,128,Give_Friendship_Points,"arg_1, arg_2"
+proc,0x081,129,Add_Rival_Points,"pair_id, points"
+func,0x082,130,Func07F,arg_1
+proc,0x083,131,Free_Event_Entity,arg_1
+func,0x084,132,Has_Spoken_To_NPC_Today,NPC_ID
+func,0x085,133,Has_NPC_Talked_Today,arg_1
+func,0x086,134,Func083,arg_1
+proc,0x087,135,Warp_Entity_To_Map,arg_1
+func,0x088,136,Has_NPC_Talked_Today_2,arg_1
+func,0x089,137,Chek_Love_Points,arg_1
+proc,0x08A,138,Give_Love_Points,"direccion, cantidad"
+proc,0x08C,140,Routine_State_Override,"arg_1, arg_2"
+proc,0x08D,141,Despawn_Entity   ,arg_1
+proc,0x08E,142,Proc08B,
+proc,0x08F,143,Open_Shop_Quantity_UI,Shop_Item_ID
+proc,0x090,144,Proc08D,
+proc,0x091,145,Proc08E,
+proc,0x092,146,Open_Gotz_Shop_Menu,
+proc,0x093,147,Proc090,
+proc,0x094,148,Proc091,
+proc,0x095,149,Proc092,
+proc,0x096,150,Proc093,
+proc,0x097,151,Proc094,
+proc,0x098,152,Proc095,
+proc,0x099,153,Proc096,
+proc,0x09A,154,Open_Rucksack_Select_UI,
+proc,0x09B,155,Display_Full_Screen_Image,image_id
+proc,0x09C,156,Proc099,
+proc,0x09D,157,Proc09A,
+proc,0x09E,158,Proc09B,
+proc,0x09F,159,Proc09C,
+proc,0x0A0,160,Proc09D,
+proc,0x0A1,161,Proc09E,
+proc,0x0A2,162,Proc09F,
+proc,0x0A3,163,Proc0A0,
+proc,0x0A4,164,Proc0A1,
+func,0x0A5,165,Func0A2,
+proc,0x0A6,166,Show_Naming_Screen,"arg_1, arg_2"
+proc,0x0A8,168,Proc0A5,
+proc,0x0A9,169,Proc0A6,arg_1
+func,0x0AA,170,Func0A7,arg_1
+proc,0x0AB,171,Reset_Event_Entities,
+proc,0x0AC,172,Proc0A9,arg_1
+proc,0x0AD,173,Proc0AA,
+proc,0x0AE,174,Proc0AB,
+proc,0x0AF,175,Proc0AC,
+proc,0x0B0,176,Proc0AD,
+proc,0x0B1,177,Proc0AE,
+proc,0x0B2,178,Proc0AF,
+func,0x0B3,179,Func0B0,
+func,0x0B4,180,Func0B1,arg_1
+func,0x0B5,181,Func0B2,
+proc,0x0B6,182,Proc0B3,arg_1
+func,0x0B7,183,Func0B4,arg_1
+proc,0x0B8,184,Proc0B5,arg_1
+func,0x0B9,185,Func0B6,
+func,0x0BA,186,Func0B7,arg_1
+proc,0x0BB,187,Proc0B8,arg_1
+proc,0x0BC,188,Proc0B9,arg_1
+func,0x0BD,189,Func0BA,arg_1
+func,0x0BE,190,Func0BB,
+func,0x0BF,191,Func0BC,arg_1
+func,0x0C0,192,Func0BD,arg_1
+func,0x0C1,193,Func0BE,arg_1
+proc,0x0C2,194,Add_Fodder_to_Box,slot_id
+proc,0x0C3,195,Proc0C0,
+func,0x0C4,196,Func0C1,
+func,0x0C5,197,Func0C2,arg_1
+func,0x0C6,198,Func0C3,arg_1
+proc,0x0C7,199,Proc0C4,
+proc,0x0C8,200,Proc0C5,
+func,0x0C9,201,Init_Notice_Board_UI,
+proc,0x0CA,202,Anim_Door_Enter,arg_1
+proc,0x0CB,203,Anim_Door_Exit,arg_1
+proc,0x0CC,204,Proc0C9,
+proc,0x0CD,205,Proc0CA,
+func,0x0CE,206,Func0CB,arg_1
+func,0x0CF,207,Func0CC,arg_1
+func,0x0D0,208,Func0CD,"arg_1, arg_2"
+func,0x0D1,209,Func0CE,arg_1
+proc,0x0D3,211,Hire_Harvest_Sprite,"sprite_id, task_id, days"
+proc,0x0D4,212,Proc0D1,arg_1
+func,0x0D5,213,Func0D2,arg_1
+func,0x0D6,214,Func0D3,arg_1
+func,0x0D7,215,Func0D4,arg_1
+func,0x0D8,216,Func0D5,arg_1
+func,0x0D9,217,Func0D6,
+func,0x0DA,218,Open_Betting_UI,Player_Participating
+proc,0x0DB,219,Set_Festival_Participation,participate_bool
+proc,0x0DC,220,Open_Prize_Exchange_UI,
+func,0x0DD,221,Func0DA,arg_1
+proc,0x0DE,222,Proc0DB,
+proc,0x0DF,223,Unlock_Summer_Events,
+func,0x0E0,224,Func0DD,
+func,0x0E1,225,Chek_Envio,
+func,0x0E2,226,Func0DF,
+proc,0x0E3,227,Proc0E0,arg_1
+proc,0x0E4,228,Proc0E1,
+proc,0x0E5,229,Electrodomestic_initiation,
+func,0x0E6,230,Func0E3,
+func,0x0E7,231,Func0E4,
+func,0x0E8,232,Func0E5,
+func,0x0E9,233,Func0E6,
+func,0x0EA,234,Func0E7,
+func,0x0EB,235,Func0E8,
+func,0x0EC,236,Func0E9,
+func,0x0ED,237,Func0EA,
+func,0x0EF,239,Check_Money,
+proc,0x0F0,240,Proc0ED,arg_1
+proc,0x0F1,241,Take_Money,arg_1
+proc,0x0F2,242,End_Cinematic_State,
+proc,0x0F3,243,Refresh_Map_Entities,
+func,0x0F4,244,Func0F1,
+func,0x0F5,245,Func0F2,
+func,0x0F6,246,Func0F3,
+proc,0x0F7,247,Set_Time,"Hour, Minute"
+func,0x0F8,248,Func0F5,arg_1
+func,0x0F9,249,Func0F6,arg_1
+proc,0x0FA,250,Schedule_Next_Event,script_id
+proc,0x0FB,251,Proc0F8,arg_1
+func,0x0FC,252,Func0F9,
+func,0x0FD,253,Func0FA,
+func,0x0FE,254,Print_TV_Message,arg_1: string
+proc,0x0FF,255,Set_TV_Screen_Graphic,arg_1
+proc,0x100,256,Close_TV_Interface,
+proc,0x101,257,Finalize_Event,
+func,0x102,258,Func0FF,"arg_1, arg_2"
+proc,0x103,259,Allocate_Unique_Animal,"arg_1, arg_2, arg_3, arg_4, arg_5"
+proc,0x104,260,Deallocate_Unique_Animal,"arg_1, arg_2"
 proc,0x105,261,GetAnimalName,"arg_1, arg_2, arg_3"
-func,0x106,262,Func106,
+func,0x106,262,Get_Targeted_Animal_Index,
 func,0x107,263,HasAnimalBeenTalkedTo,"arg_1, arg_2"
 proc,0x108,264,SetAnimalTalkedTo,"arg_1, arg_2"
-proc,0x109,265,Proc109,"arg_1, arg_2, arg_3"
-func,0x10A,266,Func10A,"arg_1, arg_2"
+proc,0x109,265,Add_Animal_Affection,"arg_1, arg_2, arg_3"
+func,0x10A,266,Is_Animal_Stressed,"arg_1, arg_2"
 func,0x10B,267,GetAnimalAge,"arg_1, arg_2"
-func,0x10C,268,Func10C,"arg_1, arg_2"
-func,0x10D,269,Func10D,"arg_1, arg_2"
-func,0x10F,271,Func10F,"arg_1, arg_2"
-func,0x110,272,Func110,"arg_1, arg_2"
-func,0x111,273,Func111,arg_1
-func,0x112,274,Func112,"arg_1, arg_2"
-proc,0x113,275,Proc113,
-proc,0x114,276,Proc114,
-proc,0x115,277,Proc115,
-proc,0x116,278,Proc116,
-func,0x117,279,Func117,arg_1
-func,0x118,280,Func118,
-func,0x119,281,Func119,
-func,0x11A,282,Func11A,
-proc,0x11B,283,Proc11B,"arg_1, arg_2"
-proc,0x11C,284,Proc11C,arg_1
-func,0x11D,285,Func11D,arg_1
-proc,0x11E,286,Proc11E,arg_1
-func,0x11F,287,Func11F,
-func,0x120,288,Func120,
-func,0x121,289,Func121,
-func,0x122,290,Func122,
-func,0x124,292,Func124,
-func,0x125,293,Func125,
-func,0x126,294,Func126,
-func,0x127,295,Func127,
-func,0x128,296,Func128,
-proc,0x129,297,Proc129,arg_1: string
-proc,0x12A,298,Proc12A,
-proc,0x12B,299,Proc12B,"arg_1, arg_2, arg_3"
-proc,0x12C,300,Proc12C,
-proc,0x12D,301,Proc12D,
-proc,0x12E,302,Proc12E,arg_1
-proc,0x12F,303,Proc12F,
-func,0x130,304,Func130,arg_1
-proc,0x131,305,Proc131,
-proc,0x132,306,Proc132,"arg_1, arg_2, arg_3, arg_4"
-proc,0x133,307,Proc133,
-proc,0x134,308,Proc134,
-proc,0x135,309,Proc135,
-proc,0x136,310,Proc136,
-func,0x137,311,Func137,
-proc,0x138,312,Proc138,"arg_1, arg_2"
-proc,0x139,313,Proc139,
-func,0x13A,314,Func13A,arg_1
-func,0x13B,315,Func13B,arg_1
-func,0x13C,316,Func13C,arg_1
-proc,0x13D,317,Proc13D,"arg_1, arg_2, arg_3, arg_4, arg_5"
-proc,0x13E,318,Proc13E,arg_1
-func,0x13F,319,Func13F,arg_1
-proc,0x142,322,Proc142,"arg_1, arg_2, arg_3, arg_4, arg_5"
-proc,0x143,323,Proc143,"arg_1, arg_2, arg_3"
-proc,0x144,324,Proc144,"arg_1, arg_2, arg_3"
-proc,0x145,325,Proc145,arg_1
-proc,0x146,326,Proc146,arg_1
-proc,0x147,327,Proc147,"arg_1, arg_2, arg_3"
-proc,0x148,328,Proc148,"arg_1, arg_2"
-func,0x149,329,Func149,
-proc,0x14A,330,Proc14A,
+func,0x10C,268,Is_Animal_Pregnant,"arg_1, arg_2"
+func,0x10D,269,Get_Pregnancy_Days_Passed,"arg_1, arg_2"
+func,0x10F,271,Get_Animal_Stats,"Animal_Type, Animal_ID"
+func,0x110,272,Func10D,"arg_1, arg_2"
+func,0x111,273,Func10E,arg_1
+func,0x112,274,Func10F,"arg_1, arg_2"
+proc,0x113,275,Proc110,
+proc,0x114,276,Proc111,
+proc,0x115,277,Proc112,
+proc,0x116,278,Proc113,
+func,0x117,279,Func114,arg_1
+func,0x118,280,Func115,
+func,0x119,281,Func116,
+func,0x11A,282,Func117,
+proc,0x11B,283,Register_Animal_Festival,"arg_1, arg_2"
+proc,0x11C,284,Recalculate_Global_Schedules,arg_1
+func,0x11D,285,Get_Festival_Entry_ID,Animal_Type
+proc,0x11E,286,Proc11B,arg_1
+func,0x11F,287,Func11C,
+func,0x120,288,Func11D,
+func,0x121,289,Func11E,
+func,0x122,290,Func11F,
+func,0x124,292,Func120,
+func,0x125,293,Func121,
+func,0x126,294,Func122,
+func,0x127,295,Func123,
+func,0x128,296,Func124,
+proc,0x129,297,Set_Player_Nickname_ID,Nickname_Index
+proc,0x12A,298,Reload_Base_Map_Tiles,
+proc,0x12B,299,Color_Shader_Effect,"arg_1, arg_2, arg_3"
+proc,0x12C,300,Proc128,
+proc,0x12D,301,Proc129,
+proc,0x12E,302,Proc12A,arg_1
+proc,0x12F,303,Proc12B,
+func,0x130,304,Func12C,arg_1
+proc,0x131,305,Proc12D,
+proc,0x132,306,Proc12E,"arg_1, arg_2, arg_3, arg_4"
+proc,0x133,307,Proc12F,
+proc,0x134,308,Proc130,
+proc,0x135,309,Proc131,
+proc,0x136,310,Trigger_Screen_Flash,
+func,0x137,311,Func133,
+proc,0x138,312,Proc134,"arg_1, arg_2"
+proc,0x139,313,Proc135,
+func,0x13A,314,Func136,arg_1
+func,0x13B,315,Func137,arg_1
+func,0x13C,316,Take_Tool,arg_1
+proc,0x13D,317,Spawn_Item_On_Grid,"arg_1, arg_2, arg_3, arg_4, arg_5"
+proc,0x13E,318,Despawn_Map_Item,arg_1
+func,0x13F,319,Get_Item_Sprite_ID,arg_1
+proc,0x142,322,Refresh_Current_Tile,
+proc,0x143,323,Get_Tile_Object_Type,arg_1
+proc,0x144,324,Proc140,"arg_1, arg_2, arg_3"
+proc,0x145,325,Proc141,arg_1
+proc,0x146,326,Set_Carrying_Entity,entity_id
+proc,0x147,327,Initialize_Animal_Stats,"entity_id, growth, species"
+proc,0x148,328,Proc144,"arg_1, arg_2"
+func,0x149,329,Func145,
+proc,0x14A,330,Proc146,

@@ -1,0 +1,20 @@
+#include "lib_fomt.csv"
+
+script 1081 Unknown_Event_1081 {
+PlayBGM(1, 7);
+Set_Time(0x12, 1);
+SetEntityPosition(0xD, 0x55, 0x5B, 0);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+if ((Check_Flag(0x18A) == 1)) {
+    Fade_In(2, 1);
+} else {
+    Fade_In(3, 1);
+}
+Routine_State_Override("Huachito", "Script_1082");
+exit;
+}

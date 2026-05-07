@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 382 Unknown_Event_0382 {
+const MESSAGE_0 = "Barrel\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

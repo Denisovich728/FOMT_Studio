@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1262 Unknown_Event_1262 {
+const MESSAGE_0 = "You must believe\r\nin yourself. \BRK";
+const MESSAGE_1 = "I'm betting on you, \r\nso don't fail me!\BRK";
+
+if ((Func083(0x1B) == 0)) {
+    Free_Event_Entity("Gotz");
+}
+SetEntityFacing(0x1B, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x1AB) == 0)) {
+    TalkOpen();
+    Set_Portrait("Gotz_Happy");
+    Set_Name_Window("Gotz");
+    TalkMessage(0);
+} else {
+    TalkOpen();
+    Set_Portrait("Gotz_Happy");
+    Set_Name_Window("Gotz");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Gotz") == 0)) {
+    Give_Friendship_Points("Gotz", 5);
+}
+Free_Event_Entity("Gotz");
+SetEntityFacing(0x1B, 0);
+exit;
+}

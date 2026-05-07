@@ -1,0 +1,25 @@
+#include "lib_fomt.csv"
+
+script 1321 Unknown_Event_1321 {
+const MESSAGE_0 = "The year went by \r\nso quickly!\BRK";
+
+if ((Func083(0x18) == 0)) {
+    Free_Event_Entity("Doug");
+}
+SetEntityFacing(0x18, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doug_Neutral");
+Set_Name_Window("Doug");
+TalkMessage(0);
+TalkClose();
+if ((Has_NPC_Talked_Today("Doug") == 0)) {
+    Give_Friendship_Points("Doug", 5);
+}
+Free_Event_Entity("Doug");
+if (((((((((Check_Flag("Flag_0xF4") == 0) || Has_NPC_Talked_Today("Cliff")) && Has_NPC_Talked_Today("Doug")) && Has_NPC_Talked_Today("Anna")) && Has_NPC_Talked_Today("Basil")) && Has_NPC_Talked_Today("Mary")) && Has_NPC_Talked_Today("Saibara")) && Has_NPC_Talked_Today("Gray"))) {
+    Fade_Out(2, 1);
+    Execute_Script(0x527);
+}
+SetEntityFacing(0x18, 1);
+exit;
+}

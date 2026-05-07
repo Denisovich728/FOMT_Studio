@@ -1,0 +1,109 @@
+#include "lib_fomt.csv"
+
+script 736 Unknown_Event_0736 {
+const MESSAGE_0 = "I wonder if this is \r\nthe right grass?...\BRK";
+const MESSAGE_1 = "Oh! Hi, \xFF!. \BRK";
+const MESSAGE_2 = "How do you like your\r\nmarried life? Takes some\r\nadjusting to, I bet!\BRK";
+const MESSAGE_3 = "What was I doing? \r\nI'm looking for a grass for\r\nmy father that he needs \BRK\r\nfor his research. \BRK";
+const MESSAGE_4 = "That's nice of you.";
+const MESSAGE_5 = "I see.";
+const MESSAGE_6 = "I try to help out my dad. \r\nBesides, I actually enjoy\r\nit!\BRK";
+const MESSAGE_7 = "Sorry for interrupting you. \r\nI have to get back now. \BRK\WAIT_CLICKGood luck on the farm!\BRK";
+const MESSAGE_8 = "Well, Dad's research really\r\nis important, so I like to \r\nhelp out any way I can. \BRK";
+
+var var_0;
+
+End_Cinematic_State();
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xC, 0x288, 0x80, 2);
+SetEntityAnim("Mary", 0x813);
+Fade_In(2, 1);
+Pan_Camera_To(0x29C, 0x80, 2);
+Wait_Camera_Stop();
+Show_Emote("Mary", "Exclamation", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Mary_Surprised");
+Set_Name_Window("Mary");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0, 0);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x80, 1);
+Execute_Movement("Player");
+SetEntityFacing(0, 2);
+Set_Vector_X("Player", 0x29C, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Show_Emote("Mary", "Exclamation", 0);
+SetEntityFacing(0xC, 3);
+Set_Vector_X("Mary", 0x284, 1);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(1);
+Set_Portrait("Mary_Happy");
+TalkMessage(2);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x1E);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(4, 5);
+switch (var_0) {
+    case 1:
+        TalkOpen();
+        Set_Portrait("Mary_Happy");
+        Set_Name_Window("Mary");
+        TalkMessage(6);
+        Set_Portrait("Mary_Neutral");
+        TalkMessage(7);
+        TalkClose();
+        Give_Friendship_Points("Mary", 0x14);
+        break;
+    case 2:
+        TalkOpen();
+        Set_Portrait("Mary_Surprised");
+        Set_Name_Window("Mary");
+        TalkMessage(8);
+        Set_Portrait("Mary_Neutral");
+        TalkMessage(7);
+        TalkClose();
+        Give_Friendship_Points("Mary", -0xA);
+        break;
+}
+SetEntityFacing(0xC, 2);
+SetEntityAnim("Mary", "Mary_Base");
+Set_Vector_X("Mary", 0x1D0, 1);
+Execute_Movement("Mary");
+Hide_Entity("Mary");
+Free_Event_Entity("Mary");
+Refresh_Map_Entities();
+Set_Flag("Flag_0x105", 2);
+exit;
+exit;
+}

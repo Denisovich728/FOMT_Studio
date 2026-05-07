@@ -1,0 +1,116 @@
+#include "lib_fomt.csv"
+
+script 744 Unknown_Event_0744 {
+const MESSAGE_0 = "Is this the White Flower\r\nthat Ellen was talking \r\nabout?\BRK\WAIT_CLICKYou should bring it to her.\BRK";
+const MESSAGE_1 = "That's...\BRK";
+const MESSAGE_2 = "It's beautiful...\BRK";
+const MESSAGE_3 = "You really found it...?\BRK";
+const MESSAGE_4 = "It's wonderful! \r\nThis is the famous \r\nWhite Flower...\BRK";
+const MESSAGE_5 = "Where did you find this, \r\n\xFF!?\BRK\WAIT_CLICKOn the mountaintop?\r\nSo that's where it blooms!\BRK";
+const MESSAGE_6 = "Thanks, \xFF!. \r\nI'll treasure it. \BRK";
+const MESSAGE_7 = "You made Ellen very \r\nhappy. \BRK";
+
+Warp_Player("Mothers_Hill_Top", 0xEC, 0x123);
+Spawn_Item_On_Grid(0, 0xEC, 0xFF, 2, Get_Item_Sprite_ID("Empty Can"));
+SetEntityPosition(0, 0xEC, 0x1BB, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x14C, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Run_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Run_Base");
+}
+Set_Vector_Y("Player", 0x11B, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay((0x3C * 2));
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+Despawn_Map_Item(0);
+Warp_Player("Ellen_House", 0x8F, 0x72);
+SetEntityPosition(0xF, 0x80, 0x60, 0);
+SetEntityAnim("Ellen", "Ellen_Stop_Base");
+SetEntityPosition(0xA, 0x9A, 0x60, 0);
+SetEntityAnim("Basil", "Basil_Stop_Base");
+SetEntityPosition(0x10, 0xB7, 0x66, 2);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0, 0x80, 0x76, 1);
+Lock_Player_Input();
+SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+Spawn_Item_On_Grid(0, 0x80, (0x76 - 0x15), 1, Get_Item_Sprite_ID("Empty Can"));
+Fade_In(2, 1);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Basil_Angry");
+Set_Name_Window("Basil");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Stu_Happy");
+Set_Name_Window("Stu");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellen_Neutral");
+Set_Name_Window("Ellen");
+TalkMessage(3);
+TalkClose();
+Make_Delay(0x3C);
+Despawn_Map_Item(0);
+SetEntityAnim("Player", "Player_Middle_Hand_StopB_2");
+Make_Delay(0x3C);
+SetEntityAnim("Player", "Player_Stop_Base");
+TalkOpen();
+Set_Portrait("Ellen_Happy");
+Set_Name_Window("Ellen");
+TalkMessage(4);
+TalkClose();
+TalkOpen();
+Set_Portrait("Basil_Neutral");
+Set_Name_Window("Basil");
+TalkMessage(5);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellen_Neutral");
+Set_Name_Window("Ellen");
+TalkMessage(6);
+TalkClose();
+Make_Delay(0x3C);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(7);
+TalkClose();
+Free_Event_Entity("Ellen");
+Free_Event_Entity("Basil");
+Give_Friendship_Points("Ellen", 0x14);
+Give_Friendship_Points("Basil", 0x14);
+Give_Friendship_Points("Stu", 0x14);
+Set_Flag("Flag_0x110", 2);
+Execute_Script(0x3DC);
+exit;
+}

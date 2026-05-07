@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 961 Unknown_Event_0961 {
+const MESSAGE_0 = "Elli's so pretty! \BRK";
+const MESSAGE_1 = "I bet he'll be surprised\r\nwhen he eats Elli's cooking!\BRK";
+
+if ((Func083(0x10) == 0)) {
+    Free_Event_Entity("Stu");
+}
+if ((Has_NPC_Talked_Today("Stu") == 0)) {
+    SetEntityFacing(0x10, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Stu_Neutral");
+    Set_Name_Window("Stu");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x10, 2);
+    Free_Event_Entity("Stu");
+} else {
+    SetEntityFacing(0x10, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Stu_Happy");
+    Set_Name_Window("Stu");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0x10, 2);
+    Free_Event_Entity("Stu");
+}
+exit;
+}

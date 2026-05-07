@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 431 Unknown_Event_0431 {
+const MESSAGE_0 = "Window\BRK";
+
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+exit;
+}

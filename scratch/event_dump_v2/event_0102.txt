@@ -1,0 +1,19 @@
+#include "lib_fomt.csv"
+
+script 102 Unknown_Event_0102 {
+const MESSAGE_0 = "Plants\BRK";
+const MESSAGE_1 = "Snowman\BRK";
+
+TalkOpen();
+if ((Check_Flag("System_Season") == 3)) {
+    if (((Check_Flag("System_DayOfMonth") == 1) && (Check_Flag("System_Hour") < 6))) {
+        Print_Message(0);
+    } else {
+        Print_Message(1);
+    }
+} else {
+    Print_Message(0);
+}
+TalkClose();
+exit;
+}

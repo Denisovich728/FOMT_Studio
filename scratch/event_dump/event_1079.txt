@@ -1,0 +1,109 @@
+#include "lib_fomt.csv"
+
+script 1079 Unknown_Event_1079 {
+const MESSAGE_0 = "The Horse Races are \r\ntomorrow at the Square, you\r\nknow...\BRK\WAIT_CLICKIf you've got a Horse, you\r\nshould consider competing!\BRK";
+const MESSAGE_1 = "Hi there, \xFF!. \r\nAre you going to compete\r\nin the Horse Races in the \BRK\r\nSquare tomorrow?\BRK";
+const MESSAGE_2 = "I'll compete.";
+const MESSAGE_3 = "I don't think so.";
+const MESSAGE_4 = "In that case, bring\r\n\xFF\" to \r\nthe Square by 10AM. \BRK";
+const MESSAGE_5 = "Really?...\r\nWell, you can still \r\nplace bets on the Race.\BRK\r\nIt's fun - you should come!\BRK";
+
+var var_0;
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xD, 0xE4, 0x91, 1);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+Fade_In(2, 1);
+if ((Check_Flag(0x43) == 0)) {
+    TalkOpen();
+    Set_Portrait("Thomas_Neutral");
+    Set_Name_Window("Huachito");
+    TalkMessage(0);
+    TalkClose();
+    Proc0D8(0);
+} else {
+    if ((Check_Flag(0x44) == 0)) {
+        TalkOpen();
+        Set_Portrait("Thomas_Neutral");
+        Set_Name_Window("Huachito");
+        TalkMessage(0);
+        TalkClose();
+        Proc0D8(0);
+        goto LBL_0007;
+    }
+    TalkOpen();
+    Set_Portrait("Thomas_Neutral");
+    Set_Name_Window("Huachito");
+    TalkMessage(1);
+    TalkClose();
+    TalkOpen();
+    var_0 = TalkChoice2(2, 3);
+    switch (var_0) {
+        case 1:
+            TalkClose();
+            Proc0D8(1);
+            Fade_Out(2, 1);
+            SetEntityPosition(0xD, 0xF2, 0x91, 1);
+            SetEntityAnim("Huachito", "Thomas_Stop_Base");
+            SetEntityPosition(0x2C, 0xD4, 0x91, 1);
+            SetEntityAnim(0x2C, "Player_Horse_Rider_Base");
+            Wait_For_Animation(0x2C);
+            Fade_In(2, 1);
+            TalkOpen();
+            Set_Portrait("Thomas_Neutral");
+            Set_Name_Window("Huachito");
+            TalkMessage(4);
+            TalkClose();
+            SetEntityAnim("Huachito", "Thomas_Base");
+            SetEntityFacing(0xD, 3);
+            Set_Vector_X("Huachito", 0x14A, 1);
+            Execute_Movement("Huachito");
+            SetEntityAnim("Huachito", "Thomas_Stop_Base");
+            SetEntityFacing(0xD, 2);
+            SetEntityAnim(0x2C, "Player_Horse_Rider_Finish_Base");
+            SetEntityFacing(0x2C, 3);
+            Set_Vector_X(0x2C, 0x131, 1);
+            Execute_Movement(0x2C);
+            SetEntityAnim(0x2C, "Player_Horse_Rider_Base");
+            Make_Delay(0x1E);
+            SetEntityFacing(0x2C, 1);
+            SetEntityFacing(0xD, 1);
+            SetEntityAnim("Huachito", "Thomas_Base");
+            Set_Vector_Y("Huachito", 0, 1);
+            SetEntityAnim(0x2C, "Player_Horse_Rider_Finish_Base");
+            Set_Vector_Y(0x2C, 0, 1);
+            Execute_Movement("Huachito");
+            Execute_Movement(0x2C);
+            Hide_Entity("Huachito");
+            Hide_Entity(0x2C);
+            Set_Flag(0x188, 1);
+            Proc118(0);
+            Set_Flag(0x187, 2);
+            exit;
+        case 2:
+            Proc0D8(0);
+            TalkClose();
+            TalkOpen();
+            Set_Portrait("Thomas_Neutral");
+            Set_Name_Window("Huachito");
+            TalkMessage(5);
+            TalkClose();
+            break;
+    }
+}
+SetEntityAnim("Huachito", "Thomas_Base");
+SetEntityFacing(0xD, 3);
+Set_Vector_X("Huachito", 0x13F, 1);
+Execute_Movement("Huachito");
+SetEntityFacing(0xD, 1);
+Set_Vector_Y("Huachito", 0, 1);
+Execute_Movement("Huachito");
+Hide_Entity("Huachito");
+Set_Flag(0x188, 0);
+Set_Flag(0x187, 2);
+exit;
+}

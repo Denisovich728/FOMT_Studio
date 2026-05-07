@@ -1,0 +1,36 @@
+#include "lib_fomt.csv"
+
+script 1138 Unknown_Event_1138 {
+const MESSAGE_0 = "Beach Day is now over. \r\nWe'll return your Dogs to\r\nyour homes, so you can go\BRK\r\nback home without them. \r\nCome again next year!\BRK";
+
+PlayBGM(1, 7);
+Set_Time(0x12, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xD, 0xF5, 0xB2, 3);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(0x11, 0x80, 0x12D, 3);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+SetEntityPosition(0x12, 0x80, 0x104, 3);
+SetEntityAnim("Sasha", "Sasha_Stop_Base");
+SetEntityPosition(0x1A, 0xD3, 0x13E, 3);
+SetEntityAnim("Kai", "Kai_Stop_Base");
+SetEntityPosition(3, 0xE7, 0x15D, 3);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+SetEntityPosition(0x1C, 0xCD, 0x83, 0);
+SetEntityAnim("Zack", "Zack_Stop_Base");
+Fade_In(3, 1);
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+Routine_State_Override("Huachito", "Script_1142");
+Routine_State_Override("Jeff", "Script_1140");
+Routine_State_Override("Sasha", "Script_1141");
+Routine_State_Override("Kai", "Script_1143");
+Routine_State_Override("Popuri", "Script_1139");
+Routine_State_Override("Zack", "Script_1144");
+exit;
+}

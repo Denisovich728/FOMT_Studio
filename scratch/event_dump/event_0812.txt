@@ -1,0 +1,60 @@
+#include "lib_fomt.csv"
+
+script 812 Unknown_Event_0812 {
+const MESSAGE_0 = "This is a very beautiful \r\nhouse! It deserves \r\nsomething special...\BRK";
+const MESSAGE_1 = "What this house lacks is a \r\nVase! Believe me, I know \r\nabout such things! \BRK\WAIT_CLICKI happen to have one here \r\nI can sell for just 5000G.\BRK";
+const MESSAGE_2 = "Buy Vase.";
+const MESSAGE_3 = "Don't Buy.";
+const MESSAGE_4 = "It\x81fs a very rare vase from\r\nthe Ming Dynasty!\BRK";
+const MESSAGE_5 = "Of course, you'll have to \r\nfind some flowers for it \r\nyourself. \BRK";
+const MESSAGE_6 = "It's good for your soul to\r\nsurround yourself with \r\nbeauty!\BRK";
+
+var var_0;
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1D, 0xE4, 0x91, 1);
+SetEntityAnim("Won", "Won_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Won_Happy");
+Set_Name_Window("Won");
+TalkMessage(0);
+Set_Portrait("Won_Happy");
+TalkMessage(1);
+var_0 = TalkChoice2(2, 3);
+switch (var_0) {
+    case 1:
+        TalkOpen();
+        Set_Portrait("Won_Happy");
+        Set_Name_Window("Won");
+        TalkMessage(4);
+        Set_Portrait("Won_Angry");
+        TalkMessage(5);
+        Set_Flag(0x1C, 1);
+        Take_Money(5000);
+        break;
+    case 2:
+        TalkOpen();
+        Set_Portrait("Won_Angry");
+        Set_Name_Window("Won");
+        TalkMessage(6);
+        break;
+}
+TalkClose();
+SetEntityFacing(0x1D, 3);
+SetEntityAnim("Won", "Won_Base");
+Set_Vector_X("Won", 0x13F, 1);
+Execute_Movement("Won");
+SetEntityFacing(0x1D, 1);
+Set_Vector_Y("Won", 0, 1);
+Execute_Movement("Won");
+Hide_Entity("Won");
+Free_Event_Entity("Won");
+Set_Flag(0x139, 2);
+exit;
+exit;
+}

@@ -1,0 +1,5 @@
+#include "lib_fomt.csv"
+
+script 84 Unknown_Event_0084 {
+exit;
+}

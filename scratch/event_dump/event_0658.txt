@@ -1,0 +1,126 @@
+#include "lib_fomt.csv"
+
+script 658 Unknown_Event_0658 {
+const MESSAGE_0 = "I wonder if I've been \r\nreading too much...?\BRK\WAIT_CLICKI don't feel well all of\r\nthe sudden.\BRK\WAIT_CLICK\xFF), will you \r\ntake me to the Clinic?\BRK";
+const MESSAGE_1 = "Thank you. \BRK";
+const MESSAGE_2 = "Your wife isn't sick.\BRK";
+const MESSAGE_3 = "You're going to be parents.\r\nCongratulations!\BRK";
+const MESSAGE_4 = "Mary, you're going to have \r\na baby. Congratulations!\BRK";
+const MESSAGE_5 = "Hmmm...I'm not sure how\r\nI feel...\BRK";
+const MESSAGE_6 = "This is kind of sudden news,\r\nbut I'm excited!\BRK";
+const MESSAGE_7 = "My parents will be so happy!\r\nI can't wait to tell them!\r\nLet's go home, OK?\BRK";
+const MESSAGE_8 = "I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK";
+
+Warp_Player("Farm_House_1", 0x12C, 0x5E);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x12C, 0x5E, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xC, 0x14D, 0x5E, 2);
+SetEntityAnim("Mary", 0x813);
+Fade_In(2, 1);
+Set_Flag(0xC7, 1);
+TalkOpen();
+Set_Name_Window("Mary");
+Set_Portrait("Mary_Afraid");
+Set_Hearth_Anim("Mary");
+TalkMessage(0);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Show_Emote("Mary", "Happy", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Mary");
+Set_Portrait("Mary_Neutral");
+Set_Hearth_Anim("Mary");
+TalkMessage(1);
+TalkClose();
+Fade_Out(2, 1);
+Warp_Player("Mineral_Clinic_Floor_01", 0xE4, 0x94);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0xE4, 0x7C, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xC, 0xE4, 0x94, 3);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0x14, 0x106, 0x94, 2);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0x15, 0x106, 0x7C, 2);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(2);
+TalkClose();
+Show_Emote("Mary", "Question", 0);
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Doctor_Happy");
+Set_Name_Window("Doctor");
+TalkMessage(3);
+TalkClose();
+Show_Emote("Mary", "Hearth", 0);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellie_Happy");
+Set_Name_Window("Elli");
+TalkMessage(4);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Mary");
+Set_Portrait("Mary_Ruborized");
+TalkMessage(5);
+TalkClose();
+SetEntityFacing(0xC, 1);
+TalkOpen();
+Set_Name_Window("Mary");
+Set_Portrait("Mary_Ruborized");
+Set_Hearth_Anim("Mary");
+TalkMessage(6);
+Set_Name_Window("Mary");
+Set_Portrait("Mary_Happy");
+Set_Hearth_Anim("Mary");
+TalkMessage(7);
+TalkClose();
+SetEntityFacing(0, 0);
+Make_Delay(0x3C);
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+Free_Event_Entity("Mary");
+Free_Event_Entity("Doctor");
+Free_Event_Entity("Elli");
+Give_Love_Points("Mary", 0xBB8);
+Give_Friendship_Points("Doctor", 0x14);
+Give_Friendship_Points("Elli", 0x14);
+Set_Flag(0xC7, 2);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(8);
+TalkClose();
+Proc126(0);
+Set_Time(0x11, 0);
+Fade_In(2, 1);
+exit;
+exit;
+}

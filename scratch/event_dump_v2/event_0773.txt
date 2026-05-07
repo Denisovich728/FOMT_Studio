@@ -1,0 +1,170 @@
+#include "lib_fomt.csv"
+
+script 773 Unknown_Event_0773 {
+const MESSAGE_0 = "I don't understand this \r\npart here...\BRK";
+const MESSAGE_1 = "This? It's just like \r\nthis, see...?\BRK";
+const MESSAGE_2 = "I see now! \r\nThanks, Doctor!\BRK";
+const MESSAGE_3 = "Just ask me anything \r\nyou don't understand. \BRK";
+const MESSAGE_4 = "You're so kind. \BRK";
+const MESSAGE_5 = "Hi, there. \BRK";
+const MESSAGE_6 = "How are you, \r\n\xFF!. \BRK";
+const MESSAGE_7 = "What am I studying? \r\nI'm studying medicine to try\r\nto figure out how to heal\BRK\r\nmy grandmother's legs. \BRK";
+const MESSAGE_8 = "You can do it!";
+const MESSAGE_9 = "Put her in a big hospital.";
+const MESSAGE_10 = "Thanks for saying so!\r\nI'll never give up!\BRK";
+const MESSAGE_11 = "I have confidence \r\nin you, Elli.\BRK";
+const MESSAGE_12 = "Thanks!\BRK";
+const MESSAGE_13 = "But Grandma doesn't want \r\nto leave Mineral Town!\r\nI could never send her \BRK\r\naway...She'd be so sad!\BRK";
+const MESSAGE_14 = "No need to rush, Elli. \r\nYou'll do it eventually. \BRK";
+
+var var_0;
+
+Warp_Player("Mineral_Clinic_Floor_01", 0x108, 0x89);
+SetEntityPosition(0x15, 0xE9, 0x7C, 3);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x14, 0x104, 0x7C, 2);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0, 0xDC, 0x104, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Ellie_Surprised");
+Set_Name_Window("Elli");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(1);
+TalkClose();
+Show_Emote("Elli", "Happy", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Happy");
+Set_Name_Window("Doctor");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Happy");
+Set_Name_Window("Elli");
+TalkMessage(4);
+TalkClose();
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x97, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+SetEntityFacing(0x15, 0);
+SetEntityFacing(0x14, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(5);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Elli_Doctor_Married") == 2)) || (Check_Flag("Flag_0x97") == 2))) {
+    Set_Hearth_Anim("Elli");
+}
+TalkMessage(6);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Elli_Doctor_Married") == 2)) || (Check_Flag("Flag_0x97") == 2))) {
+    Set_Hearth_Anim("Elli");
+}
+TalkMessage(7);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(8, 9);
+switch (var_0) {
+    case 1:
+        TalkOpen();
+        Set_Portrait("Ellie_Happy");
+        Set_Name_Window("Elli");
+        if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Elli_Doctor_Married") == 2)) || (Check_Flag("Flag_0x97") == 2))) {
+            Set_Hearth_Anim("Elli");
+        }
+        TalkMessage(10);
+        TalkClose();
+        SetEntityFacing(0x14, 2);
+        Make_Delay(0x1E);
+        TalkOpen();
+        Set_Portrait("Doctor_Neutral");
+        Set_Name_Window("Doctor");
+        TalkMessage(11);
+        TalkClose();
+        SetEntityFacing(0x15, 3);
+        Make_Delay(0x1E);
+        TalkOpen();
+        Set_Portrait("Ellie_Happy");
+        Set_Name_Window("Elli");
+        TalkMessage(12);
+        TalkClose();
+        Give_Friendship_Points("Elli", 0x14);
+        Give_Friendship_Points("Doctor", 0x14);
+        break;
+    case 2:
+        TalkOpen();
+        Set_Portrait("Ellie_Surprised");
+        Set_Name_Window("Elli");
+        if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Elli_Doctor_Married") == 2)) || (Check_Flag("Flag_0x97") == 2))) {
+            Set_Hearth_Anim("Elli");
+        }
+        TalkMessage(13);
+        TalkClose();
+        SetEntityFacing(0x14, 2);
+        Make_Delay(0x1E);
+        TalkOpen();
+        Set_Portrait("Doctor_Neutral");
+        Set_Name_Window("Doctor");
+        TalkMessage(14);
+        TalkClose();
+        SetEntityFacing(0x15, 3);
+        Make_Delay(0x1E);
+        TalkOpen();
+        Set_Portrait("Ellie_Happy");
+        Set_Name_Window("Elli");
+        TalkMessage(12);
+        TalkClose();
+        Give_Friendship_Points("Elli", -0xA);
+        Give_Friendship_Points("Doctor", -0xA);
+        break;
+}
+Free_Event_Entity("Doctor");
+Free_Event_Entity("Elli");
+End_Cinematic_State();
+Pan_Camera_To(0xDC, 0x97, 2);
+Wait_Camera_Stop();
+Set_Flag("Flag_0x11E", 1);
+Routine_State_Override("Doctor", "Script_774");
+Routine_State_Override("Elli", "Script_775");
+exit;
+}

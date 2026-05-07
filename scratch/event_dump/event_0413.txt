@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 413 Unknown_Event_0413 {
+const MESSAGE_0 = "Wine Bottles\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

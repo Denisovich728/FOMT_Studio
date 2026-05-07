@@ -1,0 +1,27 @@
+#include "lib_fomt.csv"
+
+script 305 Unknown_Event_0305 {
+const MESSAGE_0 = "We're still arranging the\r\nbooks upstairs, so please\r\ndon't go up there.\BRK";
+
+if ((GetEntityFacing(0) == 1)) {
+    if (((((Check_Flag(0x61) == 1) || (Check_Flag(0x62) == 1)) || (Check_Flag(0x8B) == 1)) || (Check_Flag(0x8D) == 1))) {
+        TalkOpen();
+        Set_Portrait("Mary_Neutral");
+        Set_Name_Window("Mary");
+        if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x6F) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x8E) == 2)) || (Check_Flag(0x8F) == 2))) {
+            Set_Hearth_Anim("Mary");
+        }
+        TalkMessage(0);
+        TalkClose();
+        Set_Vector_Y("Player", (GetEntityY(0) + 2), 1);
+        Pan_Camera_To(GetEntityX(0), (GetEntityY(0) + 2), 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Mary_Library_Floor_02", 0xD8, 0x60);
+    SetEntityPosition(0, 0xD8, 0x60, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

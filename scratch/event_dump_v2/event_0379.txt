@@ -1,0 +1,147 @@
+#include "lib_fomt.csv"
+
+script 379 Unknown_Event_0379 {
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+
+if ((GetEntityFacing(0) == 0)) {
+    Fade_Out(2, 1);
+    Warp_Player("Rose_Square", 0xDC, 0x18);
+    SetEntityPosition(0, 0xDC, 0x18, 0);
+    var_0 = Check_Flag("System_Season");
+    var_1 = Check_Flag("System_DayOfMonth");
+    var_2 = Check_Flag("System_Hour");
+    if ((((Check_Flag("Event_NewYears_Day_Active") == 0) && (var_0 == 0)) && (var_1 == 1))) {
+        if (((var_2 >= 6) && (var_2 < 0x12))) {
+            Execute_Script(0x2B1);
+        } else {
+            if ((var_2 >= 0x12)) {
+                Set_Flag("Event_NewYears_Day_Active", 1);
+                Execute_Script(0x429);
+            }
+        }
+    } else {
+        if ((((Check_Flag("Event_Spring_HorseRace_Active") == 0) && (var_0 == 0)) && (var_1 == 0x12))) {
+            if (((var_2 >= 6) && (var_2 < 0xA))) {
+                Execute_Script(0x2B1);
+            } else {
+                if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+                    Set_Flag("Event_Spring_HorseRace_Active", 1);
+                    Execute_Script(0x438);
+                }
+            }
+        } else {
+            if (((var_0 == 0) && (var_1 == 0x16))) {
+                if ((Check_Flag("Event_Cooking_Festival_Active") == 0)) {
+                    if (((var_2 >= 6) && (var_2 < 0xA))) {
+                        Execute_Script(0x2B1);
+                    } else {
+                        if (((var_2 >= 0xA) && (var_2 < 0xC))) {
+                            Set_Flag("Event_Cooking_Festival_Active", 1);
+                            Execute_Script(0x44C);
+                        }
+                    }
+                }
+                if ((Check_Flag("Event_Cooking_Festival_Completed") == 0)) {
+                    if (((var_2 >= 0xC) && (var_2 < 0x12))) {
+                        if ((Check_Flag("Event_Cooking_Festival_Active") != 2)) {
+                            if ((Check_Flag("System_TotalShipments") <= 5)) {
+                                var_3 = Check_Flag("System_TotalShipments");
+                            }
+                            switch (var_3) {
+                                case 1:
+                                    Set_Flag("Event_Cooking_Festival_Result", 0);
+                                    break;
+                                case 2:
+                                    Set_Flag("Event_Cooking_Festival_Result", 1);
+                                    break;
+                                case 3:
+                                    Set_Flag("Event_Cooking_Festival_Result", 2);
+                                    break;
+                                case 4:
+                                    Set_Flag("Event_Cooking_Festival_Result", 3);
+                                    break;
+                                case 5:
+                                    Set_Flag("Event_Cooking_Festival_Result", 4);
+                                    break;
+                            }
+                        }
+                        Set_Flag("Event_Cooking_Festival_Completed", 1);
+                        Execute_Script(0x45A);
+                    }
+                }
+            } else {
+                if ((((Check_Flag("Event_Chicken_Festival_Active") == 0) && (var_0 == 1)) && (var_1 == 7))) {
+                    if (((var_2 >= 6) && (var_2 < 0xA))) {
+                        Execute_Script(0x2B1);
+                    } else {
+                        if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+                            Set_Flag("Event_Chicken_Festival_Active", 1);
+                            Execute_Script(0x489);
+                        }
+                    }
+                } else {
+                    if ((((Check_Flag("Event_Cow_Festival_Active") == 0) && (var_0 == 1)) && (var_1 == 0x14))) {
+                        if (((var_2 >= 6) && (var_2 < 0xA))) {
+                            Execute_Script(0x2B1);
+                        } else {
+                            if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+                                Set_Flag("Event_Cow_Festival_Active", 1);
+                                Execute_Script(0x48D);
+                            }
+                        }
+                    } else {
+                        if ((((Check_Flag("Event_Music_Festival_Active") == 0) && (var_0 == 2)) && (var_1 == 9))) {
+                            if (((var_2 >= 6) && (var_2 < 0xA))) {
+                                Execute_Script(0x2B1);
+                            } else {
+                                if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+                                    Set_Flag("Event_Music_Festival_Active", 1);
+                                    Execute_Script(0x4C1);
+                                }
+                            }
+                        } else {
+                            if ((((Check_Flag("Event_Fall_HorseRace_Active") == 0) && (var_0 == 2)) && (var_1 == 0x12))) {
+                                if (((var_2 >= 6) && (var_2 < 0xA))) {
+                                    Execute_Script(0x2B1);
+                                } else {
+                                    if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+                                        Set_Flag("Event_Fall_HorseRace_Active", 1);
+                                        Execute_Script(0x4DE);
+                                    }
+                                }
+                            } else {
+                                if ((((Check_Flag("Event_Sheep_Festival_Active") == 0) && (var_0 == 2)) && (var_1 == 0x15))) {
+                                    if (((var_2 >= 6) && (var_2 < 0xA))) {
+                                        Execute_Script(0x2B1);
+                                    } else {
+                                        if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+                                            Set_Flag("Event_Sheep_Festival_Active", 1);
+                                            Execute_Script(0x4F2);
+                                        }
+                                    }
+                                } else {
+                                    if ((((Check_Flag("Event_NewYears_Eve_Active") == 0) && (var_0 == 3)) && (var_1 == 0x1E))) {
+                                        if (((var_2 >= 6) && (var_2 < 0x12))) {
+                                            Execute_Script(0x2B1);
+                                        } else {
+                                            if ((var_2 >= 0x12)) {
+                                                Set_Flag("Event_NewYears_Eve_Active", 1);
+                                                Execute_Script(0x51C);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Fade_In(2, 1);
+}
+exit;
+}

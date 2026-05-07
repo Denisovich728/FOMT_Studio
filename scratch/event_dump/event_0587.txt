@@ -1,0 +1,51 @@
+#include "lib_fomt.csv"
+
+script 587 Unknown_Event_0587 {
+const MESSAGE_0 = "The Mirror you ordered \r\nis here. \BRK\WAIT_CLICKA man's gotta take care of \r\nhis looks!\r\nIt's top quality, too!\BRK";
+const MESSAGE_1 = "Delivered safe and sound!\BRK";
+
+Warp_Player("Farm", 0xE4, 0x78);
+SetEntityPosition(0, 0xE4, 0x78, 0);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1C, 0xE4, 0x91, 1);
+SetEntityAnim("Zack", "Zack_Stop_Base");
+Fade_In(2, 1);
+Set_Flag(0xA8, 1);
+TalkOpen();
+Set_Portrait("Zack_Neutral");
+Set_Name_Window("Zack");
+TalkMessage(0);
+Set_Portrait("Zack_Happy");
+Set_Name_Window("Zack");
+TalkMessage(1);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityFacing(0x1C, 3);
+SetEntityAnim("Zack", "Zack_Walking_Base");
+Set_Vector_X("Zack", 0x13F, 1);
+Execute_Movement("Zack");
+SetEntityAnim("Zack", "Zack_Stop_Base");
+SetEntityFacing(0x1C, 1);
+SetEntityAnim("Zack", "Zack_Walking_Base");
+SetEntityFacing(0, 3);
+Set_Vector_Y("Zack", 0, 1);
+Execute_Movement("Zack");
+SetEntityAnim("Zack", "Zack_Stop_Base");
+Hide_Entity("Zack");
+Free_Event_Entity("Zack");
+Electrodomestic_initiation();
+Set_Flag(0x1A, 1);
+Set_Flag(0xA8, 2);
+exit;
+exit;
+}

@@ -1,0 +1,26 @@
+#include "lib_fomt.csv"
+
+script 1193 Unknown_Event_1193 {
+const MESSAGE_0 = "It wouldn't be Summer \r\nwithout the Firework\r\nFestival!\BRK";
+
+if ((Func083(2) == 0)) {
+    Free_Event_Entity("Rick");
+}
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Rick_Happy");
+Set_Name_Window("Rick");
+TalkMessage(0);
+TalkClose();
+if ((Has_NPC_Talked_Today("Rick") == 0)) {
+    Give_Friendship_Points("Rick", 5);
+}
+Free_Event_Entity("Rick");
+if ((((((((((Has_NPC_Talked_Today("Rick") && Has_NPC_Talked_Today("Gray")) && Has_NPC_Talked_Today("Doctor")) && ((Check_Flag(0xF4) == 0) || Has_NPC_Talked_Today("Cliff"))) && Has_NPC_Talked_Today("Kai")) && Has_NPC_Talked_Today("Karen")) && Has_NPC_Talked_Today("Elli")) && Has_NPC_Talked_Today("Ann")) && Has_NPC_Talked_Today("Popuri")) && Has_NPC_Talked_Today("Mary"))) {
+    Set_Flag(0x19F, 0);
+    Fade_Out(2, 1);
+    Execute_Script(0x4A8);
+}
+SetEntityFacing(2, 3);
+exit;
+}

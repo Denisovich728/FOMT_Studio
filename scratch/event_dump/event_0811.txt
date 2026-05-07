@@ -1,0 +1,102 @@
+#include "lib_fomt.csv"
+
+script 811 Unknown_Event_0811 {
+const MESSAGE_0 = "I brought 3 rare and \r\nvaluable items for you \r\ntoday! These are special\BRK\r\nfor you.\BRK";
+const MESSAGE_1 = "These 3 kinds of Apples are\r\nno ordinary Apples, \r\nyou understand? \BRK";
+const MESSAGE_2 = "This is the first kind. \r\nIt's called SUGDW Apple. \BRK";
+const MESSAGE_3 = "It's real name is very long:\r\nSuper Ultra Great Delicious\r\nWonderful Apple!\BRK";
+const MESSAGE_4 = "Sometimes I can't remember\r\nall of it...! \BRK";
+const MESSAGE_5 = "This is the second one: \r\nthe HMSGB Apple! \BRK";
+const MESSAGE_6 = "That's short for Hyper \r\nMiracle Sweet Gorgeous \r\nBeautiful  Apple!\BRK";
+const MESSAGE_7 = "That one is hard to \r\nremember, too!\BRK";
+const MESSAGE_8 = "Finally, I have this. \r\nIt's an AEPFE Apple!\BRK";
+const MESSAGE_9 = "That's short for:\r\nAngel Eternal Pure \r\nFresh Elegant Apple. \BRK";
+const MESSAGE_10 = "See? Even the name \r\nis wonderful!\BRK";
+const MESSAGE_11 = "Of course, you have to eat\r\neach one to see how \r\nwonderful it really is!\BRK";
+const MESSAGE_12 = "Price is 500G. \r\nVery cheap, very cheap. \BRK";
+const MESSAGE_13 = "Which will it be?";
+const MESSAGE_14 = "SUGDW";
+const MESSAGE_15 = "HMSGB";
+const MESSAGE_16 = "AEPFE";
+const MESSAGE_17 = "No thanks.";
+const MESSAGE_18 = "Thanks very much!\r\nI didn't think anyone would\r\never -- I mean...\BRK\r\nYou have a fine eye, sir!\r\nI'll be going now!\BRK";
+const MESSAGE_19 = "You don't even have 500G?\r\nWhat a poor man you are!\BRK";
+
+var var_0;
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1D, 0xE4, 0x91, 1);
+SetEntityAnim("Won", "Won_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Won_Neutral");
+Set_Name_Window("Won");
+TalkMessage(0);
+Set_Portrait("Won_Happy");
+TalkMessage(1);
+Set_Portrait("Won_Happy");
+TalkMessage(2);
+Set_Portrait("Won_Neutral");
+TalkMessage(3);
+Set_Portrait("Won_Angry");
+TalkMessage(4);
+Set_Portrait("Won_Happy");
+TalkMessage(5);
+Set_Portrait("Won_Neutral");
+TalkMessage(6);
+Set_Portrait("Won_Angry");
+TalkMessage(7);
+Set_Portrait("Won_Happy");
+TalkMessage(8);
+Set_Portrait("Won_Neutral");
+TalkMessage(9);
+Set_Portrait("Won_Angry");
+TalkMessage(10);
+Set_Portrait("Won_Neutral");
+TalkMessage(11);
+Set_Portrait("Won_Happy");
+TalkMessage(12);
+Draw_Menu_With_Header(0, 0xD, 0xE, 0xF, 0x10, 0x11);
+switch (var_0) {
+    case 1:
+        TalkMessage(18);
+        TalkClose();
+        Give_Food("SUGDW Apple");
+        Take_Money(500);
+        break;
+    case 2:
+        TalkMessage(18);
+        TalkClose();
+        Give_Food("HMSGB Apple");
+        Take_Money(500);
+        break;
+    case 3:
+        TalkMessage(18);
+        TalkClose();
+        Give_Food("AEPFE Apple");
+        Take_Money(500);
+        break;
+    case 4:
+        Set_Portrait("Won_Angry");
+        Set_Name_Window("Won");
+        TalkMessage(19);
+        TalkClose();
+        break;
+}
+SetEntityFacing(0x1D, 3);
+SetEntityAnim("Won", "Won_Base");
+Set_Vector_X("Won", 0x13F, 1);
+Execute_Movement("Won");
+SetEntityFacing(0x1D, 1);
+Set_Vector_Y("Won", 0, 1);
+Execute_Movement("Won");
+Hide_Entity("Won");
+Free_Event_Entity("Won");
+Set_Flag(0x138, 2);
+exit;
+exit;
+}

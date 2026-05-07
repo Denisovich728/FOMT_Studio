@@ -1,0 +1,49 @@
+#include "lib_fomt.csv"
+
+script 136 Unknown_Event_0136 {
+const MESSAGE_0 = "It's locked...\BRK";
+
+var var_0;
+
+if ((GetEntityFacing(0) == 1)) {
+    var_0 = 0;
+    if ((((((((Check_Flag("Rival_Karen_Rick_Event_2") == 1) || (Check_Flag("Rival_Popuri_Kai_Event_3") == 1)) || (Check_Flag("Rival_Ann_Cliff_Event_4") == 1)) || (Check_Flag("Rival_Mary_Gray_Married") == 1)) || (Check_Flag("Flag_0x97") == 1)) || (Check_Flag("Flag_0x83") == 1)) || (Check_Flag("Flag_0x1A2") == 1))) {
+        var_0 = 0;
+    } else {
+        if ((Check_Flag("Flag_0x121") == 2)) {
+            var_0 = 1;
+        } else {
+            if ((Check_Flag("Flag_0x120") == 2)) {
+                var_0 = 1;
+            }
+        }
+    }
+    if ((var_0 == 1)) {
+        PlaySong(0, 0x9C);
+        Anim_Door_Close(0xA);
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Walking_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+        }
+        Set_Vector_X("Player", 0x134, 1);
+        Execute_Movement("Player");
+        Set_Vector_Y("Player", 0x38, 1);
+        Execute_Movement("Player");
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Stop_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        }
+        Fade_Out(2, 1);
+        Warp_Player("Behind_Church", 0xFC, 0x170);
+        SetEntityPosition(0, 0xFC, 0x170, 1);
+        Fade_In(2, 1);
+    } else {
+        TalkOpen();
+        TalkMessage(0);
+        TalkClose();
+    }
+}
+exit;
+}

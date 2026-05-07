@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 754 Unknown_Event_0754 {
+const MESSAGE_0 = "I'm OK now!!\r\n...I think...\BRK";
+
+if ((Check_Flag("Flag_0x117") == 1)) {
+    SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Jeff_Neutral");
+    Set_Name_Window("Jeff");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Jeff");
+    SetEntityFacing(0x11, 2);
+}
+exit;
+}

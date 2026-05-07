@@ -1,0 +1,34 @@
+#include "lib_fomt.csv"
+
+script 789 Unknown_Event_0789 {
+const MESSAGE_0 = "I'm just glad they're done \r\nfighting. Now I can \r\nenjoy my meal!\BRK";
+const MESSAGE_1 = "Thanks for helping settle \r\nthings, \xFF!. \BRK";
+const MESSAGE_2 = "I wonder what they were \r\nfighting about to begin \r\nwith...?\BRK";
+const MESSAGE_3 = "Now my food doesn't taste\r\ngood any more...\r\nWhat a waste!\BRK";
+
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Huachito");
+if ((Check_Flag("Flag_0x129") == 0)) {
+    if ((Has_NPC_Talked_Today("Huachito") == 0)) {
+        Set_Portrait("Thomas_Afraid");
+        TalkMessage(0);
+    } else {
+        Set_Portrait("Thomas_Neutral");
+        TalkMessage(1);
+    }
+} else {
+    if ((Has_NPC_Talked_Today("Huachito") == 0)) {
+        Set_Portrait("Thomas_Afraid");
+        TalkMessage(2);
+        goto LBL_0007;
+    }
+    Set_Portrait("Thomas_Afraid");
+    TalkMessage(3);
+}
+TalkClose();
+Free_Event_Entity("Huachito");
+SetEntityFacing(0xD, 3);
+exit;
+exit;
+}

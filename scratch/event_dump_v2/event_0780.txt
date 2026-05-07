@@ -1,0 +1,19 @@
+#include "lib_fomt.csv"
+
+script 780 Unknown_Event_0780 {
+const MESSAGE_0 = "Carter's sleeping, so I'll \r\njust sneak out now...\BRK";
+
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+Warp_Player("North_Side_Town", 0x4D0, 0xA8);
+SetEntityPosition(0, 0x4D0, 0xA8, 0);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+Set_Flag("Flag_0x122", 2);
+exit;
+}

@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 517 Unknown_Event_0517 {
+const MESSAGE_0 = "Stove\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

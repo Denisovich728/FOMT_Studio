@@ -1,0 +1,63 @@
+#include "lib_fomt.csv"
+
+script 572 Unknown_Event_0572 {
+const MESSAGE_0 = "\x81c\x81c\x81c\x81c\r\n\r\n\BRK";
+const MESSAGE_1 = "...Here you go.\r\nDon't come back.\r\n\BRK";
+const MESSAGE_2 = "You sure are stubborn.\r\n\r\n\BRK";
+
+SetEntityAnim("Player", "Player_Stop_Base");
+Tick_Overnight_Engine(0, 0);
+Tick_Overnight_Engine(0, 0);
+Fade_Out(0, 1);
+switch (GetEntityFacing(0)) {
+    case 1:
+        SetEntityPosition(0x20, GetEntityX(0), (GetEntityY(0) - 0x18), 0);
+        break;
+    case 0:
+        SetEntityPosition(0x20, GetEntityX(0), (GetEntityY(0) + 0x18), 1);
+        break;
+    case 2:
+        SetEntityPosition(0x20, (GetEntityX(0) - 0x18), GetEntityY(0), 3);
+        break;
+    case 3:
+        SetEntityPosition(0x20, (GetEntityX(0) + 0x18), GetEntityY(0), 2);
+        break;
+}
+SetEntityAnim("Kappa", "Kappa_Stop_Base");
+Fade_In(0, 1);
+TalkOpen();
+Set_Name_Window("Kappa");
+Set_Portrait("Kappa_Neutral");
+if ((Check_Flag(0x148) != 2)) {
+    TalkMessage(0);
+    TalkClose();
+    Set_Flag(0x148, 2);
+} else {
+    if (((Check_Flag(0x240) == 0xA) && (Check_Flag(0x14A) != 2))) {
+        TalkMessage(1);
+        TalkClose();
+        SetEntityAnim("Kappa", "Kappa_Middle_Hands_Base");
+        Make_Delay(0x1E);
+        SetEntityAnim("Kappa", "Kappa_Stop_Base");
+        PlaySong(0, 0xB6);
+        Proc062();
+        Set_Flag(0x14A, 2);
+        Set_Flag(0xD, 1);
+        goto LBL_0009;
+    }
+    TalkMessage(2);
+    TalkClose();
+}
+if ((Check_Flag(0x23F) != 1)) {
+    if ((Check_Flag(0x240) == 0xA)) {
+        Set_Flag(0x240, 0);
+    } else {
+        Set_Flag(0x240, (Check_Flag(0x240) + 1));
+    }
+    Set_Flag(0x23F, 1);
+}
+Fade_Out(0, 1);
+Hide_Entity("Kappa");
+Fade_In(0, 1);
+exit;
+}

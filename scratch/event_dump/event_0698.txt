@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 698 Unknown_Event_0698 {
+const MESSAGE_0 = "I can't believe how luck I \r\nam to have such fine \r\nchildren! \BRK\WAIT_CLICKI'll have to stay healthy \r\nfor them...!\BRK";
+
+SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(1, 0);
+exit;
+exit;
+}

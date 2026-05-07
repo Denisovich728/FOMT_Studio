@@ -1,0 +1,16 @@
+#include "lib_fomt.csv"
+
+script 728 Unknown_Event_0728 {
+const MESSAGE_0 = "I'm so proud of you, Dad.\r\nNow I have to do even \r\nbetter on my novel!\BRK";
+
+SetEntityFacing(0xC, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("Mary");
+SetEntityFacing(0xC, 1);
+exit;
+exit;
+}

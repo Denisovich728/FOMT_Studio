@@ -1,0 +1,11 @@
+#include "lib_fomt.csv"
+
+script 160 Unknown_Event_0160 {
+const MESSAGE_0 = "Pieces of Lumber\r\n\x81@\r\n\x81@\x81@\x81@\x81@\x81@\x81@\x81@\xFF%boards\BRK";
+
+TalkOpen();
+Set_Text_Buffer_Int_Formatted(0, Check_Flag("Flag_0x28"), 3);
+Print_Message(0);
+TalkClose();
+exit;
+}

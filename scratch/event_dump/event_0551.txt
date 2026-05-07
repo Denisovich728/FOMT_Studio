@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 551 Unknown_Event_0551 {
+const MESSAGE_0 = "Wood Box\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

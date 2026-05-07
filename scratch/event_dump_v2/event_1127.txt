@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1127 Unknown_Event_1127 {
+const MESSAGE_0 = "I usually only get to eat my\r\nown lousy cooking, so I \r\nlove this contest! \BRK";
+
+if ((Func083(0x1B) == 0)) {
+    Free_Event_Entity("Gotz");
+}
+SetEntityFacing(0x1B, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Gotz_Happy");
+Set_Name_Window("Gotz");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Gotz") == 0)) {
+    Give_Friendship_Points("Gotz", 5);
+}
+SetEntityFacing(0x1B, 1);
+Free_Event_Entity("Gotz");
+exit;
+}

@@ -140,10 +140,11 @@ class MemoryManager:
         # Si el tamaño es igual o menor, y tenemos un offset válido, escribimos ahí mismo.
         if old_offset and new_size <= old_size:
             print(f"🎯 [In-Place] Sobrescribiendo espacio original en 0x{old_offset:06X} ({new_size} <= {old_size})")
-            # Opcional: Rellenar con FF si es más pequeño (para limpieza)
             if new_size < old_size:
-                padding = b'\xFF' * (old_size - new_size)
-                self.proyecto.write_patch(old_offset, new_data + padding)
+                # Rellenar el espacio sobrante con FF para limpieza total
+                padding_size = old_size - new_size
+                print(f"🧹 [Limpieza In-Place] Rellenando {padding_size} bytes con 0xFF en 0x{old_offset + new_size:06X}")
+                self.proyecto.write_patch(old_offset, new_data + (b'\xFF' * padding_size))
             else:
                 self.proyecto.write_patch(old_offset, new_data)
             
@@ -232,3 +233,48 @@ class MemoryManager:
                     self.proyecto.write_patch(addr, struct.pack('<H', new_id))
                     return True, (new_id == DEBUG_SCRIPT)
             return False, False
+
+    def relocate_master_event_table(self, new_capacity: int):
+        """
+        Reubica la tabla maestra de eventos a un nuevo espacio libre.
+        Copia los punteros existentes y actualiza el puntero del motor (0x03F89C en FoMT).
+        Retorna el nuevo offset y un mensaje de estado.
+        """
+        if self.proyecto.is_mfomt:
+            return None, "Reubicación de tabla no soportada aún para MFoMT (falta puntero del motor)."
+            
+        engine_ptr_offset = 0x03F89C
+        old_table_offset = self.proyecto.super_lib.table_offset
+        old_limit = self.proyecto.super_lib.event_limit
+        
+        if new_capacity <= old_limit:
+            return None, f"La nueva capacidad ({new_capacity}) debe ser mayor que la actual ({old_limit})."
+            
+        new_size = new_capacity * 4
+        new_offset = self._find_free_space(new_size)
+        
+        if new_offset == 0:
+            return None, "No se encontró espacio libre suficiente en la ROM para reubicar la tabla."
+            
+        # 1. Copiar la tabla antigua al nuevo espacio
+        old_table_data = self.proyecto.read_rom(old_table_offset, old_limit * 4)
+        
+        # Rellenar el resto de la nueva tabla con 0x00000000 (punteros nulos)
+        padding_size = (new_capacity - old_limit) * 4
+        new_table_data = old_table_data + (b'\x00' * padding_size)
+        
+        self.proyecto.write_patch(new_offset, new_table_data)
+        
+        # 2. Actualizar el puntero del motor para que use la nueva tabla
+        # Aplicamos la lógica de la Base Fantasma: New_Ghost_Base = New_Free_Space - 4
+        ghost_base = new_offset - 4
+        self.repoint_with_alignment(engine_ptr_offset, ghost_base)
+        
+        # 3. Limpiar la tabla antigua (0xFF) para recuperar el espacio
+        self.proyecto.write_patch(old_table_offset, b'\xFF' * (old_limit * 4))
+        
+        # 4. Actualizar estado de SuperLibrary
+        self.proyecto.super_lib.cfg["MASTER_TABLE_OFFSET"] = new_offset
+        self.proyecto.super_lib.cfg["EVENT_LIMIT"] = new_capacity
+        
+        return new_offset, f"Tabla de Eventos reubicada a 0x{new_offset:06X}. Límite expandido de {old_limit} a {new_capacity} eventos."

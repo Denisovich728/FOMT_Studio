@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1263 Unknown_Event_1263 {
+const MESSAGE_0 = "I look forward to this \r\nday every year. \BRK";
+const MESSAGE_1 = "You're racing? My advice\r\nis to just have fun. \BRK";
+
+if ((Func083(4) == 0)) {
+    Free_Event_Entity("Barley");
+}
+SetEntityFacing(4, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x1AB) == 0)) {
+    TalkOpen();
+    Set_Portrait("Barley_Happy");
+    Set_Name_Window("Barley");
+    TalkMessage(0);
+} else {
+    TalkOpen();
+    Set_Portrait("Barley_Neutral");
+    Set_Name_Window("Barley");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Barley") == 0)) {
+    Give_Friendship_Points("Barley", 5);
+}
+Free_Event_Entity("Barley");
+SetEntityFacing(4, 3);
+exit;
+}

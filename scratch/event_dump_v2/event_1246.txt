@@ -1,0 +1,68 @@
+#include "lib_fomt.csv"
+
+script 1246 Unknown_Event_1246 {
+PlayBGM(1, 7);
+SetEntityPosition(0xD, 0x55, 0x5B, 0);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(4, 0x68, 0xA6, 3);
+SetEntityAnim("Barley", "Barley_Stop_Base");
+SetEntityPosition(6, 0x58, 0xAB, 3);
+SetEntityAnim("Saibara", "Saibara_Stop_Base");
+SetEntityPosition(0x1C, 0x9F, 0x54, 0);
+SetEntityAnim("Zack", "Zack_Stop_Base");
+SetEntityPosition(0x1B, 0x71, 0x49, 0);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+SetEntityPosition(7, 0x4E, 0x174, 0);
+SetEntityAnim("Gray", "Gray_Stop_Base");
+SetEntityPosition(0xC, 0x61, 0x182, 0);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0x18, 0x149, 0xAC, 2);
+SetEntityAnim("Doug", "Baby_Horse_Deep_Sleep_Base");
+SetEntityPosition(0x15, 0x128, 0x174, 1);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x14, 0x161, 0x15E, 2);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0x16, 0x17E, 0x57, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(1, 0x14C, 0x149, 2);
+SetEntityAnim("Lillia", "Lilia_Stop_Base");
+SetEntityPosition(2, 0x16E, 0x174, 2);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(0xE, 0x147, 0x4A, 0);
+SetEntityAnim("Harris", "Harris_Stop_Base");
+SetEntityPosition(8, 0x13F, 0x8A, 2);
+SetEntityAnim("Duke", "Duke_Stop_Base");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+if ((GetEntityLocation(0x2B) == "Rose_Square")) {
+    SetEntityPosition(0x2B, 0x1A0, 0x85, 0);
+}
+if ((GetEntityLocation(0x4A) == "Rose_Square")) {
+    SetEntityPosition(0x4A, (0x1A0 + 0x10), 0x85, 0);
+}
+if ((GetEntityLocation(0x4B) == "Rose_Square")) {
+    SetEntityPosition(0x4B, (0x1A0 + 0x20), 0x85, 0);
+}
+End_Cinematic_State();
+Fade_In(2, 1);
+Set_Flag("Event_Fall_HorseRace_Active", 1);
+Routine_State_Override("Huachito", "Script_1255");
+Routine_State_Override("Barley", "Script_1263");
+Routine_State_Override("Saibara", "Script_1261");
+Routine_State_Override("Zack", "Script_1251");
+Routine_State_Override("Gotz", "Script_1262");
+Routine_State_Override("Gray", "Script_1260");
+Routine_State_Override("Mary", "Script_1254");
+Routine_State_Override("Doug", "Script_1253");
+Routine_State_Override("Elli", "Script_1256");
+Routine_State_Override("Doctor", "Script_1252");
+Routine_State_Override("Carter", "Script_1259");
+Routine_State_Override("Lillia", "Script_1250");
+Routine_State_Override("Rick", "Script_1249");
+Routine_State_Override("Harris", "Script_1258");
+Routine_State_Override("Duke", "Script_1257");
+exit;
+}

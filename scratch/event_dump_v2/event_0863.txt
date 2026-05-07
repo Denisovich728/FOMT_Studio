@@ -1,0 +1,117 @@
+#include "lib_fomt.csv"
+
+script 863 Unknown_Event_0863 {
+const MESSAGE_0 = "I think I hear a voice...!\BRK";
+const MESSAGE_1 = "!!!\BRK";
+const MESSAGE_2 = "Our child has been born!\r\nWill you name it for me?\BRK";
+const MESSAGE_3 = "\xFF*...\r\nThat's a good name. \BRK\WAIT_CLICKPlease look after him. \r\nI have to get back to being\r\nthe Harvest Goddess now.\BRK";
+const MESSAGE_4 = "I'm a father now!\r\nJust you wait, \r\n\xFF*! \BRK\WAIT_CLICKWe're going to have \r\nlots of fun!\BRK";
+
+Proc12D();
+Warp_Player("Farm_House_1", 0x176, 0x55);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x176, 0x55, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x23, 0x1A0, -0x30, 0);
+SetEntityAnim("", 8);
+Set_Flag("Flag_0x17A", 1);
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+PlaySong(0, 0xAC);
+Make_Delay(0x3C);
+PlaySong(0, 0xAC);
+Make_Delay(0x3C);
+TalkOpen();
+TalkMessage(1);
+TalkClose();
+Fade_In(2, 1);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityFacing(0, 0);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x64, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityFacing(0, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0x1AE, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityFacing(0, 1);
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+PlaySong(0, 0xBE);
+SetEntityPosition(0x46, GetEntityX(0), (GetEntityY(0) + 0x18), 0);
+Spawn_Event_Entity(0x46, 3);
+SetEntityAnim(0x46, "Staid_Magic_Effect2");
+Tick_Overnight_Engine(1, 0);
+Tick_Overnight_Engine(1, 0);
+Fade_Out(1, 1);
+Hide_Entity(0x46);
+SetEntityPosition(0x1F, 0x1AE, 0x7C, 1);
+SetEntityAnim("H. Goddess", "H.Goodes_Stop_Base");
+Fade_In(1, 1);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityFacing(0, 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("H. Goddess");
+Set_Portrait("H_Goddes_Happy");
+TalkMessage(2);
+TalkClose();
+Fade_Out(3, 1);
+Trigger_Naming_Sequence(0);
+Fade_In(3, 1);
+TalkOpen();
+Set_Name_Window("H. Goddess");
+Set_Portrait("H_Goddes_Happy");
+TalkMessage(3);
+TalkClose();
+Make_Delay(0x3C);
+PlaySong(0, 0xBE);
+SetEntityPosition(0x46, GetEntityX(0x1F), (GetEntityY(0x1F) + 2), 0);
+Spawn_Event_Entity(0x46, 3);
+SetEntityAnim(0x46, "Staid_Magic_Effect2");
+Tick_Overnight_Engine(1, 0);
+Tick_Overnight_Engine(1, 0);
+Fade_Out(1, 1);
+Hide_Entity(0x46);
+Hide_Entity("H. Goddess");
+Make_Delay(0x1E);
+Fade_In(1, 1);
+Make_Delay(0x3C);
+Show_Emote("Player", "Thinking", 0);
+Make_Delay(0x3C);
+Free_Event_Entity("H. Goddess");
+Give_Love_Points("H. Goddess", 0xBB8);
+Set_Flag("Flag_0x17A", 2);
+Make_Delay(0x3C);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(4);
+TalkClose();
+Execute_Script(0x3DC);
+exit;
+}

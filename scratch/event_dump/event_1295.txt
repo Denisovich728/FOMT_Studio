@@ -1,0 +1,98 @@
+#include "lib_fomt.csv"
+
+script 1295 Unknown_Event_1295 {
+const MESSAGE_0 = "This is from me. \r\nI hope you like it. \BRK";
+const MESSAGE_1 = "This is for the Cookies\r\nyou gave me in Spring. \BRK";
+const MESSAGE_2 = "I came to give you \r\nsomething. \BRK";
+
+var var_0;
+
+Set_Flag(0x1B8, 1);
+var_0 = GetEntityFacing(0x19);
+SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Ann");
+if (Inventory_Check()) {
+    if ((Check_Flag(0x186) == 0)) {
+        Set_Portrait("Ann_Happy");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(0);
+        TalkClose();
+        SetEntityAnim("Ann", "Ann_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+        PlaySong(0, 0x6A);
+        if ((Chek_Love_Points("Ann") >= 0x9C40)) {
+            Proc049(0x90);
+        } else {
+            if ((Chek_Love_Points("Ann") < 0x9C40)) {
+                Proc049(0x45);
+            }
+        }
+        Set_Flag(0x1B9, 1);
+        Give_Love_Points("Ann", 0x3E8);
+        SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        if ((GetEntityX(0x19) != 0x154)) {
+            SetEntityFacing(0x19, 3);
+            SetEntityAnim("Ann", "Ann_Stop_Base");
+            Set_Vector_X("Ann", 0x154, 1);
+            Execute_Movement("Ann");
+            SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        }
+        SetEntityFacing(0x19, 1);
+        SetEntityAnim("Ann", "Ann_Stop_Base");
+        Set_Vector_Y("Ann", 0, 1);
+        Execute_Movement("Ann");
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        Hide_Entity("Ann");
+        Set_Flag(0x1B8, 2);
+        Finalize_Event();
+    } else {
+        Set_Portrait("Ann_Happy");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(1);
+        TalkClose();
+        SetEntityAnim("Ann", "Ann_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+        PlaySong(0, 0x6A);
+        if ((Chek_Love_Points("Ann") >= 0x9C40)) {
+            Proc049(0x90);
+        } else {
+            if ((Chek_Love_Points("Ann") < 0x9C40)) {
+                Proc049(0x45);
+            }
+        }
+        Set_Flag(0x1B9, 1);
+        Set_Flag(0x186, 0);
+        Give_Love_Points("Ann", 0x3E8);
+        SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        if ((GetEntityX(0x19) != 0x154)) {
+            SetEntityFacing(0x19, 3);
+            SetEntityAnim("Ann", "Ann_Stop_Base");
+            Set_Vector_X("Ann", 0x154, 1);
+            Execute_Movement("Ann");
+            SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        }
+        SetEntityFacing(0x19, 1);
+        SetEntityAnim("Ann", "Ann_Stop_Base");
+        Set_Vector_Y("Ann", 0, 1);
+        Execute_Movement("Ann");
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+        Hide_Entity("Ann");
+        Set_Flag(0x1B8, 2);
+        Finalize_Event();
+    }
+} else {
+    Set_Portrait("Ann_Happy");
+    Set_Hearth_Anim("Ann");
+    TalkMessage(2);
+    TalkClose();
+    Set_Flag(0x1B8, 0);
+}
+SetEntityFacing(0x19, var_0);
+Free_Event_Entity("Ann");
+exit;
+}

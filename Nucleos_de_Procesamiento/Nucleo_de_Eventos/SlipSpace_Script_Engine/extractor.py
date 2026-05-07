@@ -107,15 +107,25 @@ def extract_all_resources(rom_path: str, output_dir: str, library_path: str = No
     worker_args = [(i, s, known_callables, library_path, eventos_dir) for i, s in enumerate(scripts)]
     
     scripts_ready = 0
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for i, success, error in executor.map(_decompile_worker, worker_args):
+    try:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+            for i, success, error in executor.map(_decompile_worker, worker_args):
+                if not success:
+                    failed_scripts.append((i, error))
+                else:
+                    scripts_ready += 1
+                    if scripts_ready % 200 == 0 and update_callback:
+                        update_callback(f"Progreso paralelo: {scripts_ready}/{len(scripts)} scripts...")
+    except Exception as e:
+        if update_callback: update_callback(f"Multiprocessing falló ({e}). Usando modo seguro (secuencial)...")
+        for args in worker_args:
+            i, success, error = _decompile_worker(args)
             if not success:
                 failed_scripts.append((i, error))
             else:
                 scripts_ready += 1
-                # Optional UI progress update
                 if scripts_ready % 200 == 0 and update_callback:
-                    update_callback(f"Progreso paralelo: {scripts_ready}/{len(scripts)} scripts...")
+                    update_callback(f"Progreso modo seguro: {scripts_ready}/{len(scripts)} scripts...")
                     
     if update_callback: update_callback(f"Scripts listos. {len(scripts)-len(failed_scripts)} extraídos, {len(failed_scripts)} fallidos.")
             

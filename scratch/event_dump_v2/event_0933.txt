@@ -1,0 +1,134 @@
+#include "lib_fomt.csv"
+
+script 933 Unknown_Event_0933 {
+const MESSAGE_0 = "Lately Gramps is finally\r\nletting me do some \r\nreal work. \BRK";
+const MESSAGE_1 = "That's great! \BRK";
+const MESSAGE_2 = "Well, just small things...\BRK";
+const MESSAGE_3 = "That's still good, right?\BRK";
+const MESSAGE_4 = "I guess...\BRK";
+const MESSAGE_5 = "...?\r\nWhat's wrong?\BRK";
+const MESSAGE_6 = "I was just thinking that \r\nI owe everything to you. \BRK";
+const MESSAGE_7 = "Me? But I haven't \r\ndone anything! \BRK";
+const MESSAGE_8 = "Talking to you on the peak\r\nof the mountain made me\r\nrealize what's wrong \BRK\r\nwith me.\BRK";
+const MESSAGE_9 = "Oh yeah...\r\nI'm glad anything I said \r\nwas useful...\BRK";
+const MESSAGE_10 = "If you hadn't said that,\r\nthen I might have given up!\BRK";
+const MESSAGE_11 = "Saibara said he would give \r\nme a test on my skills. \BRK\WAIT_CLICKIf I pass it, there's some-\r\nthing I want to ask you. \BRK";
+const MESSAGE_12 = "What is it!?\BRK";
+const MESSAGE_13 = "I have to pass the test \r\nfirst! Forget I said it...\BRK";
+const MESSAGE_14 = "If you say so...\BRK";
+
+Warp_Player("Mary_Library_Floor_01", 0x78, 0x50);
+PlayBGM(1, 0x10);
+SetEntityPosition(0, 0x78, 0xD0, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(7, 0x68, 0x44, 3);
+SetEntityAnim("Gray", "Gray_Stop_Base");
+SetEntityPosition(0xC, 0x88, 0x44, 2);
+SetEntityAnim("Mary", 0x813);
+Fade_In(2, 1);
+Show_Emote("Gray", "Happy", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Happy");
+Set_Name_Window("Mary");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Gray_Happy");
+Set_Name_Window("Gray");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Happy");
+Set_Name_Window("Mary");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(4);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(5);
+TalkClose();
+Show_Emote("Mary", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(6);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(7);
+TalkClose();
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(8);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Ruborized");
+Set_Name_Window("Mary");
+TalkMessage(9);
+TalkClose();
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(10);
+Set_Portrait("Gray_Happy");
+Set_Name_Window("Gray");
+TalkMessage(11);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(12);
+TalkClose();
+Show_Emote("Mary", "Question", 0);
+Make_Delay(0x3C);
+Show_Emote("Gray", "Afraid", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Gray_Timid");
+Set_Name_Window("Gray");
+TalkMessage(13);
+TalkClose();
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+TalkMessage(14);
+TalkClose();
+Pan_Camera_To(0x78, 0x90, 1);
+Wait_Camera_Stop();
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0xA0, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+End_Cinematic_State();
+Routine_State_Override("Mary", "Script_934");
+Routine_State_Override("Gray", "Script_935");
+Set_Flag("Rival_Mary_Gray_Event_3", 1);
+exit;
+exit;
+}

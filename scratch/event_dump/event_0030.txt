@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 30 Unknown_Event_0030 {
+const MESSAGE_0 = "So I have to eat Karen's\r\ncooking?...\BRK\WAIT_CLICKJust the thought makes\r\nme queasy!\BRK";
+
+if ((Check_Flag(0x4A) == 1)) {
+}
+SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Jeff_Hurt");
+Set_Name_Window("Jeff");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x11, 1);
+Free_Event_Entity("Jeff");
+exit;
+}

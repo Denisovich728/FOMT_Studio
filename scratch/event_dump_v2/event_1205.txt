@@ -1,0 +1,38 @@
+#include "lib_fomt.csv"
+
+script 1205 Unknown_Event_1205 {
+Warp_Player("Church", 0xB8, 0x102);
+PlayBGM(1, 8);
+SetEntityPosition(0, 0xB8, 0x140, 1);
+SetEntityPosition(5, 0x108, 0xC3, 1);
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityPosition(0xC, 0x48, 0x9B, 1);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0x10, 0x128, 0xC3, 1);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0x11, 0x68, 0xC3, 1);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+SetEntityPosition(0x12, 0x48, 0xC3, 1);
+SetEntityAnim("Sasha", "Sasha_Stop_Base");
+SetEntityPosition(0x13, 0x68, 0x9B, 1);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(0x15, 0x108, 0x9B, 1);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x16, 0xB8, 0x43, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0x19, 0x128, 0x9B, 1);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+Fade_In(2, 1);
+End_Cinematic_State();
+Routine_State_Override("Elli", "Script_1211");
+Routine_State_Override("Carter", "Script_1213");
+Routine_State_Override("May", "Script_1214");
+Routine_State_Override("Ann", "Script_1209");
+Routine_State_Override("Karen", "Script_1207");
+Routine_State_Override("Mary", "Script_1210");
+Routine_State_Override("Jeff", "Script_1206");
+Routine_State_Override("Sasha", "Script_1208");
+Routine_State_Override("Stu", "Script_1212");
+Set_Flag("Flag_0x1A2", 1);
+exit;
+}

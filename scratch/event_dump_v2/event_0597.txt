@@ -1,0 +1,123 @@
+#include "lib_fomt.csv"
+
+script 597 Unknown_Event_0597 {
+const MESSAGE_0 = "Good morning!!\r\nDo you know what makes\r\ntoday special?\BRK";
+const MESSAGE_1 = "Your birthday";
+const MESSAGE_2 = "Our anniversary";
+const MESSAGE_3 = "My birthday";
+const MESSAGE_4 = "My birthday? \r\nNo, it's our anniversary, \r\nsilly! I can't believe you \BRK\r\nforgot! I could hardly wait\r\nto give you a present!\BRK\WAIT_CLICKI'm not giving it to \r\nsomeone so thoughtless!\BRK";
+const MESSAGE_5 = "You're right!\r\nI was afraid you'd forget,\r\nbut you are so wonderful \BRK\r\nyou always surprise me!\BRK\WAIT_CLICKI love you, \xFF)!\BRK";
+const MESSAGE_6 = "Here you are, \xFF).\BRK";
+const MESSAGE_7 = "I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK";
+const MESSAGE_8 = "Your kidding, aren't you?!\r\nDo you have a fever,\r\nbecause if you don't \BRK\r\nthere's no excuse for this!\BRK\WAIT_CLICKIt's our anniversary, silly!\BRK";
+
+var var_0;
+
+Warp_Player("Farm_House_1", 0x109, 0x8A);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x109, 0x8A, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x15, 0x109, 0x72, 0);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+if ((Check_Flag("Flag_0xCA") == 2)) {
+    if ((Check_Flag("Baby_Age_Days") >= 0x3C)) {
+        SetEntityPosition(0x23, 0x124, 0x54, 0);
+        if ((Check_Flag("Baby_Growth_Stage") == 1)) {
+            SetEntityAnim("", "Baby_Stop_Base");
+        } else {
+            SetEntityAnim("", "Baby_Sit_Base");
+        }
+    } else {
+        SetEntityPosition(0x23, 0x1A0, -0x30, 0);
+        SetEntityAnim("", 0xC);
+    }
+}
+Fade_In(2, 1);
+TalkOpen();
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Happy");
+Set_Hearth_Anim("Elli");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice3(1, 2, 3);
+switch (var_0) {
+    case 1:
+        Give_Love_Points("Elli", -0x7D0);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Angry");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(4);
+        TalkClose();
+        Set_Flag("Flag_0xAE", 2);
+        Fade_Out(2, 1);
+        Warp_Player("Farm_House_1", 0x147, 0x70);
+        SetEntityPosition(0, 0x147, 0x70, 2);
+        Fade_In(2, 1);
+        break;
+    case 2:
+        Give_Love_Points("Elli", 0xBB8);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Happy");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(5);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Elli");
+        Set_Hearth_Anim("Elli");
+        if (Inventory_Check()) {
+            Set_Portrait("Ellie_Happy");
+            TalkMessage(6);
+            TalkClose();
+            SetEntityAnim("Elli", "Elli_Hands_Base");
+            Make_Delay(0x3C);
+            SetEntityAnim("Elli", "Elli_Stop_Base");
+            PlaySong(0, 0x6A);
+            SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+            Give_Item(Func122());
+            SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+            Set_Flag("Flag_0xAE", 2);
+            Make_Delay(0x3C);
+            Fade_Out(2, 1);
+            Warp_Player("Farm_House_1", 0x147, 0x70);
+            SetEntityPosition(0, 0x147, 0x70, 2);
+            Fade_In(2, 1);
+            goto LBL_0010;
+        }
+        Set_Portrait("Ellie_Neutral");
+        TalkMessage(7);
+        TalkClose();
+        End_Cinematic_State();
+        Routine_State_Override("Elli", "Script_599");
+        if ((Check_Flag("Flag_0xCA") == 2)) {
+            Routine_State_Override("", "Script_598");
+        }
+        Set_Flag("Flag_0xAE", 1);
+        break;
+    case 3:
+        Give_Love_Points("Elli", -0x7D0);
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Angry");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(8);
+        TalkClose();
+        Set_Flag("Flag_0xAE", 2);
+        Fade_Out(2, 1);
+        Warp_Player("Farm_House_1", 0x147, 0x70);
+        SetEntityPosition(0, 0x147, 0x70, 2);
+        Fade_In(2, 1);
+        break;
+}
+Free_Event_Entity("Elli");
+exit;
+}

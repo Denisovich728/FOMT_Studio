@@ -1,0 +1,120 @@
+#include "lib_fomt.csv"
+
+script 1130 Unknown_Event_1130 {
+const MESSAGE_0 = "Tomorrow is Beach Day, \r\nyou know. \BRK\WAIT_CLICKI came to invite you and \r\nyour Dog. \BRK\WAIT_CLICK";
+const MESSAGE_1 = "Oh, your Dog is still \r\na puppy? \BRK\WAIT_CLICKI'm sorry, but that means \r\nhe can't compete. \BRK\WAIT_CLICKIf you have the time, come\r\nto the Beach tomorrow at \r\n10AM anyway. Bye now.\BRK";
+const MESSAGE_2 = "Tomorrow is Beach Day, \r\nyou know. \BRK\WAIT_CLICKI cam to invite you and \r\nyour Dog. \BRK\WAIT_CLICK";
+const MESSAGE_3 = "Compete.";
+const MESSAGE_4 = "Don't compete.";
+const MESSAGE_5 = "In that case, I'll take him\r\nwith me now. \BRK";
+const MESSAGE_6 = "If you have the time, come\r\nto the Beach tomorrow at \r\n10AM anyway to watch. \BRK\r\nBye now.\BRK";
+
+var var_0;
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1C, 0xE4, 0x91, 1);
+SetEntityAnim("Zack", "Zack_Stop_Base");
+Fade_In(2, 1);
+if ((Check_Flag("Flag_0x41") == 0)) {
+    TalkOpen();
+    Set_Portrait("Zack_Happy");
+    Set_Name_Window("Zack");
+    TalkMessage(0);
+    Set_Portrait("Zack_Neutral");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0x1C, 3);
+    SetEntityAnim("Zack", "Zack_Walking_Base");
+    Set_Vector_X("Zack", 0x13F, 1);
+    Execute_Movement("Zack");
+    SetEntityFacing(0x1C, 1);
+    Set_Vector_Y("Zack", 0, 1);
+    Execute_Movement("Zack");
+    Hide_Entity("Zack");
+    Set_Flag("Flag_0x193", 0);
+    Set_Flag("Flag_0x192", 2);
+} else {
+    TalkOpen();
+    Set_Portrait("Zack_Happy");
+    Set_Name_Window("Zack");
+    TalkMessage(2);
+    TalkClose();
+    TalkOpen();
+    var_0 = TalkChoice2(3, 4);
+    switch (var_0) {
+        case 1:
+            TalkClose();
+            Fade_Out(2, 1);
+            if ((Inventory_Check() == 1)) {
+                SetEntityAnim("Player", "Player_Stop_Base");
+                goto LBL_000C;
+            }
+            if ((Compare_Gift() == 2)) {
+                Drop_Held_Item();
+                SetEntityAnim("Player", "Player_Stop_Base");
+            }
+            Hide_Entity(0x2B);
+            Set_Flag("Flag_0x193", 1);
+            Open_Animal_Selection_UI(0);
+            SetEntityPosition(0x46, 0xD4, 0x91, 1);
+            Spawn_Event_Entity(0x46, 0);
+            SetEntityAnim(0x46, 0x338);
+            Wait_For_Animation(0x46);
+            Fade_In(2, 1);
+            TalkOpen();
+            Set_Portrait("Zack_Happy");
+            Set_Name_Window("Zack");
+            TalkMessage(5);
+            TalkClose();
+            SetEntityFacing(0x1C, 3);
+            SetEntityAnim("Zack", "Zack_Walking_Base");
+            Set_Vector_X("Zack", 0x13F, 1);
+            Execute_Movement("Zack");
+            SetEntityAnim("Zack", "Zack_Stop_Base");
+            SetEntityFacing(0x1C, 2);
+            SetEntityFacing(0x46, 3);
+            SetEntityAnim(0x46, 0x33C);
+            Set_Vector_X(0x46, 0x131, 1);
+            Execute_Movement(0x46);
+            SetEntityAnim(0x46, 0x338);
+            Make_Delay(0x1E);
+            SetEntityFacing(0x46, 1);
+            SetEntityFacing(0x1C, 1);
+            SetEntityAnim("Zack", "Zack_Walking_Base");
+            Set_Vector_Y("Zack", 0, 1);
+            SetEntityAnim(0x46, 0x33C);
+            Set_Vector_Y(0x46, 0, 1);
+            Execute_Movement("Zack");
+            Execute_Movement(0x46);
+            SetEntityAnim("Zack", "Zack_Stop_Base");
+            SetEntityAnim(0x46, 0x338);
+            SetEntityFacing(0x1C, 0);
+            SetEntityFacing(0x46, 1);
+            Hide_Entity("Zack");
+            Hide_Entity(0x46);
+            Set_Flag("Flag_0x192", 2);
+            break;
+        case 2:
+            Set_Portrait("Zack_Neutral");
+            Set_Name_Window("Zack");
+            TalkMessage(6);
+            TalkClose();
+            SetEntityFacing(0x1C, 3);
+            SetEntityAnim("Zack", "Zack_Walking_Base");
+            Set_Vector_X("Zack", 0x13F, 1);
+            Execute_Movement("Zack");
+            SetEntityFacing(0x1C, 1);
+            Set_Vector_Y("Zack", 0, 1);
+            Execute_Movement("Zack");
+            Hide_Entity("Zack");
+            Set_Flag("Flag_0x193", 0);
+            Set_Flag("Flag_0x192", 2);
+            break;
+    }
+}
+exit;
+}

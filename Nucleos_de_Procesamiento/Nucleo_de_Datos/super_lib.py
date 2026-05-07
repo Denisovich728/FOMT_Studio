@@ -76,6 +76,9 @@ class SuperLibrary:
         "NPC_LIMIT": 42,
         "GFoodInfo_OFFSET": 0x08111B90,
         "GToolInfo_OFFSET": 0x081116A8,
+        "TOOLS_TABLE": (0x0, 0x0), # (start, end)
+        "FOODS_TABLE": (0x0, 0x0),
+        "MISC_TABLE": (0x0, 0x0),
     }
     
     MFOMT_CONSTANTS = {
@@ -86,6 +89,9 @@ class SuperLibrary:
         "NPC_LIMIT": 42,
         "GFoodInfo_OFFSET": 0x0813D8E8,
         "GToolInfo_OFFSET": 0x0813D3A8,
+        "TOOLS_TABLE": (0x0, 0x0),
+        "FOODS_TABLE": (0x0, 0x0),
+        "MISC_TABLE": (0x0, 0x0),
     }
 
     # NLP Keywords extraídos de Carter.py
@@ -107,14 +113,61 @@ class SuperLibrary:
         self.known_callables = {}
         self.data_banks = {} # {Offset: (DecompSize, Name_Hint)}
         self.palette_cache = {} # {Offset: List[Tuple(r,g,b)]} para Previsualización Rápida
+        self.portrait_map = {} # {Nombre: ID}
+        self.map_map = {} # {Nombre: ID}
+        self.anim_map = {} # {Nombre: ID}
         
         # Cargar mapeos externos (Editables por el usuario)
         self.custom_event_names = {}
         self.custom_map_names = {}
         self._load_extraction_pointers()
         self._load_custom_names()
+        self._load_portraits()
+        self._load_maps()
+        self._load_animations()
         
         self._parse_mary_bible()
+
+    def dynamic_init(self, rom_data: bytes):
+        """
+        Escanea la ROM (o ROM virtual) para detectar dinámicamente la tabla maestra de eventos.
+        Si la tabla ha sido reubicada, actualiza los offsets internos.
+        También detecta el límite real de eventos según la tabla en la ROM.
+        """
+        if not self.is_mfomt:
+            # Puntero maestro del motor FOMT a la tabla de eventos
+            engine_ptr_offset = 0x03F89C
+            
+            # 1. Leer el puntero que usa el motor
+            if engine_ptr_offset + 4 <= len(rom_data):
+                ptr_val = struct.unpack_from('<I', rom_data, engine_ptr_offset)[0]
+                
+                # 2. Validar que sea un puntero ROM (0x08XXXXXX)
+                if ptr_val >= 0x08000000 and ptr_val < 0x09000000:
+                    # El puntero apunta a la "Base Fantasma" (offset - 4). 
+                    # El espacio real de los eventos (Event 1) empieza +4 bytes adelante.
+                    real_table_offset = (ptr_val & 0x01FFFFFF) + 4
+                    self.cfg["MASTER_TABLE_OFFSET"] = real_table_offset
+                    
+                    # 3. Escanear el límite de eventos (hasta encontrar un puntero inválido)
+                    idx = 0
+                    max_events = 5000  # Límite de seguridad
+                    while idx < max_events:
+                        entry_ptr = real_table_offset + (idx * 4)
+                        if entry_ptr + 4 > len(rom_data):
+                            break
+                            
+                        val = struct.unpack_from('<I', rom_data, entry_ptr)[0]
+                        # Validar si es un puntero razonable para GBA (o nulo)
+                        if val != 0 and (val < 0x08000000 or val >= 0x09000000):
+                            # Fin de la tabla (no es un puntero ROM)
+                            break
+                        idx += 1
+                        
+                    # 4. Actualizar el límite de eventos detectado
+                    if idx > 0:
+                        self.cfg["EVENT_LIMIT"] = idx
+                        print(f"[*] SuperLibrary: Tabla de Eventos dinámicamente detectada en 0x{real_table_offset:06X} con {idx} eventos.")
 
     def _load_extraction_pointers(self):
         import csv
@@ -138,6 +191,56 @@ class SuperLibrary:
                         self.cfg["NPC_TABLE_OFFSET"] = base_offset + delta
                         # Cada entrada NPC ocupa 8 bytes (puntero + script/flags)
                         self.cfg["NPC_LIMIT"] = ((end_offset - base_offset + 1) // 8)
+                    elif t == 'Herramientas':
+                        self.cfg["TOOLS_TABLE"] = (int(row['ofsetini'], 16), int(row['ofsetfin'], 16))
+                    elif t == 'Comestibles':
+                        self.cfg["FOODS_TABLE"] = (int(row['ofsetini'], 16), int(row['ofsetfin'], 16))
+                    elif t == 'Variados':
+                        self.cfg["MISC_TABLE"] = (int(row['ofsetini'], 16), int(row['ofsetfin'], 16))
+
+    def _load_portraits(self):
+        import csv
+        csv_path = get_data_path("portraits.csv")
+        if os.path.exists(csv_path):
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    name = row.get('id_portrait')
+                    hex_val = row.get('hex_name')
+                    if name and hex_val:
+                        try:
+                            self.portrait_map[name] = int(hex_val, 16)
+                        except: pass
+
+    def _load_maps(self):
+        import csv
+        csv_path = get_data_path("Mapas.csv")
+        if os.path.exists(csv_path):
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f, skipinitialspace=True)
+                for row in reader:
+                    name = row.get('Map_Name')
+                    hex_val = row.get('Map_ID')
+                    if name and hex_val:
+                        try:
+                            # Quitar espacios y manejar hex
+                            self.map_map[name.strip()] = int(hex_val.strip(), 16)
+                        except: pass
+
+    def _load_animations(self):
+        import csv
+        csv_path = get_data_path("Animations.csv")
+        if os.path.exists(csv_path):
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                # El formato es Nombre,ID (ej: Player_Stop_Down,0x000)
+                reader = csv.reader(f)
+                for row in reader:
+                    if len(row) < 2: continue
+                    name, hex_val = row[0].strip(), row[1].strip()
+                    if name and hex_val:
+                        try:
+                            self.anim_map[name] = int(hex_val.replace("0x", ""), 16)
+                        except: pass
 
     def _load_custom_names(self):
         mapas_path = get_data_path("mapas.json")
@@ -151,6 +254,34 @@ class SuperLibrary:
             with open(eventos_path, 'r', encoding='utf-8') as f:
                 try: self.custom_event_names = json.load(f)
                 except: pass
+
+    def load_event_names_from_csv(self, filename):
+        """Carga nombres de eventos desde un archivo CSV (Formato: Event_Name,ID)."""
+        import csv
+        path = get_data_path(filename)
+        if not os.path.exists(path):
+            print(f"Alerta: No se encontró el archivo {filename} en {path}.")
+            return False
+            
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                new_names = {}
+                for row in reader:
+                    name = row.get('Event_Name')
+                    id_val = row.get('ID')
+                    if name and id_val:
+                        # Limpiar y guardar
+                        new_names[str(id_val).strip()] = name.strip()
+                
+                if new_names:
+                    self.custom_event_names.update(new_names)
+                    print(f"Éxito: Se cargaron {len(new_names)} nombres de eventos desde {filename}.")
+                    return True
+            return False
+        except Exception as e:
+            print(f"Error cargando nombres de eventos desde CSV ({filename}): {e}")
+            return False
 
     def _parse_mary_bible(self):
         import csv
@@ -174,13 +305,13 @@ class SuperLibrary:
         with open(lib_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                t = row.get('Type', '').strip()
+                t = (row.get('Type') or '').strip()
                 if t not in ('proc', 'func'):
                     continue
                 
-                hex_id_str = row.get('Hex_ID', '').strip()
-                name = row.get('Name', '').strip()
-                args_str = row.get('Arguments', '').strip()
+                hex_id_str = (row.get('Hex_ID') or '').strip()
+                name = (row.get('Name') or '').strip()
+                args_str = (row.get('Arguments') or '').strip()
                 
                 try:
                     call_id_val = int(hex_id_str, 16)
@@ -219,8 +350,16 @@ class SuperLibrary:
             end = start + chunk_size if i < num_cores - 1 else total_len
             chunks.append((rom_data, start, end))
 
-        with concurrent.futures.ProcessPoolExecutor(max_workers=num_cores) as executor:
-            for local_banks, local_palette_cache in executor.map(_scan_chunk_worker_wrapper, chunks):
+        try:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=num_cores) as executor:
+                for local_banks, local_palette_cache in executor.map(_scan_chunk_worker_wrapper, chunks):
+                    self.data_banks.update(local_banks)
+                    self.palette_cache.update(local_palette_cache)
+        except Exception as e:
+            print(f"Alerta: Multiprocessing falló ({e}). Usando escaneo secuencial de respaldo...")
+            # Fallback secuencial
+            for chunk in chunks:
+                local_banks, local_palette_cache = _scan_chunk_worker_wrapper(chunk)
                 self.data_banks.update(local_banks)
                 self.palette_cache.update(local_palette_cache)
 
@@ -260,19 +399,19 @@ class SuperLibrary:
 
     def get_baptized_name(self, event_id, script_content):
         """
-        Versión simplificada: Prioriza eventos.json. Fallback: ID + Script.
+        Retorna el nombre del evento para la UI (Formato: ID - Nombre).
         """
-        ev_key = str(event_id)
+        ev_key = str(event_id).strip()
         if ev_key in self.custom_event_names:
-            return f"[{event_id:04d}] {self.custom_event_names[ev_key]}"
+            return f"{event_id:04d} - {self.custom_event_names[ev_key]}"
         
-        return f"[{event_id:04d}] Script {event_id:04d}"
+        return f"{event_id:04d} - Script {event_id:04d}"
 
     def get_event_name_hint(self, event_id):
         """
-        Versión rápida para el Explorador (Heurística básica).
+        Retorna solo el nombre o un genérico (usado en el IDE y punteros).
         """
-        ev_key = str(event_id)
+        ev_key = str(event_id).strip()
         if ev_key in self.custom_event_names:
             return self.custom_event_names[ev_key]
         return f"Unknown_Event_{event_id:04d}"

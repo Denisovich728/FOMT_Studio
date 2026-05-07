@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 774 Unknown_Event_0774 {
+const MESSAGE_0 = "I'm sure she can do it.\BRK";
+
+if ((Check_Flag("Flag_0x11E") == 1)) {
+    SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Doctor_Neutral");
+    Set_Name_Window("Doctor");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Doctor");
+    SetEntityFacing(0x14, 2);
+}
+exit;
+}

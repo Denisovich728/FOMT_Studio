@@ -281,28 +281,34 @@ class MapCanvas(QWidget):
 #  Diálogo de Warp (Añadir / Editar)
 # ─────────────────────────────────────────────────────────────────────────────
 class WarpDialog(QDialog):
-    def __init__(self, warp: Warp | None = None, map_names: list[str] = [], parent=None):
+    def __init__(self, target=None, map_names: list[str] = [], parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Warp" if warp else "Nuevo Warp")
+        is_script = isinstance(target, ScriptTrigger)
+        self.setWindowTitle("Script Trigger" if is_script else ("Warp" if target else "Nuevo Warp"))
         self.resize(300, 220)
 
-        w = warp or Warp(b'\x00' * 8, 0)
+        # Usamos duck typing, ambos (Warp y ScriptTrigger) tienen x, y, script_id, metadata
+        t = target or Warp(b'\x00' * 8, 0)
 
         form = QFormLayout(self)
 
-        self.spin_x  = QSpinBox(); self.spin_x.setRange(0, 255);  self.spin_x.setValue(w.x)
-        self.spin_y  = QSpinBox(); self.spin_y.setRange(0, 255);  self.spin_y.setValue(w.y)
-        self.spin_tm = QSpinBox(); self.spin_tm.setRange(0, 255); self.spin_tm.setValue(w.target_map)
-        self.spin_tx = QSpinBox(); self.spin_tx.setRange(0, 255); self.spin_tx.setValue(w.target_x)
-        self.spin_ty = QSpinBox(); self.spin_ty.setRange(0, 255); self.spin_ty.setValue(w.target_y)
-        self.spin_dir = QSpinBox(); self.spin_dir.setRange(0, 3); self.spin_dir.setValue(w.face_dir)
+        self.spin_x  = QSpinBox(); self.spin_x.setRange(0, 255);  self.spin_x.setValue(t.x)
+        self.spin_y  = QSpinBox(); self.spin_y.setRange(0, 255);  self.spin_y.setValue(t.y)
+        
+        self.spin_script = QSpinBox()
+        self.spin_script.setRange(0, 0xFFFF)
+        self.spin_script.setDisplayIntegerBase(16)
+        self.spin_script.setPrefix("0x")
+        self.spin_script.setValue(t.script_id)
+        
+        self.edit_meta = QLineEdit()
+        self.edit_meta.setText(t.metadata.hex().upper())
+        self.edit_meta.setPlaceholderText("Ej. 00000000")
 
-        form.addRow("X origen:",      self.spin_x)
-        form.addRow("Y origen:",      self.spin_y)
-        form.addRow("Mapa destino (ID):", self.spin_tm)
-        form.addRow("X destino:",     self.spin_tx)
-        form.addRow("Y destino:",     self.spin_ty)
-        form.addRow("Dirección (0-3):", self.spin_dir)
+        form.addRow("X:", self.spin_x)
+        form.addRow("Y:", self.spin_y)
+        form.addRow("Script ID (Hex):", self.spin_script)
+        form.addRow("Metadata (4 bytes Hex):", self.edit_meta)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,
@@ -313,9 +319,12 @@ class WarpDialog(QDialog):
         form.addRow(buttons)
 
     def get_values(self):
-        return (self.spin_x.value(), self.spin_y.value(),
-                self.spin_tm.value(), self.spin_tx.value(),
-                self.spin_ty.value(), self.spin_dir.value())
+        try:
+            meta = bytes.fromhex(self.edit_meta.text().replace(" ", ""))
+            if len(meta) != 4: meta = meta.ljust(4, b'\x00')[:4]
+        except Exception:
+            meta = b'\x00\x00\x00\x00'
+        return (self.spin_x.value(), self.spin_y.value(), self.spin_script.value(), meta)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -323,6 +332,7 @@ class WarpDialog(QDialog):
 # ─────────────────────────────────────────────────────────────────────────────
 class PropertiesPanel(QWidget):
     warpChanged = pyqtSignal()   # Solicita que el canvas se actualice
+    openScriptRequested = pyqtSignal(int) # Solicita abrir un script por ID
 
     def __init__(self, editor: "MapEditorWidget"):
         super().__init__()
@@ -351,23 +361,30 @@ class PropertiesPanel(QWidget):
         self.lbl_type = QLabel("—")
         self.lbl_pos  = QLabel("—")
         self.lbl_dest = QLabel("—")
+        self.btn_go_script = QPushButton("🔗 Ver Script")
+        self.btn_go_script.setEnabled(False)
+        self.btn_go_script.clicked.connect(self._on_go_script)
+        
         self.form_elem.addRow("Tipo:",    self.lbl_type)
         self.form_elem.addRow("Pos:",     self.lbl_pos)
         self.form_elem.addRow("Destino:", self.lbl_dest)
+        self.form_elem.addRow(self.btn_go_script)
         layout.addWidget(self.grp_elem)
 
-        # — CRUD de Warps —
-        self.grp_warps = QGroupBox("Warps")
-        btn_lay = QHBoxLayout(self.grp_warps)
-        self.btn_add_warp  = QPushButton("+ Warp")
-        self.btn_edit_warp = QPushButton("✎ Editar")
-        self.btn_del_warp  = QPushButton("✕ Borrar")
+        # — CRUD de Triggers —
+        self.grp_triggers = QGroupBox("Gestión de Triggers")
+        btn_lay = QHBoxLayout(self.grp_triggers)
+        self.btn_add_warp   = QPushButton("+ Tr. Losa")
+        self.btn_add_script = QPushButton("+ Tr. Interacción")
+        self.btn_edit_warp  = QPushButton("✎ Editar")
+        self.btn_del_warp   = QPushButton("✕ Borrar")
         self.btn_edit_warp.setEnabled(False)
         self.btn_del_warp.setEnabled(False)
         btn_lay.addWidget(self.btn_add_warp)
+        btn_lay.addWidget(self.btn_add_script)
         btn_lay.addWidget(self.btn_edit_warp)
         btn_lay.addWidget(self.btn_del_warp)
-        layout.addWidget(self.grp_warps)
+        layout.addWidget(self.grp_triggers)
 
         # — Guardar en ROM —
         self.btn_save_rom = QPushButton("💾 Guardar en ROM")
@@ -379,6 +396,7 @@ class PropertiesPanel(QWidget):
 
         # Señales
         self.btn_add_warp.clicked.connect(self._on_add_warp)
+        self.btn_add_script.clicked.connect(self._on_add_script)
         self.btn_edit_warp.clicked.connect(self._on_edit_warp)
         self.btn_del_warp.clicked.connect(self._on_del_warp)
         self.btn_save_rom.clicked.connect(self._on_save_rom)
@@ -394,18 +412,19 @@ class PropertiesPanel(QWidget):
         self._target = w
         self.lbl_type.setText(f"Warp #{w.id}")
         self.lbl_pos.setText(f"({w.x}, {w.y})")
-        self.lbl_dest.setText(f"Mapa {w.target_map} @ ({w.target_x},{w.target_y})")
+        self.lbl_dest.setText(f"Script: 0x{w.script_id:04X}")
         self.btn_edit_warp.setEnabled(True)
         self.btn_del_warp.setEnabled(True)
+        self.btn_go_script.setEnabled(True)
 
     def show_script(self, s: ScriptTrigger):
         self._target = s
-        kinds = {0: "Cartel", 1: "Mueble", 2: "Oculto"}
-        self.lbl_type.setText(f"Script — {kinds.get(s.kind,'?')} #{s.id}")
+        self.lbl_type.setText(f"Script #{s.id}")
         self.lbl_pos.setText(f"({s.x}, {s.y})")
-        self.lbl_dest.setText(f"Script ID: 0x{s.script_id:04X}")
-        self.btn_edit_warp.setEnabled(False)
-        self.btn_del_warp.setEnabled(False)
+        self.lbl_dest.setText(f"Script: 0x{s.script_id:04X}")
+        self.btn_edit_warp.setEnabled(True)
+        self.btn_del_warp.setEnabled(True)
+        self.btn_go_script.setEnabled(True)
 
     def clear_selection(self):
         self._target = None
@@ -414,6 +433,11 @@ class PropertiesPanel(QWidget):
         self.lbl_dest.setText("—")
         self.btn_edit_warp.setEnabled(False)
         self.btn_del_warp.setEnabled(False)
+        self.btn_go_script.setEnabled(False)
+
+    def _on_go_script(self):
+        if self._target:
+            self.openScriptRequested.emit(self._target.script_id)
 
     # ── Acciones CRUD ────────────────────────────────────────
     def _on_add_warp(self):
@@ -421,37 +445,64 @@ class PropertiesPanel(QWidget):
         if not m:
             return
         dlg = WarpDialog(parent=self)
+        dlg.setWindowTitle("Nuevo Trigger de Losa")
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            x, y, tm, tx, ty, fd = dlg.get_values()
-            m.add_warp(x, y, tm, tx, ty, fd)
+            import struct
+            x, y, sid, meta = dlg.get_values()
+            data = struct.pack('<BBH', x, y, sid) + meta
+            w = Warp(data, len(m.warps), m.objects_offset)
+            m.warps.append(w)
+            self.warpChanged.emit()
+
+    def _on_add_script(self):
+        m = self.editor.current_map
+        if not m:
+            return
+        dlg = WarpDialog(parent=self)
+        dlg.setWindowTitle("Nuevo Trigger de Interacción")
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            import struct
+            x, y, sid, meta = dlg.get_values()
+            data = struct.pack('<BBH', x, y, sid) + meta
+            s = ScriptTrigger(data, len(m.scripts), m.objects_offset)
+            m.scripts.append(s)
             self.warpChanged.emit()
 
     def _on_edit_warp(self):
-        if not isinstance(self._target, Warp):
+        if not (isinstance(self._target, Warp) or isinstance(self._target, ScriptTrigger)):
             return
         dlg = WarpDialog(self._target, parent=self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            x, y, tm, tx, ty, fd = dlg.get_values()
-            self._target.x = x; self._target.y = y
-            self._target.target_map = tm
-            self._target.target_x = tx; self._target.target_y = ty
-            self._target.face_dir = fd
-            self.show_warp(self._target)
+            x, y, sid, meta = dlg.get_values()
+            self._target.x = x
+            self._target.y = y
+            self._target.script_id = sid
+            self._target.metadata = meta
+            if isinstance(self._target, Warp):
+                self.show_warp(self._target)
+            else:
+                self.show_script(self._target)
             self.warpChanged.emit()
 
     def _on_del_warp(self):
-        if not isinstance(self._target, Warp):
+        if not self._target:
             return
         m = self.editor.current_map
         if not m:
             return
+        tipo = "Warp" if isinstance(self._target, Warp) else "Script"
         reply = QMessageBox.question(
-            self, "Eliminar Warp",
-            f"¿Eliminar Warp #{self._target.id} en ({self._target.x},{self._target.y})?",
+            self, f"Eliminar {tipo}",
+            f"¿Eliminar {tipo} #{self._target.id} en ({self._target.x},{self._target.y})?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
-            m.remove_warp(self._target.id)
+            if isinstance(self._target, Warp):
+                m.warps.remove(self._target)
+                for i, w in enumerate(m.warps): w.id = i
+            else:
+                m.scripts.remove(self._target)
+                for i, s in enumerate(m.scripts): s.id = i
             self.clear_selection()
             self.warpChanged.emit()
 
@@ -459,11 +510,14 @@ class PropertiesPanel(QWidget):
         m = self.editor.current_map
         if not m:
             return
-        ok = m.save_warps_to_rom(self.editor.project)
-        if ok:
-            QMessageBox.information(self, "Guardado", "Warps guardados en la ROM correctamente.")
+        ok1 = m.save_warps_to_rom(self.editor.project)
+        ok2 = m.save_layout_to_rom(self.editor.project)
+        if ok1 and ok2:
+            QMessageBox.information(self, "Guardado", "Objetos y Layout guardados en la ROM.")
+        elif ok1 or ok2:
+            QMessageBox.warning(self, "Guardado Parcial", "Se guardaron algunos datos pero otros fallaron.")
         else:
-            QMessageBox.warning(self, "Error", "No se pudo guardar en la ROM.")
+            QMessageBox.warning(self, "Error", "No se pudo guardar nada en la ROM.")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -474,6 +528,7 @@ class MapEditorWidget(QWidget):
     Panel principal del editor de mapas.
     Se instancia UNA VEZ en app.py y recibe mapas mediante load_map().
     """
+    openScriptRequested = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -541,6 +596,7 @@ class MapEditorWidget(QWidget):
         self.canvas.scriptClicked.connect(self.props.show_script)
         self.canvas.tileClicked.connect(lambda tx, ty: self.props.clear_selection())
         self.props.warpChanged.connect(self.canvas.update)
+        self.props.openScriptRequested.connect(self.openScriptRequested.emit)
 
     def _build_toolbar(self, tb: QHBoxLayout):
         """Crea los botones de toggle para capas y overlays."""
@@ -564,8 +620,8 @@ class MapEditorWidget(QWidget):
 
         # Overlay layers
         self.btn_col = toggle_btn("Col 0/1", True, self._toggle_col)
-        self.btn_w   = toggle_btn("W Warps", True, self._toggle_warps)
-        self.btn_s   = toggle_btn("S Scripts", True, self._toggle_scripts)
+        self.btn_w   = toggle_btn("Losa (W)", True, self._toggle_warps)
+        self.btn_s   = toggle_btn("Int. (S)", True, self._toggle_scripts)
 
         tb.addSpacing(12)
 

@@ -16,6 +16,7 @@ class TokenType(Enum):
     KW_SWITCH = "switch"
     KW_CASE = "case"
     KW_DEFAULT = "default"
+    KW_BREAK = "break"
     KW_EXIT = "exit"
     KW_STRING = "string"
     KW_INTEGER = "integer"
@@ -152,7 +153,12 @@ class Lexer:
                         for _ in range(len(tag_buf)): self.next_char()
                         continue
                 # Si no es un tag válido, se trata como texto normal
-                buf.extend(c.encode('windows-1252'))
+                if c == 'Ñ':
+                    buf.append(0xCB)
+                elif c == 'ñ':
+                    buf.append(0xCC)
+                else:
+                    buf.extend(c.encode('windows-1252'))
                 self.next_char()
             elif c == '\\':
                 self.next_char() # consume slash
@@ -189,6 +195,12 @@ class Lexer:
                 else:
                     buf.append(ord(nc))
                     self.next_char()
+            elif c == 'Ñ':
+                buf.append(0xCB)
+                self.next_char()
+            elif c == 'ñ':
+                buf.append(0xCC)
+                self.next_char()
             else:
                 buf.extend(c.encode('windows-1252'))
                 self.next_char()

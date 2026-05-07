@@ -1,0 +1,117 @@
+#include "lib_fomt.csv"
+
+script 699 Unknown_Event_0699 {
+const MESSAGE_0 = "Hello, \xFF!. \r\nHow are you?  \BRK";
+const MESSAGE_1 = "Hi.\r\n\BRK";
+const MESSAGE_2 = "Hi there, \xFF!. \BRK";
+const MESSAGE_3 = "What? You say I look \r\nin a good mood? \BRK\WAIT_CLICKThat's because I am!\r\nDo you want to know why? \BRK";
+const MESSAGE_4 = "You see...tee-hee...\r\nI got a letter from my \r\ndarling today...\BRK\WAIT_CLICKIt was the first time \r\never!\BRK";
+const MESSAGE_5 = "Do you want to hear\r\nwhat he wrote? \BRK";
+const MESSAGE_6 = "Dear Lillia, \r\nHow are Popuri and Rick? \r\nI am fine. I'm writing from\BRK\r\na vast desert, where the \r\nsearch for the flower to \r\ncure you has lead me. \BRK\WAIT_CLICKI am confident I'll find it\r\nsoon, so do not give up\r\nhope. Look after the store.\BRK\WAIT_CLICKAll my love, your husband. \BRK";
+const MESSAGE_7 = "Isn't he wonderful...?\BRK";
+const MESSAGE_8 = "\"Look after the store\"...\r\nEasy for him to say!\BRK";
+const MESSAGE_9 = "Why can't you just be happy\r\nlike Mom, Rick?\BRK";
+const MESSAGE_10 = "This mean's he's safe, \r\ndon't you see?\r\nI'm so happy...\BRK";
+
+End_Cinematic_State();
+SetEntityPosition(0, 0x78, 0xD0, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+SetEntityPosition(1, 0x78, 0x90, 0);
+SetEntityAnim("Lillia", "Lilia_Stop_Base");
+SetEntityPosition(2, 0x8C, 0x90, 0);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(3, 0xA0, 0xA0, 2);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+Fade_In(2, 1);
+Set_Vector_Y("Player", 0xA8, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Lilia_Happy");
+Set_Name_Window("Lillia");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Portrait("Rick_Neutral");
+Set_Name_Window("Rick");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Popuri_Happy");
+Set_Name_Window("Popuri");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x6F) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x7E) == 2)) || (Check_Flag(0x7F) == 2))) {
+    Set_Hearth_Anim("Popuri");
+}
+TalkMessage(2);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Lilia_Happy");
+Set_Name_Window("Lillia");
+TalkMessage(3);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Lilia_Neutral");
+Set_Name_Window("Lillia");
+TalkMessage(4);
+Set_Portrait("Lilia_Happy");
+TalkMessage(5);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+TalkMessage(6);
+Set_Portrait("Lilia_Happy");
+Set_Name_Window("Lillia");
+TalkMessage(7);
+TalkClose();
+Show_Emote("Rick", "Angry", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Rick_Surprised");
+Set_Name_Window("Rick");
+TalkMessage(8);
+TalkClose();
+TalkOpen();
+Set_Portrait("Popuri_Angry");
+Set_Name_Window("Popuri");
+TalkMessage(9);
+TalkClose();
+TalkOpen();
+Set_Portrait("Lilia_Happy");
+Set_Name_Window("Lillia");
+TalkMessage(10);
+TalkClose();
+Free_Event_Entity("Lillia");
+End_Cinematic_State();
+Set_Flag(0xE6, 1);
+Routine_State_Override("Popuri", "Script_701");
+Routine_State_Override("Rick", "Script_700");
+Routine_State_Override("Lillia", "Script_702");
+exit;
+exit;
+}

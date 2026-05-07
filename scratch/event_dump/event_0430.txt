@@ -1,0 +1,59 @@
+#include "lib_fomt.csv"
+
+script 430 Unknown_Event_0430 {
+const MESSAGE_0 = "The wind is too strong\r\nto go outside.\BRK";
+const MESSAGE_1 = "The snow is too deep\r\nto go outside.\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+
+var_0 = Check_Flag(1);
+var_1 = Check_Flag(2);
+var_2 = Check_Flag(3);
+if ((GetEntityFacing(0) == 0)) {
+    if ((Check_Flag(6) == 3)) {
+        TalkOpen();
+        TalkMessage(0);
+        TalkClose();
+        SetEntityFacing(0, 1);
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Walking_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+        }
+        Set_Vector_Y("Player", 0xC8, 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    if ((Check_Flag(6) == 4)) {
+        TalkOpen();
+        TalkMessage(1);
+        TalkClose();
+        SetEntityFacing(0, 1);
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Walking_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+        }
+        Set_Vector_Y("Player", 0xC8, 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Mineral_Beach", 0x104, 0x1F8);
+    SetEntityPosition(0, 0x104, 0x1F8, 0);
+    PlaySong(0, 0xCD);
+    if ((((Check_Flag(0x194) == 0) && (var_0 == 1)) && (var_1 == 1))) {
+        if (((var_2 >= 6) && (var_2 < 0xA))) {
+            Execute_Script(0x2B5);
+        }
+        if (((var_2 >= 0xA) && (var_2 < 0x12))) {
+            Set_Flag(0x194, 1);
+            Execute_Script(0x46B);
+        }
+    }
+    Fade_In(2, 1);
+}
+exit;
+}

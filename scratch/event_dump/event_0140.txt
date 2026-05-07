@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 140 Unknown_Event_0140 {
+const MESSAGE_0 = "Organ\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

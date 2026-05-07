@@ -1,0 +1,632 @@
+#include "lib_fomt.csv"
+
+script 1027 Unknown_Event_1027 {
+const MESSAGE_0 = "I've never seen your face\r\naround these parts before.\BRK\WAIT_CLICKYou're new at the farm, \r\nyou say? That's tough for \r\none man, but you can do it\BRK\r\nif you try. \BRK\WAIT_CLICKI'm Saibara, the blacksmith.\BRK";
+const MESSAGE_1 = "Heh heh, what's this?\BRK";
+const MESSAGE_2 = "A man doesn't expect to get\r\nbirthday gifts at my age!\BRK\WAIT_CLICKMy thanks, though!\BRK";
+const MESSAGE_3 = "You're kind to an old man, \r\nto give me such a gift.\BRK\WAIT_CLICKI only wish Gray would \r\nlearn from you.\BRK";
+const MESSAGE_4 = "Thanks very much. \r\nYou're a generous man.\BRK";
+const MESSAGE_5 = "Much obliged.\BRK";
+const MESSAGE_6 = "Sorry, but I've never needed\r\nanything like this. \BRK";
+const MESSAGE_7 = "Just what are you thinking!?\r\nYoung people these days \r\nhave the worst manners!\BRK";
+const MESSAGE_8 = "This little guy is small,\r\nbut his will to live is \r\ngreat. We could all learn\BRK\r\nfrom it!\BRK";
+const MESSAGE_9 = "Sorry, but I'm busy \r\nright now. Go show that to\r\nsomebody else. \BRK";
+const MESSAGE_10 = "What's this? Was there \r\nsomething wrong with the \r\nworkmanship? \BRK\WAIT_CLICKI've never had anybody try\r\nto give something back...\BRK";
+const MESSAGE_11 = "Now just what do you \r\nexpect me to do with this?\BRK";
+const MESSAGE_12 = "Perfume? I don't see this \r\nmuch in my line of work!\BRK\WAIT_CLICKWhy give this to me?\BRK";
+const MESSAGE_13 = "You should eat simple foods,\r\nyou know. You'll live \r\nlonger, like me.\BRK\WAIT_CLICKIf you agree, I'll tell you\r\na great recipe for Pickled\r\nTurnip. It's delicious!\BRK\WAIT_CLICKAll you need is Turnip,\r\nVinegar, and a Knife.\BRK\WAIT_CLICKA youngin' like you might \r\nwant to flavor it with \r\nSugar, Salt, and Soy Sauce.\BRK";
+const MESSAGE_14 = "A Blue Feather, eh?\r\nI hope that's not for me!!...\BRK";
+const MESSAGE_15 = "My father used to tell me \r\nrising with dawn was the \r\nkey to a long life. \BRK";
+const MESSAGE_16 = "The most important work on a\r\nfarm is done early in the \r\nmorning. Sleep in and you \BRK\r\nfail, son.\BRK";
+const MESSAGE_17 = "D'ya need something?\BRK";
+const MESSAGE_18 = "Don't loiter around here \r\nnow, young man!\BRK";
+const MESSAGE_19 = "A farm requires steady \r\nwork now, don't forget!\BRK";
+const MESSAGE_20 = "All life is study, \r\nyou understand.\BRK";
+const MESSAGE_21 = "Good morning! We've been \r\nblessed with a fine day!\BRK";
+const MESSAGE_22 = "Sorry, but I'm going \r\nout shopping now.\BRK";
+const MESSAGE_23 = "I'm about to go out now,\r\nbut why don't you come\r\nwith me?\BRK\WAIT_CLICKThose who work hard \r\nget to play hard!\BRK";
+const MESSAGE_24 = "Well, I should be getting\r\nback now. \BRK";
+const MESSAGE_25 = "I can see you're doing\r\nwell. Farm life suits you,\r\nbut don't get carried away.\BRK";
+const MESSAGE_26 = "You like crafted things, \r\ndon't you? Well, what do\r\ndo you want now?\BRK";
+const MESSAGE_27 = "Sorry, \xFF!,\r\nbut I'm off to buy \r\ningredients for supper!\BRK";
+const MESSAGE_28 = "When my wife died,\r\nI didn't know how to do \r\nanything around the house.\BRK\WAIT_CLICKNow, I can do it as well\r\nas anyone!\BRK";
+const MESSAGE_29 = "Have you ever tasted the \r\nwine from around here?\BRK\WAIT_CLICKIt's worth a try. \BRK";
+const MESSAGE_30 = "I've tried rice wine, but \r\nI couldn't tell you which \r\none tasted better. \BRK";
+const MESSAGE_31 = "Hi, \xFF!. \r\nA nice evening we have \r\ntonight, eh?\BRK";
+const MESSAGE_32 = "I'm getting old, and\r\nI want to teach Gray so \r\nmuch before I die...!\BRK";
+const MESSAGE_33 = "Can you believe...\r\nHe won't even go mountain \r\nclimbing with me now \BRK\r\nthat he's married!\BRK";
+const MESSAGE_34 = "It's easier without Gray\r\naround anyway! It was like \r\nthat before...\BRK";
+const MESSAGE_35 = "You like mountain climbing, \r\ntoo, \xFF!?\BRK\WAIT_CLICKI always close the store \r\nto go hiking on Thursdays.\BRK";
+const MESSAGE_36 = "You should find a way to\r\nget some rest, too!\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+
+SetEntityAnim("Saibara", "Saibara_Stop_Base");
+var_3 = GetEntityFacing(6);
+SetEntityFacing(6, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Saibara");
+if ((Func083(6) == 0)) {
+    Set_Portrait("Saibara_Neutral");
+    TalkMessage(0);
+    Free_Event_Entity("Saibara");
+} else {
+    if (((Inventory_Check() || (((((((Check_Flag(0x46) == 1) || (Check_Flag(0x47) == 1)) || (Check_Flag(0x49) == 1)) || (Check_Flag(0x4A) == 1)) || (Check_Flag(0xFC) == 1)) || (Check_Flag(0x116) == 1)) || (Check_Flag(0x117) == 1))) || ((((Check_Flag(0x57) == 1) || (Check_Flag(0x5C) == 1)) || (Check_Flag(0x84) == 1)) || (Check_Flag(0x128) == 1)))) {
+        var_0 = 6;
+    } else {
+        switch (Compare_Gift()) {
+            case 0:
+                switch (Search_Food_Gift_Address()) {
+                    case "Turnip":
+                    case "Bamboo Shoot":
+                    case "Truffle":
+                    case "Buckwheat Flour":
+                    case "Miso Soup":
+                    case "Pickles":
+                    case "Bamboo Rice":
+                    case "Truffle Rice":
+                    case "Buckwheat Noodles":
+                    case "Noodles w/ Tempura":
+                    case "Buckwheat Chips":
+                    case "Mountain Stew":
+                    case "Rice Cake":
+                    case "Roasted Rice Cake":
+                    case "Elli Leaves":
+                    case "Large Fish":
+                        var_0 = 1;
+                        break;
+                    case "Pickled Turnip":
+                        var_2 = 1;
+                        var_0 = 1;
+                        break;
+                    case "Cucumber":
+                    case "Pumpkin":
+                    case "Eggplant":
+                    case "Carrot":
+                    case "Sweet Potato":
+                    case "Spinach":
+                    case "Milk (S)":
+                    case "Milk (M)":
+                    case "Milk (L)":
+                    case "Milk (G)":
+                    case "Milk (P)":
+                    case "Milk (X)":
+                    case "Cheese (S)":
+                    case "Cheese (M)":
+                    case "Cheese (L)":
+                    case "Cheese (G)":
+                    case "Cheese (P)":
+                    case "Cheese (X)":
+                    case "Apple":
+                    case "Mushroom":
+                    case "Wine":
+                    case "Rice Ball":
+                    case "SUGDW Apple":
+                    case "HMSGB Apple":
+                    case "AEPFE Apple":
+                    case "Wild Grape Juice":
+                    case "Baked Corn":
+                    case "Pumpkin Stew":
+                    case "Happy Eggplant":
+                    case "Baked Sweet Potato":
+                    case "Greens":
+                    case "Scrambled Eggs":
+                    case "Apple Souffl?":
+                    case "Mushroom Rice":
+                    case "Grilled Fish":
+                    case "Tempura Noodles":
+                    case "Tempura":
+                    case "Toasted Rice Ball":
+                    case "Tempura Rice":
+                    case "Rice Gruel":
+                        var_0 = 2;
+                        break;
+                    case "Potato":
+                    case "Cabbage":
+                    case "Tomato":
+                    case "Corn":
+                    case "Onion":
+                    case "Green Pepper":
+                    case "Regular Quality Egg":
+                    case "Good Quality Egg":
+                    case "High Quality Egg":
+                    case "Golden Egg":
+                    case "P Egg":
+                    case "X Egg":
+                    case "Spa-Boiled Egg":
+                    case "Mayonnaise (S)":
+                    case "Mayonnaise (M)":
+                    case "Mayonnaise (L)":
+                    case "Mayonnaise (G)":
+                    case "Mayonnaise (P)":
+                    case "Mayonnaise (X)":
+                    case "Honey":
+                    case "Wild Grapes":
+                    case "Muffin Mix":
+                    case "Relax Tea Leaves":
+                    case "Salad":
+                    case "Stir Fry":
+                    case "Fried Rice":
+                    case "Savory Pancake":
+                    case "Fruit Juice":
+                    case "Vegetable Juice":
+                    case "Mixed Juice":
+                    case "Fruit Latte":
+                    case "Vegetable Latte":
+                    case "Mixed Latte":
+                    case "Tomato Juice":
+                    case "Ketchup":
+                    case "Boiled Egg":
+                    case "Hot Milk":
+                    case "Butter":
+                    case "Cheese Fondue":
+                    case "Sushi":
+                    case "Grape Jam":
+                    case "Sashimi":
+                    case "Chirashi Sushi":
+                    case "Noodles":
+                    case "Curry Noodles":
+                    case "Fried Noodles":
+                    case "Relaxation Tea":
+                    case "Moon Dumplings":
+                    case "Small Fish":
+                    case "Medium Fish":
+                    case "Egg Over Rice":
+                    case "Fish Sticks":
+                    case "Potato Pancakes":
+                        var_0 = 3;
+                        break;
+                    case "Strawberry":
+                    case "Pineapple":
+                    case "Blue Grass":
+                    case "Green Grass":
+                    case "Red Grass":
+                    case "Yellow Grass":
+                    case "Orange Grass":
+                    case "Purple Grass":
+                    case "Indigo Grass":
+                    case "Black Grass":
+                    case "White Grass":
+                    case "Bodigizer":
+                    case "Bodigizer XL":
+                    case "Turbojolt":
+                    case "Turbojolt XL":
+                    case "Grape Juice":
+                    case "Bread":
+                    case "Oil":
+                    case "Flower":
+                    case "Curry Powder":
+                    case "Chocolate":
+                    case "Curry Rice":
+                    case "Stew":
+                    case "Sandwich":
+                    case "Strawberry Milk":
+                    case "Strawberry Jam":
+                    case "French Fries":
+                    case "Popcorn":
+                    case "Corn Flakes":
+                    case "Pineapple Juice":
+                    case "Pumpkin Pudding":
+                    case "Sweet Potatoes":
+                    case "Omelet":
+                    case "Omelet Rice":
+                    case "Cheese Cake":
+                    case "Apple Pie":
+                    case "Apple Jam":
+                    case "Jam Bun":
+                    case "Dinner Role":
+                    case "Raisin Bread":
+                    case "Curry Bread":
+                    case "Pizza":
+                    case "Fried Noodles":
+                    case "Cookies":
+                    case "Chocolate Cookies":
+                    case "Ice Cream":
+                    case "Cake":
+                    case "Chocolate Cake":
+                    case "Toast":
+                    case "French Toast":
+                    case "Pudding":
+                    case "Pancakes":
+                    case "Candied Potato":
+                        var_0 = 4;
+                        break;
+                    case "Poisonous Mushroom":
+                    case "Failed Dish":
+                    case "Failed Drink":
+                    case "Failed Pot Dish":
+                    case "Failed Dessert":
+                    case "Failed Bread":
+                    case "Failed Noodles":
+                        var_0 = 5;
+                        break;
+                }
+                break;
+            case 1:
+                switch (Search_Item_Gift_Address()) {
+                    case "Mystrile":
+                    case "Orichalc":
+                    case "Adamantite":
+                    case "Pink Diamond":
+                    case "Diamond":
+                        var_0 = 1;
+                        break;
+                    case "Copper":
+                    case "Silver":
+                    case "Gold":
+                    case "Moon Stone":
+                    case "Sand Rose":
+                    case "Alexandrite":
+                    case "Mythic Stone":
+                    case "Emerald":
+                    case "Ruby":
+                    case "Topaz":
+                    case "Peridot":
+                    case "Fluorite":
+                    case "Agate":
+                    case "Amethyst":
+                    case "Branches":
+                    case "Lumber":
+                        var_0 = 2;
+                        break;
+                    case "Moon Drop Grass":
+                    case "Pink Cat Grass":
+                    case "Blue Magic Grass":
+                    case "Red Magic Grass":
+                    case "Toy Flower":
+                    case "The Spring Sun":
+                    case "The Summer Sun":
+                    case "The Autumn Sun":
+                    case "The Winter Sun":
+                        var_0 = 3;
+                        break;
+                    case "Wool (S)":
+                    case "Wool (M)":
+                    case "Wool (L)":
+                    case "Wool (G)":
+                    case "Wool (P)":
+                    case "Wool (P)":
+                    case "Yarn (S)":
+                    case "Yarn (M)":
+                    case "Yarn (L)":
+                    case "Yarn (G)":
+                    case "Yarn (P)":
+                    case "Yarn (X)":
+                    case "Junk Ore":
+                    case "Lithograph":
+                        var_0 = 4;
+                        break;
+                    case "Weeds":
+                    case "Stones":
+                    case "Message in a Bottle":
+                    case "Ball":
+                    case "Pirate Treasure":
+                    case "Fossil of Fish":
+                    case "Empty Can":
+                    case "Boots":
+                    case "Fish Bones":
+                    case "Golden Lumber":
+                    case "Animal Fodder":
+                    case "Chicken Feed":
+                        var_0 = 5;
+                        break;
+                    case "Harvest Goddess Jewel":
+                    case "Kappa Jewel":
+                    case "Jewel of Truth":
+                    case "Karen's Wine":
+                    case "Popuri's Mud Ball":
+                    case "Ann's Music Box":
+                    case "Mary's Great Book":
+                    case "Elli's Pressed Flwr":
+                    case "Album 1":
+                    case "Album 2":
+                    case "Album 3":
+                    case "Album 4":
+                    case "Album 5":
+                    case "Album 6":
+                    case "Album 7":
+                    case "Album 8":
+                    case "Album 9":
+                    case "Album 10":
+                    case "Album 11":
+                    case "Album 12":
+                    case "Album 13":
+                    case "Album 14":
+                    case "Album 15":
+                    case "Book":
+                    case "Photo":
+                    case "Invitation":
+                    case "Lottery":
+                    case "Frisbee":
+                        var_0 = 6;
+                        break;
+                    case "Bracelet":
+                    case "Necklace":
+                    case "Earrings":
+                    case "Broach":
+                        var_0 = 9;
+                        break;
+                    case "Dress":
+                    case "Facial Pack":
+                    case "Skin Lotion":
+                    case "Sunblock":
+                        var_0 = 0xA;
+                        break;
+                    case "Perfume":
+                        var_0 = 0xB;
+                        break;
+                }
+                break;
+            case 4:
+                var_0 = 6;
+                break;
+            case 2:
+                var_0 = 7;
+                break;
+            case 3:
+                var_0 = 7;
+                break;
+        }
+    }
+    if ((var_0 != 6)) {
+        if (((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) && Is_NPC_Birthday("Saibara"))) {
+            Set_Portrait("Saibara_Neutral");
+            TalkMessage(1);
+            Set_Portrait("Saibara_Happy");
+            TalkMessage(2);
+        } else {
+            switch (var_0) {
+                case 1:
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(3);
+                    break;
+                case 2:
+                    Set_Portrait("Saibara_Happy");
+                    TalkMessage(4);
+                    break;
+                case 3:
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(5);
+                    break;
+                case 4:
+                    Set_Portrait("Saibara_Afraid");
+                    TalkMessage(6);
+                    break;
+                case 5:
+                    Set_Portrait("Saibara_Angry");
+                    TalkMessage(7);
+                    break;
+                case 7:
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(8);
+                    break;
+                case 8:
+                    Set_Portrait("Saibara_Afraid");
+                    TalkMessage(9);
+                    break;
+                case 9:
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(10);
+                    break;
+                case 0xA:
+                    Set_Portrait("Saibara_Afraid");
+                    TalkMessage(11);
+                    break;
+                case 0xB:
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(12);
+                    break;
+            }
+        }
+        if ((Has_NPC_Talked_Today_2("Saibara") == 0)) {
+            switch (var_0) {
+                case 1:
+                    var_1 = 9;
+                    break;
+                case 2:
+                    var_1 = 3;
+                    break;
+                case 3:
+                    var_1 = 1;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 1;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = 3;
+                    break;
+                case 0xA:
+                    var_1 = -3;
+                    break;
+                case 0xB:
+                    var_1 = -9;
+                    break;
+            }
+        } else {
+            switch (var_0) {
+                case 1:
+                    var_1 = 3;
+                    break;
+                case 2:
+                    var_1 = 1;
+                    break;
+                case 3:
+                    var_1 = 0;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 0;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = 1;
+                    break;
+                case 0xA:
+                    var_1 = -3;
+                    break;
+                case 0xB:
+                    var_1 = -9;
+                    break;
+            }
+        }
+        if (Is_NPC_Birthday("Saibara")) {
+            var_1 *= 5;
+        }
+        if (Is_Item_Wrapped()) {
+            var_1 = (var_1 + (var_1 / 4));
+        }
+        Give_Friendship_Points("Saibara", var_1);
+        if (((((Check_Flag(0x1D5) == 0) && (var_2 == 0)) && (Chek_Friendship_Points("Saibara") > 0x64)) && (((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)))) {
+            Set_Portrait("Saibara_Neutral");
+            TalkMessage(13);
+            Set_Flag(0x1D5, 1);
+        }
+        TalkClose();
+        if (((((((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) || (var_0 == 4)) || (var_0 == 5)) || (var_0 == 9)) || (var_0 == 0xA)) || (var_0 == 0xB))) {
+            Proc045();
+        }
+        Warp_Entity_To_Map("Rose_Square");
+        goto LBL_0003;
+    }
+    if (Func05C(0)) {
+        switch (Check_Equped_Tool()) {
+            case "Blue Feather":
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(14);
+                break;
+        }
+        goto LBL_0003;
+    }
+    switch (GetEntityLocation(6)) {
+        case "Saibara_House":
+            if ((((Check_Flag(3) >= 6) && (Check_Flag(3) < 8)) || (Check_Flag(3) >= 0x16))) {
+                if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(15);
+                } else {
+                    Set_Portrait("Saibara_Afraid");
+                    TalkMessage(16);
+                }
+                goto LBL_009B;
+            }
+            if ((Chek_Friendship_Points("Saibara") <= 0x64)) {
+                if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(17);
+                } else {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(18);
+                }
+                goto LBL_00A3;
+            }
+            if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(19);
+                goto LBL_00A7;
+            }
+            Set_Portrait("Saibara_Neutral");
+            TalkMessage(20);
+            break;
+        case "North_Side_Town":
+        case "South_Side_Town":
+            if (((Check_Flag(3) >= 7) && (Check_Flag(3) < 0xA))) {
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(21);
+                goto LBL_00AE;
+            }
+            if (((Check_Flag(3) >= 0xD) && (Check_Flag(3) < 0x10))) {
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(22);
+                goto LBL_00B4;
+            }
+            if (((Check_Flag(3) >= 0x13) && (Check_Flag(3) < 0x16))) {
+                Set_Portrait("Saibara_Happy");
+                TalkMessage(23);
+                goto LBL_00BA;
+            }
+            Set_Portrait("Saibara_Neutral");
+            TalkMessage(24);
+            break;
+        case "Jeff_Shop":
+            if ((Chek_Friendship_Points("Saibara") <= 0x64)) {
+                if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(25);
+                } else {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(26);
+                }
+                goto LBL_00C3;
+            }
+            if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(27);
+                goto LBL_00C7;
+            }
+            Set_Portrait("Saibara_Neutral");
+            TalkMessage(28);
+            break;
+        case "Doug_Inn_Floor_01":
+            if ((Chek_Friendship_Points("Saibara") <= 0x64)) {
+                if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(29);
+                } else {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(30);
+                }
+                goto LBL_00D0;
+            }
+            if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(31);
+                goto LBL_00D4;
+            }
+            Set_Portrait("Saibara_Afraid");
+            TalkMessage(32);
+            break;
+        case "Mothers_Hill_Top":
+            if (((Check_Flag(0x8E) == 2) || (Check_Flag(0x8E) == 2))) {
+                if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                    Set_Portrait("Saibara_Afraid");
+                    TalkMessage(33);
+                } else {
+                    Set_Portrait("Saibara_Neutral");
+                    TalkMessage(34);
+                }
+                goto LBL_00DF;
+            }
+            if ((Has_NPC_Talked_Today("Saibara") == 0)) {
+                Set_Portrait("Saibara_Neutral");
+                TalkMessage(35);
+                goto LBL_00E3;
+            }
+            Set_Portrait("Saibara_Neutral");
+            TalkMessage(36);
+            break;
+    }
+    Free_Event_Entity("Saibara");
+}
+TalkClose();
+SetEntityFacing(6, var_3);
+exit;
+}

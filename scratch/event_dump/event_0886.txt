@@ -1,0 +1,84 @@
+#include "lib_fomt.csv"
+
+script 886 Unknown_Event_0886 {
+const MESSAGE_0 = "That was great!\BRK\WAIT_CLICKYou sure have a lot of food\r\nI've never seen before. \BRK";
+const MESSAGE_1 = "Why do you know so much \r\nabout other towns?\BRK";
+const MESSAGE_2 = "I really hate the cold, so I\r\nalways spend winters in \r\nthe south. \BRK\WAIT_CLICKSo, I've eaten foods from \r\nall over the world! \BRK";
+const MESSAGE_3 = "Really...\BRK";
+const MESSAGE_4 = "I wonder if my mom would get\r\nbetter if she ate your \r\ncooking...?\BRK";
+const MESSAGE_5 = "Should I go make some \r\nfor her?\BRK";
+const MESSAGE_6 = "Would you really?\BRK";
+const MESSAGE_7 = "Just leave it to me!\BRK";
+const MESSAGE_8 = "Thank you, Kai!\BRK";
+
+Warp_Player("Mineral_Beach", 0xA0, 0x78);
+PlayBGM(1, 0x10);
+SetEntityPosition(0, 0x18, 0x118, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(3, 0x98, 0x78, 3);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+SetEntityPosition(0x1A, 0xA8, 0x78, 2);
+SetEntityAnim("Kai", "Kai_Stop_Base");
+Fade_In(2, 1);
+Show_Emote("Popuri", "Happy", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Popuri_Happy");
+Set_Name_Window("Popuri");
+TalkMessage(0);
+Set_Portrait("Popuri_Neutral");
+Set_Name_Window("Popuri");
+TalkMessage(1);
+TalkClose();
+Show_Emote("Popuri", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Kai_Neutral");
+Set_Name_Window("Kai");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Popuri_Happy");
+Set_Name_Window("Popuri");
+TalkMessage(3);
+Set_Portrait("Popuri_Neutral");
+Set_Name_Window("Popuri");
+TalkMessage(4);
+TalkClose();
+Show_Emote("Kai", "Thinking", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Kai_Neutral");
+Set_Name_Window("Kai");
+TalkMessage(5);
+TalkClose();
+Show_Emote("Popuri", "Exclamation", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Popuri_Happy");
+Set_Name_Window("Popuri");
+TalkMessage(6);
+TalkClose();
+TalkOpen();
+Set_Portrait("Kai_Happy");
+Set_Name_Window("Kai");
+TalkMessage(7);
+TalkClose();
+TalkOpen();
+Set_Portrait("Popuri_Happy");
+Set_Name_Window("Popuri");
+TalkMessage(8);
+TalkClose();
+Pan_Camera_To(0x18, 0x118, 2);
+Wait_Camera_Stop();
+End_Cinematic_State();
+Routine_State_Override("Popuri", "Script_887");
+Routine_State_Override("Kai", "Script_888");
+Set_Flag(0x7A, 1);
+exit;
+exit;
+}

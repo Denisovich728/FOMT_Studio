@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 564 Unknown_Event_0564 {
+const MESSAGE_0 = "Bookshelf\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

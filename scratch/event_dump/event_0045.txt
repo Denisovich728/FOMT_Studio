@@ -1,0 +1,154 @@
+#include "lib_fomt.csv"
+
+script 45 Unknown_Event_0045 {
+const MESSAGE_0 = "Now that we're married, \r\nwe have to think of \r\nnicknames! What do you \BRK\r\nwant to be called? \BRK";
+const MESSAGE_1 = "Just my name";
+const MESSAGE_2 = "Honey";
+const MESSAGE_3 = "Darling";
+const MESSAGE_4 = "Other";
+const MESSAGE_5 = "\xFF!";
+const MESSAGE_6 = "OK, it's set!\r\nFrom now on, I'll call \r\nyou \xFF)!\BRK";
+const MESSAGE_7 = "What?\r\nWhat do you want me\r\nto call you then?\BRK";
+const MESSAGE_8 = "OK. \r\nFrom now on I'll call you\r\n\xFF).\BRK";
+const MESSAGE_9 = "Can I ask you a question, \r\n\xFF)?\BRK\r\nI would still like to help\BRK\r\nmy mom out. Is that OK?\BRK";
+const MESSAGE_10 = "Of course!";
+const MESSAGE_11 = "No.";
+const MESSAGE_12 = "Thanks, \xFF).\BRK";
+const MESSAGE_13 = "Tomorrow is the first day\r\nof our new life together! \BRK";
+const MESSAGE_14 = "Alright. In that case,\r\nleave the house chores \r\nto me. \BRK";
+const MESSAGE_15 = "Tomorrow is the first day\r\nof our new life together!\BRK";
+
+var var_0;
+
+Set_Flag(0x56, 1);
+Warp_Player("Farm_House_1", 0x12F, 0x94);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x12F, 0x94, 3);
+Lock_Player_Input();
+SetEntityAnim("Player", "Player_Stop_Base");
+SetEntityPosition(3, 0x14B, 0x94, 2);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+Fade_In(1, 1);
+TalkOpen();
+Set_Portrait("Popuri_Ruborized");
+Set_Name_Window("Popuri");
+Set_Hearth_Anim("Popuri");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice4(1, 2, 3, 4);
+switch (var_0) {
+    case 1:
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Popuri_Ruborized");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        Proc125(5);
+        TalkMessage(6);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        break;
+    case 2:
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Popuri_Ruborized");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        Proc125(2);
+        TalkMessage(6);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        break;
+    case 3:
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Popuri_Ruborized");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        Proc125(3);
+        TalkMessage(6);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        break;
+    case 4:
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Popuri_Neutral");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(7);
+        TalkClose();
+        Fade_Out(3, 1);
+        Proc0A3(0);
+        Lock_Player_Input();
+        Fade_In(3, 1);
+        TalkOpen();
+        Set_Portrait("Popuri_Ruborized");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(8);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        break;
+}
+TalkOpen();
+Set_Portrait("Popuri_Neutral");
+Set_Name_Window("Popuri");
+Set_Hearth_Anim("Popuri");
+TalkMessage(9);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(0xA, 0xB);
+switch (var_0) {
+    case 1:
+        Set_Flag(0x35, 1);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Popuri_Happy");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(12);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        Free_Event_Entity("Popuri");
+        Set_Flag(0x56, 2);
+        Fade_Out(2, 1);
+        TalkOpen();
+        TalkMessage(13);
+        TalkClose();
+        Execute_Script(0x3DC);
+        break;
+    case 2:
+        Set_Flag(0x35, 0);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Popuri_Neutral");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(14);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        Free_Event_Entity("Popuri");
+        Set_Flag(0x56, 2);
+        Fade_Out(2, 1);
+        TalkOpen();
+        TalkMessage(15);
+        TalkClose();
+        Execute_Script(0x3DC);
+        break;
+}
+exit;
+}

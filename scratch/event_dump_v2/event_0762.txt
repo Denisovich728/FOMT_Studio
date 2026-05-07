@@ -1,0 +1,24 @@
+#include "lib_fomt.csv"
+
+script 762 Unknown_Event_0762 {
+const MESSAGE_0 = "Were you listening? \r\nHow embarrassing!\BRK";
+const MESSAGE_1 = "I never could leave Jeff\r\nalone. \BRK";
+
+if ((Check_Flag("Flag_0x119") == 1)) {
+    SetEntityFacing(0x12, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    if ((Has_NPC_Talked_Today("Sasha") == 0)) {
+        Set_Portrait("Sasha_Neutral");
+        Set_Name_Window("Sasha");
+        TalkMessage(0);
+    } else {
+        Set_Portrait("Sasha_Happy");
+        Set_Name_Window("Sasha");
+        TalkMessage(1);
+    }
+    TalkClose();
+    Free_Event_Entity("Sasha");
+    SetEntityFacing(0x12, 3);
+}
+exit;
+}

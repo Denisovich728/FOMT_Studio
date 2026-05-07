@@ -1,0 +1,39 @@
+#include "lib_fomt.csv"
+
+script 784 Unknown_Event_0784 {
+const MESSAGE_0 = "This is the anniversary \r\nof Ann's mother's death.\BRK\WAIT_CLICKAnn lets me take the day \r\noff every year, bless her. \BRK";
+
+Warp_Player("Mothers_Hill_Top", 0xE6, 0x118);
+SetEntityPosition(0, 0xE6, 0x1A4, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x18, 0xC8, 0x118, 1);
+SetEntityAnim("Doug", "Baby_Horse_Deep_Sleep_Base");
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x118, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Doug_Afraid");
+Set_Name_Window("Doug");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("Doug");
+End_Cinematic_State();
+Set_Flag(0x127, 1);
+Routine_State_Override("Doug", "Script_785");
+exit;
+}

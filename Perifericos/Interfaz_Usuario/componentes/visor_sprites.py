@@ -373,7 +373,7 @@ class VisorSprites(QWidget):
             except (ValueError, struct.error):
                 pass
                 
-        # Caso 2: Hexadecimal directo
+        # Caso 2: Hexadecimal directo (offset crudo de archivo)
         try:
             return int(raw_str, 16)
         except ValueError:

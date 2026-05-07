@@ -1,0 +1,41 @@
+#include "lib_fomt.csv"
+
+script 40 Unknown_Event_0040 {
+const MESSAGE_0 = "Yeah well...\r\nWhat do you know about it?!\BRK";
+const MESSAGE_1 = "I'm glad you understand me. \BRK";
+const MESSAGE_2 = "Sorry for dragging you \r\ninto this. \BRK";
+
+if ((Check_Flag("Popuri_Heart_Blue") == 1)) {
+    if ((Check_Flag("Popuri_Heart_Yellow") == 0)) {
+        SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+        TalkOpen();
+        Set_Portrait("Rick_Angry");
+        Set_Name_Window("Rick");
+        TalkMessage(0);
+        TalkClose();
+        SetEntityFacing(2, 2);
+        Free_Event_Entity("Rick");
+    } else {
+        if ((Check_Flag("Popuri_Heart_Yellow") == 1)) {
+            SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+            TalkOpen();
+            Set_Portrait("Rick_Happy");
+            Set_Name_Window("Rick");
+            TalkMessage(1);
+            TalkClose();
+            SetEntityFacing(2, 2);
+            Free_Event_Entity("Rick");
+        } else {
+            SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+            TalkOpen();
+            Set_Portrait("Rick_Neutral");
+            Set_Name_Window("Rick");
+            TalkMessage(2);
+            TalkClose();
+            SetEntityFacing(2, 1);
+            Free_Event_Entity("Rick");
+        }
+    }
+}
+exit;
+}

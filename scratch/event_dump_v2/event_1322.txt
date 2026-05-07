@@ -1,0 +1,25 @@
+#include "lib_fomt.csv"
+
+script 1322 Unknown_Event_1322 {
+const MESSAGE_0 = "I don't know about you,\r\nbut I had a great year.\BRK";
+
+if ((Func083(0xA) == 0)) {
+    Free_Event_Entity("Basil");
+}
+SetEntityFacing(0xA, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Basil_Happy");
+Set_Name_Window("Basil");
+TalkMessage(0);
+TalkClose();
+if ((Has_NPC_Talked_Today("Basil") == 0)) {
+    Give_Friendship_Points("Basil", 5);
+}
+Free_Event_Entity("Basil");
+if (((((((((Check_Flag("Flag_0xF4") == 0) || Has_NPC_Talked_Today("Cliff")) && Has_NPC_Talked_Today("Doug")) && Has_NPC_Talked_Today("Anna")) && Has_NPC_Talked_Today("Basil")) && Has_NPC_Talked_Today("Mary")) && Has_NPC_Talked_Today("Saibara")) && Has_NPC_Talked_Today("Gray"))) {
+    Fade_Out(2, 1);
+    Execute_Script(0x527);
+}
+SetEntityFacing(0xA, 1);
+exit;
+}

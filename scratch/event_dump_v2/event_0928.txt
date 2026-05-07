@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 928 Unknown_Event_0928 {
+const MESSAGE_0 = "What's wrong with Gray? \r\nHe's been smiling non-stop! \BRK";
+
+SetEntityFacing(6, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Saibara_Neutral");
+Set_Name_Window("Saibara");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(6, 0);
+Free_Event_Entity("Saibara");
+exit;
+}

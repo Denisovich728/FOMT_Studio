@@ -1,0 +1,49 @@
+#include "lib_fomt.csv"
+
+script 561 Unknown_Event_0561 {
+const MESSAGE_0 = "You might get lost, so \r\ndon't go upstairs.\BRK";
+const MESSAGE_1 = "Wooof! WOOF!!\r\nHannah's mad about \r\nsomething...\BRK";
+const MESSAGE_2 = "Please don't go upstairs!\BRK";
+
+var var_0;
+var var_1;
+
+if ((GetEntityFacing(0) == 1)) {
+    var_0 = 0;
+    var_1 = Check_Flag("System_Hour");
+    if ((var_1 >= 0x16)) {
+        var_0 = 0;
+    }
+    if ((Chek_Friendship_Points("Barley") <= 0x64)) {
+        var_0 = 0;
+    } else {
+        if ((Chek_Friendship_Points("Barley") > 0x64)) {
+            var_0 = 1;
+        }
+    }
+    if ((var_0 == 1)) {
+        Fade_Out(2, 1);
+        Warp_Player("Barley_House_Floor_02", 0xD8, 0x60);
+        SetEntityPosition(0, 0xD8, 0x60, 1);
+        Fade_In(2, 1);
+    } else {
+        TalkOpen();
+        if ((var_1 >= 0x16)) {
+            TalkMessage(0);
+        } else {
+            if (((GetEntityLocation("Barley") != "Barley_House_Floor_01") && (Chek_Friendship_Points("Barley") <= 0x64))) {
+                TalkMessage(1);
+            } else {
+                Set_Portrait("Barley_Neutral");
+                Set_Name_Window("Barley");
+                TalkMessage(2);
+            }
+        }
+        TalkClose();
+        Set_Vector_Y("Player", (GetEntityY(0) + 2), 1);
+        Pan_Camera_To(GetEntityX(0), (GetEntityY(0) + 2), 1);
+        Execute_Movement("Player");
+    }
+}
+exit;
+}

@@ -1,0 +1,594 @@
+#include "lib_fomt.csv"
+
+script 1019 Unknown_Event_1019 {
+const MESSAGE_0 = "You're not from around\r\nhere, are you? \BRK\WAIT_CLICKMy name? It's Stu.\r\nHey, you have cows on\r\nyour farm, right? \BRK\WAIT_CLICKCan I come pet one?\BRK";
+const MESSAGE_1 = "Well, I really wanted \r\nMechabot Ultror, but \r\nthanks anyway!\BRK";
+const MESSAGE_2 = "Just remember next\r\nyear, OK?\BRK";
+const MESSAGE_3 = "Wow!\r\nThanks!\BRK";
+const MESSAGE_4 = "Thanks!\BRK";
+const MESSAGE_5 = "I think maybe I'll\r\ngive this to Grandma...!\BRK";
+const MESSAGE_6 = "Can't you give this\r\nto somebody else?\BRK";
+const MESSAGE_7 = "Gee, thanks!\BRK";
+const MESSAGE_8 = "Gosh! You mean this\r\nis really for me?\BRK";
+const MESSAGE_9 = "Thanks! When I get older,\r\nI'll give it to a girl \r\nI like. \BRK";
+const MESSAGE_10 = "Thanks, but I won't\r\nuse it, so I'll give it\r\nto my sister Elli.\BRK";
+const MESSAGE_11 = "Ewww....\r\nWhat's this...?\BRK";
+const MESSAGE_12 = "Wow...It's pretty!\r\nWe had something like it\r\nin our house...\BRK\WAIT_CLICKElli said it was mom's.\BRK";
+const MESSAGE_13 = "Hi there!\BRK";
+const MESSAGE_14 = "You look like you're \r\nas bored as me!\BRK";
+const MESSAGE_15 = "Hey...\BRK";
+const MESSAGE_16 = "Have you ever ridden a cow?\r\nI want to do Rodeo. \BRK\WAIT_CLICK...You don\x81ft know Rodeo? \r\nMilk Cows are different from\r\nRodeo Cows, I heard...\BRK";
+const MESSAGE_17 = "Won't you play with me?\BRK";
+const MESSAGE_18 = "Elli's always at work, \r\nand Grandma can't walk \r\ngood, so I don't have \BRK\r\nanyone to play with!\BRK";
+const MESSAGE_19 = "Tomorrow is Church day!\BRK\WAIT_CLICKDo you go, too? Ever \r\nbeen to confessional?\BRK";
+const MESSAGE_20 = "Carter says that we can be\r\nforgiven for everything if\r\nwe truly feel sorry.\BRK\WAIT_CLICKI do sorta feel bad about \r\nputting bugs in Elli's bed.\BRK";
+const MESSAGE_21 = "I'm so bored...!\r\nI wonder if May's at home?\BRK";
+const MESSAGE_22 = "I wish there was someone who\r\nwould take me to the Church\r\nwhen it was raining...\BRK\WAIT_CLICKMaybe Carter would come...\BRK";
+const MESSAGE_23 = "Today isn't a Church day.\BRK\WAIT_CLICKMy sis Elli is free on \r\nWednesdays, and on Mondays\r\nMay goes out with her\BRK\r\ngrandfather.\BRK";
+const MESSAGE_24 = "I don't like playing mommy\r\nall day, you know!\BRK";
+const MESSAGE_25 = "Hi!\BRK";
+const MESSAGE_26 = "It's my bed time...\BRK\WAIT_CLICKIf I stay up longer, the \r\nmonsters will come get me!\BRK";
+const MESSAGE_27 = "Hello!\BRK";
+const MESSAGE_28 = "Carter makes really good \r\nfood, you know.\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+
+SetEntityAnim("Stu", "Stu_Stop_Base");
+var_2 = GetEntityFacing(0x10);
+SetEntityFacing(0x10, GetOppositeFacing(GetEntityFacing(0)));
+if (((Check_Flag(1) == 2) && (Check_Flag(2) == 0x1E))) {
+    switch (GetEntityLocation(0x10)) {
+        case "Farm":
+            Execute_Script(0x50B);
+            break;
+    }
+}
+TalkOpen();
+Set_Name_Window("Stu");
+if ((Func083(0x10) == 0)) {
+    Set_Portrait("Stu_Neutral");
+    TalkMessage(0);
+    Free_Event_Entity("Stu");
+} else {
+    if ((Inventory_Check() || ((((Check_Flag(0x6B) == 1) || (Check_Flag(0x93) == 1)) || (Check_Flag(0x10F) == 1)) || (Check_Flag(0x111) == 1)))) {
+        var_0 = 6;
+    } else {
+        switch (Compare_Gift()) {
+            case 0:
+                switch (Search_Food_Gift_Address()) {
+                    case "Honey":
+                    case "Wild Grapes":
+                    case "Grape Juice":
+                    case "Chocolate":
+                    case "Sandwich":
+                    case "Fruit Juice":
+                    case "Fruit Latte":
+                    case "Strawberry Milk":
+                    case "Strawberry Jam":
+                    case "French Fries":
+                    case "Ketchup":
+                    case "Popcorn":
+                    case "Sweet Potatoes":
+                    case "Omelet Rice":
+                    case "Hot Milk":
+                    case "Cheese Cake":
+                    case "Cheese Fondue":
+                    case "Apple Pie":
+                    case "Pizza":
+                    case "Cookies":
+                    case "Chocolate Cookies":
+                    case "Ice Cream":
+                    case "Cake":
+                    case "Chocolate Cake":
+                    case "Pancakes":
+                    case "Candied Potato":
+                        var_0 = 1;
+                        break;
+                    case "Strawberry":
+                    case "Pineapple":
+                    case "Mayonnaise (S)":
+                    case "Mayonnaise (M)":
+                    case "Mayonnaise (L)":
+                    case "Mayonnaise (G)":
+                    case "Mayonnaise (P)":
+                    case "Mayonnaise (X)":
+                    case "Milk (S)":
+                    case "Milk (M)":
+                    case "Milk (L)":
+                    case "Milk (G)":
+                    case "Milk (P)":
+                    case "Milk (X)":
+                    case "Cheese (S)":
+                    case "Cheese (M)":
+                    case "Cheese (L)":
+                    case "Cheese (G)":
+                    case "Cheese (P)":
+                    case "Cheese (X)":
+                    case "Apple":
+                    case "SUGDW Apple":
+                    case "HMSGB Apple":
+                    case "AEPFE Apple":
+                    case "Curry Rice":
+                    case "Stew":
+                    case "Savory Pancake":
+                    case "Baked Corn":
+                    case "Pineapple Juice":
+                    case "Pumpkin Pudding":
+                    case "Baked Sweet Potato":
+                    case "Omelet":
+                    case "Butter":
+                    case "Apple Jam":
+                    case "Apple Souffl?":
+                    case "Jam Bun":
+                    case "Curry Bread":
+                    case "Curry Noodles":
+                    case "Fried Noodles":
+                    case "Buckwheat Noodles":
+                    case "Noodles w/ Tempura":
+                    case "Fried Noodles":
+                    case "Rice Cake":
+                    case "Roasted Rice Cake":
+                    case "Medium Fish":
+                    case "Large Fish":
+                    case "Fish Sticks":
+                        var_0 = 2;
+                        break;
+                    case "Tomato":
+                    case "Corn":
+                    case "Regular Quality Egg":
+                    case "Good Quality Egg":
+                    case "High Quality Egg":
+                    case "Golden Egg":
+                    case "P Egg":
+                    case "X Egg":
+                    case "Bamboo Shoot":
+                    case "Rice Ball":
+                    case "Bread":
+                    case "Oil":
+                    case "Flower":
+                    case "Curry Powder":
+                    case "Muffin Mix":
+                    case "Relax Tea Leaves":
+                    case "Salad":
+                    case "Stir Fry":
+                    case "Fried Rice":
+                    case "Mixed Latte":
+                    case "Corn Flakes":
+                    case "Scrambled Eggs":
+                    case "Boiled Egg":
+                    case "Truffle Rice":
+                    case "Dinner Role":
+                    case "Grape Jam":
+                    case "Noodles":
+                    case "Tempura Noodles":
+                    case "Tempura":
+                    case "Relaxation Tea":
+                    case "Toast":
+                    case "French Toast":
+                    case "Pudding":
+                    case "Mountain Stew":
+                    case "Moon Dumplings":
+                    case "Toasted Rice Ball":
+                    case "Tempura Rice":
+                    case "Egg Over Rice":
+                    case "Rice Gruel":
+                        var_0 = 3;
+                        break;
+                    case "Turnip":
+                    case "Potato":
+                    case "Cucumber":
+                    case "Cabbage":
+                    case "Onion":
+                    case "Pumpkin":
+                    case "Eggplant":
+                    case "Carrot":
+                    case "Sweet Potato":
+                    case "Spinach":
+                    case "Green Pepper":
+                    case "Spa-Boiled Egg":
+                    case "Mushroom":
+                    case "Red Grass":
+                    case "Bodigizer":
+                    case "Bodigizer XL":
+                    case "Turbojolt":
+                    case "Turbojolt XL":
+                    case "Buckwheat Flour":
+                    case "Miso Soup":
+                    case "Vegetable Juice":
+                    case "Mixed Juice":
+                    case "Vegetable Latte":
+                    case "Tomato Juice":
+                    case "Pickled Turnip":
+                    case "Pickles":
+                    case "Pumpkin Stew":
+                    case "Happy Eggplant":
+                    case "Greens":
+                    case "Mushroom Rice":
+                    case "Bamboo Rice":
+                    case "Sushi":
+                    case "Raisin Bread":
+                    case "Sashimi":
+                    case "Grilled Fish":
+                    case "Chirashi Sushi":
+                    case "Small Fish":
+                    case "Potato Pancakes":
+                        var_0 = 4;
+                        break;
+                    case "Poisonous Mushroom":
+                    case "Truffle":
+                    case "Blue Grass":
+                    case "Green Grass":
+                    case "Yellow Grass":
+                    case "Orange Grass":
+                    case "Purple Grass":
+                    case "Indigo Grass":
+                    case "Black Grass":
+                    case "White Grass":
+                    case "Wine":
+                    case "Wild Grape Juice":
+                    case "Buckwheat Chips":
+                    case "Elli Leaves":
+                    case "Failed Dish":
+                    case "Failed Drink":
+                    case "Failed Pot Dish":
+                    case "Failed Dessert":
+                    case "Failed Bread":
+                    case "Failed Noodles":
+                        var_0 = 5;
+                        break;
+                }
+                break;
+            case 1:
+                switch (Search_Item_Gift_Address()) {
+                    case "Yarn (S)":
+                    case "Yarn (M)":
+                    case "Yarn (L)":
+                    case "Yarn (G)":
+                    case "Yarn (P)":
+                    case "Yarn (X)":
+                    case "Lithograph":
+                    case "Ball":
+                        var_0 = 1;
+                        break;
+                    case "Moon Drop Grass":
+                    case "Pink Cat Grass":
+                    case "Toy Flower":
+                    case "Wool (S)":
+                    case "Wool (M)":
+                    case "Wool (L)":
+                    case "Wool (G)":
+                    case "Wool (P)":
+                    case "Wool (P)":
+                    case "Copper":
+                    case "Silver":
+                    case "Gold":
+                    case "Mystrile":
+                    case "Orichalc":
+                    case "Adamantite":
+                    case "Moon Stone":
+                    case "Sand Rose":
+                    case "Pink Diamond":
+                    case "Alexandrite":
+                    case "Mythic Stone":
+                    case "Diamond":
+                    case "Emerald":
+                    case "Ruby":
+                    case "Topaz":
+                    case "Peridot":
+                    case "Fluorite":
+                    case "Agate":
+                    case "Amethyst":
+                    case "Branches":
+                        var_0 = 2;
+                        break;
+                    case "The Spring Sun":
+                    case "The Summer Sun":
+                    case "The Autumn Sun":
+                    case "The Winter Sun":
+                    case "Lumber":
+                        var_0 = 3;
+                        break;
+                    case "Blue Magic Grass":
+                    case "Red Magic Grass":
+                    case "Junk Ore":
+                        var_0 = 4;
+                        break;
+                    case "Weeds":
+                    case "Stones":
+                    case "Message in a Bottle":
+                    case "Pirate Treasure":
+                    case "Fossil of Fish":
+                    case "Empty Can":
+                    case "Boots":
+                    case "Fish Bones":
+                    case "Golden Lumber":
+                    case "Animal Fodder":
+                    case "Chicken Feed":
+                        var_0 = 5;
+                        break;
+                    case "Harvest Goddess Jewel":
+                    case "Kappa Jewel":
+                    case "Jewel of Truth":
+                    case "Karen's Wine":
+                    case "Popuri's Mud Ball":
+                    case "Ann's Music Box":
+                    case "Mary's Great Book":
+                    case "Elli's Pressed Flwr":
+                    case "Album 1":
+                    case "Album 2":
+                    case "Album 3":
+                    case "Album 4":
+                    case "Album 5":
+                    case "Album 6":
+                    case "Album 7":
+                    case "Album 8":
+                    case "Album 9":
+                    case "Album 10":
+                    case "Album 11":
+                    case "Album 12":
+                    case "Album 13":
+                    case "Album 14":
+                    case "Album 15":
+                    case "Book":
+                    case "Photo":
+                    case "Invitation":
+                    case "Lottery":
+                    case "Frisbee":
+                        var_0 = 6;
+                        break;
+                    case "Bracelet":
+                    case "Necklace":
+                    case "Earrings":
+                    case "Broach":
+                        var_0 = 9;
+                        break;
+                    case "Dress":
+                    case "Facial Pack":
+                    case "Skin Lotion":
+                    case "Sunblock":
+                        var_0 = 0xA;
+                        break;
+                    case "Perfume":
+                        var_0 = 0xB;
+                        break;
+                }
+                break;
+            case 4:
+                var_0 = 6;
+                break;
+            case 2:
+                var_0 = 7;
+                break;
+            case 3:
+                var_0 = 7;
+                break;
+        }
+    }
+    if ((var_0 != 6)) {
+        if (((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) && Is_NPC_Birthday("Stu"))) {
+            Set_Portrait("Stu_Afraid");
+            TalkMessage(1);
+            Set_Portrait("Stu_Happy");
+            TalkMessage(2);
+        } else {
+            switch (var_0) {
+                case 1:
+                    Set_Portrait("Stu_Happy");
+                    TalkMessage(3);
+                    break;
+                case 2:
+                    Set_Portrait("Stu_Happy");
+                    TalkMessage(4);
+                    break;
+                case 3:
+                    Set_Portrait("Stu_Neutral");
+                    TalkMessage(4);
+                    break;
+                case 4:
+                    Set_Portrait("Stu_Afraid");
+                    TalkMessage(5);
+                    break;
+                case 5:
+                    Set_Portrait("Stu_Angry");
+                    TalkMessage(6);
+                    break;
+                case 7:
+                    Set_Portrait("Stu_Happy");
+                    TalkMessage(7);
+                    break;
+                case 8:
+                    Set_Portrait("Stu_Neutral");
+                    TalkMessage(8);
+                    break;
+                case 9:
+                    Set_Portrait("Stu_Neutral");
+                    TalkMessage(9);
+                    break;
+                case 0xA:
+                    Set_Portrait("Stu_Neutral");
+                    TalkMessage(10);
+                    break;
+                case 0xB:
+                    Set_Portrait("Stu_Neutral");
+                    TalkMessage(11);
+                    break;
+            }
+        }
+        if ((Has_NPC_Talked_Today_2("Stu") == 0)) {
+            switch (var_0) {
+                case 1:
+                    var_1 = 9;
+                    break;
+                case 2:
+                    var_1 = 3;
+                    break;
+                case 3:
+                    var_1 = 1;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 1;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = -3;
+                    break;
+                case 0xA:
+                    var_1 = -3;
+                    break;
+                case 0xB:
+                    var_1 = -9;
+                    break;
+            }
+        } else {
+            switch (var_0) {
+                case 1:
+                    var_1 = 3;
+                    break;
+                case 2:
+                    var_1 = 1;
+                    break;
+                case 3:
+                    var_1 = 0;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 0;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = -3;
+                    break;
+                case 0xA:
+                    var_1 = -3;
+                    break;
+                case 0xB:
+                    var_1 = -9;
+                    break;
+            }
+        }
+        if (Is_NPC_Birthday("Stu")) {
+            var_1 *= 5;
+        }
+        if (Is_Item_Wrapped()) {
+            var_1 = (var_1 + (var_1 / 4));
+        }
+        Give_Friendship_Points("Stu", var_1);
+        TalkClose();
+        if (((((((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) || (var_0 == 4)) || (var_0 == 5)) || (var_0 == 9)) || (var_0 == 0xA)) || (var_0 == 0xB))) {
+            Proc045();
+        }
+        Warp_Entity_To_Map("Jeff_Shop_Back_Room");
+        goto LBL_000B;
+    }
+    if (Func05C(0)) {
+        switch (Check_Equped_Tool()) {
+            case "Blue Feather":
+                Set_Portrait("Stu_Happy");
+                TalkMessage(12);
+                break;
+        }
+        goto LBL_000B;
+    }
+    switch (GetEntityLocation(0x10)) {
+        case "Ellen_House":
+            if (((Check_Flag(3) >= 6) && (Check_Flag(3) < 0xC))) {
+                if ((Chek_Friendship_Points("Stu") <= 0x64)) {
+                    if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                        Set_Portrait("Stu_Neutral");
+                        TalkMessage(13);
+                    } else {
+                        Set_Portrait("Stu_Happy");
+                        TalkMessage(14);
+                    }
+                } else {
+                    if (((Chek_Friendship_Points("Stu") > 0x64) && (Chek_Friendship_Points("Stu") <= 0xC8))) {
+                        if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                            Set_Portrait("Stu_Happy");
+                            TalkMessage(15);
+                        } else {
+                            Set_Portrait("Stu_Neutral");
+                            TalkMessage(16);
+                        }
+                    } else {
+                        if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                            Set_Portrait("Stu_Neutral");
+                            TalkMessage(17);
+                        } else {
+                            Set_Portrait("Stu_Afraid");
+                            TalkMessage(18);
+                        }
+                    }
+                }
+                goto LBL_0097;
+            }
+            if (((Check_Flag(3) >= 0xC) && (Check_Flag(3) < 0x10))) {
+                if (((Check_Flag(5) != 1) && (Check_Flag(5) != 3))) {
+                    if ((Check_Flag(6) == 0)) {
+                        if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                            Set_Portrait("Stu_Neutral");
+                            TalkMessage(19);
+                        } else {
+                            Set_Portrait("Stu_Happy");
+                            TalkMessage(20);
+                        }
+                    } else {
+                        if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                            Set_Portrait("Stu_Afraid");
+                            TalkMessage(21);
+                        } else {
+                            Set_Portrait("Stu_Afraid");
+                            TalkMessage(22);
+                        }
+                    }
+                } else {
+                    if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                        Set_Portrait("Stu_Neutral");
+                        TalkMessage(23);
+                    } else {
+                        Set_Portrait("Stu_Neutral");
+                        TalkMessage(24);
+                    }
+                }
+                goto LBL_00B3;
+            }
+            if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                Set_Portrait("Stu_Neutral");
+                TalkMessage(25);
+                goto LBL_00B7;
+            }
+            Set_Portrait("Stu_Afraid");
+            TalkMessage(26);
+            break;
+        case "North_Side_Town":
+            if ((Has_NPC_Talked_Today("Stu") == 0)) {
+                Set_Portrait("Stu_Neutral");
+                TalkMessage(27);
+                goto LBL_00BC;
+            }
+            Set_Portrait("Stu_Happy");
+            TalkMessage(28);
+            break;
+    }
+    Free_Event_Entity("Stu");
+}
+TalkClose();
+SetEntityFacing(0x10, var_2);
+exit;
+}

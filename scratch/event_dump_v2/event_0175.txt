@@ -1,0 +1,9 @@
+#include "lib_fomt.csv"
+
+script 175 Unknown_Event_0175 {
+Fade_Out(2, 1);
+Warp_Player("Mothers_Hill_Middle", 0x498, 0x1FE);
+SetEntityPosition(0, 0x498, 0x1FE, 2);
+Fade_In(2, 1);
+exit;
+}

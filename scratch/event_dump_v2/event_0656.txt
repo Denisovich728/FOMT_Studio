@@ -1,0 +1,122 @@
+#include "lib_fomt.csv"
+
+script 656 Unknown_Event_0656 {
+const MESSAGE_0 = "I think I might have \r\ncome down with something...\BRK\WAIT_CLICKI feel sick to my stomach.\BRK\WAIT_CLICK\xFF), will you take\r\nme to the Clinic?\BRK";
+const MESSAGE_1 = "Thanks. You're a sweetheart.\BRK";
+const MESSAGE_2 = "Your wife isn't sick.\BRK";
+const MESSAGE_3 = "You're going to be parents.\r\nCongratulations!\BRK";
+const MESSAGE_4 = "Congratulations, Elli.\r\nYou always did want a baby.\BRK";
+const MESSAGE_5 = "I...I understand.\BRK";
+const MESSAGE_6 = "I can't believe I'm actually\r\npregnant!\BRK";
+const MESSAGE_7 = "I can't wait to tell \r\nGrandma and everybody!\r\nLet's go home!\BRK";
+const MESSAGE_8 = "I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK";
+
+Warp_Player("Farm_House_1", 0x12C, 0x5E);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x12C, 0x5E, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x15, 0x14D, 0x5E, 2);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+Fade_In(2, 1);
+Set_Flag("Flag_0xC5", 1);
+TalkOpen();
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Afraid");
+Set_Hearth_Anim("Elli");
+TalkMessage(0);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Show_Emote("Elli", "Happy", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Neutral");
+Set_Hearth_Anim("Elli");
+TalkMessage(1);
+TalkClose();
+Fade_Out(2, 1);
+Warp_Player("Mineral_Clinic_Floor_01", 0xE4, 0x94);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0xE4, 0x7C, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x15, 0xE4, 0x94, 3);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x14, 0x106, 0x94, 2);
+SetEntityAnim("Doctor", 0x320);
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(2);
+TalkClose();
+Show_Emote("Elli", "Question", 0);
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Doctor_Happy");
+Set_Name_Window("Doctor");
+TalkMessage(3);
+TalkClose();
+Show_Emote("Elli", "Hearth", 0);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Doctor_Happy");
+Set_Name_Window("Doctor");
+TalkMessage(4);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Ruborized");
+TalkMessage(5);
+TalkClose();
+SetEntityFacing(0x15, 1);
+TalkOpen();
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Ruborized");
+Set_Hearth_Anim("Elli");
+TalkMessage(6);
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Happy");
+Set_Hearth_Anim("Elli");
+TalkMessage(7);
+TalkClose();
+SetEntityFacing(0, 0);
+Make_Delay(0x3C);
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+Free_Event_Entity("Elli");
+Free_Event_Entity("Doctor");
+Give_Love_Points("Elli", 0xBB8);
+Give_Friendship_Points("Doctor", 0x14);
+Set_Flag("Flag_0xC5", 2);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(8);
+TalkClose();
+Reset_Player_After_Festival_Activity();
+Set_Time(0x11, 0);
+Fade_In(2, 1);
+exit;
+exit;
+}

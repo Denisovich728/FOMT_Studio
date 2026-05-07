@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 940 Unknown_Event_0940 {
+const MESSAGE_0 = "And I thought Mary wasn't \r\ninterested in boys yet! \BRK";
+const MESSAGE_1 = "I'm glad she is, though.\r\nIt's only healthy, \r\nafter all! \BRK";
+
+if ((Func083(0xB) == 0)) {
+    Free_Event_Entity("Anna");
+}
+if ((Has_NPC_Talked_Today("Anna") == 0)) {
+    SetEntityFacing(0xB, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Anna_Neutral");
+    Set_Name_Window("Anna");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0xB, 2);
+    Free_Event_Entity("Anna");
+} else {
+    SetEntityFacing(0xB, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Anna_Happy");
+    Set_Name_Window("Anna");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0xB, 2);
+    Free_Event_Entity("Anna");
+}
+exit;
+}

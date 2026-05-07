@@ -24,7 +24,15 @@ class Formatter:
         
     def format_expr(self, expr: Expr) -> str:
         if isinstance(expr, ExprName): return expr.name
-        elif isinstance(expr, ExprInt): return f"0x{expr.value:X}" if expr.value > 9 or expr.value < 0 else str(expr.value)
+        elif isinstance(expr, ExprInt): 
+            if expr.force_decimal:
+                base = str(expr.value)
+            else:
+                base = f"0x{expr.value:X}" if expr.value > 9 or expr.value < 0 else str(expr.value)
+            
+            if expr.comment:
+                return f"{base} /* {expr.comment} */"
+            return base
         elif isinstance(expr, ExprStr): 
             # Mapa de Caracteres Especiales de FoMT (USA)
             charmap = {
@@ -174,9 +182,36 @@ class Formatter:
             
         elif isinstance(stmt, StmtExit):
             self.write_line("exit;")
+        elif isinstance(stmt, StmtBreak):
+            self.write_line("break;")
+        elif isinstance(stmt, StmtLabel):
+            # Las etiquetas se imprimen sin indentación para mayor visibilidad
+            old_indent = self.indent_level
+            self.indent_level = 0
+            self.write_line(f"LBL_{stmt.jump_id.id:04X}:")
+            self.indent_level = old_indent
+        elif isinstance(stmt, StmtGoto):
+            self.write_line(f"goto LBL_{stmt.jump_id.id:04X};")
 
 def format_script(stmts: List[Stmt]) -> str:
     f = Formatter()
-    for s in stmts:
+    
+    # Separar constantes/mensajes del resto del código para mejor jerarquía
+    msgs = [s for s in stmts if isinstance(s, StmtMessage)]
+    consts = [s for s in stmts if isinstance(s, (StmtConsts, StmtVars))]
+    others = [s for s in stmts if not isinstance(s, (StmtMessage, StmtConsts, StmtVars))]
+    
+    for s in msgs: 
         f.format_stmt(s)
+    if msgs and (consts or others): 
+        f.write("\n")
+    
+    for s in consts: 
+        f.format_stmt(s)
+    if consts and others: 
+        f.write("\n")
+    
+    for s in others: 
+        f.format_stmt(s)
+    
     return "".join(f.output)

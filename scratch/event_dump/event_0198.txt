@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 198 Unknown_Event_0198 {
+const MESSAGE_0 = "Refrigerator\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

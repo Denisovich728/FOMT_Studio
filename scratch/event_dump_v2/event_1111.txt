@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1111 Unknown_Event_1111 {
+const MESSAGE_0 = "You're going to enter \r\nthis year, \xFF!? \r\nThat's great! I love seeing\BRK\r\nmen cook, you know. \r\nMy husband can't cook\r\nat all...\r\nI'll be rooting for you! \BRK";
+
+if ((Func083(9) == 0)) {
+    Free_Event_Entity("Manna");
+}
+SetEntityFacing(9, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Manna_Neutral");
+Set_Name_Window("Manna");
+TalkMessageSlow(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Manna") == 0)) {
+    Give_Friendship_Points("Manna", 5);
+}
+SetEntityFacing(9, 2);
+Free_Event_Entity("Manna");
+exit;
+}

@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 73 Unknown_Event_0073 {
+const MESSAGE_0 = "I'm so glad Stu is back!\BRK";
+const MESSAGE_1 = "You are very kind, \r\n\xFF!.\BRK";
+
+if ((Check_Flag("Elli_Heart_Purple") == 1)) {
+}
+if ((Check_Flag("Elli_Heart_Blue") == 0)) {
+    SetEntityFacing(0xF, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Ellen_Neutral");
+    Set_Name_Window("Ellen");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0xF, 0);
+    Free_Event_Entity("Ellen");
+} else {
+    SetEntityFacing(0xF, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Ellen_Happy");
+    Set_Name_Window("Ellen");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0xF, 0);
+    Free_Event_Entity("Ellen");
+}
+exit;
+}

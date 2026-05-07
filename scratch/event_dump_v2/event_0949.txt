@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 949 Unknown_Event_0949 {
+const MESSAGE_0 = "The Doctor is a very \r\nkind man, you know. \BRK";
+
+SetEntityFacing(0x10, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Stu_Neutral");
+Set_Name_Window("Stu");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x10, 2);
+Free_Event_Entity("Stu");
+exit;
+}

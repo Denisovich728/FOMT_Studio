@@ -1,0 +1,127 @@
+#include "lib_fomt.csv"
+
+script 78 Unknown_Event_0078 {
+const MESSAGE_0 = "You may now kiss the bride. \BRK";
+const MESSAGE_1 = "Let\x81fs make a happy family!\BRK";
+const MESSAGE_2 = "May you be happy always. \BRK";
+
+Warp_Player("Church", 0xB8, 0xA0);
+SetEntityPosition(0, 0xA8, 0x98, 0);
+Lock_Player_Input();
+SetEntityAnim("Player", "Player_Weeding_Wait_Base");
+SetEntityPosition(0x15, 0xC8, 0x98, 0);
+SetEntityAnim("Elli", "Elli_Weeding_Stop_Base");
+SetEntityPosition(0x16, 0xB8, 0x78, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0xD, 0x68, 0x9B, 3);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(5, 0x108, 0xC3, 2);
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityPosition(0x10, 0x68, 0xC3, 3);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0xF, 0x108, 0x78, 0);
+SetEntityAnim("Ellen", "Ellen_Stop_Base");
+if ((GetEntityLocation("Cliff") == "Church")) {
+    Hide_Entity("Cliff");
+}
+if ((GetEntityLocation("Jeff") == "Church")) {
+    Hide_Entity("Jeff");
+}
+if ((GetEntityLocation("Doctor") == "Church")) {
+    Hide_Entity("Doctor");
+}
+if ((GetEntityLocation("Duke") == "Church")) {
+    Hide_Entity("Duke");
+}
+if ((GetEntityLocation("Manna") == "Church")) {
+    Hide_Entity("Manna");
+}
+if ((GetEntityLocation("Popuri") == "Church")) {
+    Hide_Entity("Popuri");
+}
+StopAllSongs();
+Fade_In(2, 1);
+PlaySong(0, 0xB3);
+Make_Delay((0x3C * 3));
+PlaySong(0, 0xB3);
+Make_Delay((0x3C * 3));
+PlayBGM(1, 6);
+TalkOpen();
+Set_Portrait("Carter_Neutral");
+Set_Name_Window("Carter");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0, 3);
+SetEntityFacing(0x15, 2);
+Show_Emote("Elli", "Hearth", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellie_Weeding");
+Set_Name_Window("Elli");
+Set_Hearth_Anim("Elli");
+TalkMessage(1);
+TalkClose();
+SetEntityAnim("Player", "Player_Weeding_Walk_Base");
+Set_Vector_X("Player", 0xB8, 1);
+Execute_Movement("Player");
+SetEntityAnim("Player", "Player_Weeding_Wait_Base");
+SetEntityAnim("Player", "Player_Weeding_Kiss_2");
+SetEntityAnim("Elli", "Elli_Weeding_Kiss_2");
+Make_Delay(0x5A);
+SetEntityAnim("Player", "Player_Weeding_Wait_Base");
+SetEntityAnim("Elli", "Elli_Weeding_Stop_Base");
+SetEntityAnim("Player", "Player_Weeding_Walk_Base");
+Set_Vector_X("Player", 0xA8, 1);
+Execute_Movement("Player");
+SetEntityAnim("Player", "Player_Weeding_Wait_Base");
+Make_Delay(0x3C);
+SetEntityFacing(0, 0);
+SetEntityFacing(0x15, 0);
+TalkOpen();
+Set_Portrait("Thomas_Happy");
+Set_Name_Window("Huachito");
+TalkMessage(2);
+TalkClose();
+SetEntityAnim("Player", "Player_Weeding_Walk_Base");
+SetEntityAnim("Elli", "Elli_Weeding_Base");
+Set_Vector_Y("Player", 0xB3, 1);
+Set_Vector_Y("Elli", 0xB3, 1);
+Execute_Movement("Player");
+Execute_Movement("Elli");
+SetEntityFacing(0xD, 0);
+Set_Vector_Y("Player", 0x118, 1);
+Set_Vector_Y("Elli", 0x118, 1);
+SetEntityAnim("Stu", "Stu_Base");
+SetEntityAnim("May", "May_Base");
+Set_Vector_X("Stu", 0xA8, 1);
+Set_Vector_X("May", 0xC8, 1);
+Execute_Movement("Stu");
+Execute_Movement("May");
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityFacing(0x10, 0);
+SetEntityFacing(5, 0);
+SetEntityAnim("Stu", "Stu_Base");
+SetEntityAnim("May", "May_Base");
+Set_Vector_Y("Stu", 0x118, 1);
+Set_Vector_Y("May", 0x118, 1);
+Execute_Movement("Stu");
+Execute_Movement("May");
+Make_Delay((0x3C * 2));
+Give_Friendship_Points("Carter", 0x14);
+Give_Friendship_Points("Huachito", 0x14);
+Give_Friendship_Points("May", 0x14);
+Give_Friendship_Points("Stu", 0xFF);
+Give_Friendship_Points("Ellen", 0xFF);
+Free_Event_Entity("Elli");
+Free_Event_Entity("Carter");
+Free_Event_Entity("Huachito");
+Free_Event_Entity("May");
+Free_Event_Entity("Stu");
+Free_Event_Entity("Ellen");
+Set_Flag("Elli_Marriage_State", 2);
+Fade_Out(1, 1);
+Finish_Wedding_Sequence();
+Execute_Script(0x4F);
+exit;
+}

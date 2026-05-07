@@ -1,0 +1,18 @@
+#include "lib_fomt.csv"
+
+script 58 Unknown_Event_0058 {
+const MESSAGE_0 = "Read any book you want. \BRK";
+
+if ((Check_Flag(0x61) == 1)) {
+}
+SetEntityFacing(0xC, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+Set_Hearth_Anim("Mary");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0xC, 2);
+Free_Event_Entity("Mary");
+exit;
+}

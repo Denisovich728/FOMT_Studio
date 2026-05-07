@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 516 Unknown_Event_0516 {
+const MESSAGE_0 = "Shovel\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

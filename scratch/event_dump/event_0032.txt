@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 32 Unknown_Event_0032 {
+const MESSAGE_0 = "Now where did I put that \r\nstomach medicine...\BRK";
+
+if ((Check_Flag(0x4A) == 1)) {
+}
+SetEntityFacing(0x12, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Sasha_Afraid");
+Set_Name_Window("Sasha");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x12, 1);
+Free_Event_Entity("Sasha");
+exit;
+}

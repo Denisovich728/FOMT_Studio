@@ -1,0 +1,347 @@
+#include "lib_fomt.csv"
+
+script 487 Unknown_Event_0487 {
+const MESSAGE_0 = "Counter\BRK";
+const MESSAGE_1 = "Copper Sickle";
+const MESSAGE_2 = "Silver Sickle";
+const MESSAGE_3 = "Gold Sickle";
+const MESSAGE_4 = "Mystrile Sickle";
+const MESSAGE_5 = "Mythic Sickle";
+const MESSAGE_6 = "Copper Hoe";
+const MESSAGE_7 = "Silver Hoe";
+const MESSAGE_8 = "Gold Hoe";
+const MESSAGE_9 = "Mystrile Hoe";
+const MESSAGE_10 = "Mythic Hoe";
+const MESSAGE_11 = "Copper Axe";
+const MESSAGE_12 = "Silver Axe";
+const MESSAGE_13 = "Gold Axe";
+const MESSAGE_14 = "Mystrile Axe";
+const MESSAGE_15 = "Mythic Axe";
+const MESSAGE_16 = "Copper Hammer";
+const MESSAGE_17 = "Silver Hammer";
+const MESSAGE_18 = "Gold Hammer";
+const MESSAGE_19 = "Mystrile Hammer";
+const MESSAGE_20 = "Mythic Hammer";
+const MESSAGE_21 = "Copper Watering Can";
+const MESSAGE_22 = "Silver Watering Can";
+const MESSAGE_23 = "Gold Watering Can";
+const MESSAGE_24 = "Mystrile Watering Can";
+const MESSAGE_25 = "Mythic Watering Can";
+const MESSAGE_26 = "Copper Fishing Rod";
+const MESSAGE_27 = "Silver Fishing Rod";
+const MESSAGE_28 = "Gold Fishing Rod";
+const MESSAGE_29 = "Mystrile Fishing Rod";
+const MESSAGE_30 = "Mythic Fishing Rod";
+const MESSAGE_31 = "Bracelet";
+const MESSAGE_32 = "Necklace";
+const MESSAGE_33 = "Earrings";
+const MESSAGE_34 = "Broach";
+const MESSAGE_35 = "Mayonnaise Maker";
+const MESSAGE_36 = "Cheese Maker";
+const MESSAGE_37 = "Yarn Maker";
+const MESSAGE_38 = "Your \xFF%\r\nis done, so you can\r\ntake it home now.\BRK\r\n\BRK";
+const MESSAGE_39 = "The \xFF%\r\nyou asked me to make\r\nis done now.\BRK\r\n\BRK";
+const MESSAGE_40 = "I asked Gray to deliver it.\r\n\BRK";
+const MESSAGE_41 = "The \xFF%\r\nis ready.\BRK\WAIT_CLICKYour Rucksack seems to\r\nbe full.\BRK\WAIT_CLICKI'll have Grey deliver\r\nit to you later.\BRK";
+const MESSAGE_42 = "Your Ruchsack seems to\r\nbe full.\BRK\WAIT_CLICKI'll have Grey deliver your\r\n\xFF% to you later.\r\nLook forward to it.\BRK";
+const MESSAGE_43 = "\xFF% is ready,\r\nbut your Rucksack is full.\BRK\WAIT_CLICKGo home, drop off\r\nsome items and come back\r\nto get your new tool.\BRK";
+const MESSAGE_44 = "The \xFF%\r\nyou asked me to make\r\nis done now...\BRK\WAIT_CLICKBut, you seem to have your\r\nhands full now, so I'll \r\nhold onto the necklace \BRK\r\nfor now, OK?\BRK";
+const MESSAGE_45 = "What would you like \r\ntoday? I always like to \r\ntalk, as long as I'm \BRK\r\nnot working.\BRK";
+const MESSAGE_46 = "Counters\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+
+if ((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((Check_Flag("Flag_0x46") == 1) || (Check_Flag("Karen_Heart_Black") == 1)) || (Check_Flag("Karen_Heart_Blue") == 1)) || (Check_Flag("Karen_Heart_Yellow") == 1)) || (Check_Flag("Karen_Heart_Orange") == 1)) || (Check_Flag("Karen_Marriage_State") == 1)) || (Check_Flag("Flag_0x4D") == 1)) || (Check_Flag("Flag_0x4E") == 1)) || (Check_Flag("Flag_0x4F") == 1)) || (Check_Flag("Popuri_Heart_Black") == 1)) || (Check_Flag("Popuri_Heart_Blue") == 1)) || (Check_Flag("Popuri_Heart_Orange") == 1)) || (Check_Flag("Popuri_Marriage_State") == 1)) || (Check_Flag("Flag_0x56") == 1)) || (Check_Flag("Flag_0x57") == 1)) || (Check_Flag("Flag_0x58") == 1)) || (Check_Flag("Ann_Heart_Black") == 1)) || (Check_Flag("Ann_Heart_Blue") == 1)) || (Check_Flag("Ann_Heart_Orange") == 1)) || (Check_Flag("Ann_Marriage_State") == 1)) || (Check_Flag("Flag_0x60") == 1)) || (Check_Flag("Flag_0x61") == 1)) || (Check_Flag("Mary_Heart_Black") == 1)) || (Check_Flag("Mary_Heart_Blue") == 1)) || (Check_Flag("Mary_Heart_Yellow") == 1)) || (Check_Flag("Mary_Heart_Orange") == 1)) || (Check_Flag("Mary_Marriage_State") == 1)) || (Check_Flag("Flag_0x68") == 1)) || (Check_Flag("Flag_0x69") == 1)) || (Check_Flag("Elli_Heart_Black") == 1)) || (Check_Flag("Elli_Heart_Purple") == 1)) || (Check_Flag("Elli_Heart_Yellow") == 1)) || (Check_Flag("Elli_Heart_Orange") == 1)) || (Check_Flag("Elli_Marriage_State") == 1)) || (Check_Flag("Flag_0x70") == 1)) || (Check_Flag("Flag_0x71") == 1)) || (Check_Flag("Flag_0x72") == 1)) || (Check_Flag("Flag_0x73") == 1)) || (Check_Flag("Flag_0x74") == 1)) || (Check_Flag("Flag_0x75") == 1)) || (Check_Flag("Rival_Karen_Rick_Event_1") == 1)) || (Check_Flag("Rival_Karen_Rick_Married") == 1)) || (Check_Flag("Flag_0x7B") == 1)) || (Check_Flag("Flag_0x7C") == 1)) || (Check_Flag("Rival_Popuri_Kai_Event_1") == 1)) || (Check_Flag("Rival_Popuri_Kai_Event_2") == 1)) || (Check_Flag("Flag_0x82") == 1)) || (Check_Flag("Flag_0x83") == 1)) || (Check_Flag("Rival_Ann_Cliff_Event_1") == 1)) || (Check_Flag("Rival_Ann_Cliff_Event_2") == 1)) || (Check_Flag("Rival_Ann_Cliff_Event_3") == 1)) || (Check_Flag("Flag_0x8A") == 1)) || (Check_Flag("Rival_Mary_Gray_Event_1") == 1)) || (Check_Flag("Rival_Mary_Gray_Event_2") == 1)) || (Check_Flag("Rival_Mary_Gray_Event_3") == 1)) || (Check_Flag("Rival_Mary_Gray_Event_4") == 1)) || (Check_Flag("Rival_Elli_Doctor_Event_1") == 1)) || (Check_Flag("Rival_Elli_Doctor_Event_2") == 1)) || (Check_Flag("Rival_Elli_Doctor_Event_3") == 1)) || (Check_Flag("Rival_Elli_Doctor_Event_4") == 1)) || (Check_Flag("Rival_Elli_Doctor_Married") == 1)) || (Check_Flag("Flag_0x9A") == 1)) || (Check_Flag("Flag_0x9B") == 1)) || (Check_Flag("Flag_0x9C") == 1)) || (Check_Flag("Flag_0x9D") == 1)) || (Check_Flag("Flag_0x9E") == 1)) || (Check_Flag("Flag_0x9F") == 1)) || (Check_Flag("Flag_0xA0") == 1)) || (Check_Flag("Flag_0xA1") == 1)) || (Check_Flag("Flag_0xA2") == 1)) || (Check_Flag("Flag_0xA3") == 1)) || (Check_Flag("Flag_0xA4") == 1)) || (Check_Flag("Flag_0xA5") == 1)) || (Check_Flag("Flag_0xA6") == 1)) || (Check_Flag("Flag_0xA7") == 1)) || (Check_Flag("Flag_0xA8") == 1)) || (Check_Flag("Flag_0xA9") == 1)) || (Check_Flag("Flag_0xAA") == 1)) || (Check_Flag("Flag_0xAB") == 1)) || (Check_Flag("Flag_0xAC") == 1)) || (Check_Flag("Flag_0xAD") == 1)) || (Check_Flag("Flag_0xAE") == 1)) || (Check_Flag("Flag_0xAF") == 1)) || (Check_Flag("Flag_0xB0") == 1)) || (Check_Flag("Flag_0xB1") == 1)) || (Check_Flag("Flag_0xB2") == 1)) || (Check_Flag("Flag_0xB3") == 1)) || (Check_Flag("Flag_0xB4") == 1)) || (Check_Flag("Flag_0xB5") == 1)) || (Check_Flag("Flag_0xB6") == 1)) || (Check_Flag("Flag_0xB7") == 1)) || (Check_Flag("Flag_0xB8") == 1)) || (Check_Flag("Flag_0xB9") == 1)) || (Check_Flag("Flag_0xBA") == 1)) || (Check_Flag("Flag_0xBB") == 1)) || (Check_Flag("Flag_0xBC") == 1)) || (Check_Flag("Flag_0xBD") == 1)) || (Check_Flag("Flag_0xBE") == 1)) || (Check_Flag("Flag_0xBF") == 1)) || (Check_Flag("Flag_0xC0") == 1)) || (Check_Flag("Flag_0xC1") == 1)) || (Check_Flag("Flag_0xC2") == 1)) || (Check_Flag("Flag_0xC3") == 1)) || (Check_Flag("Flag_0xC4") == 1)) || (Check_Flag("Flag_0xC5") == 1)) || (Check_Flag("Flag_0xC6") == 1)) || (Check_Flag("Flag_0xC7") == 1)) || (Check_Flag("Baby_Birth_Event_State") == 1)) || (Check_Flag("Flag_0xC9") == 1)) || (Check_Flag("Flag_0xCA") == 1)) || (Check_Flag("Flag_0xCB") == 1)) || (Check_Flag("Flag_0xCC") == 1)) || (Check_Flag("Flag_0xCD") == 1)) || (Check_Flag("Flag_0xCE") == 1)) || (Check_Flag("Flag_0xCF") == 1)) || (Check_Flag("Flag_0xD0") == 1)) || (Check_Flag("Flag_0xD1") == 1)) || (Check_Flag("Flag_0xD7") == 1)) || (Check_Flag("Flag_0xD8") == 1)) || (Check_Flag("Flag_0xD9") == 1)) || (Check_Flag("Flag_0xDA") == 1)) || (Check_Flag("Flag_0xDB") == 1)) || (Check_Flag("Flag_0xDC") == 1)) || (Check_Flag("Flag_0xDD") == 1)) || (Check_Flag("Flag_0xDF") == 1)) || (Check_Flag("Flag_0xE0") == 1)) || (Check_Flag("Flag_0xE1") == 1)) || (Check_Flag("Flag_0xE2") == 1)) || (Check_Flag("Flag_0xE3") == 1)) || (Check_Flag("Flag_0xE4") == 1)) || (Check_Flag("Flag_0xE6") == 1)) || (Check_Flag("Flag_0xE7") == 1)) || (Check_Flag("Flag_0xE8") == 1)) || (Check_Flag("Flag_0xE9") == 1)) || (Check_Flag("Flag_0xEA") == 1)) || (Check_Flag("Flag_0xEB") == 1)) || (Check_Flag("Flag_0xEC") == 1)) || (Check_Flag("Flag_0xED") == 1)) || (Check_Flag("Flag_0xEE") == 1)) || (Check_Flag("Flag_0xEF") == 1)) || (Check_Flag("Flag_0xF0") == 1)) || (Check_Flag("Flag_0xF1") == 1)) || (Check_Flag("Flag_0xF2") == 1)) || (Check_Flag("Flag_0xF3") == 1)) || (Check_Flag("Flag_0xF9") == 1)) || (Check_Flag("Flag_0xFA") == 1)) || (Check_Flag("Flag_0xFB") == 1)) || (Check_Flag("Flag_0xFC") == 1)) || (Check_Flag("Flag_0xFD") == 1)) || (Check_Flag("Flag_0xFF") == 1)) || (Check_Flag("Flag_0x100") == 1)) || (Check_Flag("Flag_0x102") == 1)) || (Check_Flag("Flag_0x104") == 1)) || (Check_Flag("Flag_0x105") == 1)) || (Check_Flag("Flag_0x106") == 1)) || (Check_Flag("Flag_0x107") == 1)) || (Check_Flag("Flag_0x10A") == 1)) || (Check_Flag("Flag_0x10B") == 1)) || (Check_Flag("Flag_0x10E") == 1)) || (Check_Flag("Flag_0x10F") == 1)) || (Check_Flag("Flag_0x110") == 1)) || (Check_Flag("Flag_0x111") == 1)) || (Check_Flag("Flag_0x112") == 1)) || (Check_Flag("Flag_0x114") == 1)) || (Check_Flag("Flag_0x115") == 1)) || (Check_Flag("Flag_0x116") == 1)) || (Check_Flag("Flag_0x117") == 1)) || (Check_Flag("Flag_0x118") == 1)) || (Check_Flag("Flag_0x119") == 1)) || (Check_Flag("Flag_0x11A") == 1)) || (Check_Flag("Flag_0x11B") == 1)) || (Check_Flag("Flag_0x11C") == 1)) || (Check_Flag("Flag_0x11D") == 1)) || (Check_Flag("Flag_0x11E") == 1)) || (Check_Flag("Flag_0x11F") == 1)) || (Check_Flag("Flag_0x120") == 1)) || (Check_Flag("Flag_0x121") == 1)) || (Check_Flag("Flag_0x122") == 1)) || (Check_Flag("Flag_0x123") == 1)) || (Check_Flag("Flag_0x126") == 1)) || (Check_Flag("Flag_0x127") == 1)) || (Check_Flag("Flag_0x128") == 1)) || (Check_Flag("Flag_0x12A") == 1)) || (Check_Flag("Flag_0x12B") == 1)) || (Check_Flag("Flag_0x12C") == 1)) || (Check_Flag("Flag_0x12D") == 1)) || (Check_Flag("Flag_0x12E") == 1)) || (Check_Flag("Flag_0x12F") == 1)) || (Check_Flag("Flag_0x130") == 1)) || (Check_Flag("Flag_0x132") == 1)) || (Check_Flag("Flag_0x133") == 1)) || (Check_Flag("Flag_0x134") == 1)) || (Check_Flag("Flag_0x135") == 1)) || (Check_Flag("Flag_0x136") == 1)) || (Check_Flag("Flag_0x137") == 1)) || (Check_Flag("Flag_0x138") == 1)) || (Check_Flag("Flag_0x139") == 1)) || (Check_Flag("Flag_0x13B") == 1)) || (Check_Flag("Flag_0x13C") == 1)) || (Check_Flag("Flag_0x13D") == 1)) || (Check_Flag("Flag_0x13E") == 1)) || (Check_Flag("Flag_0x13F") == 1)) || (Check_Flag("Flag_0x140") == 1)) || (Check_Flag("Flag_0x141") == 1)) || (Check_Flag("Goddess_First_Offering_Done") == 1)) || (Check_Flag("Flag_0x143") == 1)) || (Check_Flag("Flag_0x145") == 1)) || (Check_Flag("Flag_0x146") == 1)) || (Check_Flag("Flag_0x148") == 1)) || (Check_Flag("Flag_0x149") == 1)) || (Check_Flag("Flag_0x14A") == 1)) || (Check_Flag("Flag_0x14B") == 1)) || (Check_Flag("Flag_0x14E") == 1)) || (Check_Flag("Flag_0x14F") == 1)) || (Check_Flag("Flag_0x150") == 1)) || (Check_Flag("Flag_0x151") == 1)) || (Check_Flag("System_Interaction_Blocked") == 1)) || (Check_Flag("Flag_0x153") == 1)) || (Check_Flag("Flag_0x155") == 1)) || (Check_Flag("Flag_0x156") == 1)) || (Check_Flag("Flag_0x158") == 1)) || (Check_Flag("Flag_0x159") == 1)) || (Check_Flag("Flag_0x15A") == 1)) || (Check_Flag("Flag_0x15B") == 1)) || (Check_Flag("Flag_0x15C") == 1)) || (Check_Flag("Flag_0x15D") == 1)) || (Check_Flag("Flag_0x15E") == 1)) || (Check_Flag("Event_Goddess_Shipment_Reward_Active") == 1)) || (Check_Flag("Flag_0x160") == 1)) || (Check_Flag("Flag_0x161") == 1)) || (Check_Flag("Flag_0x162") == 1)) || (Check_Flag("Flag_0x163") == 1)) || (Check_Flag("Flag_0x164") == 1)) || (Check_Flag("Flag_0x165") == 1)) || (Check_Flag("Flag_0x166") == 1)) || (Check_Flag("Flag_0x167") == 1)) || (Check_Flag("Flag_0x168") == 1)) || (Check_Flag("Flag_0x169") == 1)) || (Check_Flag("Flag_0x16A") == 1)) || (Check_Flag("Flag_0x16B") == 1)) || (Check_Flag("Flag_0x16C") == 1)) || (Check_Flag("Flag_0x16D") == 1)) || (Check_Flag("Flag_0x16E") == 1)) || (Check_Flag("Flag_0x16F") == 1)) || (Check_Flag("Flag_0x170") == 1)) || (Check_Flag("Flag_0x171") == 1)) || (Check_Flag("Flag_0x172") == 1)) || (Check_Flag("Flag_0x173") == 1)) || (Check_Flag("Flag_0x174") == 1)) || (Check_Flag("Flag_0x175") == 1)) || (Check_Flag("Flag_0x176") == 1)) || (Check_Flag("Flag_0x177") == 1)) || (Check_Flag("Flag_0x178") == 1)) || (Check_Flag("Flag_0x179") == 1)) || (Check_Flag("Flag_0x17A") == 1)) || (Check_Flag("Flag_0x17B") == 1)) || (Check_Flag("Flag_0x17C") == 1)) || (Check_Flag("Flag_0x17D") == 1)) || (Check_Flag("Flag_0x17E") == 1)) || (Check_Flag("Flag_0x17F") == 1)) || (Check_Flag("Event_NewYears_Day_Active") == 1)) || (Check_Flag("Flag_0x181") == 1)) || (Check_Flag("Flag_0x187") == 1)) || (Check_Flag("Event_Spring_HorseRace_Active") == 1)) || (Check_Flag("Flag_0x18B") == 1)) || (Check_Flag("Event_Cooking_Festival_Active") == 1)) || (Check_Flag("Event_Cooking_Festival_Completed") == 1)) || (Check_Flag("Flag_0x192") == 1)) || (Check_Flag("Event_BeachDay_Active") == 1)) || (Check_Flag("Flag_0x196") == 1)) || (Check_Flag("Event_Chicken_Festival_Active") == 1)) || (Check_Flag("Flag_0x19A") == 1)) || (Check_Flag("Event_Cow_Festival_Active") == 1)) || (Check_Flag("Event_Fireworks_Active") == 1)) || (Check_Flag("Flag_0x1A0") == 1)) || (Check_Flag("Flag_0x1A2") == 1)) || (Check_Flag("Flag_0x1A3") == 1)) || (Check_Flag("Event_Music_Festival_Active") == 1)) || (Check_Flag("Event_MoonViewing_Active") == 1)) || (Check_Flag("Flag_0x1AA") == 1)) || (Check_Flag("Event_Fall_HorseRace_Active") == 1)) || (Check_Flag("Flag_0x1AE") == 1)) || (Check_Flag("Event_Sheep_Festival_Active") == 1)) || (Check_Flag("Flag_0x1B2") == 1)) || (Check_Flag("Flag_0x1B3") == 1)) || (Check_Flag("Flag_0x1B4") == 1)) || (Check_Flag("Flag_0x1B5") == 1)) || (Check_Flag("Flag_0x1B6") == 1)) || (Check_Flag("Flag_0x1B8") == 1)) || (Check_Flag("Flag_0x1BA") == 1)) || (Check_Flag("Flag_0x1BC") == 1)) || (Check_Flag("Flag_0x1BE") == 1)) || (Check_Flag("Flag_0x1C0") == 1)) || (Check_Flag("Flag_0x1C1") == 1)) || (Check_Flag("Flag_0x1C8") == 1)) || (Check_Flag("Flag_0x1C9") == 1)) || (Check_Flag("Flag_0x1CA") == 1)) || (Check_Flag("Flag_0x1CB") == 1)) || (Check_Flag("Flag_0x1CC") == 1)) || (Check_Flag("Flag_0x1CD") == 1)) || (Check_Flag("Flag_0x1CE") == 1)) || (Check_Flag("Event_NewYears_Eve_Active") == 1)) || (Check_Flag("Event_NewYears_Eve_Morning_Active") == 1))) {
+    TalkOpen();
+    TalkMessage(0);
+    TalkClose();
+    exit;
+}
+if ((GetEntityFacing(0) == 1)) {
+    if ((((GetEntityLocation("Saibara") == "Saibara_House") && (Check_Flag("System_Weather_Tomorrow") != 4)) && ((Check_Flag("System_Hour") >= 0xA) && (Check_Flag("System_Hour") < 0x10)))) {
+        Free_Event_Entity("Saibara");
+        TalkOpen();
+        Set_Portrait("Saibara_Neutral");
+        Set_Name_Window("Saibara");
+        if ((Func0F2(0) == 1)) {
+            var_2 = Func0F1();
+            Func0F3(3);
+            switch (var_2) {
+                case 1:
+                    Check_Date(0, 1);
+                    var_1 = 1;
+                    var_0 = 0;
+                    break;
+                case 2:
+                    Check_Date(0, 2);
+                    var_1 = 2;
+                    var_0 = 0;
+                    break;
+                case 3:
+                    Check_Date(0, 3);
+                    var_1 = 3;
+                    var_0 = 0;
+                    break;
+                case 4:
+                    Check_Date(0, 4);
+                    var_1 = 4;
+                    var_0 = 0;
+                    break;
+                case 5:
+                    Check_Date(0, 5);
+                    var_1 = 7;
+                    var_0 = 0;
+                    break;
+                case 6:
+                    Check_Date(0, 6);
+                    var_1 = 9;
+                    var_0 = 0;
+                    break;
+                case 7:
+                    Check_Date(0, 7);
+                    var_1 = 0xA;
+                    var_0 = 0;
+                    break;
+                case 8:
+                    Check_Date(0, 8);
+                    var_1 = 0xB;
+                    var_0 = 0;
+                    break;
+                case 9:
+                    Check_Date(0, 9);
+                    var_1 = 0xC;
+                    var_0 = 0;
+                    break;
+                case 0xA:
+                    Check_Date(0, 0xA);
+                    var_1 = 0xF;
+                    var_0 = 0;
+                    break;
+                case 0xB:
+                    Check_Date(0, 0xB);
+                    var_1 = 0x11;
+                    var_0 = 0;
+                    break;
+                case 0xC:
+                    Check_Date(0, 0xC);
+                    var_1 = 0x12;
+                    var_0 = 0;
+                    break;
+                case 0xD:
+                    Check_Date(0, 0xD);
+                    var_1 = 0x13;
+                    var_0 = 0;
+                    break;
+                case 0xE:
+                    Check_Date(0, 0xE);
+                    var_1 = 0x14;
+                    var_0 = 0;
+                    break;
+                case 0xF:
+                    Check_Date(0, 0xF);
+                    var_1 = 0x17;
+                    var_0 = 0;
+                    break;
+                case 0x10:
+                    Check_Date(0, 0x10);
+                    var_1 = 0x19;
+                    var_0 = 0;
+                    break;
+                case 0x11:
+                    Check_Date(0, 0x11);
+                    var_1 = 0x1A;
+                    var_0 = 0;
+                    break;
+                case 0x12:
+                    Check_Date(0, 0x12);
+                    var_1 = 0x1B;
+                    var_0 = 0;
+                    break;
+                case 0x13:
+                    Check_Date(0, 0x13);
+                    var_1 = 0x1C;
+                    var_0 = 0;
+                    break;
+                case 0x14:
+                    Check_Date(0, 0x14);
+                    var_1 = 0x1F;
+                    var_0 = 0;
+                    break;
+                case 0x15:
+                    Check_Date(0, 0x15);
+                    var_1 = 0x21;
+                    var_0 = 0;
+                    break;
+                case 0x16:
+                    Check_Date(0, 0x16);
+                    var_1 = 0x22;
+                    var_0 = 0;
+                    break;
+                case 0x17:
+                    Check_Date(0, 0x17);
+                    var_1 = 0x23;
+                    var_0 = 0;
+                    break;
+                case 0x18:
+                    Check_Date(0, 0x18);
+                    var_1 = 0x24;
+                    var_0 = 0;
+                    break;
+                case 0x19:
+                    Check_Date(0, 0x19);
+                    var_1 = 0x27;
+                    var_0 = 0;
+                    break;
+                case 0x1A:
+                    Check_Date(0, 0x1A);
+                    var_1 = 0x29;
+                    var_0 = 0;
+                    break;
+                case 0x1B:
+                    Check_Date(0, 0x1B);
+                    var_1 = 0x2A;
+                    var_0 = 0;
+                    break;
+                case 0x1C:
+                    Check_Date(0, 0x1C);
+                    var_1 = 0x2B;
+                    var_0 = 0;
+                    break;
+                case 0x1D:
+                    Check_Date(0, 0x1D);
+                    var_1 = 0x2C;
+                    var_0 = 0;
+                    break;
+                case 0x1E:
+                    Check_Date(0, 0x1E);
+                    var_1 = 0x2F;
+                    var_0 = 0;
+                    break;
+                case 0x1F:
+                    Check_Date(0, 0x1F);
+                    var_1 = 0x2C;
+                    var_0 = 1;
+                    break;
+                case 0x20:
+                    Check_Date(0, 0x20);
+                    var_1 = 0x2D;
+                    var_0 = 1;
+                    break;
+                case 0x21:
+                    Check_Date(0, 0x21);
+                    var_1 = 0x2E;
+                    var_0 = 1;
+                    break;
+                case 0x22:
+                    Check_Date(0, 0x22);
+                    var_1 = 0x2F;
+                    var_0 = 1;
+                    break;
+                case 0x23:
+                    Check_Date(0, 0x23);
+                    var_0 = 2;
+                    break;
+                case 0x24:
+                    Check_Date(0, 0x24);
+                    var_0 = 2;
+                    break;
+                case 0x25:
+                    Check_Date(0, 0x25);
+                    var_0 = 2;
+                    break;
+            }
+            switch (var_3) {
+                case 0:
+                    switch (var_0) {
+                        case 0:
+                            TalkMessage(38);
+                            TalkClose();
+                            if ((Inventory_Check() == 1)) {
+                                PlaySong(0, 0xB8);
+                                Animation_Tool_Give(var_1);
+                            }
+                            break;
+                        case 1:
+                            TalkMessage(38);
+                            TalkClose();
+                            Resume_Tick_Engine();
+                            break;
+                        case 2:
+                            TalkMessage(39);
+                            Set_Portrait("Saibara_Happy");
+                            TalkMessage(40);
+                            break;
+                    }
+                    break;
+                case 1:
+                    switch (var_0) {
+                        case 0:
+                            TalkMessage(38);
+                            TalkClose();
+                            if ((Inventory_Check() == 1)) {
+                                PlaySong(0, 0xB8);
+                                Animation_Tool_Give(var_1);
+                            }
+                            break;
+                        case 1:
+                            TalkMessage(38);
+                            break;
+                        case 2:
+                            TalkMessage(39);
+                            Set_Portrait("Saibara_Happy");
+                            TalkMessage(40);
+                            break;
+                    }
+                    break;
+                case 2:
+                    switch (var_0) {
+                        case 0:
+                            TalkMessage(41);
+                            break;
+                        case 1:
+                            TalkMessage(42);
+                            break;
+                        case 2:
+                            TalkMessage(40);
+                            Set_Portrait("Saibara_Happy");
+                            TalkMessage(40);
+                            break;
+                    }
+                    break;
+                case 3:
+                    switch (var_0) {
+                        case 0:
+                            TalkMessage(43);
+                            break;
+                        case 1:
+                            TalkMessage(44);
+                            break;
+                        case 2:
+                            TalkMessage(39);
+                            Set_Portrait("Saibara_Happy");
+                            TalkMessage(40);
+                            break;
+                    }
+                    break;
+            }
+        } else {
+            TalkMessage(45);
+            TalkClose();
+            Fade_Out(3, 1);
+            Proc08F();
+            Fade_In(3, 1);
+        }
+    } else {
+        TalkOpen();
+        TalkMessage(46);
+    }
+} else {
+    TalkOpen();
+    TalkMessage(46);
+}
+TalkClose();
+exit;
+}

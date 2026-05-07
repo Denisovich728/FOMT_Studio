@@ -1,0 +1,37 @@
+#include "lib_fomt.csv"
+
+script 1278 Unknown_Event_1278 {
+const MESSAGE_0 = "It's harder to tell what\r\nSheep are thinking than \r\nCows, don't you think? \BRK";
+const MESSAGE_1 = "Your Sheep had such fine\r\nWool I was sure it would\r\nwin! \BRK";
+const MESSAGE_2 = "Don't worry. \r\nThere's always next year.\BRK";
+
+if ((Func083(2) == 0)) {
+    Free_Event_Entity("Rick");
+}
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x1AF) == 0)) {
+    TalkOpen();
+    Set_Portrait("Rick_Afraid");
+    Set_Name_Window("Rick");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag(0x1B1) == 1)) {
+        TalkOpen();
+        Set_Portrait("Rick_Happy");
+        Set_Name_Window("Rick");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Rick_Neutral");
+    Set_Name_Window("Rick");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Rick") == 0)) {
+    Give_Friendship_Points("Rick", 5);
+}
+Free_Event_Entity("Rick");
+SetEntityFacing(2, 0);
+exit;
+}

@@ -1,0 +1,6 @@
+#include "lib_fomt.csv"
+
+script 1288 Unknown_Event_1288 {
+PlaySong(0, 0xA3);
+exit;
+}

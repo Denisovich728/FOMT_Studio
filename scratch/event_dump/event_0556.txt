@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 556 Unknown_Event_0556 {
+const MESSAGE_0 = "Kitchen Cabinet\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

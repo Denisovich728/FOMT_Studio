@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 17 Unknown_Event_0017 {
+const MESSAGE_0 = "Good luck on the farm! \BRK";
+
+if ((Check_Flag(0x46) == 1)) {
+}
+SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Jeff_Neutral");
+Set_Name_Window("Jeff");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x11, 0);
+Free_Event_Entity("Jeff");
+exit;
+}

@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 507 Unknown_Event_0507 {
+const MESSAGE_0 = "\x81@\x81@\x81@\x81@\x81@\x81@\x81@\x81\xAARose Square\r\n\x81@\r\n\x81\xA9South side of Mineral Town\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

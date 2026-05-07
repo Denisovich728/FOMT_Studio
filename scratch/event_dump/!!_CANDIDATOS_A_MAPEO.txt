@@ -1,0 +1,355 @@
+=== REPORTE DE CANDIDATOS A MAPEARE ===
+Opcodes genéricos o desconocidos detectados en la ROM.
+
+[Proc08A]
+  Frecuencia: 867
+  Eventos: 90, 91, 92, 93, 106, 107, 124, 143, 153, 168...
+
+[Proc045]
+  Frecuencia: 121
+  Eventos: 36, 59, 156, 173, 209, 210, 211, 212, 213, 214...
+
+[Proc098]
+  Frecuencia: 78
+  Eventos: 157, 308, 309, 310, 311, 312, 313, 314, 315, 316...
+
+[Proc126]
+  Frecuencia: 33
+  Eventos: 106, 409, 410, 411, 654, 655, 656, 657, 658, 717...
+
+[Proc127]
+  Frecuencia: 21
+  Eventos: 1192
+
+[Proc049]
+  Frecuencia: 20
+  Eventos: 1294, 1295, 1296, 1297, 1298
+
+[Proc0A3]
+  Frecuencia: 17
+  Eventos: 5, 7, 35, 45, 56, 65, 79, 659, 660, 661...
+
+[Proc0C7]
+  Frecuencia: 16
+  Eventos: 29, 85, 86, 136, 139, 205, 239, 240, 258, 259...
+
+[Proc0E0]
+  Frecuencia: 16
+  Eventos: 1051
+
+[Proc125]
+  Frecuencia: 14
+  Eventos: 35, 45, 56, 65, 79
+
+[Func058]
+  Frecuencia: 14
+  Eventos: 1066, 1299, 1309
+
+[Proc0D8]
+  Frecuencia: 10
+  Eventos: 982, 1079, 1245
+
+[Proc0D1]
+  Frecuencia: 7
+  Eventos: 999, 1000, 1001, 1002, 1003, 1004, 1005
+
+[Proc0A8]
+  Frecuencia: 6
+  Eventos: 34, 44, 55, 64, 78, 848
+
+[Proc061]
+  Frecuencia: 6
+  Eventos: 87, 571, 586, 1098, 1145, 1264
+
+[Proc0C4]
+  Frecuencia: 6
+  Eventos: 592, 596, 600, 604, 608, 852
+
+[Proc12D]
+  Frecuencia: 6
+  Eventos: 659, 660, 661, 662, 663, 863
+
+[Proc007]
+  Frecuencia: 6
+  Eventos: 815
+
+[Proc144]
+  Frecuencia: 6
+  Eventos: 828, 829, 830, 831, 832, 833
+
+[Proc118]
+  Frecuencia: 6
+  Eventos: 1079, 1130, 1146, 1164, 1245, 1265
+
+[Proc0C0]
+  Frecuencia: 5
+  Eventos: 464, 1060, 1061, 1062, 1063
+
+[Proc12E]
+  Frecuencia: 4
+  Eventos: 5, 7, 694, 981
+
+[Proc142]
+  Frecuencia: 4
+  Eventos: 36, 1061
+
+[Proc04D]
+  Frecuencia: 4
+  Eventos: 173, 1063
+
+[Proc09F]
+  Frecuencia: 4
+  Eventos: 226, 348, 428, 537
+
+[Proc00B]
+  Frecuencia: 4
+  Eventos: 1060, 1062
+
+[Proc0F8]
+  Frecuencia: 3
+  Eventos: 157
+
+[Proc0B9]
+  Frecuencia: 3
+  Eventos: 218, 219, 1061
+
+[Proc067]
+  Frecuencia: 3
+  Eventos: 341, 978, 981
+
+[Proc08B]
+  Frecuencia: 3
+  Eventos: 468, 480, 481
+
+[Proc060]
+  Frecuencia: 3
+  Eventos: 816, 818, 820
+
+[Func123]
+  Frecuencia: 3
+  Eventos: 1022
+
+[Proc134]
+  Frecuencia: 2
+  Eventos: 89, 92
+
+[Proc12A]
+  Frecuencia: 2
+  Eventos: 139
+
+[Proc0AC]
+  Frecuencia: 2
+  Eventos: 352
+
+[Proc0AE]
+  Frecuencia: 2
+  Eventos: 353
+
+[Proc0AA]
+  Frecuencia: 2
+  Eventos: 357
+
+[Proc0B5]
+  Frecuencia: 2
+  Eventos: 359
+
+[Proc0C9]
+  Frecuencia: 2
+  Eventos: 479
+
+[Proc074]
+  Frecuencia: 2
+  Eventos: 479
+
+[Proc07A]
+  Frecuencia: 2
+  Eventos: 571
+
+[Proc0A9]
+  Frecuencia: 2
+  Eventos: 737
+
+[Proc066]
+  Frecuencia: 2
+  Eventos: 867, 988
+
+[Proc140]
+  Frecuencia: 2
+  Eventos: 1061
+
+[Proc141]
+  Frecuencia: 2
+  Eventos: 1061
+
+[Proc0E1]
+  Frecuencia: 1
+  Eventos: 285
+
+[Proc099]
+  Frecuencia: 1
+  Eventos: 344
+
+[Proc09A]
+  Frecuencia: 1
+  Eventos: 344
+
+[Proc0A0]
+  Frecuencia: 1
+  Eventos: 349
+
+[Proc0A1]
+  Frecuencia: 1
+  Eventos: 349
+
+[Func0B1]
+  Frecuencia: 1
+  Eventos: 351
+
+[Proc09D]
+  Frecuencia: 1
+  Eventos: 352
+
+[Proc0AD]
+  Frecuencia: 1
+  Eventos: 352
+
+[Proc09E]
+  Frecuencia: 1
+  Eventos: 353
+
+[Proc0AF]
+  Frecuencia: 1
+  Eventos: 353
+
+[Proc09C]
+  Frecuencia: 1
+  Eventos: 357
+
+[Proc0AB]
+  Frecuencia: 1
+  Eventos: 357
+
+[Proc096]
+  Frecuencia: 1
+  Eventos: 465
+
+[Proc095]
+  Frecuencia: 1
+  Eventos: 466
+
+[Proc072]
+  Frecuencia: 1
+  Eventos: 469
+
+[Proc097]
+  Frecuencia: 1
+  Eventos: 477
+
+[Proc090]
+  Frecuencia: 1
+  Eventos: 482
+
+[Proc094]
+  Frecuencia: 1
+  Eventos: 484
+
+[Proc093]
+  Frecuencia: 1
+  Eventos: 485
+
+[Proc091]
+  Frecuencia: 1
+  Eventos: 486
+
+[Func0F3]
+  Frecuencia: 1
+  Eventos: 487
+
+[Proc08F]
+  Frecuencia: 1
+  Eventos: 487
+
+[Proc08E]
+  Frecuencia: 1
+  Eventos: 488
+
+[Proc092]
+  Frecuencia: 1
+  Eventos: 489
+
+[Proc0DB]
+  Frecuencia: 1
+  Eventos: 492
+
+[Func0DA]
+  Frecuencia: 1
+  Eventos: 492
+
+[Proc0B3]
+  Frecuencia: 1
+  Eventos: 531
+
+[Proc0C5]
+  Frecuencia: 1
+  Eventos: 571
+
+[Proc062]
+  Frecuencia: 1
+  Eventos: 572
+
+[Proc0ED]
+  Frecuencia: 1
+  Eventos: 717
+
+[Proc0A4]
+  Frecuencia: 1
+  Eventos: 867
+
+[Proc0A5]
+  Frecuencia: 1
+  Eventos: 974
+
+[Proc11B]
+  Frecuencia: 1
+  Eventos: 976
+
+[Proc135]
+  Frecuencia: 1
+  Eventos: 978
+
+[Proc128]
+  Frecuencia: 1
+  Eventos: 982
+
+[Proc110]
+  Frecuencia: 1
+  Eventos: 985
+
+[Proc111]
+  Frecuencia: 1
+  Eventos: 985
+
+[Proc112]
+  Frecuencia: 1
+  Eventos: 985
+
+[Proc113]
+  Frecuencia: 1
+  Eventos: 985
+
+[Proc054]
+  Frecuencia: 1
+  Eventos: 1243
+
+[Proc12F]
+  Frecuencia: 1
+  Eventos: 1319
+
+[Proc130]
+  Frecuencia: 1
+  Eventos: 1319
+
+[Proc131]
+  Frecuencia: 1
+  Eventos: 1319
+

@@ -1,0 +1,19 @@
+#include "lib_fomt.csv"
+
+script 696 Unknown_Event_0696 {
+const MESSAGE_0 = "Mom's health has always been\r\nshakey...That's why I have \r\nso much responsibility!\BRK";
+const MESSAGE_1 = "If only she would get \r\nbetter once and for all...\BRK";
+
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Rick");
+Set_Portrait("Rick_Neutral");
+TalkMessage(0);
+Set_Portrait("Rick_Afraid");
+TalkMessage(1);
+TalkClose();
+Free_Event_Entity("Rick");
+SetEntityFacing(2, 2);
+exit;
+exit;
+}

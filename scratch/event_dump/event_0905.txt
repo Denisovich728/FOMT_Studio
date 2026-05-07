@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 905 Unknown_Event_0905 {
+const MESSAGE_0 = "Sorry for not inviting you\r\ntoday. I didn't want to \r\nmake the wedding such a big\BRK\WAIT_CLICKdeal. Thanks, though.\r\nLet's celebrate, tonight! \BRK";
+const MESSAGE_1 = "Rick... ah...\r\nmy future brother-in-law has\BRK\WAIT_CLICKapproved of me and Popuri.\r\nWe'll be happy.\BRK";
+
+if ((Func083(0x1A) == 0)) {
+    Free_Event_Entity("Kai");
+}
+if ((Has_NPC_Talked_Today("Kai") == 0)) {
+    SetEntityFacing(0x1A, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Kai_Weeding");
+    Set_Name_Window("Kai");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x1A, 0);
+    Free_Event_Entity("Kai");
+} else {
+    SetEntityFacing(0x1A, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Kai_Weeding");
+    Set_Name_Window("Kai");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0x1A, 0);
+    Free_Event_Entity("Kai");
+}
+exit;
+}

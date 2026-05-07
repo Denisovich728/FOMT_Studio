@@ -1,0 +1,52 @@
+#include "lib_fomt.csv"
+
+script 172 Unknown_Event_0172 {
+const MESSAGE_0 = "You can't go outside\r\nwhile riding a horse!\BRK";
+const MESSAGE_1 = "You can't go outside while\r\nholding a chicken.\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+
+if ((GetEntityFacing(0) == 1)) {
+    if ((Func063() == 1)) {
+        TalkOpen();
+        Print_Message(0);
+        TalkClose();
+        SetEntityFacing(0, 0);
+        SetEntityFacing(0x2C, 0);
+        SetEntityAnim("Player", "Riding_Horse_Walk_Base");
+        SetEntityAnim(0x2C, "Player_Horse_Rider_Finish_Base");
+        Set_Vector_Y("Player", 0x40, 1);
+        Set_Vector_Y(0x2C, 0x40, 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    if ((Inventory_Check() == 0)) {
+        if ((Compare_Gift() == 3)) {
+            TalkOpen();
+            Print_Message(1);
+            TalkClose();
+            SetEntityFacing(0, 0);
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+            Set_Vector_Y("Player", 0x38, 1);
+            Execute_Movement("Player");
+            exit;
+        }
+    }
+    var_0 = Check_Flag("System_Season");
+    var_1 = Check_Flag("System_DayOfMonth");
+    var_2 = Check_Flag("System_Hour");
+    var_3 = Check_Flag("System_TotalShipments");
+    Fade_Out(2, 1);
+    Warp_Player("South_Side_Town", 0x68, 0x1F0);
+    SetEntityPosition(0, 0x68, 0x1F0, 1);
+    if (((((((((((((Check_Flag("Flag_0x12D") == 0) && (var_3 == 1)) && (var_0 == 0)) && (var_1 == 0x1E)) && ((var_2 >= 9) && (var_2 < 0x13))) && (GetEntityLocation("Lillia") != "South_Side_Town")) && (GetEntityLocation("Rick") != "South_Side_Town")) && (GetEntityLocation("Popuri") != "South_Side_Town")) && (GetEntityLocation("Barley") != "South_Side_Town")) && (GetEntityLocation("Gray") != "South_Side_Town")) && (GetEntityLocation("Saibara") != "South_Side_Town")) && (GetEntityLocation("Sasha") != "South_Side_Town"))) {
+        Set_Flag("Flag_0x12D", 1);
+        Execute_Script(0x31C);
+    }
+    Fade_In(2, 1);
+}
+exit;
+}

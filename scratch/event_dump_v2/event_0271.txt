@@ -1,0 +1,81 @@
+#include "lib_fomt.csv"
+
+script 271 Unknown_Event_0271 {
+const MESSAGE_0 = "It's locked...\BRK";
+const MESSAGE_1 = "Please don't go in there!\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+var var_4;
+var var_5;
+var var_6;
+
+if ((GetEntityFacing(0) == 1)) {
+    var_6 = 0;
+    var_0 = Check_Flag("System_Season");
+    var_1 = Check_Flag("System_DayOfMonth");
+    var_3 = Check_Flag("System_Hour");
+    var_2 = Check_Flag("System_Weather_Tomorrow");
+    var_4 = Check_Flag("System_Weather_Today");
+    var_5 = Check_Flag("System_TotalShipments");
+    if ((Check_Flag("Flag_0x57") == 1)) {
+        var_6 = 0;
+    } else {
+        if ((Check_Flag("Ann_Heart_Blue") == 1)) {
+            var_6 = 0;
+        } else {
+            if ((Check_Flag("Rival_Ann_Cliff_Event_1") == 1)) {
+                var_6 = 0;
+            } else {
+                if ((Check_Flag("Flag_0x127") == 1)) {
+                    var_6 = 0;
+                } else {
+                    if ((Check_Flag("Flag_0x128") == 1)) {
+                        var_6 = 0;
+                    } else {
+                        if ((Check_Flag("Ann_Marriage_State") == 2)) {
+                            var_6 = 1;
+                        } else {
+                            if ((Chek_Friendship_Points("Doug") <= 0x64)) {
+                                var_6 = 0;
+                            } else {
+                                if ((Chek_Friendship_Points("Doug") > 0x64)) {
+                                    var_6 = 0;
+                                    if ((Chek_Friendship_Points("Doug") > 0xC8)) {
+                                        var_6 = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if ((var_6 == 1)) {
+        PlaySong(0, 0x9C);
+        Anim_Door_Close(1);
+        Fade_Out(2, 1);
+        Warp_Player("Doug_Inn_Back_Room", 0x5C, 0x140);
+        SetEntityPosition(0, 0x5C, 0x140, 1);
+        if ((((((((((((Check_Flag("Flag_0x12A") == 0) && (var_0 == 3)) && (var_1 == 0xB)) && ((var_3 >= 0x13) && (var_3 < 0x15))) && (Check_Flag("Ann_Marriage_State") == 0)) && (Check_Flag("Rival_Ann_Cliff_Event_3") == 0)) && (Check_Flag("Rival_Ann_Cliff_Event_4") == 0)) && (Func083(0x19) == 1)) && (Func083(0x18) == 1)) && (GetEntityLocation("Ann") == "Doug_Inn_Floor_01")) && (GetEntityLocation("Doug") == "Doug_Inn_Back_Room"))) {
+            Set_Flag("Flag_0x12A", 1);
+            Execute_Script(0x318);
+        }
+        Fade_In(2, 1);
+    } else {
+        TalkOpen();
+        if (((((((Check_Flag("Flag_0x57") == 1) || (Check_Flag("Ann_Heart_Blue") == 1)) || (Check_Flag("Rival_Ann_Cliff_Event_1") == 1)) || (Check_Flag("Flag_0x127") == 1)) || (Check_Flag("Flag_0x128") == 1)) || (GetEntityLocation("Doug") != "Doug_Inn_Floor_01"))) {
+            TalkMessage(0);
+        } else {
+            Set_Portrait("Doug_Angry");
+            Set_Name_Window("Doug");
+            TalkMessage(1);
+        }
+        TalkClose();
+    }
+}
+exit;
+}

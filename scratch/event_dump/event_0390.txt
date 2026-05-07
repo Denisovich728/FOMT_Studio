@@ -1,0 +1,34 @@
+#include "lib_fomt.csv"
+
+script 390 Unknown_Event_0390 {
+const MESSAGE_0 = "I haven't cleaned upstairs\r\nyet, so please don't \r\ngo up there.\BRK";
+
+if ((GetEntityFacing(0) == 1)) {
+    if ((Check_Flag(0xFB) == 1)) {
+        TalkOpen();
+        Set_Portrait("Manna_Neutral");
+        Set_Name_Window("Manna");
+        TalkMessage(0);
+        TalkClose();
+        SetEntityFacing(0, 0);
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Walking_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+        }
+        Set_Vector_Y("Player", 0x80, 1);
+        Execute_Movement("Player");
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Stop_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        }
+        exit;
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Aja_Winery_Floor_02", 0xD8, 0x40);
+    SetEntityPosition(0, 0xD8, 0x40, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

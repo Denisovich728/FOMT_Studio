@@ -1,0 +1,12 @@
+#include "lib_fomt.csv"
+
+script 521 Unknown_Event_0521 {
+if ((GetEntityFacing(0) == 1)) {
+    PlaySong(0, 0x9C);
+    Fade_Out(2, 1);
+    Warp_Player("Barley_House_Floor_01", 0x28, 0xD0);
+    SetEntityPosition(0, 0x28, 0xD0, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

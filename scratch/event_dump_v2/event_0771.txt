@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 771 Unknown_Event_0771 {
+const MESSAGE_0 = "I have to tell Sasha about\r\nthis when I get home! \BRK\WAIT_CLICKShe always did say that\r\nmy personality was too kind\r\nfor that blood type!\BRK";
+
+if ((Check_Flag("Flag_0x11D") == 1)) {
+    SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Jeff_Afraid");
+    Set_Name_Window("Jeff");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Jeff");
+    SetEntityFacing(0x11, 0);
+}
+exit;
+}

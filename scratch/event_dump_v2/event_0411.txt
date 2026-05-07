@@ -1,0 +1,337 @@
+#include "lib_fomt.csv"
+
+script 411 Unknown_Event_0411 {
+const MESSAGE_0 = "\xFF!, \r\nwhere are you going?\BRK\WAIT_CLICKThe competition hasn't \r\nstarted yet!\BRK";
+const MESSAGE_1 = "Hmm...What should I make?\BRK";
+const MESSAGE_2 = "The judging hasn't\r\neven begun yet.\BRK";
+const MESSAGE_3 = "That was fun!\r\nNow back to work...\BRK";
+const MESSAGE_4 = "Where are you going?\r\nThe New Year Festival \r\nhasn't even started yet!\BRK";
+const MESSAGE_5 = "What are you doing?\r\nWe haven't eaten the \r\nyear end noodles yet!\BRK";
+const MESSAGE_6 = "There are still races left.\BRK";
+const MESSAGE_7 = "Where are you going?\r\nIt hasn't started yet!\BRK";
+const MESSAGE_8 = "Where are you going?\BRK";
+const MESSAGE_9 = "\xFF!,\r\nThe Sheep Festival hasn't \r\nended yet.\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+var var_7;
+
+var_7 = 1;
+var_0 = Check_Flag("System_Season");
+var_1 = Check_Flag("System_DayOfMonth");
+var_2 = Check_Flag("System_Hour");
+var_3 = Check_Flag("System_Minute");
+if ((GetEntityFacing(0) == 0)) {
+    if ((Check_Flag("Event_Cooking_Festival_Active") == 1)) {
+        if ((Has_Spoken_To_NPC_Today("Gourmet") == 0)) {
+            TalkOpen();
+            Set_Portrait("Thomas_Neutral");
+            Set_Name_Window("Huachito");
+            TalkMessage(0);
+            TalkClose();
+            var_7 = 0;
+        } else {
+            Fade_Out(2, 1);
+            Set_Flag("Event_Cooking_Festival_Active", 2);
+            Add_Festival_Friendship_Bonus(0xD);
+            Add_Festival_Friendship_Bonus(0x14);
+            Add_Festival_Friendship_Bonus(0x16);
+            Add_Festival_Friendship_Bonus(0x1E);
+            Add_Festival_Friendship_Bonus(0x1C);
+            Add_Festival_Friendship_Bonus(0x19);
+            Add_Festival_Friendship_Bonus(0x1B);
+            Add_Festival_Friendship_Bonus(0x13);
+            Add_Festival_Friendship_Bonus(0x18);
+            Add_Festival_Friendship_Bonus(0x12);
+            Add_Festival_Friendship_Bonus(9);
+            Add_Festival_Friendship_Bonus(2);
+            Add_Festival_Friendship_Bonus(1);
+            Refresh_Map_Entities();
+            TalkOpen();
+            TalkMessage(1);
+            TalkClose();
+            Reset_Player_After_Festival_Activity();
+            Set_Time(0xC, 0);
+            Fade_In(2, 1);
+            exit;
+        }
+    } else {
+        if ((Check_Flag("Event_Cooking_Festival_Completed") == 1)) {
+            TalkOpen();
+            Set_Portrait("Thomas_Afraid");
+            Set_Name_Window("Huachito");
+            TalkMessage(2);
+            TalkClose();
+            var_7 = 0;
+        } else {
+            if ((Check_Flag("Event_Music_Festival_Active") == 1)) {
+                if ((Check_Flag("Flag_0x1A6") == 1)) {
+                    Fade_Out(2, 1);
+                    Set_Flag("Event_Music_Festival_Active", 2);
+                    Add_Festival_Friendship_Bonus(0xD);
+                    Add_Festival_Friendship_Bonus(0x15);
+                    Add_Festival_Friendship_Bonus(0x16);
+                    Add_Festival_Friendship_Bonus(0x19);
+                    Add_Festival_Friendship_Bonus(0x1B);
+                    Add_Festival_Friendship_Bonus(0x13);
+                    Add_Festival_Friendship_Bonus(0x18);
+                    Add_Festival_Friendship_Bonus(0xC);
+                    Add_Festival_Friendship_Bonus(0x12);
+                    Add_Festival_Friendship_Bonus(0xB);
+                    Add_Festival_Friendship_Bonus(9);
+                    Refresh_Map_Entities();
+                    TalkOpen();
+                    TalkMessage(3);
+                    TalkClose();
+                    Reset_Player_After_Festival_Activity();
+                    Fade_In(2, 1);
+                    exit;
+                } else {
+                    Set_Flag("Event_Music_Festival_Active", 0);
+                    Add_Festival_Friendship_Bonus(0xD);
+                    Add_Festival_Friendship_Bonus(0x15);
+                    Add_Festival_Friendship_Bonus(0x16);
+                    Add_Festival_Friendship_Bonus(0x19);
+                    Add_Festival_Friendship_Bonus(0x1B);
+                    Add_Festival_Friendship_Bonus(0x13);
+                    Add_Festival_Friendship_Bonus(0x18);
+                    Add_Festival_Friendship_Bonus(0xC);
+                    Add_Festival_Friendship_Bonus(0x12);
+                    Add_Festival_Friendship_Bonus(0xB);
+                    Add_Festival_Friendship_Bonus(9);
+                    Refresh_Map_Entities();
+                }
+            } else {
+                if ((Check_Flag("Event_NewYears_Day_Active") == 1)) {
+                    TalkOpen();
+                    Set_Portrait("Thomas_Afraid");
+                    Set_Name_Window("Huachito");
+                    TalkMessage(4);
+                    TalkClose();
+                    var_7 = 0;
+                } else {
+                    if ((Check_Flag("Event_NewYears_Eve_Active") == 1)) {
+                        TalkOpen();
+                        Set_Portrait("Thomas_Afraid");
+                        Set_Name_Window("Huachito");
+                        TalkMessage(5);
+                        TalkClose();
+                        var_7 = 0;
+                    } else {
+                        if ((Check_Flag("Event_Spring_HorseRace_Active") == 1)) {
+                            if (!((var_2 == 0x12) && (var_3 == 1))) {
+                                TalkOpen();
+                                Set_Portrait("Thomas_Afraid");
+                                Set_Name_Window("Huachito");
+                                TalkMessage(6);
+                                TalkClose();
+                                var_7 = 0;
+                            } else {
+                                Fade_Out(2, 1);
+                                TalkOpen();
+                                TalkMessage(3);
+                                TalkClose();
+                                Refresh_Map_Entities();
+                                Set_Flag("Event_Spring_HorseRace_Active", 2);
+                                Recalculate_Global_Schedules(0);
+                                Set_Flag("Flag_0x188", 0);
+                                Add_Festival_Friendship_Bonus(2);
+                                Add_Festival_Friendship_Bonus(3);
+                                Add_Festival_Friendship_Bonus(4);
+                                Add_Festival_Friendship_Bonus(5);
+                                Add_Festival_Friendship_Bonus(6);
+                                Add_Festival_Friendship_Bonus(8);
+                                Add_Festival_Friendship_Bonus(9);
+                                Add_Festival_Friendship_Bonus(0xD);
+                                Add_Festival_Friendship_Bonus(0xE);
+                                Add_Festival_Friendship_Bonus(0x11);
+                                Add_Festival_Friendship_Bonus(0x12);
+                                Add_Festival_Friendship_Bonus(0x13);
+                                Add_Festival_Friendship_Bonus(0x18);
+                                Add_Festival_Friendship_Bonus(0x19);
+                                Add_Festival_Friendship_Bonus(0x1C);
+                                Reset_Player_After_Festival_Activity();
+                                SetEntityAnim("Player", "Player_Stop_Base");
+                                Fade_In(2, 1);
+                                exit;
+                            }
+                        } else {
+                            if ((Check_Flag("Event_Chicken_Festival_Active") == 1)) {
+                                if (!((var_2 == 0x12) && (var_3 == 1))) {
+                                    TalkOpen();
+                                    Set_Portrait("Rick_Angry");
+                                    Set_Name_Window("Rick");
+                                    TalkMessage(7);
+                                    TalkClose();
+                                    var_7 = 0;
+                                } else {
+                                    Fade_Out(2, 1);
+                                    TalkOpen();
+                                    TalkMessage(3);
+                                    TalkClose();
+                                    Refresh_Map_Entities();
+                                    Set_Flag("Event_Chicken_Festival_Active", 2);
+                                    Recalculate_Global_Schedules(3);
+                                    Set_Flag("Flag_0x197", 0);
+                                    Add_Festival_Friendship_Bonus(2);
+                                    Add_Festival_Friendship_Bonus(4);
+                                    Add_Festival_Friendship_Bonus(6);
+                                    Add_Festival_Friendship_Bonus(8);
+                                    Add_Festival_Friendship_Bonus(0xD);
+                                    Add_Festival_Friendship_Bonus(3);
+                                    Add_Festival_Friendship_Bonus(0x18);
+                                    Reset_Player_After_Festival_Activity();
+                                    SetEntityAnim("Player", "Player_Stop_Base");
+                                    Fade_In(2, 1);
+                                    exit;
+                                }
+                            } else {
+                                if ((Check_Flag("Event_Cow_Festival_Active") == 1)) {
+                                    if (!((var_2 == 0x12) && (var_3 == 1))) {
+                                        TalkOpen();
+                                        Set_Portrait("Barley_Afraid");
+                                        Set_Name_Window("Barley");
+                                        TalkMessage(8);
+                                        TalkClose();
+                                        var_7 = 0;
+                                    } else {
+                                        Fade_Out(2, 1);
+                                        TalkOpen();
+                                        TalkMessage(3);
+                                        TalkClose();
+                                        Refresh_Map_Entities();
+                                        Set_Flag("Event_Cow_Festival_Active", 2);
+                                        Recalculate_Global_Schedules(1);
+                                        Set_Flag("Flag_0x19B", 0);
+                                        Add_Festival_Friendship_Bonus(2);
+                                        Add_Festival_Friendship_Bonus(3);
+                                        Add_Festival_Friendship_Bonus(4);
+                                        Add_Festival_Friendship_Bonus(5);
+                                        Add_Festival_Friendship_Bonus(0xA);
+                                        Add_Festival_Friendship_Bonus(0xC);
+                                        Add_Festival_Friendship_Bonus(0xD);
+                                        Add_Festival_Friendship_Bonus(0x10);
+                                        Add_Festival_Friendship_Bonus(0x14);
+                                        Add_Festival_Friendship_Bonus(0x15);
+                                        Add_Festival_Friendship_Bonus(0x16);
+                                        Hide_Entity(0x47);
+                                        Hide_Entity(0x48);
+                                        Hide_Entity(0x49);
+                                        Add_Festival_Friendship_Bonus(0x47);
+                                        Add_Festival_Friendship_Bonus(0x48);
+                                        Add_Festival_Friendship_Bonus(0x49);
+                                        Reset_Player_After_Festival_Activity();
+                                        SetEntityAnim("Player", "Player_Stop_Base");
+                                        Fade_In(2, 1);
+                                        exit;
+                                    }
+                                } else {
+                                    if ((Check_Flag("Event_Fall_HorseRace_Active") == 1)) {
+                                        if (!((var_2 == 0x12) && (var_3 == 1))) {
+                                            TalkOpen();
+                                            Set_Portrait("Thomas_Afraid");
+                                            Set_Name_Window("Huachito");
+                                            TalkMessage(6);
+                                            TalkClose();
+                                            var_7 = 0;
+                                        } else {
+                                            Fade_Out(2, 1);
+                                            TalkOpen();
+                                            TalkMessage(3);
+                                            TalkClose();
+                                            Refresh_Map_Entities();
+                                            Set_Flag("Event_Fall_HorseRace_Active", 2);
+                                            Recalculate_Global_Schedules(0);
+                                            Set_Flag("Flag_0x1AB", 0);
+                                            Add_Festival_Friendship_Bonus(0xD);
+                                            Add_Festival_Friendship_Bonus(4);
+                                            Add_Festival_Friendship_Bonus(6);
+                                            Add_Festival_Friendship_Bonus(0x1C);
+                                            Add_Festival_Friendship_Bonus(0x1B);
+                                            Add_Festival_Friendship_Bonus(7);
+                                            Add_Festival_Friendship_Bonus(0xC);
+                                            Add_Festival_Friendship_Bonus(0x18);
+                                            Add_Festival_Friendship_Bonus(0x15);
+                                            Add_Festival_Friendship_Bonus(0x14);
+                                            Add_Festival_Friendship_Bonus(0x16);
+                                            Add_Festival_Friendship_Bonus(1);
+                                            Add_Festival_Friendship_Bonus(2);
+                                            Add_Festival_Friendship_Bonus(0xE);
+                                            Add_Festival_Friendship_Bonus(8);
+                                            Reset_Player_After_Festival_Activity();
+                                            SetEntityAnim("Player", "Player_Stop_Base");
+                                            Fade_In(2, 1);
+                                            exit;
+                                        }
+                                    } else {
+                                        if ((Check_Flag("Event_Sheep_Festival_Active") == 1)) {
+                                            if (!((var_2 == 0x12) && (var_3 == 1))) {
+                                                TalkOpen();
+                                                Set_Portrait("Barley_Neutral");
+                                                Set_Name_Window("Barley");
+                                                TalkMessage(9);
+                                                TalkClose();
+                                                var_7 = 0;
+                                            } else {
+                                                Fade_Out(2, 1);
+                                                TalkOpen();
+                                                TalkMessage(3);
+                                                TalkClose();
+                                                Refresh_Map_Entities();
+                                                Set_Flag("Event_Sheep_Festival_Active", 2);
+                                                Recalculate_Global_Schedules(2);
+                                                Set_Flag("Flag_0x1AF", 0);
+                                                Add_Festival_Friendship_Bonus(2);
+                                                Add_Festival_Friendship_Bonus(0x13);
+                                                Add_Festival_Friendship_Bonus(4);
+                                                Add_Festival_Friendship_Bonus(5);
+                                                Add_Festival_Friendship_Bonus(0xE);
+                                                Add_Festival_Friendship_Bonus(0xB);
+                                                Add_Festival_Friendship_Bonus(0xD);
+                                                Add_Festival_Friendship_Bonus(0x1B);
+                                                Add_Festival_Friendship_Bonus(7);
+                                                Add_Festival_Friendship_Bonus(0x11);
+                                                Hide_Entity(0x47);
+                                                Hide_Entity(0x48);
+                                                Hide_Entity(0x49);
+                                                Add_Festival_Friendship_Bonus(0x47);
+                                                Add_Festival_Friendship_Bonus(0x48);
+                                                Add_Festival_Friendship_Bonus(0x49);
+                                                Reset_Player_After_Festival_Activity();
+                                                SetEntityAnim("Player", "Player_Stop_Base");
+                                                Fade_In(2, 1);
+                                                exit;
+                                            }
+                                        } else {
+                                            if ((Check_Flag("Flag_0x118") == 1)) {
+                                                Set_Flag("Flag_0x118", 2);
+                                                Add_Festival_Friendship_Bonus(0x12);
+                                                Add_Festival_Friendship_Bonus(0xB);
+                                                Add_Festival_Friendship_Bonus(9);
+                                                Refresh_Map_Entities();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (var_7) {
+        Fade_Out(2, 1);
+        Warp_Player("South_Side_Town", 0x4F8, 0x18);
+        SetEntityPosition(0, 0x4F8, 0x18, 0);
+        Fade_In(2, 1);
+    } else {
+        SetEntityFacing(0, 1);
+        Set_Vector_Y("Player", 0x18C, 1);
+        Execute_Movement("Player");
+    }
+}
+exit;
+}

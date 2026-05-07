@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 402 Unknown_Event_0402 {
+const MESSAGE_0 = "Square's Bench\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

@@ -1,0 +1,63 @@
+#include "lib_fomt.csv"
+
+script 820 Unknown_Event_0820 {
+const MESSAGE_0 = "You have found the final \r\nJewel of Truth. \BRK\WAIT_CLICKPlease follow me.\BRK";
+const MESSAGE_1 = "You can now exchange all of \r\nthe Jewels of Truth for \r\nthe Gem of Truth. \BRK";
+const MESSAGE_2 = "...But, it seems you can't \r\nhold any more. \BRK\WAIT_CLICKCome back when your \r\nload is lighter. \BRK";
+
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0xA);
+if ((Check_Flag("Flag_0x153") != 2)) {
+    TalkOpen();
+    Set_Name_Window("Huachito");
+    Set_Portrait("Thomas_Happy");
+    TalkMessage(0);
+    TalkClose();
+    Pan_Camera_To(0x78, 0x58, 1);
+    SetEntityFacing(0, 3);
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+    Set_Vector_X("Player", 0x78, 1);
+    Execute_Movement("Player");
+    SetEntityFacing(0, 0);
+    Set_Vector_Y("Player", 0x58, 1);
+    Execute_Movement("Player");
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Name_Window("Huachito");
+Set_Portrait("Thomas_Happy");
+TalkMessage(1);
+if (((Check_Tool_TBox_Space() != -1) && (Func055() == -1))) {
+    Set_Portrait("Thomas_Afraid");
+    TalkMessage(2);
+    TalkClose();
+    Set_Flag("Flag_0x153", 2);
+} else {
+    TalkClose();
+    if ((Inventory_Check() == 0)) {
+        if ((Compare_Gift() == 1)) {
+            if ((Search_Item_Gift_Address() == 0x27)) {
+                Drop_Held_Item();
+            }
+        }
+    }
+    Consume_Items_From_Inventory(0x27);
+    if ((Inventory_Check() == 1)) {
+        PlaySong(0, 0xB6);
+        Animation_Tool_Give("Book");
+        SetEntityAnim("Player", "Player_Stop_Base");
+    }
+    if ((Check_Tool_TBox_Space() == -1)) {
+        Give_Tool_In_ToolBox("Book", 1);
+    } else {
+        Give_Tool_In_Inventory("Book", 1);
+    }
+    Set_Flag("Flag_0x155", 2);
+}
+exit;
+}

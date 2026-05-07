@@ -1,0 +1,37 @@
+#include "lib_fomt.csv"
+
+script 1178 Unknown_Event_1178 {
+const MESSAGE_0 = "I thought that Cow would \r\nwin. It had the best teeth!\BRK";
+const MESSAGE_1 = "Your Cow had good teeth, \r\ntoo. I thought it could win.\BRK";
+const MESSAGE_2 = "It was too bad this year,\r\nbut you should try again \r\nnext year. \BRK";
+
+if ((Func083(2) == 0)) {
+    Free_Event_Entity("Rick");
+}
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag("Flag_0x19B") == 0)) {
+    TalkOpen();
+    Set_Portrait("Rick_Neutral");
+    Set_Name_Window("Rick");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag("Flag_0x19D") == 1)) {
+        TalkOpen();
+        Set_Portrait("Rick_Happy");
+        Set_Name_Window("Rick");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Rick_Neutral");
+    Set_Name_Window("Rick");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Rick") == 0)) {
+    Give_Friendship_Points("Rick", 5);
+}
+Free_Event_Entity("Rick");
+SetEntityFacing(2, 0);
+exit;
+}

@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 261 Unknown_Event_0261 {
+const MESSAGE_0 = "Big Kitchen\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

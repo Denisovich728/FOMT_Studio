@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 505 Unknown_Event_0505 {
+const MESSAGE_0 = "\x81\xAANorth side of Mineral Town\r\nSouth side of Mineral Town\x81\xA8\r\n\x81\xAB\xFF$farm\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

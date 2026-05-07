@@ -1,0 +1,27 @@
+#include "lib_fomt.csv"
+
+script 759 Unknown_Event_0759 {
+const MESSAGE_0 = "Friends really are \r\nall we have sometimes...\BRK";
+const MESSAGE_1 = "I just hope Aja \r\ncomes home now...\BRK";
+
+if ((Func083(9) == 0)) {
+    Free_Event_Entity("Manna");
+}
+if ((Check_Flag(0x118) == 1)) {
+    SetEntityFacing(9, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    if ((Has_NPC_Talked_Today("Manna") == 0)) {
+        Set_Portrait("Manna_Happy");
+        Set_Name_Window("Manna");
+        TalkMessageSlow(0);
+    } else {
+        Set_Portrait("Manna_Afraid");
+        Set_Name_Window("Manna");
+        TalkMessageSlow(1);
+    }
+    TalkClose();
+    Free_Event_Entity("Manna");
+    SetEntityFacing(9, 1);
+}
+exit;
+}

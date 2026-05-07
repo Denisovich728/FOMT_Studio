@@ -1,0 +1,22 @@
+#include "lib_fomt.csv"
+
+script 803 Unknown_Event_0803 {
+const MESSAGE_0 = "You have to be careful\r\non the mountain. \BRK";
+const MESSAGE_1 = "...............\r\n\BRK";
+
+SetEntityFacing(0x1B, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Gotz");
+if ((Has_NPC_Talked_Today("Gotz") == 0)) {
+    Set_Portrait("Gotz_Neutral");
+    TalkMessage(0);
+} else {
+    Set_Portrait("Gotz_Afraid");
+    TalkMessage(1);
+}
+TalkClose();
+Free_Event_Entity("Gotz");
+SetEntityFacing(0x1B, 2);
+exit;
+exit;
+}

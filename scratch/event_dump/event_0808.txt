@@ -1,0 +1,20 @@
+#include "lib_fomt.csv"
+
+script 808 Unknown_Event_0808 {
+const MESSAGE_0 = "You've gotten a nice \r\nfishing rod. \BRK";
+
+if ((Func083(0x1D) == 0)) {
+    Free_Event_Entity("Won");
+}
+if ((Check_Flag(0x135) == 1)) {
+    SetEntityFacing(0x1D, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Won_Neutral");
+    Set_Name_Window("Won");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x1D, 2);
+    Free_Event_Entity("Won");
+}
+exit;
+}

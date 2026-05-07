@@ -1,0 +1,9 @@
+#include "lib_fomt.csv"
+
+script 975 Unknown_Event_0975 {
+SetEntityAnim("Player", "Player_Stop_Base");
+Tick_Overnight_Engine(1, 0);
+Fade_Out(1, 0);
+Fade_In(1, 0);
+exit;
+}

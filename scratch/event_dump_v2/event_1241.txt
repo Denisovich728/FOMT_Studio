@@ -1,0 +1,60 @@
+#include "lib_fomt.csv"
+
+script 1241 Unknown_Event_1241 {
+Warp_Player("Rose_Square", 0xDE, 0xC8);
+PlayBGM(1, 7);
+SetEntityPosition(0, 0xC6, 0xE8, 0);
+SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+Give_Food("Stew");
+SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+SetEntityPosition(0xC, 0x106, 0x118, 0);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0x13, 0x96, 0xC8, 0);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(0x15, 0x9E, 0xA0, 0);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x18, 0x11E, 0xF8, 0);
+SetEntityAnim("Doug", "Baby_Horse_Deep_Sleep_Base");
+SetEntityPosition(0x19, 0x11E, 0xC8, 0);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+SetEntityPosition(0xD, 0xDE, 0xE8, 0);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(9, 0x3C, 0x188, 0);
+SetEntityAnim("Manna", "Manna_Stop_Base");
+SetEntityPosition(0xB, 0x4E, 0x170, 0);
+SetEntityAnim("Anna", "Anna_Stop_Base");
+SetEntityPosition(0x12, 0x64, 0x188, 0);
+SetEntityAnim("Sasha", "Sasha_Stop_Base");
+SetEntityPosition(0x16, 0x16A, 0x54, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0x1B, 0x162, 0xA0, 0);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+Fade_In(2, 1);
+Make_Delay((0x3C * 2));
+PlaySong(0, 0x65);
+Remove_Held_Item();
+SetEntityAnim("Player", "Eat_2");
+Make_Delay(0x18);
+SetEntityAnim("Player", "Player_Stop_Base");
+Make_Delay(0x3C);
+if ((Check_Flag("Flag_0x1A5") == 0)) {
+    Show_Emote("Player", "GooD", 0);
+    Make_Delay((0x3C * 4));
+    Fade_Out(2, 1);
+    Set_Time(0x12, 0);
+    Execute_Script(0x4C2);
+} else {
+    Fade_Out(4, 0);
+    Fade_In(4, 0);
+    Make_Delay(0x1E);
+    Fade_Out(4, 0);
+    Fade_In(4, 0);
+    Make_Delay(0x3C);
+    SetEntityAnim("Player", "Player_Over_Work_2");
+    Make_Delay(0x24);
+    Fade_Out(2, 1);
+    Set_Time(0x12, 0);
+    Execute_Script(0x4C2);
+}
+exit;
+}

@@ -1,0 +1,74 @@
+#include "lib_fomt.csv"
+
+script 852 Unknown_Event_0852 {
+const MESSAGE_0 = "Good morning, \xFF!. \r\nToday is very special. It's\r\nour 50th wedding \BRK\r\nanniversary. \BRK\WAIT_CLICKI even bought you a cottage\r\nin the mountains as a gift.\BRK\WAIT_CLICKHow did I pay for it?\r\nNever mind that!\BRK";
+const MESSAGE_1 = "Go and take a look at it \r\nlater on. \BRK";
+
+Warp_Player("Farm_House_1", 0x109, 0x8A);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x109, 0x8A, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+if ((Check_Flag("Flag_0x17A") == 2)) {
+    if ((Check_Flag("Baby_Age_Days") >= 0x3C)) {
+        SetEntityPosition(0x23, 0x124, 0x54, 0);
+        if ((Check_Flag("Baby_Growth_Stage") == 1)) {
+            SetEntityAnim("", "Baby_Stop_Base");
+        } else {
+            SetEntityAnim("", "Baby_Sit_Base");
+        }
+    } else {
+        SetEntityPosition(0x23, 0x1A0, -0x30, 0);
+        SetEntityAnim("", 0xC);
+    }
+}
+Fade_In(2, 1);
+Set_Flag("Flag_0x175", 1);
+Make_Delay(0x3C);
+PlaySong(0, 0xBE);
+SetEntityPosition(0x46, GetEntityX(0), (GetEntityY(0) - 0x18), 0);
+Spawn_Event_Entity(0x46, 3);
+SetEntityAnim(0x46, "Staid_Magic_Effect2");
+Tick_Overnight_Engine(1, 0);
+Tick_Overnight_Engine(1, 0);
+Fade_Out(1, 1);
+Hide_Entity(0x46);
+SetEntityPosition(0x1F, 0x109, 0x72, 0);
+SetEntityAnim("H. Goddess", "H.Goodes_Stop_Base");
+Fade_In(1, 1);
+Make_Delay(0x3C);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("H. Goddess");
+Set_Portrait("H_Goddes_Happy");
+TalkMessage(0);
+Set_Name_Window("H. Goddess");
+Set_Portrait("H_Goddes_Neutral");
+TalkMessage(1);
+TalkClose();
+Free_Event_Entity("H. Goddess");
+Make_Delay(0x3C);
+PlaySong(0, 0xBE);
+SetEntityPosition(0x46, GetEntityX(0x1F), (GetEntityY(0x1F) + 4), 0);
+Spawn_Event_Entity(0x46, 3);
+SetEntityAnim(0x46, "Staid_Magic_Effect2");
+Tick_Overnight_Engine(1, 0);
+Tick_Overnight_Engine(1, 0);
+Fade_Out(1, 1);
+Hide_Entity(0x46);
+Hide_Entity("H. Goddess");
+Make_Delay(0x1E);
+Fade_In(1, 1);
+Set_Flag("Flag_0x175", 2);
+Unlock_Mountain_Cottage();
+Make_Delay(0x3C);
+Fade_Out(2, 1);
+Warp_Player("Farm_House_1", 0x147, 0x70);
+SetEntityPosition(0, 0x147, 0x70, 2);
+Fade_In(2, 1);
+exit;
+}

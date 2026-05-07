@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1206 Unknown_Event_1206 {
+const MESSAGE_0 = "Listening to music \r\nrelaxes me so much. \BRK";
+
+if ((Func083(0x11) == 0)) {
+    Free_Event_Entity("Jeff");
+}
+SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Jeff_Happy");
+Set_Name_Window("Jeff");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Jeff") == 0)) {
+    Give_Friendship_Points("Jeff", 5);
+}
+SetEntityFacing(0x11, 1);
+Free_Event_Entity("Jeff");
+exit;
+}

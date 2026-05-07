@@ -1,0 +1,84 @@
+#include "lib_fomt.csv"
+
+script 1198 Unknown_Event_1198 {
+const MESSAGE_0 = "I love fireworks \r\nmore than anything!\BRK";
+const MESSAGE_1 = "Invite to the fireworks?";
+const MESSAGE_2 = "Invite.";
+const MESSAGE_3 = "Don't invite.";
+const MESSAGE_4 = "Of course! \r\nSit down, they're about \r\nto start!\BRK";
+const MESSAGE_5 = "Oh, hi \xFF!!\r\nWe might as well watch the \r\nfireworks together!\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+var var_4;
+
+if ((Func083(0x19) == 0)) {
+    Free_Event_Entity("Ann");
+}
+SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+if ((Has_NPC_Talked_Today("Ann") == 0)) {
+    Give_Friendship_Points("Ann", 5);
+}
+Free_Event_Entity("Ann");
+TalkOpen();
+var_1 = ((((((Check_Flag("Karen_Marriage_State") == 0) && (Check_Flag("Popuri_Marriage_State") == 0)) && (Check_Flag("Ann_Marriage_State") == 0)) && (Check_Flag("Mary_Marriage_State") == 0)) && (Check_Flag("Elli_Marriage_State") == 0)) && (Check_Flag("Flag_0x173") == 0));
+var_2 = (((((Check_Flag("Popuri_Marriage_State") == 2) || (Check_Flag("Karen_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Elli_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2));
+var_3 = (((Check_Flag("Ann_Marriage_State") == 0) && (Check_Flag("Rival_Ann_Cliff_Event_3") == 0)) && (Check_Flag("Rival_Ann_Cliff_Event_4") == 0));
+var_4 = ((Check_Flag("Rival_Ann_Cliff_Event_3") == 2) || (Check_Flag("Rival_Ann_Cliff_Event_4") == 2));
+if (((((var_1 && var_3) && (Chek_Love_Points("Ann") < 0x7530)) || var_4) || var_2)) {
+    Set_Portrait("Ann_Neutral");
+    Set_Name_Window("Ann");
+    if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Mary_Marriage_State") == 2)) || (Check_Flag("Elli_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Ann_Cliff_Event_3") == 2)) || (Check_Flag("Rival_Ann_Cliff_Event_4") == 2))) {
+        Set_Hearth_Anim("Ann");
+    }
+    TalkMessage(0);
+    TalkClose();
+} else {
+    if (((var_1 && var_3) && (Chek_Love_Points("Ann") >= 0x7530))) {
+        Set_Portrait("Ann_Neutral");
+        Set_Name_Window("Ann");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(0);
+        TalkClose();
+        TalkOpen();
+        var_0 = Show_Tre_Option_Menu(1, 2, 3);
+        switch (var_0) {
+            case 1:
+                Set_Flag("Selected_Festival_Partner", 5);
+                TalkClose();
+                TalkOpen();
+                Set_Portrait("Ann_Happy");
+                Set_Name_Window("Ann");
+                Set_Hearth_Anim("Ann");
+                TalkMessage(4);
+                TalkClose();
+                Fade_Out(2, 1);
+                Execute_Script(0x4A8);
+                break;
+            case 2:
+                TalkClose();
+                break;
+        }
+        goto LBL_0038;
+    }
+    if ((Check_Flag("Ann_Marriage_State") == 2)) {
+        Set_Flag("Selected_Festival_Partner", 5);
+        Set_Portrait("Ann_Neutral");
+        Set_Name_Window("Ann");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(5);
+        TalkClose();
+        Fade_Out(2, 1);
+        Execute_Script(0x4A8);
+    }
+}
+if ((((((((((Has_NPC_Talked_Today("Rick") && Has_NPC_Talked_Today("Gray")) && Has_NPC_Talked_Today("Doctor")) && ((Check_Flag("Flag_0xF4") == 0) || Has_NPC_Talked_Today("Cliff"))) && Has_NPC_Talked_Today("Kai")) && Has_NPC_Talked_Today("Karen")) && Has_NPC_Talked_Today("Elli")) && Has_NPC_Talked_Today("Ann")) && Has_NPC_Talked_Today("Popuri")) && Has_NPC_Talked_Today("Mary"))) {
+    Set_Flag("Selected_Festival_Partner", 0);
+    Fade_Out(2, 1);
+    Execute_Script(0x4A8);
+}
+SetEntityFacing(0x19, 3);
+exit;
+}

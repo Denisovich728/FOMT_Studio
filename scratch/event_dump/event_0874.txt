@@ -1,0 +1,82 @@
+#include "lib_fomt.csv"
+
+script 874 Unknown_Event_0874 {
+const MESSAGE_0 = "We used to play here \r\nall the time. \BRK";
+const MESSAGE_1 = "We played games like tag,\r\nkick the can, hide and \r\nseek...everything.\BRK";
+const MESSAGE_2 = "We also wrestled...\r\nAlthough...I never could \r\nbeat you.\BRK";
+const MESSAGE_3 = "What do you mean?!\r\nI don\x81ft remember any\r\nof it!\BRK";
+const MESSAGE_4 = "Don't you remember how I \r\nused to cry when you threw\r\nme to the ground?\BRK";
+const MESSAGE_5 = "I told you I don't remember,\r\nso I don't remember!\r\nI'm going home now!\BRK";
+const MESSAGE_6 = "What are you mad for?\r\nWait up!\BRK";
+
+Warp_Player("Forest", 0x19C, 0x9C);
+PlayBGM(1, 0x10);
+Set_Flag(0x72, 1);
+SetEntityPosition(0, 0x264, 0xF8, 0);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x13, 0x190, 0x9C, 3);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(2, 0x1A8, 0x9C, 2);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+Fade_In(2, 1);
+Show_Emote("Rick", "Happy", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Rick_Neutral");
+Set_Name_Window("Rick");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Portrait("Karen_Neutral");
+Set_Name_Window("Karen");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Rick_Happy");
+Set_Name_Window("Rick");
+TalkMessage(2);
+TalkClose();
+Show_Emote("Karen", "Angry", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Karen_Angry");
+Set_Name_Window("Karen");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Rick_Neutral");
+Set_Name_Window("Rick");
+TalkMessage(4);
+TalkClose();
+TalkOpen();
+Set_Portrait("Karen_Angry");
+Set_Name_Window("Karen");
+TalkMessage(5);
+TalkClose();
+Show_Emote("Karen", "Angry", 1);
+SetEntityFacing(0x13, 0);
+SetEntityAnim("Karen", "Karen_Walk_Base");
+SetEntityFacing(2, 0);
+Set_Vector_Y("Karen", 0x122, 1);
+Execute_Movement("Karen");
+Wait_For_Animation("Karen");
+TalkOpen();
+Set_Portrait("Rick_Surprised");
+Set_Name_Window("Rick");
+TalkMessage(6);
+TalkClose();
+SetEntityAnim("Rick", "Rick_Walking_Base");
+Set_Vector_Y("Rick", 0x10C, 1);
+Execute_Movement("Rick");
+Hide_Entity("Karen");
+Hide_Entity("Rick");
+Pan_Camera_To(0x264, 0xF8, 2);
+Wait_Camera_Stop();
+Set_Flag(0x72, 2);
+exit;
+exit;
+}

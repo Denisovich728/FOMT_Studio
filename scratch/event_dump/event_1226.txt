@@ -1,0 +1,32 @@
+#include "lib_fomt.csv"
+
+script 1226 Unknown_Event_1226 {
+const MESSAGE_0 = "What happened to \r\neverybody? I thought it \r\ntasted good...\BRK";
+const MESSAGE_1 = "The fish taste sure \r\nwas strong...\BRK";
+
+if ((Func083(0x15) == 0)) {
+    Free_Event_Entity("Elli");
+}
+SetEntityFacing(0x15, GetOppositeFacing(GetEntityFacing(0)));
+if ((Has_Spoken_To_NPC_Today("Elli") == 0)) {
+    Give_Friendship_Points("Elli", 5);
+}
+TalkOpen();
+Set_Name_Window("Elli");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x96) == 2)) || (Check_Flag(0x97) == 2))) {
+    Set_Hearth_Anim("Elli");
+}
+if ((Check_Flag(0x1A5) == 1)) {
+    Set_Portrait("Ellie_Angry");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Elli");
+} else {
+    Set_Portrait("Ellie_Happy");
+    TalkMessage(1);
+    TalkClose();
+    Free_Event_Entity("Elli");
+}
+SetEntityFacing(0x15, 0);
+exit;
+}

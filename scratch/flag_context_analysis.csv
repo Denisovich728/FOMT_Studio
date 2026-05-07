@@ -1,0 +1,1637 @@
+event,line,flag_id,value,context
+event_0005.txt,158,0xdc,2,"I'll come back again\r\nwhen he gets bigger.\BRK\WAIT_CLICKUntil then please take\r\ngood care of him, OK?\BRK"
+event_0006.txt,91,0xdd,2,"Hmm...\BRK | I'm sorry,\r\n\xFF!.\BRK\WAIT_CLICKIt seems like you haven't\r\ndone such a good job of\r\ntaking care of \BRK\r\n\xFF%.\BRK"
+event_0006.txt,131,0xdd,2,
+event_0007.txt,71,0xdf,2,"Take good care of\r\n\xFF\"", now.\BRK"
+event_0016.txt,208,0x46,1,
+event_0016.txt,233,0x46,1,
+event_0020.txt,150,0x47,1,"Ha! \r\nThanks, \xFF!!\BRK"
+event_0020.txt,151,0x48,0,"Ha! \r\nThanks, \xFF!!\BRK"
+event_0020.txt,183,0x47,1,Fine!...\BRK
+event_0020.txt,184,0x48,1,Fine!...\BRK
+event_0024.txt,51,0x49,1,"...So, we thought it\r\nwas a good idea.\BRK | Really? \BRK"
+event_0024.txt,313,0x49,2,Thanks a lot.\r\nI mean it. \BRK
+event_0024.txt,344,0x49,1,
+event_0029.txt,64,0x4a,1,I think my new dish \r\nturned out great!\BRK
+event_0029.txt,405,0x4a,2,"\xFF!, next time\r\nI'll fix you something that\r\nwill help you get well.\BRK\r\nI bet you can't wait!\BRK"
+event_0029.txt,453,0x4a,1,...............\BRK
+event_0033.txt,54,0x4b,2,
+event_0034.txt,125,0x4c,2,
+event_0035.txt,22,0x4d,1,
+event_0035.txt,112,0x35,1,"\xFF)...\r\nThere's something I want\r\nto ask you...\BRK\r\nAlthough we're married now,\r\nI'd still like to help my \r\ndad out at the store. \BRK\r\nIs that OK with you?\BRK | Thanks, \xFF)!\BRK"
+event_0035.txt,124,0x4d,2,"Thanks, \xFF)!\BRK | Tomorrow is the first day\r\nof our new life together!\BRK"
+event_0035.txt,132,0x35,0,"Tomorrow is the first day\r\nof our new life together!\BRK | I understand. I'll \r\nconcentrate on the chores\r\naround here, then. \BRK"
+event_0035.txt,144,0x4d,2,"I understand. I'll \r\nconcentrate on the chores\r\naround here, then. \BRK | Tomorrow is the first day\r\nof our new life together!\BRK"
+event_0036.txt,220,0x4e,2,But why not?!\r\nThey're so cute!\BRK
+event_0036.txt,299,0x4e,2,
+event_0037.txt,22,0x4f,1,"Good morning, \r\n\xFF!.\BRK\WAIT_CLICKToday I came to look at \r\nyour farm. Will you show \r\nme around?\BRK"
+event_0037.txt,55,0x4f,2,
+event_0037.txt,153,0x4f,2,
+event_0038.txt,80,0x50,1,You want to play house\r\noutside again? \BRK | I like it!\r\nIt's fun!\BRK
+event_0038.txt,218,0x50,1,
+event_0038.txt,373,0x51,0,
+event_0038.txt,374,0x50,2,Oh...That's too bad. \BRK
+event_0038.txt,472,0x50,2,"Well, I have to go back\r\nto work now. Sorry. \BRK\WAIT_CLICKI have to lock the Church\r\nup until tomorrow, so \r\ncan you leave?\BRK"
+event_0038.txt,473,0x51,1,"Well, I have to go back\r\nto work now. Sorry. \BRK\WAIT_CLICKI have to lock the Church\r\nup until tomorrow, so \r\ncan you leave?\BRK"
+event_0039.txt,167,0x53,0,
+event_0039.txt,168,0x52,1,
+event_0039.txt,223,0x53,1,
+event_0039.txt,224,0x52,1,
+event_0039.txt,277,0x53,2,
+event_0039.txt,278,0x52,1,
+event_0043.txt,54,0x54,2,
+event_0044.txt,125,0x55,2,
+event_0045.txt,23,0x56,1,
+event_0045.txt,113,0x35,1,"Can I ask you a question, \r\n\xFF)?\BRK\r\nI would still like to help\BRK\r\nmy mom out. Is that OK?\BRK | Thanks, \xFF).\BRK"
+event_0045.txt,125,0x56,2,"Thanks, \xFF).\BRK | Tomorrow is the first day\r\nof our new life together! \BRK"
+event_0045.txt,133,0x35,0,"Tomorrow is the first day\r\nof our new life together! \BRK | Alright. In that case,\r\nleave the house chores \r\nto me. \BRK"
+event_0045.txt,145,0x56,2,"Alright. In that case,\r\nleave the house chores \r\nto me. \BRK | Tomorrow is the first day\r\nof our new life together!\BRK"
+event_0046.txt,36,0x57,1,
+event_0046.txt,292,0x57,2,Come back soon!\BRK
+event_0049.txt,79,0x59,0,"Ha ha, I knew it!\r\nI knew you like it!\r\nGood for you. \BRK\WAIT_CLICKMy dad hates cleaning, \r\nso I have to do all of it\r\naround here. \BRK\WAIT_CLICKIt's a good thing \r\nI like it so much! \B"
+event_0049.txt,80,0x58,1,"Ha ha, I knew it!\r\nI knew you like it!\r\nGood for you. \BRK\WAIT_CLICKMy dad hates cleaning, \r\nso I have to do all of it\r\naround here. \BRK\WAIT_CLICKIt's a good thing \r\nI like it so much! \B"
+event_0049.txt,97,0x59,1,"That's too bad. \r\nYou should really try it. \r\nYou might like it!\BRK\WAIT_CLICKMy dad hates cleaning, too.\r\nWhat is it with men?...\BRK"
+event_0049.txt,98,0x58,1,"That's too bad. \r\nYou should really try it. \r\nYou might like it!\BRK\WAIT_CLICKMy dad hates cleaning, too.\r\nWhat is it with men?...\BRK"
+event_0051.txt,51,0x5a,1,"Ann, what's wrong?\r\nWhy are you sweating \r\nlike that? \BRK"
+event_0051.txt,120,0x5b,0,"Ann says her stomach \r\nhurts! What should I do?!\BRK | You're right! \r\nLet's take here there now!\BRK\r\nHelp us, \xFF!!\BRK"
+event_0051.txt,133,0x5b,1,"You're right! \r\nLet's take here there now!\BRK\r\nHelp us, \xFF!!\BRK | How can you panic at a \r\ntime like this...!?\BRK\r\nI know! Let's bring her to \r\nthe Doctor!\r\n\xFF!, help us!\BRK"
+event_0051.txt,320,0x5a,2,"Thanks again. \r\nI've got to get back to \r\nthe store now. \BRK\r\nSee you around, \r\n\xFF!.\BRK"
+event_0052.txt,173,0x5d,0,"Why are you getting red, \r\ntoo? Well, you two should\r\ntalk about this. \BRK"
+event_0052.txt,174,0x5c,1,"Why are you getting red, \r\ntoo? Well, you two should\r\ntalk about this. \BRK"
+event_0052.txt,193,0x5d,1,"That's too bad...\r\nBe a good friend to her, \r\nthen. \BRK"
+event_0052.txt,194,0x5c,1,"That's too bad...\r\nBe a good friend to her, \r\nthen. \BRK"
+event_0054.txt,54,0x5e,2,
+event_0055.txt,123,0x5f,2,
+event_0056.txt,22,0x60,1,
+event_0056.txt,112,0x35,1,"\xFF)...\r\nThere's something I want\r\nto ask you...\BRK\r\nAlthough we're married now,\r\nI'd still like to help my \r\ndad out at the Inn. \BRK\r\nIs that OK with you?\BRK | Thanks, \xFF)!\BRK"
+event_0056.txt,124,0x60,2,"Thanks, \xFF)!\BRK | Tomorrow is the first day\r\nof our new life together!\BRK"
+event_0056.txt,132,0x35,0,Tomorrow is the first day\r\nof our new life together!\BRK | I understand. I'll \r\nconcentrate on the chores\r\naround here from tomorrow.\BRK
+event_0056.txt,144,0x60,2,I understand. I'll \r\nconcentrate on the chores\r\naround here from tomorrow.\BRK | Tomorrow is the first day\r\nof our new life together!\BRK
+event_0057.txt,121,0x61,1,Just let me know if you \r\nwant to read anything.\BRK\WAIT_CLICKI bet I have lots of books\r\nyou'd like!\BRK | I'll try to be more\r\ncareful from now on. \BRK
+event_0057.txt,136,0x61,1,I'll try to be more\r\ncareful from now on. \BRK
+event_0059.txt,192,0x63,0,"Well, I can continue \r\nwriting! I'm indebted \r\nto you, \xFF!! \BRK"
+event_0059.txt,193,0x62,1,"Well, I can continue \r\nwriting! I'm indebted \r\nto you, \xFF!! \BRK"
+event_0059.txt,209,0x63,1,I'm sorry to ask such \r\nan unusual favor. \r\nForget I asked. \BRK
+event_0059.txt,210,0x62,1,I'm sorry to ask such \r\nan unusual favor. \r\nForget I asked. \BRK
+event_0061.txt,160,0x64,2,...Really?\r\nThat's probably because you\r\nhaven't read the right\r\nbooks yet! \BRK\r\nI hope you do soon. \BRK
+event_0061.txt,198,0x64,2,
+event_0062.txt,56,0x65,1,What\x81fs worng with her?\BRK
+event_0062.txt,260,0x65,2,It's natural you can't \r\nthink of anything good on \r\nthe spot.\BRK\WAIT_CLICKI've been thinking all day!\BRK
+event_0062.txt,343,0x65,2,"Now I have enough material\r\nfor my novel. Thank you, \r\n\xFF!!\BRK"
+event_0062.txt,385,0x65,2,I'll think a little bit\r\nmore about it. \BRK\r\nI know there's an idea \r\njust waiting for me!...\BRK
+event_0063.txt,54,0x66,2,
+event_0064.txt,128,0x67,2,
+event_0065.txt,19,0x68,1,
+event_0065.txt,115,0x68,2,"Thanks, \xFF). \BRK | Tomorrow is the first day\r\nof our new life together!\BRK"
+event_0066.txt,288,0x69,1,"You don't need to humor him,\r\n\xFF!.\BRK\WAIT_CLICKHe'll just start playing \r\nhis pranks on you, instead. \BRK | ..........\r\nWaaah!!....\BRK"
+event_0066.txt,329,0x69,1,"Don't worry about his \r\ncrying. He's just not used \r\nto being scolded by other \BRK\r\npeople, that's all. \BRK\WAIT_CLICKMaybe now he'll stop \r\nplaying so many pranks \r\non me!\BRK"
+event_0069.txt,38,0x6a,1,"\xFF!, is something \r\nthe matter? \BRK"
+event_0069.txt,236,0x6a,1,I knew I wasn't \r\ncut out for it...\BRK
+event_0069.txt,274,0x6a,1,
+event_0072.txt,47,0x6b,1,"\xFF!, \r\nthanks for coming. \BRK | Welcome to our house...\BRK"
+event_0072.txt,146,0x6c,0,...OK.\BRK
+event_0072.txt,147,0x6b,1,...OK.\BRK
+event_0072.txt,314,0x6c,1,
+event_0072.txt,315,0x6b,1,
+event_0076.txt,93,0x6d,2,"I knew I should have been\r\nstricter with him...\BRK\WAIT_CLICKEveryone else in town \r\nprobably thinks so, too...\r\nAhh...I'm going home now.\BRK | Thanks, \xFF!!\r\nIf you say so, then I can \r\n"
+event_0076.txt,112,0x6d,2,"Thanks, \xFF!!\r\nIf you say so, then I can \r\nbe confident I'm doing\BRK\r\na good job. \BRK"
+event_0077.txt,54,0x6e,2,
+event_0078.txt,122,0x6f,2,
+event_0079.txt,18,0x70,1,
+event_0079.txt,113,0x70,2,"Thanks, \xFF)!\BRK | Tomorrow is the first day\r\nof our new life together!\BRK"
+event_0087.txt,16,0x149,2,"You found a Power Berry.\r\n\BRK | ...But your hands are\r\nalready full, so you \r\ncan't hold it.\BRK | There's nothing here now.\r\n\BRK"
+event_0090.txt,10,0x11c,2,
+event_0091.txt,11,0x11c,2,
+event_0092.txt,10,0x11c,2,
+event_0093.txt,17,0x11c,2,
+event_0093.txt,31,0x1a8,1,
+event_0093.txt,39,0x1d1,1,
+event_0093.txt,44,0x64,1,
+event_0093.txt,48,0x8c,1,
+event_0093.txt,52,0x127,1,
+event_0093.txt,56,0x104,1,
+event_0093.txt,60,0x110,1,
+event_0098.txt,20,0x216,1,"Inside the water tank is\r\na Jewel of Truth.\BRK | Inside the water tank is\r\na Jewel of Truth.\BRK\WAIT_CLICK...But, your hands are full,\r\nso you can't hold it.\BRK"
+event_0105.txt,52,0xea,1,
+event_0105.txt,56,0x11b,1,
+event_0105.txt,61,0x135,1,It's locked...\BRK
+event_0106.txt,30,0x7a,2,Where are you going?\r\nThe fireworks are\r\nabout to start!\BRK
+event_0106.txt,36,0x7b,2,
+event_0106.txt,41,0x7c,2,
+event_0106.txt,47,0x95,2,Where are you going?\r\nThe Beach Day\r\nis about to start!\BRK
+event_0106.txt,74,0x194,2,"That was fun!\r\nAlright, back to work...\BRK"
+event_0106.txt,76,0x193,0,"That was fun!\r\nAlright, back to work...\BRK"
+event_0106.txt,106,0x180,1,
+event_0106.txt,116,0x189,1,
+event_0106.txt,127,0x18c,1,
+event_0106.txt,140,0x18d,0,
+event_0106.txt,143,0x18d,1,
+event_0106.txt,146,0x18d,2,
+event_0106.txt,149,0x18d,3,
+event_0106.txt,152,0x18d,4,
+event_0106.txt,156,0x18e,1,
+event_0106.txt,167,0x198,1,
+event_0106.txt,177,0x19c,1,
+event_0106.txt,187,0x1a4,1,
+event_0106.txt,197,0x1ac,1,
+event_0106.txt,207,0x1b0,1,
+event_0106.txt,217,0x1d0,1,
+event_0107.txt,27,0x7a,2,Where are you going?\r\nThe fireworks are\r\nabout to start!\BRK
+event_0107.txt,33,0x7b,2,
+event_0107.txt,38,0x7c,2,
+event_0107.txt,44,0x95,2,
+event_0107.txt,77,0x194,2,"That was fun!\r\nAlright, back to work...\BRK"
+event_0107.txt,79,0x193,0,"That was fun!\r\nAlright, back to work...\BRK"
+event_0108.txt,39,0xe9,1,
+event_0108.txt,43,0xf1,1,
+event_0108.txt,47,0x12c,1,It's locked...\BRK
+event_0124.txt,13,0x52,2,
+event_0124.txt,20,0x7d,2,
+event_0124.txt,27,0xe4,2,
+event_0124.txt,34,0xe6,2,
+event_0124.txt,41,0xe8,2,
+event_0124.txt,47,0x134,2,
+event_0124.txt,52,0x119,2,
+event_0124.txt,74,0x74,1,
+event_0139.txt,194,0x243,1,"What do you mean, you make\r\nthe Harvest Sprites work too\r\nhard?! How dare you repay\BRK\r\ntheir kindness by exploiting\r\nthem! Don't you give them\r\ngifts, you scoundrel?\BRK\WAIT_CLICKThe Harv"
+event_0139.txt,375,0x241,1,"...........................\r\n...........................\r\nI'm so flabbergasted, I lost\r\nthe power of speech!\BRK\WAIT_CLICKWhat would you think if \r\nsomeone threw their garbage\r\naway in your"
+event_0143.txt,11,0x83,2,
+event_0143.txt,18,0x79,1,
+event_0143.txt,19,0x77,0,
+event_0143.txt,23,0x81,1,
+event_0143.txt,24,0x7f,0,
+event_0143.txt,28,0x89,1,
+event_0143.txt,29,0x87,0,
+event_0143.txt,33,0x91,1,
+event_0143.txt,34,0x8f,0,
+event_0143.txt,38,0x99,1,"\xFF!,\r\nYou can't go outside now.\BRK"
+event_0143.txt,39,0x97,0,"\xFF!,\r\nYou can't go outside now.\BRK"
+event_0143.txt,51,0x120,2,"\xFF!,\r\nYou can't go outside now.\BRK"
+event_0153.txt,10,0x135,2,
+event_0153.txt,16,0x11b,2,
+event_0154.txt,7,0x2b,0,
+event_0155.txt,20,0x214,1,"There is a Jewel of Truth in\r\n\xFF#'s house.\BRK | There is a Jewel of Truth in\r\n\xFF#'s house.\BRK\WAIT_CLICK...But you can't hold it,\r\nbecause your hands are full.\r\n"
+event_0168.txt,33,0x242,1,
+event_0168.txt,44,0x1b5,1,
+event_0168.txt,52,0x1cd,1,
+event_0168.txt,59,0xb4,1,
+event_0168.txt,63,0xb9,1,
+event_0168.txt,67,0xbe,1,
+event_0168.txt,75,0xb9,2,
+event_0168.txt,76,0xbe,2,
+event_0168.txt,77,0xb4,2,
+event_0168.txt,85,0xb5,1,
+event_0168.txt,89,0xba,1,
+event_0168.txt,93,0xbf,1,
+event_0168.txt,101,0xb5,2,
+event_0168.txt,102,0xba,2,
+event_0168.txt,103,0xbf,2,
+event_0168.txt,111,0xb6,1,
+event_0168.txt,115,0xbb,1,
+event_0168.txt,119,0xc0,1,
+event_0168.txt,127,0xb6,2,
+event_0168.txt,128,0xbb,2,
+event_0168.txt,129,0xc0,2,
+event_0168.txt,137,0xb7,1,
+event_0168.txt,141,0xbc,1,
+event_0168.txt,145,0xc1,1,
+event_0168.txt,153,0xb7,2,
+event_0168.txt,154,0xbc,2,
+event_0168.txt,155,0xc1,2,
+event_0168.txt,163,0xb8,1,
+event_0168.txt,167,0xbd,1,
+event_0168.txt,172,0xc2,1,
+event_0168.txt,180,0xb8,2,
+event_0168.txt,181,0xbd,2,
+event_0168.txt,182,0xc2,2,
+event_0168.txt,188,0x176,1,
+event_0168.txt,192,0x177,1,
+event_0168.txt,197,0x178,1,
+event_0168.txt,205,0x176,2,
+event_0168.txt,206,0x177,2,
+event_0168.txt,207,0x178,2,
+event_0169.txt,13,0x242,1,
+event_0170.txt,13,0x242,1,
+event_0172.txt,46,0x12d,1,
+event_0176.txt,20,0x11c,1,
+event_0179.txt,46,0x130,1,
+event_0179.txt,50,0x132,1,
+event_0179.txt,54,0x133,1,It's locked...\BRK
+event_0188.txt,6,0x6b,2,
+event_0188.txt,13,0x93,2,
+event_0188.txt,19,0xef,2,
+event_0188.txt,22,0xf0,2,
+event_0188.txt,25,0x10f,2,
+event_0188.txt,30,0x111,2,
+event_0201.txt,6,0x116,2,
+event_0206.txt,6,0x46,2,
+event_0206.txt,13,0x47,2,
+event_0206.txt,20,0x49,2,
+event_0206.txt,28,0x4a,2,
+event_0206.txt,35,0xfc,2,
+event_0206.txt,41,0x117,2,
+event_0224.txt,17,0x211,1,"A Jewel of Truth is\r\nfallen behind the calendar.\BRK | A Jewel of Truth is\r\nfallen behind the calendar.\BRK\WAIT_CLICK...But your hands are\r\nalready full, so you \r\ncan't hold it.\BRK"
+event_0238.txt,6,0x69,2,
+event_0238.txt,12,0x6a,2,
+event_0238.txt,18,0x92,2,
+event_0238.txt,24,0x94,2,
+event_0238.txt,30,0x11d,2,
+event_0238.txt,37,0x11e,2,
+event_0268.txt,6,0x12a,2,
+event_0271.txt,64,0x12a,1,It's locked...\BRK
+event_0272.txt,46,0x58,1,
+event_0272.txt,50,0x82,1,
+event_0273.txt,6,0x57,2,
+event_0273.txt,12,0x5c,2,
+event_0273.txt,17,0x84,2,
+event_0273.txt,24,0x128,2,
+event_0284.txt,6,0x58,2,
+event_0284.txt,11,0x82,2,
+event_0292.txt,40,0xfd,1,Please don't go upstairs!\BRK
+event_0293.txt,6,0xff,2,
+event_0300.txt,6,0xfd,2,
+event_0306.txt,6,0x61,2,
+event_0306.txt,11,0x62,2,
+event_0306.txt,16,0x8b,2,
+event_0306.txt,22,0x8d,2,
+event_0322.txt,20,0x212,1,"A Jewel of Truth is\r\nfallen in the bookshelf.\BRK | A Jewel of Truth is\r\nfallen in the bookshelf.\BRK\WAIT_CLICK...But your hands are\r\nalready full, so you \r\ncan't hold it.\BRK"
+event_0335.txt,18,0x20e,1,"There's a Jewel of Truth\r\nfallen in the Refrigerator.\BRK | There's a Jewel of Truth\r\nfallen in the Refrigerator.\BRK\WAIT_CLICK...But your hands are\r\nalready full, so you \r\ncan't hold it.\BRK"
+event_0354.txt,32,0x1f,95,There was a present inside!\BRK | It's Mystrile!\BRK | I have to put \r\nsomething down first.\BRK | There was a present inside!\BRK
+event_0354.txt,50,0x1f,95,There was a present inside!\BRK | It's Orichalc!\BRK | I have to put \r\nsomething down first.\BRK | There was a present inside!\BRK
+event_0354.txt,68,0x1f,95,There was a present inside!\BRK | It's a Moon Stone!\BRK | I have to put \r\nsomething down first.\BRK | There was a present inside!\BRK
+event_0354.txt,86,0x1f,95,There was a present inside!\BRK | It's Sand Rose!\BRK | I have to put \r\nsomething down first.\BRK | There was a present inside!\BRK
+event_0354.txt,104,0x1f,95,There was a present inside!\BRK | It's Alexandrite \BRK | I have to put \r\nsomething down first.\BRK | Sock Hook\BRK
+event_0358.txt,100,0xb4,2,"\xFF!,\r\nwhere are you going?\BRK"
+event_0358.txt,101,0xb9,2,"\xFF!,\r\nwhere are you going?\BRK"
+event_0358.txt,102,0xbe,2,"\xFF!,\r\nwhere are you going?\BRK"
+event_0358.txt,108,0xb5,2,
+event_0358.txt,109,0xba,2,
+event_0358.txt,110,0xbf,2,
+event_0358.txt,116,0xb6,2,
+event_0358.txt,117,0xbb,2,
+event_0358.txt,118,0xc0,2,
+event_0358.txt,124,0xb7,2,
+event_0358.txt,125,0xbc,2,
+event_0358.txt,126,0xc1,2,
+event_0358.txt,132,0xb8,2,
+event_0358.txt,133,0xbd,2,
+event_0358.txt,134,0xc2,2,
+event_0358.txt,140,0x176,2,
+event_0358.txt,141,0x177,2,
+event_0358.txt,142,0x178,2,
+event_0358.txt,150,0xcd,2,
+event_0358.txt,156,0xce,2,
+event_0358.txt,162,0xcf,2,
+event_0358.txt,168,0xd0,2,
+event_0358.txt,174,0xd1,2,
+event_0358.txt,179,0x17b,2,
+event_0358.txt,209,0x187,1,
+event_0358.txt,213,0x18b,1,
+event_0358.txt,217,0x192,1,
+event_0358.txt,221,0x196,1,
+event_0358.txt,225,0x19a,1,
+event_0358.txt,229,0x1a0,1,
+event_0358.txt,233,0x1a3,1,
+event_0358.txt,237,0x1aa,1,
+event_0358.txt,241,0x1ae,1,
+event_0358.txt,265,0x4f,1,
+event_0360.txt,13,0x122,1,
+event_0368.txt,17,0x215,1,"A Jewel of Truth is fallen\r\nbeneath the street lamp.\BRK | Found a Jewel of Truth \r\nbeneath the street lamp.\BRK\r\n...But my hands are\r\nalready full, so I \r\ncan't hold it.\BRK"
+event_0370.txt,69,0x50,1,
+event_0370.txt,73,0x83,1,
+event_0370.txt,77,0x120,1,
+event_0370.txt,81,0x121,1,
+event_0371.txt,69,0x6b,1,
+event_0371.txt,73,0x93,1,
+event_0371.txt,77,0x11f,1,
+event_0371.txt,81,0x111,1,
+event_0371.txt,85,0x115,1,
+event_0371.txt,89,0xef,1,
+event_0371.txt,93,0xf0,1,
+event_0371.txt,97,0x10f,1,
+event_0372.txt,71,0x47,1,
+event_0372.txt,75,0x49,1,
+event_0372.txt,79,0x4a,1,
+event_0372.txt,83,0xfc,1,
+event_0372.txt,87,0x116,1,
+event_0372.txt,91,0x117,1,
+event_0372.txt,96,0x46,1,
+event_0373.txt,47,0x69,1,
+event_0373.txt,51,0x6a,1,
+event_0373.txt,55,0x92,1,
+event_0373.txt,59,0x94,1,
+event_0373.txt,63,0x11d,1,
+event_0373.txt,67,0x11e,1,
+event_0374.txt,66,0x57,1,
+event_0374.txt,70,0x5a,1,
+event_0374.txt,74,0x5c,1,
+event_0374.txt,78,0x84,1,
+event_0374.txt,82,0xeb,1,
+event_0374.txt,86,0xee,1,
+event_0374.txt,90,0x11a,1,
+event_0374.txt,94,0x128,1,
+event_0374.txt,98,0x12b,1,
+event_0375.txt,65,0x65,1,
+event_0375.txt,69,0xff,1,
+event_0375.txt,73,0x100,1,
+event_0375.txt,77,0x102,1,It's locked...\BRK
+event_0376.txt,37,0x61,1,
+event_0376.txt,41,0x62,1,
+event_0376.txt,45,0x8b,1,
+event_0376.txt,49,0x8d,1,It's locked...\BRK
+event_0378.txt,57,0xfb,1,It's locked...\BRK
+event_0379.txt,21,0x180,1,
+event_0379.txt,31,0x189,1,
+event_0379.txt,42,0x18c,1,
+event_0379.txt,55,0x18d,0,
+event_0379.txt,58,0x18d,1,
+event_0379.txt,61,0x18d,2,
+event_0379.txt,64,0x18d,3,
+event_0379.txt,67,0x18d,4,
+event_0379.txt,71,0x18e,1,
+event_0379.txt,81,0x198,1,
+event_0379.txt,91,0x19c,1,
+event_0379.txt,101,0x1a4,1,
+event_0379.txt,111,0x1ac,1,
+event_0379.txt,121,0x1b0,1,
+event_0379.txt,131,0x1d0,1,
+event_0380.txt,23,0x85,1,
+event_0389.txt,6,0xfb,2,
+event_0404.txt,77,0x18a,1,
+event_0404.txt,81,0x1ad,1,
+event_0404.txt,86,0x18a,0,
+event_0404.txt,90,0x1ad,0,"So you're not ready\r\nafter all, eh?\BRK"
+event_0404.txt,124,0x18a,1,
+event_0404.txt,128,0x1ad,1,
+event_0404.txt,133,0x18a,0,
+event_0404.txt,137,0x1ad,0,
+event_0404.txt,242,0x19d,1,"Great. Let's get started,\r\nthen!\BRK"
+event_0404.txt,299,0x1b1,1,"Great. Let's get started,\r\nthen!\BRK"
+event_0409.txt,41,0x18c,2,"\xFF!, \r\nwhere are you going?\BRK\WAIT_CLICKThe competition hasn't\r\nstarted yet.\BRK"
+event_0409.txt,76,0x1a4,2,The judging hasn't\r\neven begun yet.\BRK
+event_0409.txt,96,0x1a4,0,That was fun!\r\nNow back to work...\BRK
+event_0409.txt,141,0x189,2,There are still races left.\BRK | That was fun!\r\nNow back to work...\BRK
+event_0409.txt,143,0x188,0,That was fun!\r\nNow back to work...\BRK
+event_0409.txt,179,0x198,2,Where are you going?\r\nIt hasn't started yet!\BRK | That was fun!\r\nNow back to work...\BRK
+event_0409.txt,181,0x197,0,That was fun!\r\nNow back to work...\BRK
+event_0409.txt,209,0x19c,2,Where are you going?\BRK | That was fun!\r\nNow back to work...\BRK
+event_0409.txt,211,0x19b,0,That was fun!\r\nNow back to work...\BRK
+event_0409.txt,249,0x1ac,2,There are still races left.\BRK | That was fun!\r\nNow back to work...\BRK
+event_0409.txt,251,0x1ab,0,That was fun!\r\nNow back to work...\BRK
+event_0409.txt,287,0x1b0,2,"\xFF!,\r\nThe Sheep Festival hasn't\r\nended yet.\BRK | That was fun!\r\nNow back to work...\BRK"
+event_0409.txt,289,0x1af,0,That was fun!\r\nNow back to work...\BRK
+event_0409.txt,313,0x118,2,
+event_0409.txt,344,0x194,1,
+event_0409.txt,350,0x19e,1,
+event_0409.txt,355,0x6d,1,
+event_0409.txt,359,0x7a,1,
+event_0409.txt,363,0x7b,1,
+event_0409.txt,367,0x7c,1,
+event_0409.txt,371,0x95,1,
+event_0409.txt,375,0xe7,1,
+event_0409.txt,379,0x126,1,
+event_0410.txt,37,0x18c,2,"\xFF!, \r\nwhere are you going?\BRK\WAIT_CLICKThe competition hasn't \r\nstarted yet!\BRK"
+event_0410.txt,72,0x1a4,2,The judging hasn't\r\neven begun yet.\BRK
+event_0410.txt,92,0x1a4,0,That was fun!\r\nNow back to work...\BRK
+event_0410.txt,137,0x189,2,There are still races left.\BRK | That was fun!\r\nNow back to work...\BRK
+event_0410.txt,139,0x188,0,That was fun!\r\nNow back to work...\BRK
+event_0410.txt,175,0x198,2,Where are you going?\r\nIt hasn't started yet!\BRK | That was fun!\r\nNow back to work...\BRK
+event_0410.txt,177,0x197,0,That was fun!\r\nNow back to work...\BRK
+event_0410.txt,205,0x19c,2,Where are you going?\BRK | That was fun!\r\nNow back to work...\BRK
+event_0410.txt,207,0x19b,0,That was fun!\r\nNow back to work...\BRK
+event_0410.txt,245,0x1ac,2,There are still races left.\BRK | That was fun!\r\nNow back to work...\BRK
+event_0410.txt,247,0x1ab,0,That was fun!\r\nNow back to work...\BRK
+event_0410.txt,283,0x1b0,2,"\xFF!,\r\nThe Sheep Festival hasn't\r\nended yet.\BRK | That was fun!\r\nNow back to work...\BRK"
+event_0410.txt,285,0x1af,0,That was fun!\r\nNow back to work...\BRK
+event_0410.txt,309,0x118,2,
+event_0411.txt,37,0x18c,2,"\xFF!, \r\nwhere are you going?\BRK\WAIT_CLICKThe competition hasn't \r\nstarted yet!\BRK"
+event_0411.txt,72,0x1a4,2,The judging hasn't\r\neven begun yet.\BRK
+event_0411.txt,92,0x1a4,0,That was fun!\r\nNow back to work...\BRK
+event_0411.txt,137,0x189,2,There are still races left.\BRK | That was fun!\r\nNow back to work...\BRK
+event_0411.txt,139,0x188,0,That was fun!\r\nNow back to work...\BRK
+event_0411.txt,175,0x198,2,Where are you going?\r\nIt hasn't started yet!\BRK | That was fun!\r\nNow back to work...\BRK
+event_0411.txt,177,0x197,0,That was fun!\r\nNow back to work...\BRK
+event_0411.txt,205,0x19c,2,Where are you going?\BRK | That was fun!\r\nNow back to work...\BRK
+event_0411.txt,207,0x19b,0,That was fun!\r\nNow back to work...\BRK
+event_0411.txt,245,0x1ac,2,There are still races left.\BRK | That was fun!\r\nNow back to work...\BRK
+event_0411.txt,247,0x1ab,0,That was fun!\r\nNow back to work...\BRK
+event_0411.txt,283,0x1b0,2,"\xFF!,\r\nThe Sheep Festival hasn't \r\nended yet.\BRK | That was fun!\r\nNow back to work...\BRK"
+event_0411.txt,285,0x1af,0,That was fun!\r\nNow back to work...\BRK
+event_0411.txt,309,0x118,2,
+event_0415.txt,6,0x85,2,
+event_0430.txt,52,0x194,1,
+event_0440.txt,6,0xe9,2,
+event_0440.txt,11,0xf1,2,
+event_0519.txt,12,0x8a,2,
+event_0519.txt,27,0x4e,1,
+event_0523.txt,115,0x52,1,
+event_0523.txt,119,0x7d,1,
+event_0523.txt,123,0xe4,1,
+event_0523.txt,127,0xe6,1,
+event_0523.txt,131,0xe8,1,
+event_0523.txt,135,0x134,1,
+event_0523.txt,139,0x119,1,
+event_0525.txt,20,0x105,1,
+event_0527.txt,27,0x180,1,
+event_0527.txt,37,0x189,1,
+event_0527.txt,48,0x18c,1,
+event_0527.txt,61,0x18d,0,
+event_0527.txt,64,0x18d,1,
+event_0527.txt,67,0x18d,2,
+event_0527.txt,70,0x18d,3,
+event_0527.txt,73,0x18d,4,
+event_0527.txt,77,0x18e,1,
+event_0527.txt,87,0x198,1,
+event_0527.txt,97,0x19c,1,
+event_0527.txt,107,0x1a4,1,
+event_0527.txt,117,0x1ac,1,
+event_0527.txt,127,0x1b0,1,
+event_0527.txt,137,0x1d0,1,
+event_0527.txt,143,0x123,1,
+event_0527.txt,147,0x118,1,
+event_0528.txt,74,0x8a,1,It's locked...\BRK
+event_0532.txt,37,0x1a8,0,Wait one second!\r\nYou've come too far\r\nto turn back now!\BRK
+event_0532.txt,42,0x104,2,Wait one second!\r\nYou've come too far\r\nto turn back now!\BRK
+event_0532.txt,48,0x127,2,
+event_0550.txt,12,0x133,2,
+event_0550.txt,27,0x72,1,
+event_0571.txt,145,0x142,2,"Well, if it isn't \r\n\xFF!.\BRK\WAIT_CLICKHow do I know your name?\r\nLet's just say I know  \r\na great many things. \BRK\WAIT_CLICKThanks for making an \r\noffering on my birthday. \BRK\WAIT_CLICK "
+event_0571.txt,163,0x201,1,Do you want to communicate \r\nwith a GameCube? \BRK
+event_0571.txt,167,0x202,1,
+event_0571.txt,171,0x203,1,
+event_0571.txt,175,0x204,1,
+event_0571.txt,179,0x205,1,
+event_0571.txt,183,0x206,1,
+event_0571.txt,187,0x207,1,
+event_0571.txt,191,0x208,1,
+event_0571.txt,195,0x209,1,
+event_0571.txt,199,0x20a,1,
+event_0571.txt,203,0x20b,1,
+event_0571.txt,207,0x20c,1,
+event_0571.txt,212,0x1ff,1,
+event_0571.txt,214,0x1fa,1,
+event_0571.txt,221,0x200,1,
+event_0571.txt,222,0x1fb,1,
+event_0571.txt,226,0x1fb,0,
+event_0571.txt,520,0x1f0,0,
+event_0571.txt,523,0x1f1,0,
+event_0571.txt,526,0x1f2,0,
+event_0571.txt,529,0x1f3,0,
+event_0571.txt,532,0x1f4,0,
+event_0571.txt,535,0x1f5,0,
+event_0571.txt,538,0x1f6,0,
+event_0571.txt,541,0x1f7,0,
+event_0571.txt,544,0x1f8,0,
+event_0571.txt,547,0x1f9,0,
+event_0571.txt,550,0x1f0,1,
+event_0571.txt,556,0x1f1,1,
+event_0571.txt,562,0x1f2,1,
+event_0571.txt,568,0x1f3,1,
+event_0571.txt,574,0x1f4,1,
+event_0571.txt,580,0x1f5,1,
+event_0571.txt,586,0x1f6,1,
+event_0571.txt,592,0x1f7,1,
+event_0571.txt,598,0x1f8,1,
+event_0571.txt,604,0x1f9,1,
+event_0571.txt,901,0x145,2,"Since you've come and \r\nvisited me so many times, \r\nI shall now grant you a \BRK\r\nPower Berry as a token\r\nof my thanks.\BRK | I won't be giving you any \r\nmore, but come again anyway!\BRK | S"
+event_0571.txt,912,0x143,2,"Since you've come and \r\nvisited me so many times, I\r\nshall now grant you a wish.\BRK\r\nIs there a girl you like? \BRK | Oh! I see you are \r\nalready married. \BRK\WAIT_CLICKSorry about the mix-u"
+event_0571.txt,917,0x143,2,"Come again any time.\BRK\WAIT_CLICK | So...\r\nWho is it?\BRK | OK, Elli it is.\BRK\WAIT_CLICK | Elli's already married to \r\nthe Doctor! \BRK\WAIT_CLICKHere, I'll give you this\r\ninstead. Just don'"
+event_0571.txt,1071,0x144,5,"This is so great!!\r\nThanks a lot! \BRK\WAIT_CLICKHere, take this as my\r\nthanks. \BRK | Come again any time.\BRK\WAIT_CLICK | Really? You don't like any \r\nof the girls around here?\r\nWhat a wast"
+event_0571.txt,1550,0x23e,0,
+event_0571.txt,1554,0x23d,1,
+event_0572.txt,34,0x148,2,\x81c\x81c\x81c\x81c\r\n\r\n\BRK | ...Here you go.\r\nDon't come back.\r\n\BRK
+event_0572.txt,44,0x14a,2,...Here you go.\r\nDon't come back.\r\n\BRK | You sure are stubborn.\r\n\r\n\BRK
+event_0572.txt,45,0xd,1,...Here you go.\r\nDon't come back.\r\n\BRK | You sure are stubborn.\r\n\r\n\BRK
+event_0572.txt,53,0x240,0,You sure are stubborn.\r\n\r\n\BRK
+event_0572.txt,57,0x23f,1,You sure are stubborn.\r\n\r\n\BRK
+event_0573.txt,17,0x9a,1,"The Refrigerator you ordered\r\nis here. \BRK\WAIT_CLICKWithout a Refrigerator, you\r\nsure can't keep food fresh.\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0573.txt,47,0x15,1,
+event_0573.txt,48,0x9a,2,
+event_0574.txt,17,0x9b,1,"The Shelf you ordered \r\nis here. \BRK\WAIT_CLICKThis will sure help you \r\nstore lots of things. \r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0574.txt,47,0x16,1,
+event_0574.txt,48,0x9b,2,
+event_0575.txt,17,0x9c,1,"The Kitchen you ordered \r\nis here. \BRK\WAIT_CLICKNow you can make some \r\nreally delicious dishes!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0575.txt,47,0x17,1,
+event_0575.txt,48,0x9c,2,
+event_0576.txt,17,0x9d,1,"The Carpet you ordered \r\nis here. \BRK\WAIT_CLICKThis'll really cheer up a \r\nroom!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0576.txt,47,0x18,1,
+event_0576.txt,48,0x9d,2,
+event_0577.txt,17,0x9e,1,The Large Bed you ordered \r\nis here. \BRK\WAIT_CLICKWhat are you going to do \r\nwith such a huge bed? \BRK | Delivered safe and sound!\BRK
+event_0577.txt,47,0x19,1,
+event_0577.txt,48,0x9e,2,
+event_0578.txt,17,0x9f,1,"The Knife you ordered \r\nis here. \BRK\WAIT_CLICKCan't cut anything without\r\none of these!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0578.txt,47,0x20,1,
+event_0578.txt,48,0x9f,2,
+event_0579.txt,17,0xa0,1,"The Frying Pan you ordered \r\nis here. \BRK\WAIT_CLICKCan't fry anything without\r\none of these. \r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0579.txt,47,0x21,1,
+event_0579.txt,48,0xa0,2,
+event_0580.txt,17,0xa1,1,"The Pot you ordered \r\nis here. \BRK\WAIT_CLICKCan't boil water without \r\none of these!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0580.txt,47,0x22,1,
+event_0580.txt,48,0xa1,2,
+event_0581.txt,17,0xa2,1,"The Mixer you ordered \r\nis here. \BRK\WAIT_CLICKCan't make Juice without \r\none of these.\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0581.txt,47,0x23,1,
+event_0581.txt,48,0xa2,2,
+event_0582.txt,17,0xa3,1,"The Whisk you ordered \r\nis here. \BRK\WAIT_CLICKCan't make Cakes without\r\none of these.\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0582.txt,47,0x24,1,
+event_0582.txt,48,0xa3,2,
+event_0583.txt,17,0xa4,1,"The Rolling Pin you ordered \r\nis here. \BRK\WAIT_CLICKCan't make noodles without\r\nthis baby!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0583.txt,47,0x25,1,
+event_0583.txt,48,0xa4,2,
+event_0584.txt,17,0xa5,1,"The Oven you ordered \r\nis here. \BRK\WAIT_CLICKCan't bake anything without\r\nthis baby!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0584.txt,47,0x26,1,
+event_0584.txt,48,0xa5,2,
+event_0585.txt,17,0xa6,1,"The Seasoning Set you \r\nordered is here. \BRK\WAIT_CLICKCan't make tasty food \r\nwithout spices.\r\nThey're top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0585.txt,47,0x27,1,
+event_0585.txt,48,0xa6,2,
+event_0586.txt,17,0xa7,1,"The Power Berry you ordered\r\nis here. \BRK\WAIT_CLICKThis will really increase\r\nyour Stamina!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0586.txt,48,0xa7,2,
+event_0587.txt,17,0xa8,1,"The Mirror you ordered \r\nis here. \BRK\WAIT_CLICKA man's gotta take care of \r\nhis looks!\r\nIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0587.txt,47,0x1a,1,
+event_0587.txt,48,0xa8,2,
+event_0588.txt,17,0xa9,1,"Hey, the Clock you ordered \r\nfinally came in.\BRK\WAIT_CLICKIt's top quality, too!\BRK | Delivered safe and sound!\BRK"
+event_0588.txt,47,0x1b,1,
+event_0588.txt,48,0xa9,2,
+event_0589.txt,58,0xaa,2,"My birthday?!...\r\nI hope you're joking!\r\nEither way, now you're \BRK\r\nnot getting the anniversary\r\ngift I had for you!\BRK"
+event_0589.txt,87,0xaa,2,"Here you are, \xFF).\BRK | I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK"
+event_0589.txt,103,0xaa,1,"I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK | Huh? What kind of a\r\nhusband thinks an \r\nanniversary is his own \BRK\r\nbirthday!?\BRK"
+event_0589.txt,114,0xaa,2,Huh? What kind of a\r\nhusband thinks an \r\nanniversary is his own \BRK\r\nbirthday!?\BRK
+event_0590.txt,23,0xaa,2,"Here you are, \xFF).\r\nFrom me to you...\BRK"
+event_0592.txt,31,0xab,1,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you.\r\nActually...It's a Cottage \r\nin the mountains!\BRK\WAIT_CLICKHow did I pay for it?\r\nTha"
+event_0592.txt,43,0xab,2,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you.\r\nActually...It's a Cottage \r\nin the mountains!\BRK\WAIT_CLICKHow did I pay for it?\r\nTha"
+event_0593.txt,58,0xac,2,"My birthday? \r\nNo, it's our anniversary, \r\nsilly! I can't believe you\BRK\r\nforgot! I could hardly wait\r\nto give you a present!\BRK\WAIT_CLICKWell, I'm not giving it \r\nto you any more!\BRK"
+event_0593.txt,87,0xac,2,"Here you are, \xFF).\BRK | I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK"
+event_0593.txt,103,0xac,1,"I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK | What!?\r\nI can't believe you won't \r\neven remember our \BRK\r\nanniversary!\BRK\WAIT_CLICKI was going to give you a \r\ngift,"
+event_0593.txt,114,0xac,2,"What!?\r\nI can't believe you won't \r\neven remember our \BRK\r\nanniversary!\BRK\WAIT_CLICKI was going to give you a \r\ngift, but not any more!\BRK"
+event_0595.txt,23,0xac,2,Here you go.\BRK
+event_0596.txt,31,0xad,1,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you.\r\nActually...It's a Cottage \r\nin the mountains!\BRK\WAIT_CLICKHow did I pay for it?\r\nTha"
+event_0596.txt,43,0xad,2,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you.\r\nActually...It's a Cottage \r\nin the mountains!\BRK\WAIT_CLICKHow did I pay for it?\r\nTha"
+event_0597.txt,58,0xae,2,"My birthday? \r\nNo, it's our anniversary, \r\nsilly! I can't believe you \BRK\r\nforgot! I could hardly wait\r\nto give you a present!\BRK\WAIT_CLICKI'm not giving it to \r\nsomeone so thoughtless!\B"
+event_0597.txt,87,0xae,2,"Here you are, \xFF).\BRK | I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK"
+event_0597.txt,103,0xae,1,"I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK | Your kidding, aren't you?!\r\nDo you have a fever,\r\nbecause if you don't \BRK\r\nthere's no excuse for this!\BRK\WAIT_CLICKIt'"
+event_0597.txt,114,0xae,2,"Your kidding, aren't you?!\r\nDo you have a fever,\r\nbecause if you don't \BRK\r\nthere's no excuse for this!\BRK\WAIT_CLICKIt's our anniversary, silly!\BRK"
+event_0599.txt,23,0xae,2,"Here you are, \xFF).\BRK"
+event_0600.txt,31,0xaf,1,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you.\r\nActually...It's a Cottage \r\nin the mountains!\BRK\WAIT_CLICKHow did I pay for it...?\r\n"
+event_0600.txt,43,0xaf,2,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you.\r\nActually...It's a Cottage \r\nin the mountains!\BRK\WAIT_CLICKHow did I pay for it...?\r\n"
+event_0601.txt,58,0xb0,2,"My birthday? \r\nNo, it's our anniversary, \r\nsilly! I can't believe you \BRK\r\nforgot! I could hardly wait\r\nto give you a present!\BRK\WAIT_CLICKWell, I'm not giving it \r\nto you any more!\BRK"
+event_0601.txt,87,0xb0,2,"Here you are, \xFF).\BRK | I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK"
+event_0601.txt,103,0xb0,1,"I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK | Is that a joke!?\r\nI can't believe how \r\nself-centered you are!\BRK\WAIT_CLICKI was going to give you a \r\ngift, but not any"
+event_0601.txt,114,0xb0,2,"Is that a joke!?\r\nI can't believe how \r\nself-centered you are!\BRK\WAIT_CLICKI was going to give you a \r\ngift, but not any more!\BRK"
+event_0603.txt,23,0xb0,2,"Here you are, \xFF).\BRK"
+event_0604.txt,31,0xb1,1,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI hope you didn't forget!\r\nGuess what my gift is?\r\nActually...It's a Cottage \BRK\WAIT_CLICKin the mountains!\r\nHo"
+event_0604.txt,43,0xb1,2,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI hope you didn't forget!\r\nGuess what my gift is?\r\nActually...It's a Cottage \BRK\WAIT_CLICKin the mountains!\r\nHo"
+event_0605.txt,58,0xb2,2,My birthday?!?\r\nThis means you don't \r\nreally remember either my\BRK\r\nbirthday or our anniversary!\BRK\WAIT_CLICKSo much for your present!\BRK
+event_0605.txt,87,0xb2,2,"Here you are, \xFF).\BRK | I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK"
+event_0605.txt,103,0xb2,1,"I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK | You're birthday!?\r\nThat's the most insensitive \r\nthing I've ever heard!\BRK\WAIT_CLICKNow you're not getting\r\nyour present"
+event_0605.txt,114,0xb2,2,You're birthday!?\r\nThat's the most insensitive \r\nthing I've ever heard!\BRK\WAIT_CLICKNow you're not getting\r\nyour present anymore!\BRK
+event_0607.txt,23,0xb2,2,"Here you are, \xFF).\BRK"
+event_0608.txt,31,0xb3,1,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you\r\nthat I know you'll just \r\nlove...It's a Cottage\BRK\r\nin the mountains!\BRK\WAIT_CLICKHo"
+event_0608.txt,43,0xb3,2,"Good morning, \xFF).\r\nToday is our 50th wedding \r\nanniversary!\BRK\WAIT_CLICKI have a present for you\r\nthat I know you'll just \r\nlove...It's a Cottage\BRK\r\nin the mountains!\BRK\WAIT_CLICKHo"
+event_0609.txt,26,0xb4,1,
+event_0610.txt,61,0xb4,2,I'd better apologize \r\nlater...\BRK
+event_0610.txt,83,0xb4,2,I'd better apologize \r\nlater...\BRK
+event_0610.txt,127,0xb4,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0612.txt,26,0xb5,1,
+event_0614.txt,62,0xb5,2,I'd better apologize \r\nlater...\BRK
+event_0614.txt,84,0xb5,2,I'd better apologize \r\nlater...\BRK
+event_0614.txt,128,0xb5,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0615.txt,26,0xb6,1,
+event_0617.txt,62,0xb6,2,I'd better apologize \r\nlater...\BRK
+event_0617.txt,84,0xb6,2,I'd better apologize \r\nlater...\BRK
+event_0617.txt,128,0xb6,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0618.txt,26,0xb7,1,
+event_0620.txt,62,0xb7,2,I'd better apologize \r\nlater...\BRK
+event_0620.txt,84,0xb7,2,I'd better apologize \r\nlater...\BRK
+event_0620.txt,128,0xb7,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0621.txt,26,0xb8,1,
+event_0623.txt,62,0xb8,2,I'd better apologize \r\nlater...\BRK
+event_0623.txt,84,0xb8,2,I'd better apologize \r\nlater...\BRK
+event_0623.txt,128,0xb8,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0624.txt,35,0xb9,1,
+event_0625.txt,63,0xb9,2,"It's my birthday!!\r\nHow can you forget both my\r\nbirthday and our\BRK\r\nanniversary!?\BRK | I'd better apologize \r\nlater...\BRK | What!? \r\nIt's my birthday today,\r\nyou idiot!\BRK"
+event_0625.txt,83,0xb9,2,"What!? \r\nIt's my birthday today,\r\nyou idiot!\BRK | I'd better apologize \r\nlater...\BRK | You remembered!\r\nI don't know why, but I was\r\nsure you'd forget...Sorry!\BRK"
+event_0625.txt,117,0xb9,2,"I look more mature to\r\nyou, don't I...?\BRK\WAIT_CLICKWell, one day does too\r\nmake a difference!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK"
+event_0625.txt,144,0xb9,2,I'd better apologize \r\nlater...\BRK
+event_0625.txt,180,0xb9,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0625.txt,202,0xb9,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0627.txt,35,0xba,1,
+event_0629.txt,63,0xba,2,"It may not matter to you, \r\nbut it matters to me...!\BRK\WAIT_CLICKIt's my birthday!\BRK | I'd better apologize \r\nlater...\BRK | Are you feeling OK, \r\n\xFF)? \BRK\WAIT_CLICKIf you're not sick, y"
+event_0629.txt,83,0xba,2,"Are you feeling OK, \r\n\xFF)? \BRK\WAIT_CLICKIf you're not sick, you've\r\nno excuse for forgetting\r\nmy birthday!\BRK | I'd better apologize \r\nlater...\BRK | Awww...You remembered!\r\nYou're so b"
+event_0629.txt,117,0xba,2,Sorry all my food is the\r\nsame as at the Inn. \BRK\WAIT_CLICKI learned it all from dad!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0629.txt,144,0xba,2,I'd better apologize \r\nlater...\BRK
+event_0629.txt,180,0xba,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0629.txt,202,0xba,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0630.txt,35,0xbb,1,
+event_0632.txt,64,0xbb,2,"...Anniversary?\r\nYou're joking, right?\r\nNo husband is callous \BRK\r\nenough to forget his \r\nwife's birthday, right...?\BRK | I'd better apologize \r\nlater...\BRK | Are you already becoming\r\n"
+event_0632.txt,84,0xbb,2,"Are you already becoming\r\nsenile at your age?...\r\nThat's worrying...\BRK\WAIT_CLICKIt's my birthday, remember?\BRK | I'd better apologize \r\nlater...\BRK | You really did remember?\r\nYou weren't"
+event_0632.txt,118,0xbb,2,I can't wait to have a\r\nbaby. I love kids. \BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0632.txt,145,0xbb,2,I'd better apologize \r\nlater...\BRK
+event_0632.txt,181,0xbb,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0632.txt,203,0xbb,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0633.txt,35,0xbc,1,
+event_0635.txt,65,0xbc,2,..........................\r\nWrong! It's my birthday!\BRK\WAIT_CLICKI can't believe you \r\nforgot!\BRK | I'd better apologize \r\nlater...\BRK | Ha ha ha! I can't \r\nbelieve you mixed up our \r\nbi
+event_0635.txt,85,0xbc,2,"Ha ha ha! I can't \r\nbelieve you mixed up our \r\nbirthdays! You sure are \BRK\r\ncute, \xFF).\BRK | I'd better apologize \r\nlater...\BRK | That's right!\r\nYou'll celebrate with me, \r\nright?\BRK"
+event_0635.txt,119,0xbc,2,"Well, we will celebrate our\r\nanniversaries just like \r\nthis...Forever!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK"
+event_0635.txt,146,0xbc,2,I'd better apologize \r\nlater...\BRK
+event_0635.txt,182,0xbc,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0635.txt,204,0xbc,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0636.txt,35,0xbd,1,
+event_0638.txt,64,0xbd,2,"Our anniversary, huh?\BRK\WAIT_CLICKIn that case...just when do\r\nyou think my birthday is!?\BRK | I'd better apologize \r\nlater...\BRK | Ha! Sometimes you really are\r\nlike a character in a story!"
+event_0638.txt,84,0xbd,2,"Ha! Sometimes you really are\r\nlike a character in a story!\r\nIt's my birthday, silly!\BRK | I'd better apologize \r\nlater...\BRK | That's right. \r\nToday I'm a year older, and\r\nhopefully a year"
+event_0638.txt,118,0xbd,2,It's no fun having your \r\nbirthday be the same day as\r\nyour parents' anniversary!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0638.txt,145,0xbd,2,I'd better apologize \r\nlater...\BRK
+event_0638.txt,181,0xbd,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0638.txt,203,0xbd,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0639.txt,35,0xbe,1,
+event_0640.txt,63,0xbe,2,"I can't believe you're so\r\nbusy you even forgot your \r\nown birthday!\BRK\WAIT_CLICKEat this and go to bed\r\nearly, \xFF).\BRK | I'd better apologize \r\nlater...\BRK | Happy birthday! \r\nI've be"
+event_0640.txt,97,0xbe,2,Happy birthday! \r\nI've been planning this for\r\na long time!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK | How can you confuse my\r\nbirthday with your own?!\r\nYou're unbelievab
+event_0640.txt,117,0xbe,2,How can you confuse my\r\nbirthday with your own?!\r\nYou're unbelievable!\BRK | I'd better apologize \r\nlater...\BRK
+event_0640.txt,158,0xbe,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0640.txt,180,0xbe,2,I'd better apologize \r\nlater...\BRK
+event_0640.txt,202,0xbe,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0642.txt,35,0xbf,1,
+event_0644.txt,63,0xbf,2,"Sorry, try again.\r\nIt's your own birthday!\r\nAre you pulling my leg?\BRK | I'd better apologize \r\nlater...\BRK | That's right! You're getting\r\nolder now, so you have\r\nmore responsibilities, t"
+event_0644.txt,97,0xbf,2,Sorry all my food is the\r\nsame as at the Inn. \BRK\WAIT_CLICKI learned it all from dad!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK | My birthday!?...\r\nGet a grip! It's YOUR \r\
+event_0644.txt,117,0xbf,2,My birthday!?...\r\nGet a grip! It's YOUR \r\nbirthday!\BRK | I'd better apologize \r\nlater...\BRK
+event_0644.txt,158,0xbf,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0644.txt,180,0xbf,2,I'd better apologize \r\nlater...\BRK
+event_0644.txt,202,0xbf,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0645.txt,35,0xc0,1,
+event_0647.txt,64,0xc0,2,"...Our anniversary?\r\nYou were just kidding, \r\nright? I hope you'd\BRK\r\nremember your own birthday!\BRK | I'd better apologize \r\nlater...\BRK | Happy birthday!\r\nAre you surprised?\BRK"
+event_0647.txt,98,0xc0,2,"I can't wait to have a\r\nbaby. I love kids. \BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK | Well, maybe I shouldn't\r\nexpect you to remember MY\r\nbirthday, but at least \BRK\r\nre"
+event_0647.txt,118,0xc0,2,"Well, maybe I shouldn't\r\nexpect you to remember MY\r\nbirthday, but at least \BRK\r\nremember your OWN!\BRK | I'd better apologize \r\nlater...\BRK"
+event_0647.txt,159,0xc0,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0647.txt,181,0xc0,2,I'd better apologize \r\nlater...\BRK
+event_0647.txt,203,0xc0,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0648.txt,35,0xc1,1,
+event_0650.txt,65,0xc1,2,"Hmm...It's even more \r\nimportant to me than our \r\nanniversary. \BRK\WAIT_CLICKIt's your birthday, silly!\BRK | I'd better apologize \r\nlater...\BRK | Happy birthday!\r\nLet's have a glass of \r\n"
+event_0650.txt,99,0xc1,2,"Well, we will celebrate our\r\nanniversaries just like \r\nthis...Forever!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK | Ha ha ha! I can't \r\nbelieve you mixed up our \r\nbirthdays"
+event_0650.txt,119,0xc1,2,"Ha ha ha! I can't \r\nbelieve you mixed up our \r\nbirthdays! You sure are \BRK\r\ncute, \xFF).\BRK | I'd better apologize \r\nlater...\BRK"
+event_0650.txt,160,0xc1,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0650.txt,182,0xc1,2,I'd better apologize \r\nlater...\BRK
+event_0650.txt,204,0xc1,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0651.txt,35,0xc2,1,
+event_0653.txt,63,0xc2,2,"Ha! Sometimes you really are\r\nlike a character in a story!\r\nIt's you birthday, silly!\BRK\r\nHappy birthday!\BRK | I'd better apologize \r\nlater...\BRK | Were you pretending to\r\nforget, just to"
+event_0653.txt,97,0xc2,2,It's no fun having your \r\nbirthday be the same day as\r\nyour parents' anniversary!\BRK | I had so much fun today!\r\nI'll sleep like a log...\BRK | I can't believe you mix up\r\nyour birthday and m
+event_0653.txt,117,0xc2,2,"I can't believe you mix up\r\nyour birthday and mine!\r\nSometimes I wonder what \BRK\r\ngoes on in your head, \r\n\xFF).\BRK | I'd better apologize \r\nlater...\BRK"
+event_0653.txt,158,0xc2,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0653.txt,180,0xc2,2,I'd better apologize \r\nlater...\BRK
+event_0653.txt,202,0xc2,2,I'd better apologize \r\nlater...\BRK | Hurry up and finish.\r\nToday is an important day.\BRK
+event_0654.txt,25,0xc3,1,"I don't feel well at all!\r\n\xFF), will you take\r\nme to the Clinic?\BRK"
+event_0654.txt,116,0xc3,2,I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK
+event_0655.txt,25,0xc4,1,"I don't feel very good all\r\nof a sudden...\BRK\WAIT_CLICK\xFF), will you \r\ncome with me to the Clinic?\BRK"
+event_0655.txt,116,0xc4,2,I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK
+event_0656.txt,25,0xc5,1,"I think I might have \r\ncome down with something...\BRK\WAIT_CLICKI feel sick to my stomach.\BRK\WAIT_CLICK\xFF), will you take\r\nme to the Clinic?\BRK"
+event_0656.txt,112,0xc5,2,I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK
+event_0657.txt,25,0xc6,1,"I feel kind of nauseous...\r\nI wonder if I drank too much\r\nlast night?\BRK\WAIT_CLICK\xFF), will you\r\ntake me to the Clinic?\BRK"
+event_0657.txt,116,0xc6,2,I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK
+event_0658.txt,25,0xc7,1,"I wonder if I've been \r\nreading too much...?\BRK\WAIT_CLICKI don't feel well all of\r\nthe sudden.\BRK\WAIT_CLICK\xFF), will you \r\ntake me to the Clinic?\BRK"
+event_0658.txt,116,0xc7,2,I can't believe I'm about to\r\nbecome a father...\r\nThis is so great!\BRK
+event_0659.txt,28,0xc8,1,
+event_0659.txt,235,0xc8,2,"I'm so happy!\r\nWelcome to the world, \r\n\xFF*!\BRK | Now I'm a father!\r\nI love you, \xFF*.\BRK"
+event_0660.txt,28,0xc9,1,
+event_0660.txt,235,0xc9,2,"\xFF*?\r\nThat sounds like a good \r\nname to me!\BRK | Now I'm a father!\r\nI love you, \xFF*.\BRK"
+event_0661.txt,27,0xca,1,
+event_0661.txt,225,0xca,2,"\xFF*...\r\nI think it fits him well!\BRK | Now I'm a father!\r\nI love you, \xFF*.\BRK"
+event_0662.txt,28,0xcb,1,
+event_0662.txt,235,0xcb,2,"\xFF*?\r\nHow long have you been\r\nthinking of that?\BRK | Now I'm a father!\r\nI love you, \xFF*.\BRK"
+event_0663.txt,28,0xcc,1,
+event_0663.txt,235,0xcc,2,"\xFF*......\r\nI think it suits him \r\nperfectly!\BRK | Now I'm a father!\r\nI love you, \xFF*.\BRK"
+event_0664.txt,80,0x2f,1,He started walking just this\r\nmorning! I almost cried!\BRK | They just grow up so \r\nquickly!\BRK
+event_0664.txt,84,0xcd,1,They just grow up so \r\nquickly!\BRK
+event_0667.txt,80,0x2f,1,He started walking just this\r\nmorning! I couldn't believe\r\nmy eyes!\BRK | I can't wait to watch \r\nhim grow up...!\BRK
+event_0667.txt,84,0xce,1,I can't wait to watch \r\nhim grow up...!\BRK
+event_0670.txt,80,0x2f,1,"He took his first steps \r\ntoday. He's early for his\r\nage. Precocious, like you!\BRK | Or do all parents think their\r\nown baby is the smartest...?\BRK"
+event_0670.txt,84,0xcf,1,Or do all parents think their\r\nown baby is the smartest...?\BRK
+event_0673.txt,80,0x2f,1,I was so surprised this \r\nmorning when he started \r\nwalking! He couldn't walk \BRK\r\nyesterday at all!\BRK | He's growing up before our\r\nvery eyes!\BRK
+event_0673.txt,84,0xd0,1,He's growing up before our\r\nvery eyes!\BRK
+event_0676.txt,80,0x2f,1,"Being a parent really shows \r\nyou the joy of life,\r\ndon't you think?\BRK | I can hardly wait to see\r\nwhat he does next!\BRK"
+event_0676.txt,84,0xd1,1,I can hardly wait to see\r\nwhat he does next!\BRK
+event_0679.txt,45,0xd2,1,"I'm sleepy, so I think I'll \r\ntry to sleep this off now.\BRK"
+event_0680.txt,45,0xd3,1,I think I can just sleep it\r\noff and feel better in \r\nthe morning.\BRK
+event_0681.txt,45,0xd4,1,I think I'll just sleep for \r\nthe rest of the day. \r\nGood night.\BRK
+event_0682.txt,45,0xd5,1,"I think I'm going to hit the\r\nsack early tonight, \r\n\xFF).\BRK"
+event_0683.txt,45,0xd6,1,"I took some medicine, so I \r\nthink if I just go to bed\r\nnow I should be alright.\BRK"
+event_0684.txt,77,0xd7,2,"I'm taking \xFF*\r\nto the Doctor now, even if\r\nI have to kick him out\BRK\r\nof bed!\BRK"
+event_0684.txt,134,0xd7,2,"I understand. \r\nI'm sorry, \xFF*.\BRK | Da-!\BRK"
+event_0685.txt,77,0xd8,2,"I'm going to the Clinic now.\r\nI don't care what time \r\nit is!\BRK\WAIT_CLICKCome on, \xFF*!\BRK"
+event_0685.txt,134,0xd8,2,"I understand. \r\nI'm sorry, \xFF*.\BRK | Da-!\BRK"
+event_0686.txt,77,0xd9,2,"No, I definitely want the\r\nDoctor to look at him. \r\nCome on, \xFF*. \BRK"
+event_0686.txt,134,0xd9,2,"I understand. \r\nI'm sorry, \xFF*.\BRK | Da-!\BRK"
+event_0687.txt,77,0xda,2,"No, I'm going to the Clinic\r\nnow> I don't care if I have\r\nto kick the Doctor out of \BRK\r\nbed!.\BRK"
+event_0687.txt,134,0xda,2,"I understand. \r\nI'm sorry, \xFF*.\BRK | Da-!\BRK"
+event_0688.txt,77,0xdb,2,"I'll take him to the Clinic\r\nmyself, \xFF).\r\nCome on, \xFF*.\BRK"
+event_0688.txt,134,0xdb,2,I understand. \r\nI'll be more careful.\BRK | Da-!\BRK
+event_0689.txt,32,0xe2,1,"New Year's Festival is today\r\nhere from 6 PM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,39,0xe2,2,"New Year's Festival is today\r\nhere from 6 PM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,52,0xe2,2,"Spring Horse Races are today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,66,0xe2,2,"Announcement of the \r\nCooking Contest theme is \r\nhere at 10 AM. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,80,0xe2,2,"The Chicken Festival is\r\ntoday here from 10 AM on.\BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,94,0xe2,2,"The Cow Festival is today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,108,0xe2,2,"The Harvest Festival is \r\ntoday here from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,122,0xe2,2,"Fall Horse Races are today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,136,0xe2,2,"The Sheep Festival is today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0689.txt,150,0xe2,2,"The Year End Festival is \r\nhere today from 6 PM on.  \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,32,0xe2,1,"New Year's Festival is today\r\nhere from 6 PM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,39,0xe2,2,"New Year's Festival is today\r\nhere from 6 PM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,52,0xe2,2,"Spring Horse Races are today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,66,0xe2,2,"Announcement of the \r\nCooking Contest theme is \r\nhere at 10 AM. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,80,0xe2,2,"The Chicken Festival is\r\ntoday here from 10 AM on.\BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,94,0xe2,2,"The Cow Festival is today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,108,0xe2,2,"The Harvest Festival is \r\ntoday here from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,122,0xe2,2,"Fall Horse Races are today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,136,0xe2,2,"The Sheep Festival is today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0690.txt,150,0xe2,2,"The Year End Festival is \r\nhere today from 6 PM on.  \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,32,0xe2,1,"New Year's Festival is today\r\nhere from 6 PM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,39,0xe2,2,"New Year's Festival is today\r\nhere from 6 PM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,52,0xe2,2,"Spring Horse Races are today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,66,0xe2,2,"Announcement of the \r\nCooking Contest theme is \r\nhere at 10 AM. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,80,0xe2,2,"The Chicken Festival is\r\ntoday here from 10 AM on.\BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,94,0xe2,2,"The Cow Festival is today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,108,0xe2,2,"The Harvest Festival is \r\ntoday here from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,122,0xe2,2,"Fall Horse Races are today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,136,0xe2,2,"The Sheep Festival is today\r\nhere from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0691.txt,150,0xe2,2,"The Year End Festival is \r\nhere today from 6 PM on.  \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0692.txt,24,0xe2,1,"Beach Day is today at the\r\nBeach from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0692.txt,31,0xe2,2,"Beach Day is today at the\r\nBeach from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0693.txt,24,0xe2,1,"Beach Day is today at the\r\nBeach from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0693.txt,31,0xe2,2,"Beach Day is today at the\r\nBeach from 10 AM on. \BRK\WAIT_CLICKRight now I'm getting ready\r\nfor it.\BRK\WAIT_CLICKYou should come, too. \BRK"
+event_0694.txt,9,0xe3,1,
+event_0694.txt,94,0xe3,2,You'll have to learn to pace\r\nyourself better from now on.\r\nRest here for today. \BRK
+event_0694.txt,96,0xe3,0,You'll have to learn to pace\r\nyourself better from now on.\r\nRest here for today. \BRK
+event_0695.txt,137,0xe4,1,"Don't worry about it. \r\nI'm just glad my children \r\nare so concerned about me!\BRK\WAIT_CLICKThank you both, dears...\BRK | Just take care, Mom...\BRK"
+event_0695.txt,138,0xe5,1,"Don't worry about it. \r\nI'm just glad my children \r\nare so concerned about me!\BRK\WAIT_CLICKThank you both, dears...\BRK | Just take care, Mom...\BRK"
+event_0699.txt,111,0xe6,1,"Why can't you just be happy\r\nlike Mom, Rick?\BRK | This mean's he's safe, \r\ndon't you see?\r\nI'm so happy...\BRK"
+event_0703.txt,99,0xe7,2,Grrr...\BRK
+event_0704.txt,77,0xe8,1,"Gee Karen...Thanks!\BRK | You don't need to thank me!\r\nWe're married, aren't we?\r\nThat's what spouses do.\BRK"
+event_0707.txt,165,0xe9,1,...Women! \BRK
+event_0709.txt,244,0xea,2,
+event_0710.txt,142,0xeb,2,
+event_0711.txt,174,0xee,2,
+event_0712.txt,88,0xef,1,What\x81fs wrong with Sai?\r\nYour face got all red \r\nsuddenly!\BRK
+event_0713.txt,125,0xf0,1,Saibara can be so\r\nstrange sometimes!\BRK
+event_0714.txt,172,0xf1,1,"Gray's a great guy, \r\ndon't you think? \BRK"
+event_0716.txt,74,0xf3,2,
+event_0717.txt,66,0xf9,1,
+event_0717.txt,308,0xf9,2,
+event_0717.txt,309,0xfa,2,
+event_0718.txt,100,0xfb,1,...OK.\BRK | Good. I'll forgive you \r\nthis time.\BRK
+event_0721.txt,130,0xfc,1,
+event_0724.txt,118,0xfe,1,"Thanks, \xFF!. \r\nNow I feel more confident\r\nin myself. Now to that \r\nletter...\BRK | You think so...?\r\nMaybe I should have written\r\nit more clearly, after \BRK\r\nall...!\BRK\WAIT_CLICKNow I"
+event_0724.txt,127,0xfe,0,"You think so...?\r\nMaybe I should have written\r\nit more clearly, after \BRK\r\nall...!\BRK\WAIT_CLICKNow I feel horrible.\r\nWill you leave me alone\r\nnow please? \BRK"
+event_0724.txt,133,0xfd,1,"You think so...?\r\nMaybe I should have written\r\nit more clearly, after \BRK\r\nall...!\BRK\WAIT_CLICKNow I feel horrible.\r\nWill you leave me alone\r\nnow please? \BRK"
+event_0726.txt,126,0xff,1,"I'm ready to fall in love\r\nwith you all over again, \r\ndear!\BRK | Now I'm getting all\r\nembarrassed...!\BRK"
+event_0731.txt,153,0x101,1,Aww...You're no fun!\r\nDon't you know that women \r\nlove a man who knows\BRK\r\nhow to cook?\BRK
+event_0731.txt,184,0x100,2,OK. First you...\BRK
+event_0732.txt,206,0x102,2,
+event_0733.txt,113,0x104,1,"I'm glad I married \r\nyou, Gray!\BRK | Now you're making me\r\nembarrassed...!\BRK"
+event_0736.txt,106,0x105,2,
+event_0737.txt,185,0x106,2,
+event_0738.txt,49,0x108,0,"You see...\r\nI got into a boasting match\r\nwith the Mayor of the next \BRK\r\ntown over, and...\BRK | I have to bring a Diamond\r\nto him today.  \BRK | I have to bring a Bracelet\r\nto him today.  "
+event_0738.txt,53,0x108,1,"You see...\r\nI got into a boasting match\r\nwith the Mayor of the next \BRK\r\ntown over, and...\BRK | I have to bring a Diamond\r\nto him today.  \BRK | I have to bring a Bracelet\r\nto him today.  "
+event_0738.txt,57,0x108,2,I have to bring a Diamond\r\nto him today.  \BRK | I have to bring a Bracelet\r\nto him today.  \BRK | I have to bring a Green\r\nPepper to him today.  \BRK | I have to bring a Golden\r\nEgg to him to
+event_0738.txt,61,0x108,3,I have to bring a Bracelet\r\nto him today.  \BRK | I have to bring a Green\r\nPepper to him today.  \BRK | I have to bring a Golden\r\nEgg to him today.  \BRK | I have to bring Black Grass\r\nto him 
+event_0738.txt,65,0x108,4,I have to bring a Green\r\nPepper to him today.  \BRK | I have to bring a Golden\r\nEgg to him today.  \BRK | I have to bring Black Grass\r\nto him today.  \BRK | I have to bring White\r\nGrass to him
+event_0738.txt,69,0x108,5,I have to bring a Golden\r\nEgg to him today.  \BRK | I have to bring Black Grass\r\nto him today.  \BRK | I have to bring White\r\nGrass to him today.  \BRK | I have to bring a Truffle\r\nto him toda
+event_0738.txt,73,0x108,6,I have to bring Black Grass\r\nto him today.  \BRK | I have to bring White\r\nGrass to him today.  \BRK | I have to bring a Truffle\r\nto him today.  \BRK | I have to bring a Moon\r\nStone to him toda
+event_0738.txt,77,0x108,7,I have to bring White\r\nGrass to him today.  \BRK | I have to bring a Truffle\r\nto him today.  \BRK | I have to bring a Moon\r\nStone to him today.  \BRK | I have to bring an AEPFE\r\nApple to him t
+event_0738.txt,81,0x108,8,I have to bring a Truffle\r\nto him today.  \BRK | I have to bring a Moon\r\nStone to him today.  \BRK | I have to bring an AEPFE\r\nApple to him today.  \BRK | I have to bring a Rice\r\nCake to him t
+event_0738.txt,85,0x108,9,I have to bring a Moon\r\nStone to him today.  \BRK | I have to bring an AEPFE\r\nApple to him today.  \BRK | I have to bring a Rice\r\nCake to him today.  \BRK | I'm sorry to ask this of you\r\nall t
+event_0738.txt,109,0x109,0,"I knew you were the kind of \r\nman I could depend on! \BRK\WAIT_CLICKI'll come by around 7PM to \r\npick it up, OK? \r\nI'm very grateful!\BRK | Really...? \r\nI overestimated you, it \r\nseems...\BR"
+event_0738.txt,118,0x109,1,"Really...? \r\nI overestimated you, it \r\nseems...\BRK\WAIT_CLICKI'll have to do it myself, \r\nI guess...\BRK"
+event_0738.txt,130,0x107,2,
+event_0739.txt,35,0x10a,1,"Did you bring it for me, \r\n\xFF!? \BRK\WAIT_CLICKShow me quick!\BRK"
+event_0739.txt,40,0x10a,0,"Did you bring it for me, \r\n\xFF!? \BRK\WAIT_CLICKShow me quick!\BRK"
+event_0739.txt,157,0x10a,0,"This isn't it. \r\n\BRK | I asked you for a \r\nDiamond, remember? \r\nBring one quick!\BRK"
+event_0739.txt,229,0x10a,2,"Sorry, but it has to be a \r\nregular Diamond. \BRK\WAIT_CLICKBring one to me quickly!\BRK"
+event_0739.txt,233,0x10a,0,"Sorry, but it has to be a \r\nregular Diamond. \BRK\WAIT_CLICKBring one to me quickly!\BRK"
+event_0739.txt,242,0x10a,0,"Sorry, but it has to be a \r\nregular Diamond. \BRK\WAIT_CLICKBring one to me quickly!\BRK | I said I needed a Bracelet, \r\nnot just any piece of \r\njewelry! \BRK\WAIT_CLICKBring one to me quickly!\"
+event_0739.txt,251,0x10a,0,"I said I needed a Bracelet, \r\nnot just any piece of \r\njewelry! \BRK\WAIT_CLICKBring one to me quickly!\BRK | I said I needed a Golden \r\nEgg, not just any old Egg!\BRK\WAIT_CLICKBring one to me q"
+event_0739.txt,260,0x10a,0,"I said I needed a Golden \r\nEgg, not just any old Egg!\BRK\WAIT_CLICKBring one to me quickly!\BRK | What am I supposed to do \r\nwith an Egg dish!?\BRK\WAIT_CLICKBring me a Golden Egg soon!\BRK"
+event_0739.txt,269,0x10a,0,"What am I supposed to do \r\nwith an Egg dish!?\BRK\WAIT_CLICKBring me a Golden Egg soon!\BRK | Sorry, but this isn't the \r\nkind of Grass I need!\BRK | Bring me some Black Grass\r\nquickly!\BRK | Br"
+event_0739.txt,286,0x10a,0,"Bring me some Black Grass\r\nquickly!\BRK | Bring me some White Grass\r\nquickly!\BRK | I need a Truffle, not \r\nTruffle Rice! \BRK\WAIT_CLICKBring one to me quickly!\BRK"
+event_0739.txt,295,0x10a,0,"I need a Truffle, not \r\nTruffle Rice! \BRK\WAIT_CLICKBring one to me quickly!\BRK | I need a Truffle, not a \r\nnormal Mushroom!\BRK\WAIT_CLICKBring one to me quickly!\BRK"
+event_0739.txt,304,0x10a,0,"I need a Truffle, not a \r\nnormal Mushroom!\BRK\WAIT_CLICKBring one to me quickly!\BRK | I need an AEPFE Apple, \r\nnot a normal one!\BRK\WAIT_CLICKBring one to me quickly!\BRK"
+event_0739.txt,313,0x10a,0,"I need an AEPFE Apple, \r\nnot a normal one!\BRK\WAIT_CLICKBring one to me quickly!\BRK | It looks delicious, but I \r\nneed an AEPFE Apple, not a \r\nregular one! \BRK\WAIT_CLICKBring one to me quick"
+event_0739.txt,322,0x10a,0,"It looks delicious, but I \r\nneed an AEPFE Apple, not a \r\nregular one! \BRK\WAIT_CLICKBring one to me quickly!\BRK | I need an AEPFE Apple, not\r\nApple cooking!\BRK\WAIT_CLICKBring one to me quick"
+event_0739.txt,331,0x10a,0,"I need an AEPFE Apple, not\r\nApple cooking!\BRK\WAIT_CLICKBring one to me quickly!\BRK | I need a regular Rice Cake, \r\nnot a cooked one!\BRK\WAIT_CLICKBring one to me quickly!\BRK"
+event_0740.txt,55,0x10c,0,"I want to write her a \r\nletter, but I'm kind of\r\nstuck...\BRK | I thought that you might\r\nbe a good person to ask \r\nadvice from. \BRK\WAIT_CLICKDo you have any idea \r\nwhat I should write to "
+event_0740.txt,68,0x10c,1,"You're right! I'm \r\nthinking too much about it,\r\nI guess. Simple is best. \BRK | Thanks to your advice, \r\nI've decided to take a \r\nchance and just tell \BRK\r\nAja how I feel. \BRK\WAIT_CLICKT"
+event_0740.txt,79,0x10c,1,OK...Sorry to\r\nbother you...\BRK | OK...Sorry to bother you. \BRK\WAIT_CLICKDon't forget to lock you \r\ndoors at night. \BRK
+event_0740.txt,96,0x10b,2,
+event_0741.txt,47,0x10e,2,
+event_0742.txt,144,0x10f,1,
+event_0744.txt,113,0x110,2,You made Ellen very \r\nhappy. \BRK
+event_0745.txt,182,0x111,1,"He was very shy and \r\neasily embarrassed. \BRK\WAIT_CLICKI can't believe he even \r\nwrote out his feelings \r\nlike he did!\BRK\r\nHe's in heaven now, so \r\nI'll treasure this...\BRK"
+event_0749.txt,57,0x1e,1,
+event_0749.txt,58,0x112,2,
+event_0750.txt,279,0x115,2,
+event_0751.txt,297,0x116,1,
+event_0753.txt,304,0x117,1,"I knew you could \r\ndo it, honey!\BRK | It wasn't so hard after all!\BRK"
+event_0756.txt,113,0x118,1,Yeah. We love to help. \BRK
+event_0760.txt,83,0x119,1,"Huh, thanks for the mushy.\r\nstory. Hee hee hee! \BRK | Come by any time. \BRK"
+event_0763.txt,416,0x11a,2,
+event_0764.txt,243,0x11b,1,
+event_0767.txt,65,0x11c,1,"They were so busy that they \r\ndidn't have much time for\r\nme when I was a child. \BRK\WAIT_CLICKI was lonely, and I blamed \r\nthem for not paying \r\nenough attention to me. \BRK | But, now that I"
+event_0769.txt,129,0x11d,1,And I used to think that \r\nmy blood type fit my \r\npersonality so well...\BRK
+event_0773.txt,166,0x11e,1,
+event_0776.txt,227,0x11f,2,
+event_0777.txt,116,0x120,1,I guess the voice I \r\nheard was right about the \r\ngood fortune!\BRK\WAIT_CLICKI'll have to spend more \r\ntime in the confessional!\BRK
+event_0779.txt,205,0x121,2,
+event_0780.txt,17,0x122,2,"Carter's sleeping, so I'll \r\njust sneak out now...\BRK"
+event_0781.txt,149,0x123,2,
+event_0781.txt,150,0x124,1,
+event_0782.txt,24,0x124,2,"Ahh..So you told \r\nAnn and the others for me.\BRK\WAIT_CLICKThis photo shows me with\r\nmy mother and sister.\BRK\WAIT_CLICK | I didn't like the town\r\nwe lived in, so I left my\r\nmother and my si"
+event_0783.txt,98,0x126,2,
+event_0784.txt,36,0x127,1,"This is the anniversary \r\nof Ann's mother's death.\BRK\WAIT_CLICKAnn lets me take the day \r\noff every year, bless her. \BRK"
+event_0786.txt,213,0x129,0,"I knew I shouldn't count on \r\nyou, \xFF!!\BRK"
+event_0786.txt,232,0x129,1,"I knew I shouldn't count on \r\nyou, \xFF!!\BRK"
+event_0786.txt,245,0x128,1,
+event_0792.txt,123,0x12a,1,
+event_0794.txt,95,0x12b,2,
+event_0795.txt,415,0x12c,2,"Thanks a lot for your help \r\ntoday, \xFF!. \BRK | I'm beat, too!\r\nTime to go home and sleep. \BRK"
+event_0796.txt,87,0x12d,2,I don't think you were here\r\nlast summer. \BRK\WAIT_CLICKThe name's Kai. \BRK\WAIT_CLICKKnow that tiny cottage on \r\nthe beach? I run it during\r\nthe summer. \BRK\WAIT_CLICKCome by for a visit som
+event_0797.txt,28,0x12e,2,
+event_0798.txt,42,0x12f,2,See you next year!\BRK
+event_0799.txt,67,0x130,2,"I just can't get excited \r\nabout it now. I'm in a \r\nslump, I guess. \BRK | I'll snap out of it  \r\neventually, but not now. \BRK\WAIT_CLICKSorry. \BRK"
+event_0799.txt,68,0x131,1,"I just can't get excited \r\nabout it now. I'm in a \r\nslump, I guess. \BRK | I'll snap out of it  \r\neventually, but not now. \BRK\WAIT_CLICKSorry. \BRK"
+event_0800.txt,61,0x132,2,
+event_0800.txt,62,0x131,0,
+event_0801.txt,80,0x133,1,"...I think if I \r\ncan prevent others from\r\nmeeting the same fate...\BRK\WAIT_CLICKThose two will rest \r\na little bit more \r\npeacefully...\BRK | ...I think so, too. \BRK"
+event_0804.txt,139,0x134,1,
+event_0806.txt,72,0x135,1,You got a \r\nFishing Rod!\BRK
+event_0809.txt,28,0x136,2,
+event_0810.txt,53,0x137,2,
+event_0811.txt,99,0x138,2,
+event_0812.txt,37,0x1c,1,"What this house lacks is a \r\nVase! Believe me, I know \r\nabout such things! \BRK\WAIT_CLICKI happen to have one here \r\nI can sell for just 5000G.\BRK | It\x81fs a very rare vase from\r\nthe Ming "
+event_0812.txt,57,0x139,2,
+event_0813.txt,28,0x13b,2,
+event_0814.txt,28,0x13e,2,
+event_0815.txt,156,0x141,2,
+event_0816.txt,50,0x146,2,
+event_0817.txt,152,0x14b,2,
+event_0818.txt,44,0x14c,2,
+event_0819.txt,233,0x151,2,"Of course everyone is mad \r\nat you! \BRK\r\nIt's because of that Golden\r\nLumber! \BRK\WAIT_CLICKIf you respected any of us,\r\nyou'd take it down now!!\BRK"
+event_0819.txt,445,0x151,0,"Are you still using Golden\r\nLumber? \BRK\WAIT_CLICKWhat a horrid person!\r\nIt's an insult to everyone,\r\nso remove it immediately!\BRK"
+event_0819.txt,488,0x152,2,
+event_0820.txt,39,0x153,2,"You can now exchange all of \r\nthe Jewels of Truth for \r\nthe Gem of Truth. \BRK | ...But, it seems you can't \r\nhold any more. \BRK\WAIT_CLICKCome back when your \r\nload is lighter. \BRK"
+event_0820.txt,60,0x155,2,
+event_0821.txt,13,0x156,1,
+event_0821.txt,98,0x156,2,I hope my wish \r\ncomes true...\BRK
+event_0822.txt,6,0x159,1,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 10,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0822.txt,19,0x159,2,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 10,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0823.txt,6,0x15a,1,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 100,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0823.txt,19,0x15a,2,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 100,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0824.txt,6,0x15b,1,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 1,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0824.txt,19,0x15b,2,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 1,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0825.txt,6,0x15c,1,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 10,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0825.txt,19,0x15c,2,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 10,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0826.txt,6,0x15d,1,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 100,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0826.txt,19,0x15d,2,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 100,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0827.txt,6,0x15e,1,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 1,000,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0827.txt,19,0x15e,2,"Ta-daaaa!\BRK\WAIT_CLICKYour pedometer has just\r\ncounted 1,000,000,000.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0828.txt,6,0x15f,1,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped 10,000\r\n\xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0828.txt,20,0x15f,2,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped 10,000\r\n\xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0829.txt,6,0x160,1,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped 100,000\r\n\xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0829.txt,20,0x160,2,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped 100,000\r\n\xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0830.txt,6,0x161,1,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped 1,000,000\r\n\xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0830.txt,20,0x161,2,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped 1,000,000\r\n\xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0831.txt,6,0x162,1,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped\r\n10,000,000 \xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0831.txt,20,0x162,2,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped\r\n10,000,000 \xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0832.txt,6,0x163,1,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped\r\n100,000,000 \xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0832.txt,20,0x163,2,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped\r\n100,000,000 \xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0833.txt,6,0x164,1,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped\r\n1,000,000,000 \xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0833.txt,20,0x164,2,"Ta-daaaa!\BRK\WAIT_CLICKYou have shipped\r\n1,000,000,000 \xFF%.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK"
+event_0834.txt,6,0x165,1,Ta-daaaa!\BRK\WAIT_CLICKYou have shipped every kind\r\nof items you can ship.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0834.txt,19,0x165,2,Ta-daaaa!\BRK\WAIT_CLICKYou have shipped every kind\r\nof items you can ship.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0842.txt,6,0x16d,1,Ta-daaaa!\r\nYou've reached B100.\BRK\WAIT_CLICKThat's all.\r\nThere are more to go.\r\nGood luck.  Bye.\BRK
+event_0842.txt,18,0x16d,2,Ta-daaaa!\r\nYou've reached B100.\BRK\WAIT_CLICKThat's all.\r\nThere are more to go.\r\nGood luck.  Bye.\BRK
+event_0843.txt,6,0x16e,1,Ta-daaaa!\r\nYou've reached B200.\BRK\WAIT_CLICKThat's all.\r\nThere are more to go.\r\nGood luck.  Bye.\BRK
+event_0843.txt,18,0x16e,2,Ta-daaaa!\r\nYou've reached B200.\BRK\WAIT_CLICKThat's all.\r\nThere are more to go.\r\nGood luck.  Bye.\BRK
+event_0844.txt,6,0x16f,1,Ta-daaaa!\r\nYou've reached the lowest\BRK\WAIT_CLICKlevel.  That's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0844.txt,18,0x16f,2,Ta-daaaa!\r\nYou've reached the lowest\BRK\WAIT_CLICKlevel.  That's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0845.txt,6,0x170,1,Ta-daaaa!\r\nYou've found every kind of\r\nitems you can find\BRK\r\nin this mine.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0845.txt,18,0x170,2,Ta-daaaa!\r\nYou've found every kind of\r\nitems you can find\BRK\r\nin this mine.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0846.txt,6,0x171,1,Ta-daaaa!\r\nYou've found every kind of\r\nitems you can find\r\nin this mine.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0846.txt,18,0x171,2,Ta-daaaa!\r\nYou've found every kind of\r\nitems you can find\r\nin this mine.\BRK\WAIT_CLICKCongratulations.\BRK\WAIT_CLICKThat's all.\r\nYou get nothing.\r\nBye.\BRK
+event_0847.txt,8,0x172,1,
+event_0847.txt,70,0x172,2,"I'll marry you if you want,\r\n\xFF!. \BRK | Nope.\BRK"
+event_0847.txt,76,0x172,0,Nope.\BRK
+event_0848.txt,25,0x173,1,
+event_0848.txt,278,0x173,2,.......\r\nI wonder when she'll come \r\nhome...?\BRK
+event_0849.txt,69,0x174,2,My birthday? \r\nHmm...\r\nBye now.\BRK
+event_0849.txt,122,0x174,2,"I'm going to give you a \r\npresent now, so get rid \r\nof what you're holding. \BRK"
+event_0849.txt,137,0x174,1,"I'm going to give you a \r\npresent now, so get rid \r\nof what you're holding. \BRK | Your birthday? \r\nHmm...\r\nBye now.\BRK"
+event_0849.txt,147,0x174,2,Your birthday? \r\nHmm...\r\nBye now.\BRK
+event_0851.txt,34,0x174,2,
+event_0852.txt,29,0x175,1,
+event_0852.txt,66,0x175,2,
+event_0853.txt,26,0x176,1,
+event_0855.txt,72,0x176,2,I better apologize later on.\BRK | My birthday? \r\nHmm...\r\nBye now.\BRK
+event_0855.txt,106,0x176,2,I better apologize later on.\BRK | I didn't think you'd forget! \r\nHere's a special dish\r\nI made.\BRK
+event_0855.txt,148,0x176,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | Hurry up and finish work. \BRK
+event_0856.txt,35,0x177,1,
+event_0858.txt,74,0x177,2,I better apologize later on.\BRK | Your birthday? \r\nHmm...\r\nBye now.\BRK
+event_0858.txt,106,0x177,2,"I better apologize later on.\BRK | Yes, it's my birthday!\BRK\WAIT_CLICKYou hadn't said anything, \r\nso I thought you forgot. \BRK"
+event_0858.txt,139,0x177,2,I had so much fun today!\r\nI'll sleep like a log...\BRK
+event_0858.txt,178,0x177,2,"I better apologize later on.\BRK | Yes, it's my birthday!\BRK\WAIT_CLICKYou hadn't said anything, \r\nso I thought you forgot. \BRK"
+event_0858.txt,213,0x177,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | \xFF*'s birthday? \r\nHmm...\r\nBye now.\BRK
+event_0858.txt,247,0x177,2,I better apologize later on.\BRK | Hurry up and finish work. \BRK
+event_0859.txt,35,0x178,1,
+event_0861.txt,75,0x178,2,I better apologize later on.\BRK | That's right!\r\nCongratulations!\BRK
+event_0861.txt,108,0x178,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | My birthday? \r\nHmm...\r\nBye now.\BRK
+event_0861.txt,140,0x178,2,I better apologize later on.\BRK
+event_0861.txt,180,0x178,2,I had so much fun today!\r\nI'll sleep like a log...\BRK | My birthday? \r\nHmm...\r\nBye now.\BRK
+event_0861.txt,214,0x178,2,I better apologize later on.\BRK | \xFF*'s birthday? \r\nHmm...\r\nBye now.\BRK
+event_0861.txt,248,0x178,2,I better apologize later on.\BRK | Hurry up and finish work. \BRK
+event_0862.txt,15,0x179,1,
+event_0862.txt,53,0x179,2,
+event_0863.txt,21,0x17a,1,I think I hear a voice...!\BRK | !!!\BRK
+event_0863.txt,109,0x17a,2,"I'm a father now!\r\nJust you wait, \r\n\xFF*! \BRK\WAIT_CLICKWe're going to have \r\nlots of fun!\BRK"
+event_0864.txt,95,0x2f,1,
+event_0864.txt,99,0x17b,1,
+event_0866.txt,119,0x17c,2,She really can \r\ndo anything...\BRK
+event_0873.txt,16,0x71,1,
+event_0873.txt,132,0x71,2,
+event_0874.txt,14,0x72,1,
+event_0874.txt,79,0x72,2,What are you mad for?\r\nWait up!\BRK
+event_0875.txt,18,0x73,1,
+event_0875.txt,116,0x73,2,
+event_0876.txt,27,0x74,1,
+event_0876.txt,183,0x74,2,
+event_0877.txt,9,0x75,1,
+event_0877.txt,114,0x75,2,A toast to the newlyweds! \BRK
+event_0878.txt,11,0x76,1,
+event_0878.txt,135,0x76,2,Here's to the new couple. \BRK
+event_0879.txt,82,0x77,2,"Let's celebrate, then! \BRK | To the young couple! \BRK"
+event_0879.txt,83,0x79,0,"Let's celebrate, then! \BRK | To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0879.txt,84,0x245,0,"Let's celebrate, then! \BRK | To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0879.txt,88,0x78,1,"To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0879.txt,106,0x77,1,
+event_0879.txt,118,0x77,1,
+event_0885.txt,47,0x77,2,To the young couple!! \BRK
+event_0885.txt,48,0x79,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0885.txt,49,0x245,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0885.txt,53,0x78,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0885.txt,62,0x77,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0886.txt,81,0x7a,1,"Thank you, Kai!\BRK"
+event_0889.txt,183,0x7b,1,
+event_0891.txt,135,0x7c,1,...\BRK
+event_0894.txt,180,0x7d,1,
+event_0898.txt,9,0x7e,1,
+event_0898.txt,115,0x7e,2,To the newlyweds!\BRK
+event_0899.txt,121,0x7f,2,Let's celebrate then!\BRK | To the new couple!\BRK
+event_0899.txt,122,0x81,0,"Let's celebrate then!\BRK | To the new couple!\BRK | Well, come join us if you \r\nhave time. \BRK"
+event_0899.txt,123,0x246,0,"Let's celebrate then!\BRK | To the new couple!\BRK | Well, come join us if you \r\nhave time. \BRK"
+event_0899.txt,127,0x80,1,"To the new couple!\BRK | Well, come join us if you \r\nhave time. \BRK"
+event_0899.txt,145,0x7f,1,
+event_0899.txt,157,0x7f,1,
+event_0904.txt,47,0x7f,2,To the young couple!! \BRK
+event_0904.txt,48,0x81,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0904.txt,49,0x246,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0904.txt,53,0x80,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0904.txt,62,0x7f,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0906.txt,122,0x82,1,
+event_0908.txt,217,0x83,1,
+event_0911.txt,122,0x84,1,"Make yourself at home,\r\nCliff.\BRK"
+event_0915.txt,226,0x85,1,
+event_0918.txt,9,0x86,1,
+event_0918.txt,108,0x86,2,A toast to the newlyweds! \BRK
+event_0919.txt,73,0x87,2,"Let's celebrate, then! \BRK | To the young couple! \BRK"
+event_0919.txt,74,0x89,0,"Let's celebrate, then! \BRK | To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0919.txt,75,0x249,0,"Let's celebrate, then! \BRK | To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0919.txt,79,0x88,1,"To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0919.txt,97,0x87,1,
+event_0919.txt,109,0x87,1,
+event_0925.txt,47,0x87,2,To the young couple!\BRK
+event_0925.txt,48,0x89,0,"Well, come when you can. \BRK"
+event_0925.txt,49,0x249,0,"Well, come when you can. \BRK"
+event_0925.txt,53,0x88,1,"Well, come when you can. \BRK"
+event_0925.txt,62,0x87,1,"Well, come when you can. \BRK"
+event_0926.txt,206,0x8a,1,
+event_0929.txt,120,0x8b,1,
+event_0932.txt,150,0x8c,2,
+event_0933.txt,131,0x8d,1,
+event_0936.txt,9,0x8e,1,
+event_0936.txt,117,0x8e,2,A toast to the newlyweds! \BRK
+event_0937.txt,82,0x8f,2,Let's celebrate! \BRK | To the young couple!! \BRK
+event_0937.txt,83,0x91,0,"Let's celebrate! \BRK | To the young couple!! \BRK | Well, come join us if you \r\nhave the time. \BRK"
+event_0937.txt,84,0x247,0,"Let's celebrate! \BRK | To the young couple!! \BRK | Well, come join us if you \r\nhave the time. \BRK"
+event_0937.txt,88,0x90,1,"To the young couple!! \BRK | Well, come join us if you \r\nhave the time. \BRK"
+event_0937.txt,106,0x8f,1,
+event_0937.txt,118,0x8f,1,
+event_0941.txt,47,0x8f,2,To the young couple!! \BRK
+event_0941.txt,48,0x91,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0941.txt,49,0x247,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0941.txt,53,0x90,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0941.txt,62,0x8f,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0944.txt,91,0x92,1,"OK, if you say so...\BRK"
+event_0947.txt,154,0x93,1,
+event_0950.txt,97,0x94,1,Are you teasing me...? \BRK
+event_0953.txt,109,0x95,1,Yes. I want you by my \r\nside... always. \BRK
+event_0956.txt,9,0x96,1,
+event_0956.txt,113,0x96,2,A toast to the newlyweds! \BRK
+event_0957.txt,79,0x97,2,"Let's celebrate, then! \BRK | To the young couple! \BRK"
+event_0957.txt,80,0x99,0,"Let's celebrate, then! \BRK | To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0957.txt,81,0x248,0,"Let's celebrate, then! \BRK | To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0957.txt,85,0x98,1,"To the young couple! \BRK | Well, come by if you get \r\na chance. \BRK"
+event_0957.txt,103,0x97,1,
+event_0957.txt,115,0x97,1,
+event_0963.txt,47,0x97,2,To the young couple!! \BRK
+event_0963.txt,48,0x99,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0963.txt,49,0x248,0,"Well, come join us if you \r\nhave the time. \BRK"
+event_0963.txt,53,0x98,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0963.txt,62,0x97,1,"Well, come join us if you \r\nhave the time. \BRK"
+event_0976.txt,57,0x166,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n10,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,69,0x166,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n10,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,73,0x167,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n10,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK | Congratulations!\BRK\WAIT_CLICKYou have"
+event_0976.txt,85,0x167,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n100,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,89,0x168,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n100,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK | Congratulations!\BRK\WAIT_CLICKYou hav"
+event_0976.txt,101,0x168,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n1,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,105,0x169,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n1,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK | Congratulations!\BRK\WAIT_CLICKYou h"
+event_0976.txt,117,0x169,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n10,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,121,0x16a,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n10,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK | Congratulations!\BRK\WAIT_CLICKYou "
+event_0976.txt,133,0x16a,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n100,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,137,0x16b,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n100,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK | Congratulations!\BRK\WAIT_CLICKYou"
+event_0976.txt,149,0x16b,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n1,000,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0976.txt,153,0x16c,1,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\n1,000,000,000 fish!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK | Congratulations!\BRK\WAIT_CLICKY"
+event_0976.txt,165,0x16c,2,"Congratulations!\BRK\WAIT_CLICKYou have now fished\r\nevery single species!\BRK\WAIT_CLICKThat's all. You don't get \r\na prize, or anything\r\nlike that. Bye now.\BRK"
+event_0977.txt,24,0x71,1,
+event_0977.txt,28,0x73,1,
+event_0982.txt,34,0x23d,0,
+event_0982.txt,35,0x23f,0,
+event_0982.txt,36,0x241,0,
+event_0982.txt,37,0x152,0,
+event_0982.txt,39,0x1e2,0,
+event_0982.txt,40,0x1e3,0,
+event_0982.txt,41,0x1e4,0,
+event_0982.txt,42,0x1e5,0,
+event_0982.txt,43,0x1e6,0,
+event_0982.txt,44,0x1e7,0,
+event_0982.txt,45,0x1e8,0,
+event_0982.txt,46,0x1e9,0,
+event_0982.txt,47,0x1ed,0,
+event_0982.txt,48,0x1ee,0,
+event_0982.txt,49,0x1eb,0,
+event_0982.txt,50,0x1ea,0,
+event_0982.txt,51,0x1ec,0,
+event_0982.txt,52,0x1ef,0,
+event_0982.txt,55,0x1ee,0,
+event_0982.txt,61,0x1e2,0,
+event_0982.txt,66,0x1e3,0,
+event_0982.txt,71,0x1e4,0,
+event_0982.txt,76,0x1e5,0,
+event_0982.txt,77,0x1e6,0,
+event_0982.txt,83,0x1e7,0,
+event_0982.txt,88,0x1e8,0,
+event_0982.txt,93,0x1e9,0,
+event_0982.txt,98,0x1ed,0,
+event_0982.txt,103,0x1ee,0,
+event_0982.txt,108,0x1eb,0,
+event_0982.txt,113,0x1ea,0,
+event_0982.txt,118,0x1ec,0,
+event_0982.txt,123,0x1ef,0,
+event_0982.txt,472,0x141,0,
+event_0982.txt,483,0xe5,0,
+event_0982.txt,486,0x51,0,
+event_0982.txt,492,0x124,2,
+event_0982.txt,496,0x122,0,
+event_0982.txt,499,0x138,0,
+event_0982.txt,500,0x139,0,
+event_0982.txt,503,0x107,0,
+event_0982.txt,504,0x109,0,
+event_0982.txt,505,0x10a,0,
+event_0982.txt,511,0x102,0,
+event_0982.txt,517,0xf9,2,
+event_0982.txt,520,0x242,0,
+event_0982.txt,523,0x14b,0,
+event_0982.txt,527,0x188,0,
+event_0982.txt,528,0x18a,0,
+event_0982.txt,532,0x193,0,
+event_0982.txt,533,0x195,0,
+event_0982.txt,537,0x197,0,
+event_0982.txt,538,0x199,0,
+event_0982.txt,542,0x19b,0,
+event_0982.txt,543,0x19d,0,
+event_0982.txt,547,0x1ab,0,
+event_0982.txt,548,0x1ad,0,
+event_0982.txt,552,0x1af,0,
+event_0982.txt,553,0x1b1,0,
+event_0982.txt,557,0x126,2,
+event_0982.txt,565,0xd2,2,
+event_0982.txt,574,0xaa,2,
+event_0982.txt,575,0xb9,2,
+event_0982.txt,576,0xbe,2,
+event_0982.txt,577,0xb4,2,
+event_0982.txt,579,0xcd,2,
+event_0982.txt,582,0xd2,2,
+event_0982.txt,590,0xd3,2,
+event_0982.txt,599,0xac,2,
+event_0982.txt,600,0xb5,2,
+event_0982.txt,601,0xba,2,
+event_0982.txt,602,0xbf,2,
+event_0982.txt,604,0xce,2,
+event_0982.txt,607,0xd3,2,
+event_0982.txt,615,0xd4,2,
+event_0982.txt,624,0xae,2,
+event_0982.txt,625,0xb6,2,
+event_0982.txt,626,0xbb,2,
+event_0982.txt,627,0xc0,2,
+event_0982.txt,629,0xcf,2,
+event_0982.txt,632,0xd4,2,
+event_0982.txt,640,0xd5,2,
+event_0982.txt,649,0xb0,2,
+event_0982.txt,650,0xb7,2,
+event_0982.txt,651,0xbc,2,
+event_0982.txt,652,0xc1,2,
+event_0982.txt,654,0xd0,2,
+event_0982.txt,657,0xd5,2,
+event_0982.txt,665,0xd6,2,
+event_0982.txt,674,0xb2,2,
+event_0982.txt,675,0xb8,2,
+event_0982.txt,676,0xbd,2,
+event_0982.txt,677,0xc2,2,
+event_0982.txt,679,0xd1,2,
+event_0982.txt,682,0xd6,2,
+event_0982.txt,696,0x174,2,
+event_0982.txt,697,0x176,2,
+event_0982.txt,698,0x177,2,
+event_0982.txt,699,0x178,2,
+event_0982.txt,701,0x17b,2,
+event_0982.txt,705,0x1b7,0,
+event_0982.txt,706,0x1b9,0,
+event_0982.txt,707,0x1bb,0,
+event_0982.txt,708,0x1bd,0,
+event_0982.txt,709,0x1bf,0,
+event_0982.txt,712,0x1a4,2,
+event_0982.txt,726,0x1a8,2,
+event_0982.txt,747,0x79,0,
+event_0982.txt,748,0x245,0,
+event_0982.txt,761,0x77,2,
+event_0982.txt,764,0x245,0,
+event_0982.txt,765,0x77,2,
+event_0982.txt,769,0x81,0,
+event_0982.txt,770,0x246,0,
+event_0982.txt,782,0x7f,2,
+event_0982.txt,786,0x246,0,
+event_0982.txt,787,0x7f,2,
+event_0982.txt,791,0x89,0,
+event_0982.txt,792,0x249,0,
+event_0982.txt,805,0x87,2,
+event_0982.txt,809,0x249,0,
+event_0982.txt,810,0x87,2,
+event_0982.txt,814,0x91,0,
+event_0982.txt,815,0x247,0,
+event_0982.txt,828,0x8f,2,
+event_0982.txt,832,0x247,0,
+event_0982.txt,833,0x8f,2,
+event_0982.txt,837,0x99,0,
+event_0982.txt,838,0x248,0,
+event_0982.txt,851,0x97,2,
+event_0982.txt,855,0x248,0,
+event_0982.txt,856,0x97,2,
+event_0982.txt,882,0x23c,1,
+event_0982.txt,884,0x23c,0,
+event_0982.txt,887,0x180,0,
+event_0982.txt,888,0x182,0,
+event_0982.txt,889,0x183,0,
+event_0982.txt,890,0x186,0,
+event_0982.txt,891,0x185,0,
+event_0982.txt,892,0x184,0,
+event_0982.txt,893,0x187,0,
+event_0982.txt,894,0x189,0,
+event_0982.txt,895,0x18b,0,
+event_0982.txt,896,0x18c,0,
+event_0982.txt,897,0x18e,0,
+event_0982.txt,898,0x192,0,
+event_0982.txt,899,0x194,0,
+event_0982.txt,900,0x196,0,
+event_0982.txt,901,0x198,0,
+event_0982.txt,902,0x19a,0,
+event_0982.txt,903,0x19c,0,
+event_0982.txt,904,0x19e,0,
+event_0982.txt,905,0x1a0,0,
+event_0982.txt,906,0x1a2,0,
+event_0982.txt,907,0x1a1,0,
+event_0982.txt,908,0x1a3,0,
+event_0982.txt,909,0x1a4,0,
+event_0982.txt,910,0x1a6,0,
+event_0982.txt,911,0x1a7,0,
+event_0982.txt,912,0x1a8,0,
+event_0982.txt,913,0x1aa,0,
+event_0982.txt,914,0x1ac,0,
+event_0982.txt,915,0x1ae,0,
+event_0982.txt,916,0x1b0,0,
+event_0982.txt,917,0x1b2,0,
+event_0982.txt,918,0x1b3,0,
+event_0982.txt,919,0x1b4,0,
+event_0982.txt,920,0x1b5,0,
+event_0982.txt,921,0x1b6,0,
+event_0982.txt,922,0x1b8,0,
+event_0982.txt,923,0x1ba,0,
+event_0982.txt,924,0x1bc,0,
+event_0982.txt,925,0x1be,0,
+event_0982.txt,926,0x1c0,0,
+event_0982.txt,927,0x1c1,0,
+event_0982.txt,928,0x1c2,0,
+event_0982.txt,929,0x1c8,0,
+event_0982.txt,930,0x1c9,0,
+event_0982.txt,931,0x1ca,0,
+event_0982.txt,932,0x1cb,0,
+event_0982.txt,933,0x1cc,0,
+event_0982.txt,934,0x1c3,0,
+event_0982.txt,935,0x1c4,0,
+event_0982.txt,936,0x1c5,0,
+event_0982.txt,937,0x1c6,0,
+event_0982.txt,938,0x1c7,0,
+event_0982.txt,939,0x1cd,0,
+event_0982.txt,940,0x1ce,0,
+event_0982.txt,941,0x1d0,0,
+event_0982.txt,942,0x1d1,0,
+event_0982.txt,943,0x12e,0,
+event_0982.txt,944,0x12f,0,
+event_0982.txt,945,0xaa,0,
+event_0982.txt,946,0xac,0,
+event_0982.txt,947,0xae,0,
+event_0982.txt,948,0xb0,0,
+event_0982.txt,949,0xb2,0,
+event_0982.txt,950,0x174,0,
+event_0982.txt,951,0xb4,0,
+event_0982.txt,952,0xb5,0,
+event_0982.txt,953,0xb6,0,
+event_0982.txt,954,0xb7,0,
+event_0982.txt,955,0xb8,0,
+event_0982.txt,956,0x176,0,
+event_0982.txt,957,0xb9,0,
+event_0982.txt,958,0xba,0,
+event_0982.txt,959,0xbb,0,
+event_0982.txt,960,0xbc,0,
+event_0982.txt,961,0xbd,0,
+event_0982.txt,962,0x177,0,
+event_0982.txt,963,0xbe,0,
+event_0982.txt,964,0xbf,0,
+event_0982.txt,965,0xc0,0,
+event_0982.txt,966,0xc1,0,
+event_0982.txt,967,0xc2,0,
+event_0982.txt,968,0x178,0,
+event_0982.txt,969,0x156,0,
+event_0982.txt,970,0x127,0,
+event_0982.txt,973,0xe3,0,
+event_0983.txt,19,0x4c,1,
+event_0983.txt,23,0x55,1,
+event_0983.txt,27,0x5f,1,
+event_0983.txt,31,0x67,1,
+event_0983.txt,35,0x6f,1,
+event_0983.txt,39,0x173,1,
+event_0983.txt,44,0x245,1,
+event_0983.txt,47,0x76,1,
+event_0983.txt,51,0x75,1,
+event_0983.txt,59,0x246,1,
+event_0983.txt,62,0x7e,1,
+event_0983.txt,69,0x249,1,
+event_0983.txt,72,0x86,1,
+event_0983.txt,79,0x247,1,
+event_0983.txt,82,0x8e,1,
+event_0983.txt,89,0x248,1,
+event_0983.txt,92,0x96,1,
+event_0983.txt,104,0xb1,1,
+event_0983.txt,108,0xb0,1,
+event_0983.txt,112,0xc6,1,
+event_0983.txt,116,0xcb,1,
+event_0983.txt,120,0xda,1,
+event_0983.txt,124,0xd0,1,
+event_0983.txt,128,0xd5,1,
+event_0983.txt,145,0xab,1,
+event_0983.txt,149,0xaa,1,
+event_0983.txt,153,0xc3,1,
+event_0983.txt,157,0xc8,1,
+event_0983.txt,161,0xd7,1,
+event_0983.txt,165,0xcd,1,
+event_0983.txt,169,0xd2,1,
+event_0983.txt,186,0xad,1,
+event_0983.txt,190,0xac,1,
+event_0983.txt,194,0xc4,1,
+event_0983.txt,198,0xc9,1,
+event_0983.txt,202,0xd8,1,
+event_0983.txt,206,0xce,1,
+event_0983.txt,210,0xd3,1,
+event_0983.txt,227,0xb3,1,
+event_0983.txt,231,0xb2,1,
+event_0983.txt,235,0xc7,1,
+event_0983.txt,239,0xcc,1,
+event_0983.txt,243,0xdb,1,
+event_0983.txt,247,0xd1,1,
+event_0983.txt,251,0xd6,1,
+event_0983.txt,268,0xaf,1,
+event_0983.txt,272,0xae,1,
+event_0983.txt,276,0xc5,1,
+event_0983.txt,280,0xca,1,
+event_0983.txt,284,0xd9,1,
+event_0983.txt,288,0xcf,1,
+event_0983.txt,292,0xd4,1,
+event_0983.txt,309,0x175,1,
+event_0983.txt,313,0x174,1,
+event_0983.txt,317,0x179,1,
+event_0983.txt,321,0x17a,1,
+event_0983.txt,325,0x17c,1,
+event_0983.txt,329,0x17b,1,
+event_0987.txt,73,0x24d,0,Why don't you grow some\r\ncrops? Seeds are at the\r\nsupermarket.\BRK | Do you fish? Selling fish\r\nwill make you money.\BRK
+event_0991.txt,45,0x180,1,
+event_0991.txt,56,0x189,1,
+event_0991.txt,68,0x18c,1,
+event_0991.txt,81,0x18d,0,
+event_0991.txt,84,0x18d,1,
+event_0991.txt,87,0x18d,2,
+event_0991.txt,90,0x18d,3,
+event_0991.txt,93,0x18d,4,
+event_0991.txt,97,0x18e,1,
+event_0991.txt,108,0x198,1,
+event_0991.txt,119,0x19c,1,
+event_0991.txt,130,0x1a4,1,
+event_0991.txt,141,0x1ac,1,
+event_0991.txt,152,0x1b0,1,
+event_0991.txt,163,0x1d0,1,
+event_0991.txt,175,0x194,1,
+event_0991.txt,182,0x19e,1,
+event_0991.txt,192,0x1a8,1,
+event_0991.txt,201,0x1d1,1,
+event_0992.txt,525,0x1f4,0,"Marriage, huh?\r\nThat's great! The farm \r\nshould become even more\BRK\r\nfun, then!\BRK | I heard that \r\n\xFF+ has lots \r\nof animals. Keep up\BRK\WAIT_CLICKthe good work!\BRK | Hey, how is Kare"
+event_0993.txt,710,0x183,1,"You're giving this Perfume\r\nto me? Really?...\BRK\WAIT_CLICKThank you so much!\BRK | Thak you!\r\nAre you giving presents to\r\neverybody, or just me?...\BRK | Thanks!\BRK\WAIT_CLICKI can't wait to "
+event_0993.txt,717,0x183,1,"Thak you!\r\nAre you giving presents to\r\neverybody, or just me?...\BRK | Thanks!\BRK\WAIT_CLICKI can't wait to eat them!\r\nI knew today was going\r\nto be great!\BRK | Wow...Thank you so much!\r\nA"
+event_0993.txt,726,0x183,1,Thanks!\BRK\WAIT_CLICKI can't wait to eat them!\r\nI knew today was going\r\nto be great!\BRK | Wow...Thank you so much!\r\nAre you sure it's OK?\BRK\WAIT_CLICKAnd I didn't even give you\r\nanything a
+event_0993.txt,735,0x1b7,0,Wow...Thank you so much!\r\nAre you sure it's OK?\BRK\WAIT_CLICKAnd I didn't even give you\r\nanything at the Winter\r\nThanksgiving Festival!\BRK | This is for me?\r\nThanks! But...You really\r\nshou
+event_0993.txt,736,0x183,1,This is for me?\r\nThanks! But...You really\r\nshouldn't have gone to\BRK\r\nthe trouble...\BRK
+event_0993.txt,890,0x54,1,"Wait one second!\r\nLet's talk at your place!\BRK | You're sweet, but you \r\nshould really give this to\r\nsomeone you want to marry.\BRK"
+event_0993.txt,918,0x1c2,1,"Tomorrow is the \r\nStarry Night Festival, \r\nright? Why don't you come\BRK\r\nover to my house...?\BRK | Great! I'll make you the\r\nbest dinner ever!\BRK | I guess you're \r\ntoo busy...Oh well...\"
+event_0993.txt,919,0x1c3,1,"Tomorrow is the \r\nStarry Night Festival, \r\nright? Why don't you come\BRK\r\nover to my house...?\BRK | Great! I'll make you the\r\nbest dinner ever!\BRK | I guess you're \r\ntoo busy...Oh well...\"
+event_0993.txt,925,0x1c3,1,"Great! I'll make you the\r\nbest dinner ever!\BRK | I guess you're \r\ntoo busy...Oh well...\BRK | Tomorrow is the Starry\r\nNight Festival, so let's\r\nhave a party at my house!\BRK\WAIT_CLICKI just "
+event_0994.txt,492,0x1d3,1,"While I'm thinking of it,\r\nlet me tell you the recipe\r\nfor Scrambled Eggs. It's\BRK\WAIT_CLICKeasy. All you do is put\r\nOil in a Frying Pan, then\r\nput in the Eggs.\BRK\r\nThat's it!\BRK\WAIT_CL"
+event_0996.txt,550,0xf4,1,"What's up?\BRK | Hmmm...A part time job at \r\nthe Winery?...You know, my\r\nmoney IS running out...\BRK | I'll go ask\r\nabout it tomorrow!\BRK"
+event_0997.txt,494,0x1e0,1,"Oh, that's right!\r\nI was going to tell you \r\nhow to make some \BRK\r\ndelicious Fried Noodles!\BRK\WAIT_CLICKAll you do is put Oil in \r\na Frying Pan, then fry\r\nthe noodles! That's it!\BRK\WAIT"
+event_0998.txt,500,0x1db,1,"Thanks so much!\BRK\WAIT_CLICKAs thanks, I'll teach you a\r\ngreat recipe for mixed \r\nfruit and vegetable juice.\BRK\WAIT_CLICKI don't have anything to \r\nwrite it down on, but \r\njust remember it"
+event_0999.txt,602,0x1f9,0,"Weee!  What a pretty \r\nfeather!  I bet it has\r\nspecial power, budum!\BRK | I heard a rumor that there\r\nare friends of ours in \r\nForget-me-not Valley, budum?\BRK | Spring is the season for\r\nT"
+event_1000.txt,600,0x1f9,0,"What a wondrous feather!\r\nJust looking at it makes\r\nme happy, budum!\BRK | I heard a rumor that there\r\nare friends of ours in\r\nForgotten Valley, budum?\BRK | Spring is the season for\r\nTea Pa"
+event_1001.txt,604,0x1f9,0,"This is the first time I've\r\nseen a Blue Feather, budum.\r\nWhat kind of animal \BRK\r\ndoes it come from?\BRK | I heard a rumor that \r\nthere are friends of ours in\r\nForget-me-not Valley, budum?"
+event_1002.txt,605,0x1f9,0,"What a lovely feather!\r\nJust looking at it takes\r\nmy breath away, budum...\BRK | I heard a rumor that \r\nthere are friends of ours in\r\nForget-me-not Valley, budum?\BRK | Spring is the season fo"
+event_1003.txt,591,0x1e1,1,"I'll tell you how to make\r\nsome delicious Sweet \r\nPotatos. \BRK\WAIT_CLICKNot even Doug at the Inn\r\ncan make these, bubum!\BRK\WAIT_CLICKThey're our favorite dish \r\nat our Tea Parties, too.\BR"
+event_1003.txt,613,0x1f9,0,"What a gorgeous\r\nfeather, bubum!\r\nShame you can't cook\r\nwith it...\BRK | I heard a rumor that \r\nthere are friends of ours in\r\nForget-me-not Valley, budum?\BRK | Spring is the season for\r\nT"
+event_1004.txt,604,0x1f9,0,"What a beautiful \r\nfeather, budum!\BRK | I heard a rumor that \r\nthere are friends of ours in\r\nForget-me-not Valley, budum?\BRK | Spring is the season for\r\nTea Parties, budum.\r\nI can't wait!\"
+event_1005.txt,599,0x1f9,0,"This is a great feather,\r\nbut it won't fill me \r\nup, budum.\BRK | I heard a rumor that \r\nthere are friends of ours in\r\nForget-me-not Valley, budum?\BRK | Spring is the season for\r\nTea Partie"
+event_1006.txt,496,0x1d9,1,"Do you want a great \r\nrecipe for Sandwiches?\BRK\WAIT_CLICKWhat was it...?\r\nOh yeah, here goes.\BRK\WAIT_CLICKFirst, spread Butter on \r\nsome Bread, then put on\r\nsome Cucumbers and \BRK\WAIT_CL"
+event_1006.txt,517,0x1f2,0,This Blue Feather \r\nsure does bring me back...\BRK\WAIT_CLICKI was handed mine more \r\nthan 50 years ago!\BRK | I heard that the child of\r\nthat person living up in \r\nForget-me-not Valley...What
+event_1007.txt,523,0xf7,1,"Do you need anything?\BRK | Work at Duke's \r\nWinery...? \BRK\WAIT_CLICKActually, he was kind of a\r\nbully when we were kids,\r\nso I don't like him too \BRK\r\nmuch...\BRK\WAIT_CLICKJust our secret"
+event_1007.txt,533,0x1f6,0,"I hear that at the \r\n\xFF+ farm \r\nthey have a flower that \BRK\WAIT_CLICKcan talk, and other rare\r\ncrops. \BRK\WAIT_CLICKGosh, I'd like a flower \r\nlike that at the store...\BRK | Welcome to th"
+event_1008.txt,699,0x182,1,It looks so expensive!\r\nCan I really accept this?\BRK\WAIT_CLICKYay! I can't wait to\r\nshow it off!\BRK | Mmm...This Cake looks \r\ndelicious...\BRK\WAIT_CLICKOh yeah...Today's the \r\nSpring Festi
+event_1008.txt,706,0x182,1,"Mmm...This Cake looks \r\ndelicious...\BRK\WAIT_CLICKOh yeah...Today's the \r\nSpring Festival. I should \r\ngo get one from Rick, too.\BRK | I can't believe you made\r\none for me! Thanks!\BRK | Is t"
+event_1008.txt,715,0x182,1,"I can't believe you made\r\none for me! Thanks!\BRK | Is this really for me?\r\nAnd I didn't make anything \r\nfor you at the Winter \r\nThanksgiving Festival!\BRK\WAIT_CLICKThanks, I really \r\nappre"
+event_1008.txt,724,0x1bd,0,"Is this really for me?\r\nAnd I didn't make anything \r\nfor you at the Winter \r\nThanksgiving Festival!\BRK\WAIT_CLICKThanks, I really \r\nappreciate it!...\BRK | Wow, thanks!\BRK\WAIT_CLICKYou reme"
+event_1008.txt,725,0x182,1,"Wow, thanks!\BRK\WAIT_CLICKYou remembered what I gave\r\nyou at the Winter \r\nThanksgiving Festival,\r\ndidn't you? This looks \r\ndelicious!\BRK"
+event_1008.txt,879,0x4b,1,"Maybe we should go to\r\nyour house for this \r\nconversation...?\BRK | So you've finally decided\r\nto get married, huh?\r\nGood for you!\BRK"
+event_1008.txt,907,0x1c2,4,\xFF!!\r\nDid you know that tomorrow\r\nis the Starry Night \BRK\r\nFestival?\BRK\WAIT_CLICKA party at our house \r\nstarts at 6PM. Do you\r\nwant to come?\BRK | Great!\r\nWe'll be waiting.\BRK | Real
+event_1008.txt,908,0x1c6,1,\xFF!!\r\nDid you know that tomorrow\r\nis the Starry Night \BRK\r\nFestival?\BRK\WAIT_CLICKA party at our house \r\nstarts at 6PM. Do you\r\nwant to come?\BRK | Great!\r\nWe'll be waiting.\BRK | Real
+event_1008.txt,914,0x1c6,1,"Great!\r\nWe'll be waiting.\BRK | Really? That's too bad...\BRK | Tomorrow is the Starry \r\nNight Festival, so go back\r\nhome by 12, OK?\BRK"
+event_1009.txt,505,0x1da,1,"You want to learn how to\r\nmake some fabulous \r\nChocolate Cookies? Jeff\BRK\r\njust loves this recipe.\BRK\WAIT_CLICKThe ingredients are Flour,\r\nButter, Eggs, and Chocolate.\BRK\WAIT_CLICKYou als"
+event_1010.txt,495,0x1dd,1,"As a thanks, I'll tell\r\nyou the recipe to my famous\r\nCheese Fondue. Have you\BRK\r\nheard of it?\BRK\WAIT_CLICKDon't forget this now.\BRK\WAIT_CLICKThe only ingredient is \r\nCheese. Use a Knife t"
+event_1011.txt,707,0x186,1,I really don't have any \r\nuse for Perfume...\BRK | But you really want to \r\ngive it to me? In that \r\ncase...Thanks!\BRK | Cookies? For the \r\nThanksgiving Festival? \r\nHow thoughtful of you!\B
+event_1011.txt,714,0x186,1,Cookies? For the \r\nThanksgiving Festival? \r\nHow thoughtful of you!\BRK | These look great!\r\nI just love the Spring \r\nThanksgiving Festival!\BRK\WAIT_CLICKThey look even better \r\nthan I can m
+event_1011.txt,723,0x186,1,"These look great!\r\nI just love the Spring \r\nThanksgiving Festival!\BRK\WAIT_CLICKThey look even better \r\nthan I can make!\BRK | Wow, Cookies!\BRK\WAIT_CLICKAre these for the Spring\r\nThanksgivi"
+event_1011.txt,732,0x1b9,0,"Wow, Cookies!\BRK\WAIT_CLICKAre these for the Spring\r\nThanksgiving Festival?\BRK\WAIT_CLICKAnd I didn't give you \r\nanything last Winter! I \r\nfeel horrible!\BRK | Thanks...! \r\nI didn't expect y"
+event_1011.txt,733,0x186,1,Thanks...! \r\nI didn't expect you to \r\nactually give some back in\BRK\r\nreturn...I'm so happy!\BRK
+event_1011.txt,887,0x5e,1,You mean...?\BRK\WAIT_CLICKUmm...Why don't we just\r\ngo to your house first...?\BRK | Does that mean what I think\r\nit means? Congratulations!\BRK\WAIT_CLICKI'm sure she's waiting\r\nfor you!\BRK
+event_1011.txt,915,0x1c2,2,"Come over to my house \r\ntomorrow for the Starry Night \r\nFestival, OK?\BRK | Really? Great!\r\nWe'll be waiting.\BRK | Well, \r\nif you're already busy,\r\nI understand...I guess...\BRK"
+event_1011.txt,916,0x1c4,1,"Come over to my house \r\ntomorrow for the Starry Night \r\nFestival, OK?\BRK | Really? Great!\r\nWe'll be waiting.\BRK | Well, \r\nif you're already busy,\r\nI understand...I guess...\BRK"
+event_1011.txt,922,0x1c4,1,"Really? Great!\r\nWe'll be waiting.\BRK | Well, \r\nif you're already busy,\r\nI understand...I guess...\BRK | We'll make you such a feast\r\nyou won't regret it!\r\nCome around noon, OK?\BRK"
+event_1012.txt,495,0x1f1,0,"What a beautiful feather\r\nthis is! You mean it's for \r\nproposing to somebody?\BRK\WAIT_CLICKHow romantic! I bet it's \r\nvery effective!\BRK | In Forget-me-not Valley, \r\nwhere I live, there is\r"
+event_1013.txt,497,0x1d7,1,"I've been meaning to tell\r\nyou this recipe...It's for \r\na delicious Fruit Latte.\BRK\WAIT_CLICKTake fruit like Pineapple, \r\nApple, Wild Grape, or other\r\nfruit and put it in a \BRK\r\nMixer wit"
+event_1013.txt,523,0xf6,1,"You look like there's \r\nsomething you wan to\r\ntalk about. Is there?\BRK | Thanks for telling me, but I\r\ncan't. I may look like\r\nI have a lot of free time, \BRK\WAIT_CLICKbut I'm very busy stud"
+event_1014.txt,714,0x184,1,"Yippee!\r\nI've never had such nice\r\nPerfume before!\BRK | Why...?\r\nOh, never mind...\r\nThanks, I guess...\BRK | Thanks. You made these for\r\nthe Spring Thanksgiving\r\nFestival, right?\BRK"
+event_1014.txt,721,0x184,1,"Why...?\r\nOh, never mind...\r\nThanks, I guess...\BRK | Thanks. You made these for\r\nthe Spring Thanksgiving\r\nFestival, right?\BRK | Thanks! \BRK\WAIT_CLICKBut I can't believe I \r\ndidn't give yo"
+event_1014.txt,730,0x184,1,"Thanks. You made these for\r\nthe Spring Thanksgiving\r\nFestival, right?\BRK | Thanks! \BRK\WAIT_CLICKBut I can't believe I \r\ndidn't give you anything\r\nfor the Winter Thanksgiving\BRK\r\nFestival"
+event_1014.txt,739,0x1bf,0,Thanks! \BRK\WAIT_CLICKBut I can't believe I \r\ndidn't give you anything\r\nfor the Winter Thanksgiving\BRK\r\nFestival...I'm sorry!\BRK | Thanks!\r\nGiving and receiving gifts \r\nare my favorite pa
+event_1014.txt,740,0x184,1,Thanks!\r\nGiving and receiving gifts \r\nare my favorite part of\BRK\r\nthe Festivals!\BRK
+event_1014.txt,894,0x66,1,"Huh? I can't believe...\r\nWhy don't we talk at\r\nyour house...?\BRK | Congratulations!\r\nYou should really keep that\r\nfresh for the important\BRK\r\ngirl, though!\BRK"
+event_1014.txt,922,0x1c2,5,If you don't already have\r\nother plans...How about\r\ncoming over to my house\BRK\WAIT_CLICKtomorrow for the\r\nStarry Night Festival...?\BRK | Great! We'll be waiting\r\nfor you!\BRK | Really...?\r
+event_1014.txt,923,0x1c7,1,If you don't already have\r\nother plans...How about\r\ncoming over to my house\BRK\WAIT_CLICKtomorrow for the\r\nStarry Night Festival...?\BRK | Great! We'll be waiting\r\nfor you!\BRK | Really...?\r
+event_1014.txt,929,0x1c7,1,"Great! We'll be waiting\r\nfor you!\BRK | Really...?\r\nWell...Never mind...\BRK | Let's spend tomorrow's \r\nStarry Night Festival \r\ntogether, OK?\BRK"
+event_1017.txt,510,0x1f5,0,"Congratulations!\r\nWho's the lucky girl, \r\nif I may ask?\BRK | Have you heard of the\r\nForget-me-not Valley?\BRK\WAIT_CLICKI hear there's someone \r\nthere named \xFF,\r\nwho is very popular. \BRK"
+event_1018.txt,706,0x185,1,"I've never ever gotten\r\nanything so nice! \r\nThank you so much!\BRK | What...?\r\nI don't want...\r\nWait, it looks pretty good!\BRK\WAIT_CLICKYou don't mean anything\r\nby this, do you...?\BRK | C"
+event_1018.txt,713,0x185,1,"What...?\r\nI don't want...\r\nWait, it looks pretty good!\BRK\WAIT_CLICKYou don't mean anything\r\nby this, do you...?\BRK | Cookies for the \r\nThanksgiving Festival?\r\nThanks!\BRK | Now I'm embarr"
+event_1018.txt,722,0x185,1,"Cookies for the \r\nThanksgiving Festival?\r\nThanks!\BRK | Now I'm embarrassed \r\nI didn't give anything to\r\nyou last year!\BRK | ...Thanks! \r\nYou really are a \r\ngentleman, you know that?\BRK"
+event_1018.txt,731,0x1bb,0,"Now I'm embarrassed \r\nI didn't give anything to\r\nyou last year!\BRK | ...Thanks! \r\nYou really are a \r\ngentleman, you know that?\BRK"
+event_1018.txt,732,0x185,1,"...Thanks! \r\nYou really are a \r\ngentleman, you know that?\BRK"
+event_1018.txt,886,0x6e,1,"I'm so nervous all the\r\nsudden...Let's just go to\r\nyour house, OK?\BRK | You look nervous.\r\nRelax!\BRK"
+event_1018.txt,914,0x1c2,3,Do you want to come to my \r\nhouse tomorrow for the \r\nStarry Night Festival?\BRK\WAIT_CLICKGrandma and Stu will be \r\nso pleased!\BRK | We'll make lots of \r\ngreat food!\BRK | I guess I should ha
+event_1018.txt,915,0x1c5,1,Do you want to come to my \r\nhouse tomorrow for the \r\nStarry Night Festival?\BRK\WAIT_CLICKGrandma and Stu will be \r\nso pleased!\BRK | We'll make lots of \r\ngreat food!\BRK | I guess I should ha
+event_1018.txt,921,0x1c5,1,"We'll make lots of \r\ngreat food!\BRK | I guess I should have \r\nknown you'd already\r\nhave plans...\BRK | We'll make lots of \r\ndelicious food, so just\r\nyou wait!\BRK"
+event_1021.txt,537,0x1d6,1,
+event_1022.txt,487,0x1f0,0,What a nice feather. \r\nI bet I could sell it for \r\nlots...\BRK\WAIT_CLICKYou mean it's for \r\nproposing? Sorry...\BRK | Have you heard of the farm\BRK\WAIT_CLICK\xFF+ over at\r\nForget-me-not Val
+event_1022.txt,496,0x1fa,0,Have you heard of the farm\BRK\WAIT_CLICK\xFF+ over at\r\nForget-me-not Valley?\BRK\WAIT_CLICKI hear they're making a \r\nhuge profit! I wonder if \r\nthey're doing something \BRK\r\nillegal...\BRK | 
+event_1022.txt,503,0x1fa,0,I hope to make it over to\r\nForget-me-not Valley soon.\BRK | Forget-me-not Valley seems \r\nlike it's full of \r\nopportunity.\r\nI'll be going there soon.\BRK | I think I'll be going to \r\nForget-m
+event_1022.txt,510,0x1fa,0,Forget-me-not Valley seems \r\nlike it's full of \r\nopportunity.\r\nI'll be going there soon.\BRK | I think I'll be going to \r\nForget-me-not Valley again.\BRK
+event_1023.txt,490,0x1d8,1,"I bet you're like I am: \r\ntoo busy to spend lots of \r\ntime cooking. Well, here's \BRK\r\na really convenient recipe \r\nfor Fried Rice. \BRK\WAIT_CLICKFirst, put some oil in a \r\nFrying Pan, then"
+event_1024.txt,78,0x1a2,1,"Are you \xFF!?\BRK\WAIT_CLICKYes, I've heard about you.\r\nFrom Thomas, of course. \r\nI'm Carter. I'm delighted \BRK\r\nto finally meet you.\BRK"
+event_1024.txt,527,0x1dc,1,"Let me tell you the recipe of\r\nsomething I often make \r\nfor the kids. \BRK\WAIT_CLICKIt's easy, so you should\r\nbe able to remember it.\BRK\WAIT_CLICKAll you need to do is put \r\nStrawberries an"
+event_1024.txt,548,0x1f7,0,"I am glad for you.\BRK\WAIT_CLICKI will pray for it to\r\ngo well.\BRK | I happened to hear that the\r\ncouple who run \r\n\xFF+ get along\r\nfamously. \BRK\WAIT_CLICKAt least, that's the rumor.\BRK |"
+event_1024.txt,559,0xf8,1,Ein Teilzeitjob auf dem\r\nWeingut h[o]rt sich nach\r\neiner Menge Spa[b] an.\BRK | I think Cliff needs that job\r\nmore than I do. \BRK\WAIT_CLICKWhy don't you tell him?\BRK
+event_1025.txt,496,0x1de,1,"You want to learn how to\r\nmake popcorn?\BRK\WAIT_CLICKIf you want, I'll tell you.\r\nDon't forget, now!\BRK\WAIT_CLICKAll you need is Corn and a \r\nFrying Pan, although it\r\ntastes better with Sal"
+event_1026.txt,524,0xf5,1,"Something you want to \r\ntell me?\BRK | Ha! If I got a job somewhere\r\nelse, gramps would \r\ntan my hide!\BRK"
+event_1027.txt,501,0x1d5,1,"You should eat simple foods,\r\nyou know. You'll live \r\nlonger, like me.\BRK\WAIT_CLICKIf you agree, I'll tell you\r\na great recipe for Pickled\r\nTurnip. It's delicious!\BRK\WAIT_CLICKAll you need"
+event_1028.txt,503,0x1df,1,"Do you like Savory Pancakes?\r\nAll you do is add the \r\ningredients together and \BRK\r\nfry it up!\BRK | All you need is...\r\nWhat was that again...?\BRK\WAIT_CLICKOh yeah! Flour, and...Eggs,\r\na"
+event_1028.txt,524,0x1f8,0,"If you're gonna get \r\nmarried, you have to look\r\nafter your family forever!\BRK | I hear that the equipment\r\nthey got up there at \r\n\xFF+ is all\BRK\r\nfirst rate. You should go \r\ntake a loo"
+event_1030.txt,499,0x1d4,1,"Want to learn how to \r\nmake ice cream?\BRK\WAIT_CLICKMay makes me make it for\r\nher all the time.\BRK\WAIT_CLICKAll you need is Sugar, \r\nMilk, and Eggs, and of \r\nof course a Whisk and \BRK\r\na"
+event_1030.txt,520,0x1f3,0,"A Blue Feather, huh?\r\nWho's the lucky girl?\r\nDon't lose your nerve, now!\BRK | Ever heard of a place called\r\nForget-me-not Valley?\BRK\WAIT_CLICKI hear \xFF,\r\nover there is great \r\nwith hors"
+event_1050.txt,186,0x213,1,
+event_1065.txt,37,0x180,1,
+event_1066.txt,89,0x180,2,
+event_1079.txt,83,0x188,1,"Really?...\r\nWell, you can still \r\nplace bets on the Race.\BRK\r\nIt's fun - you should come!\BRK"
+event_1079.txt,85,0x187,2,"Really?...\r\nWell, you can still \r\nplace bets on the Race.\BRK\r\nIt's fun - you should come!\BRK"
+event_1079.txt,106,0x188,0,
+event_1079.txt,107,0x187,2,
+event_1080.txt,53,0x189,1,
+event_1098.txt,34,0x24b,1,"That was a great race, \r\n\xFF!!\r\nCongratulations!\BRK"
+event_1099.txt,16,0x18b,1,"The Cooking Festival is \r\ntomorrow at 10AM in Rose \r\nSquare, you know.\BRK\WAIT_CLICKIf you bring a dish, you\r\ncan enter it. \BRK"
+event_1099.txt,35,0x18b,2,
+event_1100.txt,55,0x18c,1,
+event_1114.txt,55,0x18e,1,
+event_1124.txt,163,0x18f,1,I see you don't have \r\nanything with you. \BRK | Place your dish along with \r\neverybody else's. \BRK\WAIT_CLICKThe Gourmet will try them\r\nall and declare the winner.\BRK\WAIT_CLICKCan we start n
+event_1129.txt,198,0x18e,2,
+event_1129.txt,199,0x18f,0,
+event_1130.txt,38,0x193,0,"Oh, your Dog is still \r\na puppy? \BRK\WAIT_CLICKI'm sorry, but that means \r\nhe can't compete. \BRK\WAIT_CLICKIf you have the time, come\r\nto the Beach tomorrow at \r\n10AM anyway. Bye now.\BRK | "
+event_1130.txt,39,0x192,2,"Tomorrow is Beach Day, \r\nyou know. \BRK\WAIT_CLICKI cam to invite you and \r\nyour Dog. \BRK\WAIT_CLICK"
+event_1130.txt,61,0x193,1,"In that case, I'll take him\r\nwith me now. \BRK"
+event_1130.txt,99,0x192,2,"If you have the time, come\r\nto the Beach tomorrow at \r\n10AM anyway to watch. \BRK\r\nBye now.\BRK"
+event_1130.txt,114,0x193,0,"If you have the time, come\r\nto the Beach tomorrow at \r\n10AM anyway to watch. \BRK\r\nBye now.\BRK"
+event_1130.txt,115,0x192,2,
+event_1131.txt,30,0x194,1,
+event_1145.txt,32,0x24c,1,"Listen, everyone!\r\nThis year's champion is\r\n\xFF#!!\BRK\r\nGood job!\BRK"
+event_1146.txt,91,0x197,1,
+event_1146.txt,123,0x197,0,"It's fun to root for other \r\nChickens, though, so you \r\nshould come down, anyway! \BRK | In that case, I'll bring \r\n\xFF% along now.\r\nIt starts at 10AM. \BRK"
+event_1146.txt,124,0x196,2,"In that case, I'll bring \r\n\xFF% along now.\r\nIt starts at 10AM. \BRK"
+event_1146.txt,154,0x196,2,
+event_1161.txt,35,0x198,1,
+event_1164.txt,118,0x19b,0,"I'll bring this Cow with me \r\nnow, then. \r\nSee you tomorrow!\BRK"
+event_1164.txt,119,0x19a,2,"I'll bring this Cow with me \r\nnow, then. \r\nSee you tomorrow!\BRK"
+event_1164.txt,150,0x19b,1,
+event_1164.txt,152,0x19a,2,
+event_1165.txt,52,0x19c,1,
+event_1176.txt,40,0x19d,1,"Let's start, then. \BRK"
+event_1191.txt,42,0x19e,1,
+event_1192.txt,99,0x19e,2,I love watching fireworks\r\nfrom Mineral Beach. \BRK
+event_1192.txt,117,0x19e,2,I wonder how they make \r\nall those colors and shapes! \BRK
+event_1192.txt,163,0x19e,2,I love watching fireworks\r\nfrom Mineral Beach. \BRK
+event_1192.txt,180,0x19e,2,"In the town I used to live,\r\nthey had fireworks all the \r\ntime. \BRK\WAIT_CLICKSomehow they look most \r\nbeautiful here once a \r\nyear, though. \BRK"
+event_1192.txt,227,0x19e,2,I love watching fireworks\r\nfrom Mineral Beach. \BRK
+event_1192.txt,244,0x19e,2,"I used to be afraid of \r\nfireworks when I was a kid.\BRK\WAIT_CLICKNow I think they're pretty,\r\nbut it still seems like \r\nthey're about to fall on \BRK\r\ntop of me!\BRK"
+event_1192.txt,291,0x19e,2,I love watching fireworks\r\nfrom Mineral Beach. \BRK
+event_1192.txt,308,0x19e,2,Just once a year the \r\nsky gets so bright and \r\nloud...\BRK\WAIT_CLICKI always wonder what the \r\nfish think is happening!\BRK
+event_1192.txt,314,0x19f,5,Just once a year the \r\nsky gets so bright and \r\nloud...\BRK\WAIT_CLICKI always wonder what the \r\nfish think is happening!\BRK
+event_1192.txt,356,0x19e,2,I love watching fireworks\r\nfrom Mineral Beach. \BRK
+event_1192.txt,373,0x19e,2,
+event_1192.txt,404,0x19e,2,
+event_1193.txt,20,0x19f,0,It wouldn't be Summer \r\nwithout the Firework\r\nFestival!\BRK
+event_1194.txt,49,0x19f,2,"Hi, \xFF!. \r\nI can't wait for the \r\nfireworks to start!\BRK | OK. Thanks for asking.\r\nLook! They're starting!\BRK"
+event_1194.txt,67,0x19f,2,"Hi, \xFF!. \r\nThe fireworks are starting!\BRK"
+event_1194.txt,78,0x19f,0,"Hi, \xFF!. \r\nThe fireworks are starting!\BRK"
+event_1195.txt,20,0x19f,0,They used to have summer\r\nfireworks where I used to \r\nlive. It makes me a little\BRK\r\nhomesick...\BRK
+event_1196.txt,20,0x19f,0,It's cool at night even \r\nduring the Summer. \BRK
+event_1197.txt,50,0x19f,1,Are you looking for someone\r\nto watch the fireworks \r\nwith? \BRK | Thanks for asking!\r\nI'd love to watch with you.\BRK
+event_1197.txt,68,0x19f,1,"Hi there, \xFF!. \r\nDo you want to watch \r\ntogether? \BRK\WAIT_CLICKYou're alone, right? \BRK"
+event_1197.txt,79,0x19f,0,"Hi there, \xFF!. \r\nDo you want to watch \r\ntogether? \BRK\WAIT_CLICKYou're alone, right? \BRK"
+event_1198.txt,49,0x19f,5,"I love fireworks \r\nmore than anything!\BRK | Of course! \r\nSit down, they're about \r\nto start!\BRK"
+event_1198.txt,67,0x19f,5,"Oh, hi \xFF!!\r\nWe might as well watch the \r\nfireworks together!\BRK"
+event_1198.txt,78,0x19f,0,"Oh, hi \xFF!!\r\nWe might as well watch the \r\nfireworks together!\BRK"
+event_1199.txt,49,0x19f,3,Good evening. I think \r\nthey're about to start. \BRK | That's a good idea. \r\nLet's watch together. \BRK
+event_1199.txt,67,0x19f,3,"So you're here, too?\r\nLet's watch together. \BRK"
+event_1199.txt,78,0x19f,0,"So you're here, too?\r\nLet's watch together. \BRK"
+event_1200.txt,49,0x19f,4,"Good evening, \r\n\xFF!. \r\nI'm glad I made it in time!\BRK | I'd love to!\r\nThanks for asking!\BRK"
+event_1200.txt,67,0x19f,4,"You didn't tell me you were \r\ngoing to come, \r\n\xFF). \BRK"
+event_1200.txt,78,0x19f,0,"You didn't tell me you were \r\ngoing to come, \r\n\xFF). \BRK"
+event_1201.txt,20,0x19f,0,"I go to lots of different \r\ntowns during summertime, \r\nso I see lots of fireworks.\BRK\WAIT_CLICKThe ones in Mineral Town \r\nare definitely the best.\BRK"
+event_1202.txt,20,0x19f,0,My grandfather said he made\r\na part of the fireworks.\BRK\WAIT_CLICKI hope they all work right!\BRK
+event_1203.txt,55,0x1a1,1,You'll be able to hear\r\nKaren's beautiful voice if\r\nyou do come. \BRK\WAIT_CLICKCome if you have time. \BRK
+event_1203.txt,56,0x1a0,2,You'll be able to hear\r\nKaren's beautiful voice if\r\nyou do come. \BRK\WAIT_CLICKCome if you have time. \BRK
+event_1203.txt,78,0x1a1,0,
+event_1203.txt,79,0x1a0,2,
+event_1204.txt,15,0x1a2,1,"I've been waiting for you.\r\nEverybody else is already\r\ninside waiting.\BRK | I'm sorry, but you can't \r\nbring any items into the\r\nChurch today. \BRK\WAIT_CLICKWould you please put that\r\nin y"
+event_1205.txt,36,0x1a2,1,
+event_1215.txt,80,0x1a2,2,
+event_1216.txt,17,0x1a3,1,"Hi, \xFF!. \r\nTomorrow at 10AM is the\r\nHarvest Festival. \BRK\WAIT_CLICKEveryone brings something \r\nto add to the big pot. \BRK\WAIT_CLICKBring something good, now!\r\nSee you there. \BRK"
+event_1216.txt,24,0x1a3,2,"Hi, \xFF!. \r\nTomorrow at 10AM is the\r\nHarvest Festival. \BRK\WAIT_CLICKEveryone brings something \r\nto add to the big pot. \BRK\WAIT_CLICKBring something good, now!\r\nSee you there. \BRK"
+event_1217.txt,37,0x1a6,0,
+event_1217.txt,50,0x1a4,1,
+event_1218.txt,30,0x1a6,1,
+event_1218.txt,43,0x1a4,1,
+event_1236.txt,173,0x1a5,0,
+event_1236.txt,217,0x1a5,1,
+event_1242.txt,7,0x1a8,1,
+event_1243.txt,246,0x1a8,2,I love spending all night\r\nmoongazing like this...\BRK
+event_1243.txt,332,0x1a8,2,I love spending all night\r\nmoongazing like this...\BRK
+event_1243.txt,412,0x1a8,2,I love spending all night\r\nmoongazing like this...\BRK
+event_1243.txt,454,0x1a8,2,I love spending all night\r\nmoongazing like this...\BRK
+event_1243.txt,498,0x1a8,2,I love spending all night\r\nmoongazing like this...\BRK
+event_1244.txt,249,0x1a8,2,That's too bad.\r\nAre you tired? \BRK | I'm going to bed \r\nearly tonight. \BRK
+event_1245.txt,84,0x1ab,1,"That's too bad. \r\nYou should still come and \r\nbet on the races, though. \r\nIt's fun!\BRK"
+event_1245.txt,86,0x1aa,2,"That's too bad. \r\nYou should still come and \r\nbet on the races, though. \r\nIt's fun!\BRK"
+event_1245.txt,106,0x1ab,0,
+event_1245.txt,107,0x1aa,2,
+event_1246.txt,51,0x1ac,1,
+event_1264.txt,34,0x24b,1,"That was a great race, \r\n\xFF!. \r\nCongratulations!\BRK"
+event_1265.txt,121,0x1af,0,"I'll bring this one with \r\nme now, then. Don't forget \r\nto come tomorrow. \BRK"
+event_1265.txt,122,0x1ae,2,"I'll bring this one with \r\nme now, then. Don't forget \r\nto come tomorrow. \BRK"
+event_1265.txt,153,0x1af,1,
+event_1265.txt,155,0x1ae,2,
+event_1266.txt,50,0x1b0,1,
+event_1276.txt,40,0x1b1,1,"Let's start, then. \BRK"
+event_1290.txt,12,0x1b2,1,
+event_1290.txt,50,0x1b2,0,"Today is the Pumpkin \r\nFestival. \BRK\WAIT_CLICKYou have to give treats to\r\nchildren. So, please give\r\nsome to me!\BRK | I'm waiting!\BRK"
+event_1290.txt,58,0x1b2,0,"Today is the Pumpkin \r\nFestival. \BRK\WAIT_CLICKYou have to give treats to\r\nchildren. So, please give\r\nsome to me!\BRK | I'm waiting!\BRK | Thanks a lot!\r\nBy now. \BRK"
+event_1290.txt,80,0x1b2,2,This isn't a treat!\BRK
+event_1290.txt,87,0x1b2,0,This isn't a treat!\BRK
+event_1291.txt,12,0x1b3,1,
+event_1291.txt,50,0x1b3,0,Today is the Pumpkin \r\nFestival. \BRK\WAIT_CLICKYou have to give candy to\r\nchildren. So...give some\r\nto me!\BRK | Hurry up and give me some!\BRK
+event_1291.txt,58,0x1b3,0,Today is the Pumpkin \r\nFestival. \BRK\WAIT_CLICKYou have to give candy to\r\nchildren. So...give some\r\nto me!\BRK | Hurry up and give me some!\BRK | Thanks a lot! \r\nBye now. \BRK
+event_1291.txt,81,0x1b3,2,You can't fool me! \r\nThis isn't candy!\BRK
+event_1291.txt,89,0x1b3,0,You can't fool me! \r\nThis isn't candy!\BRK
+event_1292.txt,12,0x1b4,1,
+event_1292.txt,53,0x1b4,0,"I think it's unfair that \r\nonly kids get candy on the\r\nPumpkin Festival.\BRK\WAIT_CLICKSo, I came for some, too!\BRK | Can I have some, please?\BRK"
+event_1292.txt,64,0x1b4,0,"Can I have some, please?\BRK | Thanks a lot, \r\n\xFF!. \BRK"
+event_1292.txt,90,0x1b4,2,Are you trying to trick me?\BRK
+event_1292.txt,101,0x1b4,0,Are you trying to trick me?\BRK
+event_1293.txt,66,0x1b5,1,
+event_1293.txt,206,0x1b5,2,"I feel sick from eating \r\ntoo many sweets...I can \r\nalready feel the cavities.\BRK | Today is the Pumpkin \r\nFestival, so I made some \r\ntreats for \xFF*\BRK\r\nand you. I just hope \r\nthey tas"
+event_1293.txt,272,0x1b5,2,"I feel sick from eating \r\ntoo many sweets...I can \r\nalready feel the cavities.\BRK | Today is the Pumpkin \r\nFestival, so I made some \r\ntreats for \xFF*\BRK\r\nand you. I just hope \r\nthey tas"
+event_1293.txt,339,0x1b5,2,I feel sick from eating \r\ntoo many sweets...I can \r\nalready feel the cavities.\BRK
+event_1294.txt,10,0x1b6,1,This is from me. \r\nI hope you like it. \BRK
+event_1294.txt,33,0x1b7,1,
+event_1294.txt,49,0x1b6,2,This is for the Cookies\r\nyou gave me in Spring. \BRK
+event_1294.txt,68,0x1b7,1,
+event_1294.txt,69,0x183,0,
+event_1294.txt,85,0x1b6,2,I came to give you \r\nsomething. \BRK
+event_1294.txt,93,0x1b6,0,I came to give you \r\nsomething. \BRK
+event_1295.txt,10,0x1b8,1,This is from me. \r\nI hope you like it. \BRK
+event_1295.txt,33,0x1b9,1,
+event_1295.txt,49,0x1b8,2,This is for the Cookies\r\nyou gave me in Spring. \BRK
+event_1295.txt,68,0x1b9,1,
+event_1295.txt,69,0x186,0,
+event_1295.txt,85,0x1b8,2,I came to give you \r\nsomething. \BRK
+event_1295.txt,93,0x1b8,0,I came to give you \r\nsomething. \BRK
+event_1296.txt,10,0x1ba,1,This is from me. \r\nI hope you like it. \BRK
+event_1296.txt,33,0x1bb,1,
+event_1296.txt,49,0x1ba,2,This is for the Cookies\r\nyou gave me in Spring. \BRK
+event_1296.txt,68,0x1bb,1,
+event_1296.txt,69,0x185,0,
+event_1296.txt,85,0x1ba,2,I came to give you \r\nsomething. \BRK
+event_1296.txt,93,0x1ba,0,I came to give you \r\nsomething. \BRK
+event_1297.txt,10,0x1bc,1,This is from me. \r\nI hope you like it. \BRK
+event_1297.txt,33,0x1bd,1,
+event_1297.txt,49,0x1bc,2,This is for the Cookies\r\nyou gave me in Spring. \BRK
+event_1297.txt,68,0x1bd,1,
+event_1297.txt,69,0x182,0,
+event_1297.txt,85,0x1bc,2,I came to give you \r\nsomething. \BRK
+event_1297.txt,93,0x1bc,0,I came to give you \r\nsomething. \BRK
+event_1298.txt,10,0x1be,1,This is from me. \r\nI hope you like it. \BRK
+event_1298.txt,34,0x1bf,1,
+event_1298.txt,50,0x1be,2,This is for the Cookies\r\nyou gave me in Spring. \BRK
+event_1298.txt,69,0x1bf,1,
+event_1298.txt,70,0x184,0,
+event_1298.txt,86,0x1be,2,I came to give you \r\nsomething. \BRK
+event_1298.txt,94,0x1be,0,I came to give you \r\nsomething. \BRK
+event_1299.txt,73,0x1c0,1,Shuffle...shuffle...\BRK
+event_1299.txt,87,0x1c0,2,Shuffle...shuffle...\BRK | I can't believe his Rucksack\r\nis so full. This won't \r\neven fit!\BRK | Now what'll I do...?\r\nWhy does he wear his \r\nRucksack even when he's \BRK\WAIT_CLICKsleeping? 
+event_1299.txt,100,0x1c0,2,Now what'll I do...?\r\nWhy does he wear his \r\nRucksack even when he's \BRK\WAIT_CLICKsleeping? Great! It fit!\BRK | Hmm...shuffle...shuffle....\BRK
+event_1299.txt,114,0x1c0,2,"Hmm...shuffle...shuffle....\BRK | I was gonna give it to\r\nyou if you had a space\r\nin your rucksack, but...\BRK\r\nOh well, I guess I'll\r\neat it.\BRK | I hope he wakes up soon!\r\nI can't wait to"
+event_1299.txt,127,0x1c0,2,I hope he wakes up soon!\r\nI can't wait to see the \r\nlook on his face!\BRK | Shuffle...shuffle....\BRK
+event_1299.txt,142,0x1c0,2,Shuffle...shuffle....\BRK | Shoot! I never thought of \r\nwhat to do if his Rucksack\r\nwas full...!\BRK | ...?? \r\nThank goodness he didn't \r\nwake up!\BRK
+event_1299.txt,155,0x1c0,2,...?? \r\nThank goodness he didn't \r\nwake up!\BRK | Shuffle...shuffle....\BRK
+event_1299.txt,170,0x1c0,2,"Shuffle...shuffle....\BRK | Darn it! His Rucksack is \r\nalready full! \BRK\WAIT_CLICKI can't take anything out\r\neither...Oh, I give up!!\BRK | ...\xFF)'s asleep.\r\nI can't wait to see the \r\nlook"
+event_1299.txt,183,0x1c0,2,...\xFF)'s asleep.\r\nI can't wait to see the \r\nlook on his face!\BRK | Shuffle...shuffle....\BRK
+event_1299.txt,198,0x1c0,2,Shuffle...shuffle....\BRK | Darn it! His Rucksack\r\nis full! I hope I remember\r\nto give it to him later. \BRK | I wonder if \xFF)\r\neven knows that today is \r\nthe Winter Thanksgiving\BRK\r\nFest
+event_1299.txt,211,0x1c0,2,I wonder if \xFF)\r\neven knows that today is \r\nthe Winter Thanksgiving\BRK\r\nFestival?\BRK\WAIT_CLICKI'll just put this in his\r\nRucksack!...\BRK | What...? He's asleep? \BRK
+event_1299.txt,226,0x1c0,2,"What...? He's asleep? \BRK | How dare his Rucksack\r\nbe full, even though I went\r\nto all this effort...!\BRK | \xFF!, I brought \r\nsomething nice for you!\r\nWake up!\BRK\WAIT_CLICKHe's sleeping l"
+event_1299.txt,239,0x1c0,2,"\xFF!, I brought \r\nsomething nice for you!\r\nWake up!\BRK\WAIT_CLICKHe's sleeping like a log!\r\nI know...I'll put it in his\r\nRucksackl!\BRK"
+event_1301.txt,68,0x1c8,2,Spending the Starry Night \r\nFestival with Popuri's \r\nfamily was lots of fun!\BRK
+event_1301.txt,69,0x1c2,0,Spending the Starry Night \r\nFestival with Popuri's \r\nfamily was lots of fun!\BRK
+event_1302.txt,61,0x1c9,2,Spending Starry Night \r\nFestival with Ann's family\r\nsure was fun.\BRK
+event_1302.txt,62,0x1c2,0,Spending Starry Night \r\nFestival with Ann's family\r\nsure was fun.\BRK
+event_1303.txt,69,0x1ca,2,Spending the Starry Night\r\nFestival with Elli's family\r\nsure was fun. \BRK
+event_1303.txt,70,0x1c2,0,Spending the Starry Night\r\nFestival with Elli's family\r\nsure was fun. \BRK
+event_1304.txt,83,0x1cb,2,Spending the Starry Night\r\nFestival with Karen's \r\nfamily sure was fun. \BRK
+event_1304.txt,84,0x1c2,0,Spending the Starry Night\r\nFestival with Karen's \r\nfamily sure was fun. \BRK
+event_1305.txt,72,0x1cc,2,Spending the Starry Night \r\nFestival with Mary's family\r\nsure was fun! \BRK
+event_1305.txt,73,0x1c2,0,Spending the Starry Night \r\nFestival with Mary's family\r\nsure was fun! \BRK
+event_1306.txt,328,0x1cd,2,That was fun! \r\nI know I'll sleep well\r\ntonight...\BRK
+event_1307.txt,58,0x1ce,1,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKWait, there's no stocking \r\nhere!...\BRK\WAIT_CLICKThat means I can't leave my\r\npresent. Too bad!\BRK\WAI"
+event_1307.txt,67,0x1ce,2,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKWait, there's no stocking \r\nhere!...\BRK\WAIT_CLICKThat means I can't leave my\r\npresent. Too bad!\BRK\WAI"
+event_1307.txt,73,0x1ce,2,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKWait, there's no stocking \r\nhere!...\BRK\WAIT_CLICKThat means I can't leave my\r\npresent. Too bad!\BRK\WAI"
+event_1307.txt,77,0x1f,21,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKGood, he remembered to put\r\na stocking up. \BRK\WAIT_CLICKBut it's so dark I can't\r\nsee which present is "
+event_1307.txt,80,0x1f,22,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKGood, he remembered to put\r\na stocking up. \BRK\WAIT_CLICKBut it's so dark I can't\r\nsee which present is "
+event_1307.txt,83,0x1f,24,
+event_1307.txt,86,0x1f,25,
+event_1307.txt,89,0x1f,27,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKThe present is still there!\r\nSome people don't even \r\ncare for the trouble I go \BRK\r\nthrough to do thi"
+event_1307.txt,92,0x1cf,0,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKThe present is still there!\r\nSome people don't even \r\ncare for the trouble I go \BRK\r\nthrough to do thi"
+event_1307.txt,99,0x1ce,2,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKThe present is still there!\r\nSome people don't even \r\ncare for the trouble I go \BRK\r\nthrough to do thi"
+event_1307.txt,100,0x1cf,0,"Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKThe present is still there!\r\nSome people don't even \r\ncare for the trouble I go \BRK\r\nthrough to do thi"
+event_1308.txt,35,0x1d0,1,
+event_1309.txt,79,0x1d0,2,
+event_1318.txt,4,0x1d1,1,
+event_1319.txt,40,0x1d2,1,I think it's almost time!\BRK | I hope the new year is \r\na good one for everybody.\BRK
+event_1319.txt,58,0x1d1,2,I hope the new year is \r\na good one for everybody.\BRK

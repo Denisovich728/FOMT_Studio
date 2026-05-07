@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 42 Unknown_Event_0042 {
+const MESSAGE_0 = "Thanks for stopping the\r\nfight, \xFF!. \BRK";
+const MESSAGE_1 = "I just hope they don't\r\nstart again...\BRK";
+
+if ((Check_Flag(0x52) == 1)) {
+    if (((Check_Flag(0x53) == 0) || (Check_Flag(0x53) == 2))) {
+        SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+        TalkOpen();
+        Set_Portrait("Lilia_Happy");
+        Set_Name_Window("Lillia");
+        TalkMessage(0);
+        TalkClose();
+        SetEntityFacing(1, 0);
+        Free_Event_Entity("Lillia");
+    } else {
+        SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+        TalkOpen();
+        Set_Portrait("Lilia_Afraid");
+        Set_Name_Window("Lillia");
+        TalkMessage(1);
+        TalkClose();
+        SetEntityFacing(1, 0);
+        Free_Event_Entity("Lillia");
+    }
+}
+exit;
+}

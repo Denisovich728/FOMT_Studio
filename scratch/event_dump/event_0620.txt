@@ -1,0 +1,144 @@
+#include "lib_fomt.csv"
+
+script 620 Unknown_Event_0620 {
+const MESSAGE_0 = "Are you done with work?\BRK";
+const MESSAGE_1 = "Yes";
+const MESSAGE_2 = "No";
+const MESSAGE_3 = "Doesn't this cake look good?\r\nYou know why I baked it, \r\nright?\BRK";
+const MESSAGE_4 = "My birthday.";
+const MESSAGE_5 = "Your birthday.";
+const MESSAGE_6 = "\xFF*'s birthday.";
+const MESSAGE_7 = "I can't believe you would\r\nconfuse your own birthday \r\nwith your son's!\BRK\WAIT_CLICKYou really are funny, \r\n\xFF).\BRK";
+const MESSAGE_8 = "I'd better apologize \r\nlater...\BRK";
+const MESSAGE_9 = "Thanks for thinking about\r\nme, but aren't you \r\nforgetting \xFF*?\BRK";
+const MESSAGE_10 = "\xFF* is lucky\r\nto have such a considerate\r\nfather!\BRK";
+const MESSAGE_11 = "I can't wait until he grows\r\nup and we can go out \r\non the town together!\BRK\WAIT_CLICKHis father sure won't\r\ntake me...\BRK";
+const MESSAGE_12 = "I had so much fun today!\r\nI'll sleep like a log...\BRK";
+const MESSAGE_13 = "Hurry up and finish.\r\nToday is an important day.\BRK";
+
+var var_0;
+
+SetEntityFacing(0x13, GetOppositeFacing(GetEntityFacing(0)));
+Free_Event_Entity("Karen");
+TalkOpen();
+Set_Name_Window("Karen");
+Set_Portrait("Karen_Neutral");
+Set_Hearth_Anim("Karen");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(1, 2);
+switch (var_0) {
+    case 1:
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Karen");
+        Set_Portrait("Karen_Neutral");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(3);
+        TalkClose();
+        TalkOpen();
+        var_0 = TalkChoice3(4, 5, 6);
+        switch (var_0) {
+            case 1:
+                Give_Love_Points("Karen", -0x7D0);
+                Give_Friendship_Points("", -0xA);
+                TalkClose();
+                TalkOpen();
+                Set_Name_Window("Karen");
+                Set_Portrait("Karen_Neutral");
+                Set_Hearth_Anim("Karen");
+                TalkMessage(7);
+                TalkClose();
+                Fade_Out(2, 1);
+                Despawn_Map_Item(0);
+                Despawn_Map_Item(1);
+                TalkOpen();
+                TalkMessage(8);
+                TalkClose();
+                Refresh_Map_Entities();
+                Proc08A(0x13);
+                Proc08A(0x23);
+                Set_Flag(0xB7, 2);
+                Execute_Script(0x3DC);
+                break;
+            case 2:
+                Give_Love_Points("Karen", -0x7D0);
+                Give_Friendship_Points("", -0xA);
+                TalkClose();
+                TalkOpen();
+                Set_Name_Window("Karen");
+                Set_Portrait("Karen_Surprised");
+                Set_Hearth_Anim("Karen");
+                TalkMessage(9);
+                TalkClose();
+                Fade_Out(2, 1);
+                Despawn_Map_Item(0);
+                Despawn_Map_Item(1);
+                TalkOpen();
+                TalkMessage(8);
+                TalkClose();
+                Refresh_Map_Entities();
+                Proc08A(0x13);
+                Proc08A(0x23);
+                Set_Flag(0xB7, 2);
+                Execute_Script(0x3DC);
+                break;
+            case 3:
+                Give_Love_Points("Karen", 0xBB8);
+                Give_Friendship_Points("", 0x14);
+                TalkClose();
+                TalkOpen();
+                Set_Name_Window("Karen");
+                Set_Portrait("Karen_Happy");
+                Set_Hearth_Anim("Karen");
+                TalkMessage(10);
+                TalkClose();
+                SetEntityAnim("Player", "Player_See_Base");
+                Make_Delay(0x3C);
+                if (Inventory_Check()) {
+                    SetEntityAnim("Player", "Player_Stop_Base");
+                    goto LBL_0005;
+                }
+                SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+                Make_Delay(0x3C);
+                TalkOpen();
+                Set_Name_Window("Karen");
+                Set_Portrait("Karen_Happy");
+                Set_Hearth_Anim("Karen");
+                TalkMessage(11);
+                TalkClose();
+                SetEntityAnim("Player", "Player_See_Base");
+                Make_Delay(0x3C);
+                if (Inventory_Check()) {
+                    SetEntityAnim("Player", "Player_Stop_Base");
+                    goto LBL_0007;
+                }
+                SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+                Make_Delay(0x3C);
+                Fade_Out(2, 1);
+                Despawn_Map_Item(0);
+                Despawn_Map_Item(1);
+                TalkOpen();
+                TalkMessage(12);
+                TalkClose();
+                Refresh_Map_Entities();
+                Proc08A(0x13);
+                Proc08A(0x23);
+                Set_Flag(0xB7, 2);
+                Execute_Script(0x3DC);
+                break;
+        }
+    case 2:
+        TalkClose();
+        TalkOpen();
+        Set_Name_Window("Karen");
+        Set_Portrait("Karen_Neutral");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(13);
+        TalkClose();
+        break;
+}
+SetEntityFacing(0x13, 0);
+exit;
+}

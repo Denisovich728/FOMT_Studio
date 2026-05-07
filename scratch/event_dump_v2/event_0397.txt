@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 397 Unknown_Event_0397 {
+const MESSAGE_0 = "Plant\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

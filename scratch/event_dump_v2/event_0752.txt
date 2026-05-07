@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 752 Unknown_Event_0752 {
+const MESSAGE_0 = "I think his painting is\r\ngreat. Who knew he had\r\nsuch talent?\BRK";
+
+if ((Check_Flag("Flag_0x116") == 1)) {
+    SetEntityFacing(0x12, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Sasha_Happy");
+    Set_Name_Window("Sasha");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Sasha");
+    SetEntityFacing(0x12, 3);
+}
+exit;
+}

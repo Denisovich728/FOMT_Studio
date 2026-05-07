@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 927 Unknown_Event_0927 {
+const MESSAGE_0 = "Mary\x81fs nice...\BRK";
+
+SetEntityFacing(7, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Gray_Happy");
+Set_Name_Window("Gray");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(7, 0);
+Free_Event_Entity("Gray");
+exit;
+}

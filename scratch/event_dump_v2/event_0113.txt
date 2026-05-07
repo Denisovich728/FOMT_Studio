@@ -1,0 +1,11 @@
+#include "lib_fomt.csv"
+
+script 113 Unknown_Event_0113 {
+if ((GetEntityFacing(0) == 1)) {
+    Fade_Out(2, 1);
+    Warp_Player("Farm_House_1", 0x78, 0xD0);
+    SetEntityPosition(0, 0xDC, 0x68, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

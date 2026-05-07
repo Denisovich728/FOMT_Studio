@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 951 Unknown_Event_0951 {
+const MESSAGE_0 = "Hmm... I guess I got\r\na touch of the flu.\BRK";
+
+SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x14, 2);
+Free_Event_Entity("Doctor");
+exit;
+}

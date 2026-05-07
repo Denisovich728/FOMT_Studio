@@ -1,0 +1,578 @@
+#include "lib_fomt.csv"
+
+script 316 Unknown_Event_0316 {
+const MESSAGE_0 = "There are no books here.\r\n\BRK";
+const MESSAGE_1 = "Prev. page";
+const MESSAGE_2 = "Tak";
+const MESSAGE_3 = "Manna";
+const MESSAGE_4 = "Next page";
+const MESSAGE_5 = "Lumin";
+const MESSAGE_6 = "Sebastian";
+const MESSAGE_7 = "Wally";
+const MESSAGE_8 = "Chris";
+const MESSAGE_9 = "Hugh";
+const MESSAGE_10 = "Grant";
+const MESSAGE_11 = "Sam";
+const MESSAGE_12 = "Kate";
+const MESSAGE_13 = "Galen";
+const MESSAGE_14 = "Nina";
+const MESSAGE_15 = "Daryl";
+const MESSAGE_16 = "Gustafa";
+const MESSAGE_17 = "Cody";
+const MESSAGE_18 = "Kassey";
+const MESSAGE_19 = "Patrick";
+const MESSAGE_20 = "Murray";
+const MESSAGE_21 = "Tim";
+const MESSAGE_22 = "Ruby";
+const MESSAGE_23 = "Nancy";
+const MESSAGE_24 = "Rock";
+const MESSAGE_25 = "Garcia";
+const MESSAGE_26 = "Muffy";
+const MESSAGE_27 = "Carter";
+const MESSAGE_28 = "Flora";
+const MESSAGE_29 = "Vesta";
+const MESSAGE_30 = "Marlin";
+const MESSAGE_31 = "Celia";
+const MESSAGE_32 = "Hardy";
+const MESSAGE_33 = "Van";
+const MESSAGE_34 = "Mooky";
+const MESSAGE_35 = "David";
+const MESSAGE_36 = "Nic";
+const MESSAGE_37 = "Brad";
+const MESSAGE_38 = "Player";
+const MESSAGE_39 = "You can't find it...\r\n\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+
+var_1 = 0;
+TalkOpen();
+if (((((((((((((((((((((((((((((((((((((Check_Flag("GCN_AWL_Bio_Tak") == 0) && (Check_Flag("GCN_AWL_Bio_Manna") == 0)) && (Check_Flag("GCN_AWL_Bio_Lumina") == 0)) && (Check_Flag("GCN_AWL_Bio_Sebastian") == 0)) && (Check_Flag("GCN_AWL_Bio_Wally") == 0)) && (Check_Flag("GCN_AWL_Bio_Chris") == 0)) && (Check_Flag("GCN_AWL_Bio_Hugh") == 0)) && (Check_Flag("GCN_AWL_Bio_Grant") == 0)) && (Check_Flag("GCN_AWL_Bio_Sam") == 0)) && (Check_Flag("GCN_AWL_Bio_Kate") == 0)) && (Check_Flag("GCN_AWL_Bio_Galen") == 0)) && (Check_Flag("GCN_AWL_Bio_Nina") == 0)) && (Check_Flag("GCN_AWL_Bio_Daryl") == 0)) && (Check_Flag("GCN_AWL_Bio_Gustafa") == 0)) && (Check_Flag("GCN_AWL_Bio_Cody") == 0)) && (Check_Flag("GCN_AWL_Bio_Kassey") == 0)) && (Check_Flag("GCN_AWL_Bio_Patrick") == 0)) && (Check_Flag("GCN_AWL_Bio_Murray") == 0)) && (Check_Flag("GCN_AWL_Bio_Tim") == 0)) && (Check_Flag("GCN_AWL_Bio_Ruby") == 0)) && (Check_Flag("GCN_AWL_Bio_Nancy") == 0)) && (Check_Flag("GCN_AWL_Bio_Rock") == 0)) && (Check_Flag("GCN_AWL_Bio_Garcia") == 0)) && (Check_Flag("GCN_AWL_Bio_Muffy") == 0)) && (Check_Flag("GCN_AWL_Bio_Carter_AWL") == 0)) && (Check_Flag("GCN_AWL_Bio_Flora") == 0)) && (Check_Flag("GCN_AWL_Bio_Vesta") == 0)) && (Check_Flag("GCN_AWL_Bio_Marlin") == 0)) && (Check_Flag("GCN_AWL_Bio_Celia") == 0)) && (Check_Flag("GCN_AWL_Bio_Hardy") == 0)) && (Check_Flag("GCN_AWL_Bio_Van") == 0)) && (Check_Flag("GCN_AWL_Bio_Mooky") == 0)) && (Check_Flag("GCN_AWL_Bio_David") == 0)) && (Check_Flag("GCN_AWL_Bio_Nic") == 0)) && (Check_Flag("GCN_AWL_Bio_Brad") == 0)) && (Check_Flag("GCN_AWL_Bio_Player") == 0))) {
+    TalkMessage(0);
+} else {
+    do {
+        switch (var_1) {
+            case 0:
+                var_0 = TalkChoice6(1, 2, 3, 4, 5, 6);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 8;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Tak") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0050;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x12);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Manna") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0055;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x13);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 1;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Lumina") == 0)) {
+                            var_2 = 2;
+                            goto LBL_005B;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x14);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Sebastian") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0060;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x15);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 1:
+                var_0 = TalkChoice6(1, 7, 8, 4, 9, 0xA);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 0;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Wally") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0069;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x16);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Chris") == 0)) {
+                            var_2 = 2;
+                            goto LBL_006E;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x17);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 2;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Hugh") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0074;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x18);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Grant") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0079;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x19);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 2:
+                var_0 = TalkChoice6(1, 0xB, 0xC, 4, 0xD, 0xE);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 1;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Sam") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0082;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x1A);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Kate") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0087;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x1B);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 3;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Galen") == 0)) {
+                            var_2 = 2;
+                            goto LBL_008D;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x1C);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Nina") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0092;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x1D);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 3:
+                var_0 = TalkChoice6(1, 0xF, 0x10, 4, 0x11, 0x12);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 2;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Daryl") == 0)) {
+                            var_2 = 2;
+                            goto LBL_009B;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x1E);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Gustafa") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00A0;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x1F);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 4;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Cody") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00A6;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x20);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Kassey") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00AB;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x21);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 4:
+                var_0 = TalkChoice6(1, 0x13, 0x14, 4, 0x15, 0x16);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 3;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Patrick") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00B4;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x22);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Murray") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00B9;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x23);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 5;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Tim") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00BF;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x24);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Ruby") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00C4;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x25);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 5:
+                var_0 = TalkChoice6(1, 0x17, 0x18, 4, 0x19, 0x1A);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 4;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Nancy") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00CD;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x26);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Rock") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00D2;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x27);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 6;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Garcia") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00D8;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x28);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Muffy") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00DD;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x29);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 6:
+                var_0 = TalkChoice6(1, 0x1B, 0x1C, 4, 0x1D, 0x1E);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 5;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Carter_AWL") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00E6;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x2A);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Flora") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00EB;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x2B);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 7;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Vesta") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00F1;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x2C);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Marlin") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00F6;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x2D);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 7:
+                var_0 = TalkChoice6(1, 0x1F, 0x20, 4, 0x21, 0x22);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 6;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_Celia") == 0)) {
+                            var_2 = 2;
+                            goto LBL_00FF;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x2E);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Hardy") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0104;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x2F);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 8;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Van") == 0)) {
+                            var_2 = 2;
+                            goto LBL_010A;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x30);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Mooky") == 0)) {
+                            var_2 = 2;
+                            goto LBL_010F;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x31);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+            case 8:
+                var_0 = TalkChoice6(1, 0x23, 0x24, 4, 0x25, 0x26);
+                switch (var_0) {
+                    case 1:
+                        var_1 = 7;
+                        var_2 = 0;
+                        break;
+                    case 2:
+                        if ((Check_Flag("GCN_AWL_Bio_David") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0118;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x33);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 3:
+                        if ((Check_Flag("GCN_AWL_Bio_Nic") == 0)) {
+                            var_2 = 2;
+                            goto LBL_011D;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x34);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 4:
+                        var_1 = 0;
+                        var_2 = 0;
+                        break;
+                    case 5:
+                        if ((Check_Flag("GCN_AWL_Bio_Brad") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0123;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x35);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                    case 6:
+                        if ((Check_Flag("GCN_AWL_Bio_Player") == 0)) {
+                            var_2 = 2;
+                            goto LBL_0128;
+                        }
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        Show_Document_UI(0x36);
+                        Fade_In(3, 1);
+                        var_2 = 1;
+                        break;
+                }
+                break;
+        }
+        if ((var_2 == 2)) {
+            TalkMessage(39);
+            var_2 = 0;
+        }
+    } while ((var_2 == 0));
+}
+TalkClose();
+exit;
+}

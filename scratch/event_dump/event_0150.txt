@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 150 Unknown_Event_0150 {
+const MESSAGE_0 = "Who is this photo of...?\BRK";
+const MESSAGE_1 = "It's a photo of Lillia.\BRK";
+
+TalkOpen();
+if ((Func083(1) == 0)) {
+    Print_Message(0);
+} else {
+    Print_Message(1);
+}
+TalkClose();
+exit;
+}

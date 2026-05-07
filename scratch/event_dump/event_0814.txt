@@ -1,0 +1,31 @@
+#include "lib_fomt.csv"
+
+script 814 Unknown_Event_0814 {
+const MESSAGE_0 = "Hi there. \BRK\WAIT_CLICKMy name's Lou. I come to \r\nMineral Town every week \r\nto buy food. \BRK\WAIT_CLICKThe food from Mineral Town \r\nis so delicious, I've \r\ndecided to use it at my \BRK\r\nown Inn! \BRK\WAIT_CLICKI'm at the Inn here every \r\nMonday, so come by if you\r\nwant to sell something! \BRK";
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x22, 0xE4, 0x91, 1);
+SetEntityAnim("Lu", "Lu_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Ruby_Happy");
+Set_Name_Window("Lu");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x22, 3);
+SetEntityAnim("Lu", "Lu_Base");
+Set_Vector_X("Lu", 0x13F, 1);
+Execute_Movement("Lu");
+SetEntityFacing(0x22, 1);
+Set_Vector_Y("Lu", 0, 1);
+Execute_Movement("Lu");
+Hide_Entity("Lu");
+Free_Event_Entity("Lu");
+Set_Flag(0x13E, 2);
+exit;
+exit;
+}

@@ -1,0 +1,60 @@
+#include "lib_fomt.csv"
+
+script 1277 Unknown_Event_1277 {
+const MESSAGE_0 = "The Sheep Festival has \r\nended. We'll return your\r\nSheep to your house for you,\BRK\r\nso please go home now.\BRK";
+
+PlayBGM(1, 9);
+Set_Time(0x12, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(4, 0x55, 0x5B, 0);
+SetEntityAnim("Barley", "Barley_Stop_Base");
+SetEntityPosition(2, 0x82, 0x136, 0);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(0x13, 0x5A, 0x13F, 0);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(0xD, 0x4C, 0x159, 3);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(5, 0x100, 0x73, 2);
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityPosition(0xB, 0xDC, 0x85, 1);
+SetEntityAnim("Anna", "Anna_Stop_Base");
+SetEntityPosition(0xE, 0xC4, 0x5C, 0);
+SetEntityAnim("Harris", "Harris_Stop_Base");
+SetEntityPosition(0x11, 0x17C, 0x13C, 2);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+SetEntityPosition(7, 0x160, 0x14E, 1);
+SetEntityAnim("Gray", "Gray_Stop_Base");
+SetEntityPosition(0x1B, 0x162, 0x121, 0);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+SetEntityPosition(0x47, 0x63, 0x14F, 3);
+Spawn_Event_Entity(0x47, 2);
+SetEntityAnim(0x47, "Sheep_Stop_Base");
+SetEntityPosition(0x48, 0x15E, 0x132, 3);
+Spawn_Event_Entity(0x48, 2);
+SetEntityAnim(0x48, "Sheep_Stop_Base");
+SetEntityPosition(0x49, 0xDE, 0x6D, 2);
+Spawn_Event_Entity(0x49, 2);
+SetEntityAnim(0x49, "Sheep_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+Routine_State_Override("Rick", "Script_1278");
+Routine_State_Override("Karen", "Script_1280");
+Routine_State_Override("Barley", "Script_1287");
+Routine_State_Override("May", "Script_1286");
+Routine_State_Override("Harris", "Script_1283");
+Routine_State_Override("Anna", "Script_1281");
+Routine_State_Override("Huachito", "Script_1282");
+Routine_State_Override("Gotz", "Script_1285");
+Routine_State_Override("Gray", "Script_1284");
+Routine_State_Override("Jeff", "Script_1279");
+Routine_State_Override(0x47, "Script_1288");
+Routine_State_Override(0x48, "Script_1288");
+Routine_State_Override(0x49, "Script_1288");
+exit;
+}

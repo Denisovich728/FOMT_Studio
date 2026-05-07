@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 27 Unknown_Event_0027 {
+const MESSAGE_0 = "I had no idea Karen would \r\nbe so happy!\BRK";
+
+if ((Check_Flag(0x49) == 1)) {
+}
+SetEntityFacing(0x12, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Sasha_Happy");
+Set_Name_Window("Sasha");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x12, 3);
+Free_Event_Entity("Sasha");
+exit;
+}

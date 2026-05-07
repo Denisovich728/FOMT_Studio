@@ -1,0 +1,72 @@
+#include "lib_fomt.csv"
+
+script 1301 Unknown_Event_1301 {
+const MESSAGE_0 = "Thanks for coming. \BRK";
+const MESSAGE_1 = "Good evening. \r\nPlease come in.\BRK";
+const MESSAGE_2 = "So Popuri invited you?\r\nYou live alone, right?\BRK\WAIT_CLICKIt's always good to be with\r\nfriends for the Starry \r\nNight Festival, you know!\BRK";
+const MESSAGE_3 = "Well then, let's start\r\nthe party...!\BRK";
+const MESSAGE_4 = "Spending the Starry Night \r\nFestival with Popuri's \r\nfamily was lots of fun!\BRK";
+
+Warp_Player("Poultry_Farm_House_Floor_01", 0x78, 0xA8);
+PlayBGM(1, 7);
+Spawn_Item_On_Grid(0, 0x78, 0x68, 1, Get_Item_Sprite_ID(0x8F));
+Spawn_Item_On_Grid(1, 0x88, 0x68, 1, Get_Item_Sprite_ID("Invitation"));
+SetEntityPosition(0, 0x78, 0xD2, 1);
+SetEntityPosition(3, 0xA8, 0x8E, 2);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+SetEntityPosition(2, 0x80, 0x58, 0);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(1, 0x60, 0x78, 3);
+SetEntityAnim("Lillia", "Lilia_Stop_Base");
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0xA8, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityFacing(3, 0);
+SetEntityFacing(1, 0);
+Make_Delay(0xA);
+TalkOpen();
+Set_Name_Window("Popuri");
+Set_Portrait("Popuri_Happy");
+Set_Hearth_Anim("Popuri");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Rick");
+Set_Portrait("Rick_Happy");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(3);
+TalkClose();
+Give_Love_Points("Popuri", 0x7D0);
+Give_Friendship_Points("Popuri", 0x1E);
+Give_Friendship_Points("Rick", 0x1E);
+Give_Friendship_Points("Lillia", 0x1E);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(4);
+TalkClose();
+Despawn_Map_Item(0);
+Despawn_Map_Item(1);
+Set_Flag("Flag_0x1C8", 2);
+Set_Flag("Flag_0x1C2", 0);
+Execute_Script(0x3DC);
+exit;
+}

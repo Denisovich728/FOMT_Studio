@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 766 Unknown_Event_0766 {
+const MESSAGE_0 = "Not everything is for \r\nfree, you know! Pay up!\BRK";
+
+if ((Check_Flag("Flag_0x11B") == 1)) {
+    SetEntityFacing(0x1D, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Won_Neutral");
+    Set_Name_Window("Won");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Won");
+    SetEntityFacing(0x1D, 2);
+}
+exit;
+}

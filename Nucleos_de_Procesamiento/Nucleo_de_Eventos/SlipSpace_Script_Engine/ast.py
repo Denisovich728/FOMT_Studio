@@ -14,7 +14,10 @@ class Expr: pass
 @dataclass
 class ExprName(Expr): name: str
 @dataclass
-class ExprInt(Expr): value: IntValue
+class ExprInt(Expr):
+    value: IntValue
+    comment: Optional[str] = None
+    force_decimal: bool = False
 @dataclass
 class ExprStr(Expr): value: bytes
 @dataclass
@@ -81,7 +84,7 @@ class StmtCall(Stmt): invoke: Invoke
 @dataclass
 class StmtMessage(Stmt): index: int; text: bytes
 @dataclass
-class StmtIf(Stmt): condition: Expr; stmts: List[Stmt]
+class StmtIf(Stmt): condition: Expr; stmts: List[Stmt]; exit_jump: Optional[JumpId] = None
 @dataclass
 class StmtIfElse(Stmt): condition: Expr; true_stmts: List[Stmt]; false_stmts: List[Stmt]
 @dataclass
@@ -89,9 +92,15 @@ class StmtFor(Stmt): condition: Expr; head: Stmt; tail: Stmt; body: List[Stmt]
 @dataclass
 class StmtDoWhile(Stmt): condition: Expr; body: List[Stmt]
 @dataclass
-class StmtSwitch(Stmt): condition: Expr; cases: List['SwitchCase']; switch_id: SwitchId
+class StmtSwitch(Stmt): condition: Expr; cases: List['SwitchCase']; switch_id: SwitchId; exit_label: Optional[JumpId] = None
 class StmtExit(Stmt): pass
+class StmtBreak(Stmt): pass
 class StmtEmpty(Stmt): pass
+
+@dataclass
+class StmtLabel(Stmt): jump_id: JumpId
+@dataclass
+class StmtGoto(Stmt): jump_id: JumpId
 
 class SwitchCase: pass
 

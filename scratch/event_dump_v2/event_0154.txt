@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 154 Unknown_Event_0154 {
+const MESSAGE_0 = "Bee Nest\r\nCheck everyday to \r\nfind some honey.\BRK";
+
+if (((!Func063() && Inventory_Check()) && Check_Flag("Flag_0x2B"))) {
+    Set_Flag("Flag_0x2B", 0);
+    Give_Food("Honey");
+} else {
+    TalkOpen();
+    Print_Message(0);
+    TalkClose();
+}
+exit;
+}

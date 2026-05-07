@@ -1,0 +1,37 @@
+#include "lib_fomt.csv"
+
+script 1283 Unknown_Event_1283 {
+const MESSAGE_0 = "All the Sheep here \r\nseem so happy.\BRK";
+const MESSAGE_1 = "Winning is such a great\r\naccomplishment!\BRK";
+const MESSAGE_2 = "All the Sheep this year \r\nhave such beautiful coats!\BRK";
+
+if ((Func083(0xE) == 0)) {
+    Free_Event_Entity("Harris");
+}
+SetEntityFacing(0xE, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x1AF) == 0)) {
+    TalkOpen();
+    Set_Portrait("Harris_Neutral");
+    Set_Name_Window("Harris");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag(0x1B1) == 1)) {
+        TalkOpen();
+        Set_Portrait("Harris_Happy");
+        Set_Name_Window("Harris");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Harris_Neutral");
+    Set_Name_Window("Harris");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Harris") == 0)) {
+    Give_Friendship_Points("Harris", 5);
+}
+Free_Event_Entity("Harris");
+SetEntityFacing(0xE, 0);
+exit;
+}

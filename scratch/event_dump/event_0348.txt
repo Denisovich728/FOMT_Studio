@@ -1,0 +1,8 @@
+#include "lib_fomt.csv"
+
+script 348 Unknown_Event_0348 {
+Fade_Out(3, 1);
+Proc09F();
+Fade_In(3, 1);
+exit;
+}

@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 1170 Unknown_Event_1170 {
+const MESSAGE_0 = "I think it's great for kids\r\nto live with animals. \BRK\WAIT_CLICKSome parents won't even let\r\ntheir kids have dogs!\BRK";
+const MESSAGE_1 = "I'll be rooting for \r\nyour Cow. \BRK";
+
+if ((Func083(0xC) == 0)) {
+    Free_Event_Entity("Mary");
+}
+SetEntityFacing(0xC, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Elli_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Mary_Gray_Event_4") == 2)) || (Check_Flag("Rival_Mary_Gray_Married") == 2))) {
+    Set_Hearth_Anim("Mary");
+}
+Set_Name_Window("Mary");
+if ((Check_Flag("Flag_0x19B") == 0)) {
+    Set_Portrait("Mary_Neutral");
+    TalkMessage(0);
+} else {
+    Set_Portrait("Mary_Happy");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Mary") == 0)) {
+    Give_Friendship_Points("Mary", 5);
+}
+Free_Event_Entity("Mary");
+SetEntityFacing(0xC, 2);
+exit;
+}

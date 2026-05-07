@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 146 Unknown_Event_0146 {
+const MESSAGE_0 = "Basket\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

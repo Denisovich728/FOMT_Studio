@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 765 Unknown_Event_0765 {
+const MESSAGE_0 = "Too bad...\BRK";
+
+if ((Check_Flag(0x11B) == 1)) {
+    SetEntityFacing(0x1C, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Zack_Afraid");
+    Set_Name_Window("Zack");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Zack");
+    SetEntityFacing(0x1C, 0);
+}
+exit;
+}

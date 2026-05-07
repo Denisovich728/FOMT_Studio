@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 938 Unknown_Event_0938 {
+const MESSAGE_0 = "So Mary's that age already? \BRK";
+const MESSAGE_1 = "Well, I guess it \r\nhad to happen sometime...\BRK";
+
+if ((Func083(0xA) == 0)) {
+    Free_Event_Entity("Basil");
+}
+if ((Has_NPC_Talked_Today("Basil") == 0)) {
+    SetEntityFacing(0xA, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Basil_Neutral");
+    Set_Name_Window("Basil");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0xA, 2);
+    Free_Event_Entity("Basil");
+} else {
+    SetEntityFacing(0xA, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Basil_Happy");
+    Set_Name_Window("Basil");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0xA, 2);
+    Free_Event_Entity("Basil");
+}
+exit;
+}

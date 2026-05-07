@@ -1,0 +1,38 @@
+#include "lib_fomt.csv"
+
+script 706 Unknown_Event_0706 {
+const MESSAGE_0 = "Ahh....This is the life!\BRK";
+const MESSAGE_1 = "Stop it...!\BRK";
+const MESSAGE_2 = "I'm so glad I married you, \r\nKaren. \BRK";
+const MESSAGE_3 = "Will you stop embarrasing me\r\nin front of \xFF!?\BRK";
+
+SetEntityFacing(0x13, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+if ((Has_NPC_Talked_Today("Rick") == 0)) {
+    Set_Portrait("Rick_Neutral");
+    Set_Name_Window("Rick");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x13, 3);
+    TalkOpen();
+    Set_Portrait("Karen_Surprised");
+    Set_Name_Window("Karen");
+    TalkMessage(1);
+} else {
+    Set_Portrait("Rick_Happy");
+    Set_Name_Window("Rick");
+    TalkMessage(2);
+    SetEntityFacing(0x13, 3);
+    TalkOpen();
+    Set_Portrait("Karen_Surprised");
+    Set_Name_Window("Karen");
+    TalkMessage(3);
+}
+TalkClose();
+Free_Event_Entity("Rick");
+Free_Event_Entity("Karen");
+SetEntityFacing(2, 2);
+SetEntityFacing(0x13, 3);
+exit;
+exit;
+}

@@ -1,0 +1,242 @@
+#include "lib_fomt.csv"
+
+script 659 Unknown_Event_0659 {
+const MESSAGE_0 = "I think it's about time!\BRK";
+const MESSAGE_1 = "I can't take it any more!\BRK";
+const MESSAGE_2 = "You can do it!\r\nJust a little more now!\BRK";
+const MESSAGE_3 = "It's OK. Relax.\BRK";
+const MESSAGE_4 = "It hurts!!...\BRK";
+const MESSAGE_5 = "\xFF), help!\BRK";
+const MESSAGE_6 = "Women really are stronger\r\nthan men!...\BRK";
+const MESSAGE_7 = "Now I've finally become\r\na grandmother!\BRK";
+const MESSAGE_8 = "It's a healthy boy. \r\nYou should go be with \r\nPopuri now.\BRK";
+const MESSAGE_9 = "He looks just like you,\r\n\xFF)!\BRK\WAIT_CLICKWhy don't you name him?\BRK";
+const MESSAGE_10 = "I'm so happy!\r\nWelcome to the world, \r\n\xFF*!\BRK";
+const MESSAGE_11 = "Now I'm a father!\r\nI love you, \xFF*.\BRK";
+
+Warp_Player("Farm_House_1", 0x75, 0x94);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x75, 0x94, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(1, 0x75, 0x7C, 0);
+SetEntityAnim("Lillia", "Lilia_Stop_Base");
+Fade_In(2, 1);
+Set_Flag("Baby_Birth_Event_State", 1);
+SetEntityFacing(0, 2);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0x4B, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+SetEntityFacing(0, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0xA5, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+SetEntityFacing(0, 2);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0x75, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0, 1);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Popuri");
+TalkMessage(1);
+Set_Name_Window("Elli");
+TalkMessage(2);
+TalkClose();
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityFacing(0, 3);
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(3);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+SetEntityFacing(0, 2);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0x4B, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Popuri");
+TalkMessage(4);
+TalkClose();
+SetEntityFacing(0, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0xA5, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Popuri");
+TalkMessage(5);
+TalkClose();
+SetEntityFacing(0, 2);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_X("Player", 0x75, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+PlaySong(0, 0xAC);
+Make_Delay(0x3C);
+PlaySong(0, 0xAC);
+Make_Delay(0x3C);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay((0x3C * 2));
+Fade_Out(2, 1);
+Warp_Player("Farm_House_1", 0x1AE, 0x7C);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x1AE, 0x7C, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(3, 0x1B8, -0x30, 0);
+SetEntityAnim("Popuri", "Shadwo_Anim_6");
+Proc12D();
+SetEntityPosition(0x23, 0x1A0, -0x30, 0);
+SetEntityAnim("", 8);
+SetEntityPosition(1, 0x198, 0x7C, 3);
+SetEntityAnim("Lillia", "Lilia_Stop_Base");
+SetEntityPosition(0x14, 0x1C4, 0x7C, 2);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0x15, 0x1AE, 0x94, 1);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Doctor_Happy");
+Set_Name_Window("Doctor");
+TalkMessage(6);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(7);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Elli");
+Set_Portrait("Ellie_Happy");
+TalkMessage(8);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x64, 1);
+Execute_Movement("Player");
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Popuri");
+Set_Portrait("Popuri_Happy");
+Set_Hearth_Anim("Popuri");
+TalkMessage(9);
+TalkClose();
+Fade_Out(3, 1);
+Trigger_Naming_Sequence(0);
+Fade_In(3, 1);
+TalkOpen();
+Set_Name_Window("Popuri");
+Set_Portrait("Popuri_Happy");
+Set_Hearth_Anim("Popuri");
+TalkMessage(10);
+TalkClose();
+Free_Event_Entity("Popuri");
+Free_Event_Entity("Lillia");
+Free_Event_Entity("Doctor");
+Free_Event_Entity("Elli");
+Give_Love_Points("Popuri", 0xBB8);
+Give_Friendship_Points("Lillia", 0x14);
+Give_Friendship_Points("Doctor", 0x14);
+Give_Friendship_Points("Elli", 0x14);
+Set_Flag("Baby_Birth_Event_State", 2);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(11);
+TalkClose();
+Execute_Script(0x3DC);
+exit;
+}

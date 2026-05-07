@@ -1,0 +1,111 @@
+#include "lib_fomt.csv"
+
+script 918 Unknown_Event_0918 {
+const MESSAGE_0 = "I'm getting married to Ann!\r\nShe's the only person who \r\nmakes me happy. \BRK";
+const MESSAGE_1 = "Will you be able to come \r\nto the wedding today? \BRK";
+const MESSAGE_2 = "You may now kiss the bride. \BRK";
+const MESSAGE_3 = "A toast to the newlyweds! \BRK";
+
+Set_Flag("Rival_Ann_Cliff_Event_3", 1);
+PlayBGM(1, 0x10);
+Warp_Player("Farm", 0xE4, 0xA0);
+SetEntityPosition(0, 0xE4, 0x78, 0);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x17, 0xE4, 0xA0, 1);
+SetEntityAnim("Cliff", "Clif_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Cliff_Neutral");
+Set_Name_Window("Cliff");
+TalkMessage(0);
+Set_Portrait("Cliff_Happy");
+Set_Name_Window("Cliff");
+TalkMessage(1);
+TalkClose();
+Fade_Out(2, 1);
+StopBGM();
+Warp_Player("Church", 0xB8, 0xA0);
+SetEntityPosition(0x19, 0xC8, 0x98, 0);
+SetEntityAnim("Ann", "Ann_Singing_2");
+SetEntityPosition(0x17, 0xA8, 0x98, 0);
+SetEntityAnim("Cliff", "Clif_Weeding_Stop_Base");
+SetEntityPosition(0x16, 0xB8, 0x78, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0, 0x68, 0xC3, 3);
+Lock_Player_Input();
+SetEntityPosition(9, 0x68, 0x9B, 3);
+SetEntityAnim("Manna", "Manna_Stop_Base");
+SetEntityPosition(8, 0x48, 0xC3, 3);
+SetEntityAnim("Duke", "Duke_Stop_Base");
+SetEntityPosition(0x18, 0x108, 0x9B, 2);
+SetEntityAnim("Doug", "Baby_Horse_Deep_Sleep_Base");
+if ((GetEntityLocation("Jeff") == "Church")) {
+    Hide_Entity("Jeff");
+}
+if ((GetEntityLocation("Doctor") == "Church")) {
+    Hide_Entity("Doctor");
+}
+if ((GetEntityLocation("Popuri") == "Church")) {
+    Hide_Entity("Popuri");
+}
+StopAllSongs();
+Fade_In(2, 1);
+PlaySong(0, 0xB3);
+Make_Delay((0x3C * 3));
+PlaySong(0, 0xB3);
+Make_Delay((0x3C * 3));
+PlayBGM(1, 6);
+TalkOpen();
+Set_Portrait("Carter_Neutral");
+Set_Name_Window("Carter");
+TalkMessage(2);
+TalkClose();
+SetEntityFacing(0x17, 3);
+SetEntityFacing(0x19, 2);
+SetEntityAnim("Cliff", "Cliff_Weeding_Walking_Base");
+Set_Vector_X("Cliff", 0xB8, 1);
+Execute_Movement("Cliff");
+SetEntityAnim("Cliff", "Clif_Weeding_Stop_Base");
+SetEntityAnim("Cliff", "Cliff_Weeding_Kiss_2");
+SetEntityAnim("Ann", "Ann_Weeding_Kiss_2");
+Make_Delay(0x5A);
+SetEntityAnim("Cliff", "Clif_Weeding_Stop_Base");
+SetEntityAnim("Ann", "Ann_Singing_2");
+SetEntityAnim("Cliff", "Cliff_Weeding_Walking_Base");
+Set_Vector_X("Cliff", 0xA8, 1);
+Execute_Movement("Cliff");
+SetEntityAnim("Cliff", "Clif_Weeding_Stop_Base");
+Make_Delay(0x3C);
+SetEntityFacing(0x17, 0);
+SetEntityFacing(0x19, 0);
+Make_Delay(0x3C);
+SetEntityAnim("Cliff", "Cliff_Weeding_Walking_Base");
+SetEntityAnim("Ann", "Ann_Weeding_2");
+Set_Vector_Y("Cliff", 0xB3, 1);
+Set_Vector_Y("Ann", 0xB3, 1);
+Execute_Movement("Cliff");
+Execute_Movement("Ann");
+SetEntityFacing(9, 0);
+SetEntityFacing(0x18, 0);
+Set_Vector_Y("Cliff", 0xDB, 1);
+Set_Vector_Y("Ann", 0xDB, 1);
+Execute_Movement("Cliff");
+Execute_Movement("Ann");
+SetEntityFacing(0, 0);
+SetEntityFacing(8, 0);
+Set_Vector_Y("Cliff", 0x110, 1);
+Set_Vector_Y("Ann", 0x110, 1);
+Make_Delay((0x3C * 3));
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(3);
+TalkClose();
+Free_Event_Entity("Cliff");
+Set_Flag("Rival_Ann_Cliff_Event_3", 2);
+Execute_Script(0x3DC);
+exit;
+}

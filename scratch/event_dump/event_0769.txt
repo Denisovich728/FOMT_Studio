@@ -1,0 +1,134 @@
+#include "lib_fomt.csv"
+
+script 769 Unknown_Event_0769 {
+const MESSAGE_0 = "What!\r\nThis must be a mistake...!\BRK";
+const MESSAGE_1 = "It's no mistake this time.\BRK";
+const MESSAGE_2 = "I can't believe that\r\nfor all these years...\BRK";
+const MESSAGE_3 = "Things are the way they are.\r\nYou might as well \r\naccept it...\BRK";
+const MESSAGE_4 = ".......\BRK";
+const MESSAGE_5 = "What's wrong, \r\n\xFF!? \BRK";
+const MESSAGE_6 = "You heard us from \r\nthe waiting room? \r\nSorry...\BRK";
+const MESSAGE_7 = "You see, today we found\r\nout something very \r\nimportant about Jeff. \BRK";
+const MESSAGE_8 = "A long time ago I had the \r\nDoctor check my blood \r\ntype, but now he tells me\BRK\r\nit's wrong!\BRK";
+const MESSAGE_9 = "I'm terribly sorry. \r\nIt must have been some \r\nkind of clerical error. \BRK";
+const MESSAGE_10 = "And I used to think that \r\nmy blood type fit my \r\npersonality so well...\BRK";
+
+Warp_Player("Mineral_Clinic_Floor_01", 0xB8, 0x140);
+SetEntityPosition(0, 0xB8, 0x140, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0xFA, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Jeff_Angry");
+Set_Name_Window("Jeff");
+TalkMessage(0);
+TalkClose();
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+Fade_Out(2, 1);
+Warp_Player("Mineral_Clinic_Floor_01", 0x108, 0x89);
+SetEntityPosition(0x11, 0xE9, 0x7C, 3);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+SetEntityPosition(0x14, 0x104, 0x7C, 2);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0, 0xDC, 0x104, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Jeff_Afraid");
+Set_Name_Window("Jeff");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Afraid");
+Set_Name_Window("Doctor");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Jeff_Hurt");
+Set_Name_Window("Jeff");
+TalkMessage(4);
+TalkClose();
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x97, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+SetEntityFacing(0x11, 0);
+SetEntityFacing(0x14, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(5);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Doctor_Surprised");
+Set_Name_Window("Doctor");
+TalkMessage(6);
+Set_Portrait("Doctor_Neutral");
+TalkMessage(7);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Jeff_Afraid");
+Set_Name_Window("Jeff");
+TalkMessage(8);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Afraid");
+Set_Name_Window("Doctor");
+TalkMessage(9);
+TalkClose();
+TalkOpen();
+Set_Portrait("Jeff_Afraid");
+Set_Name_Window("Jeff");
+TalkMessage(10);
+TalkClose();
+Free_Event_Entity("Jeff");
+Free_Event_Entity("Doctor");
+End_Cinematic_State();
+Pan_Camera_To(0xDC, 0x97, 2);
+Wait_Camera_Stop();
+Set_Flag(0x11D, 1);
+Routine_State_Override("Doctor", "Script_770");
+Routine_State_Override("Jeff", "Script_771");
+Routine_State_Override("Elli", "Script_772");
+exit;
+}

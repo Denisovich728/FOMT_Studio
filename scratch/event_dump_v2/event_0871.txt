@@ -1,0 +1,5 @@
+#include "lib_fomt.csv"
+
+script 871 Unknown_Event_0871 {
+exit;
+}

@@ -1,0 +1,22 @@
+#include "lib_fomt.csv"
+
+script 1078 Unknown_Event_1078 {
+const MESSAGE_0 = "Yippee! Rice Cakes! \BRK";
+
+if ((Func083(5) == 0)) {
+    Free_Event_Entity("May");
+}
+SetEntityFacing(5, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("May_Happy");
+Set_Name_Window("May");
+TalkMessage(0);
+Talk_Mini_Close();
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("May") == 0)) {
+    Give_Friendship_Points("May", 5);
+}
+Free_Event_Entity("May");
+SetEntityFacing(5, 0);
+exit;
+}

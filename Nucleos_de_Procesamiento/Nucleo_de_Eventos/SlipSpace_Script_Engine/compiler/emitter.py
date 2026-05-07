@@ -52,12 +52,21 @@ class ConstScope(BlockScope):
         self.names[name] = NameRefProc(call_id, shape)
 
 class Emitter:
-    def __init__(self, item_resolver: Dict[str, int] = None):
+    def __init__(self, item_resolver: Dict[str, int] = None, food_resolver: Dict[str, int] = None, tool_resolver: Dict[str, int] = None, char_resolver: Dict[str, int] = None, candidate_resolver: Dict[str, int] = None, portrait_resolver: Dict[str, int] = None, map_resolver: Dict[str, int] = None, emote_resolver: Dict[str, int] = None, anim_resolver: Dict[str, int] = None):
         self.instructions: List[Ins] = []
         self.strings: List[bytes] = []
         self.location_counter = 0
         self.errors = []
         self.item_resolver = item_resolver or {}
+        self.food_resolver = food_resolver or {}
+        self.tool_resolver = tool_resolver or {}
+        self.char_resolver = char_resolver or {}
+        self.candidate_resolver = candidate_resolver or {}
+        self.portrait_resolver = portrait_resolver or {}
+        self.map_resolver = map_resolver or {}
+        self.emote_resolver = emote_resolver or {}
+        self.anim_resolver = anim_resolver or {}
+        self.break_targets: List[JumpId] = []
         
     def new_label(self) -> JumpId:
         self.location_counter += 1
@@ -133,21 +142,86 @@ class Emitter:
                 self.errors.append(f"Not callable: {expr.invoke.func}")
                 
     def _emit_invoke_args(self, scope: BlockScope, invoke: Invoke):
-        """Helper para emitir argumentos, manejando resolución de nombres de ítems para Give_Item."""
+        """Helper para emitir argumentos, manejando resolución de nombres de ítems y personajes."""
         is_give_item = (invoke.func == "Give_Item")
+        is_give_food = (invoke.func == "Give_Food")
+        is_give_tool = invoke.func in ("Give_Tool", "Give_Tool_TBox", "Give_Tool_Inventory")
+        
+        # SINCRONIZADO con decorator.py CharacterDecorateVisitor.char_funcs
+        char_funcs = (
+            "Set_Name_Window", "Give_Friendship_Points", "Free_Event_Entity",
+            "Set_Entity_Position", "Get_Entity_X", "Get_Entity_Y",
+            "Set_Entity_Facing", "Set_Entit_y_Facing", "Get_Entity_Facing",
+            "Get_Entity_X_Facing", "Despawn_Entity",
+            "Is_NPC_Birthday", "Chek_Friendship_Points", "Has_NPC_Talked_Today",
+            "Has_NPC_Talked_Today_2", "Kill_NPC", "Execute_Movement", "SetEntityAnim",
+            "Hide_Entity", "GetEntityLocation", "Wait_For_Animation",
+            "Set_Vector_X", "Set_Vector_Y", "Has_Met_NPC", "Has_Spoken_To_NPC_Today",
+            "Routine_State_Override"
+        )
+        is_char_func = invoke.func in char_funcs
+        
+        is_candidate_func = invoke.func in ("Set_Hearth_Anim", "Give_Love_Points", "Chek_Love_Points")
+        is_portrait_func = (invoke.func == "Set_Portrait")
+        is_map_func = invoke.func in ("Warp_Player", "Warp_Entity_To_Map")
+        is_routine_override = (invoke.func == "Routine_State_Override")
         
         for i, arg in enumerate(invoke.args):
-            if i == 0 and is_give_item and isinstance(arg, ExprStr):
-                # Intentar resolver nombre de ítem a ID decimal
+            if isinstance(arg, ExprStr):
                 name = arg.value.decode('windows-1252', errors='ignore').strip()
-                if name in self.item_resolver:
-                    val = self.item_resolver[name]
-                    self.emit(PushInt(val))
+                resolved = False
+                
+                if i == 0:
+                    if is_give_item:
+                        if name in self.item_resolver:
+                            self.emit(PushInt(self.item_resolver[name])); resolved = True
+                    
+                    elif is_give_food:
+                        if name in self.food_resolver:
+                            self.emit(PushInt(self.food_resolver[name])); resolved = True
+                    
+                    elif is_give_tool:
+                        if name in self.tool_resolver:
+                            self.emit(PushInt(self.tool_resolver[name])); resolved = True
+                        elif name in self.item_resolver:
+                            self.emit(PushInt(self.item_resolver[name])); resolved = True
+                    
+                    elif is_candidate_func:
+                        if name in self.candidate_resolver:
+                            self.emit(PushInt(self.candidate_resolver[name])); resolved = True
+                    
+                    elif is_portrait_func:
+                        if name in self.portrait_resolver:
+                            self.emit(PushInt(self.portrait_resolver[name])); resolved = True
+                    
+                    elif is_char_func:
+                        # Player → 0 (hardcoded en decorator.py)
+                        if name == "Player":
+                            self.emit(PushInt(0)); resolved = True
+                        elif name in self.char_resolver:
+                            self.emit(PushInt(self.char_resolver[name])); resolved = True
+                    
+                    elif is_map_func:
+                        if name in self.map_resolver:
+                            self.emit(PushInt(self.map_resolver[name])); resolved = True
+                
+                elif i == 1:
+                    if invoke.func == "Show_Emote":
+                        if name in self.emote_resolver:
+                            self.emit(PushInt(self.emote_resolver[name])); resolved = True
+                    elif invoke.func == "SetEntityAnim":
+                        if name in self.anim_resolver:
+                            self.emit(PushInt(self.anim_resolver[name])); resolved = True
+                
+                # Segundo argumento de Routine_State_Override: "Script_XXXX" → int
+                if not resolved and i == 1 and is_routine_override:
+                    if name.startswith("Script_"):
+                        try:
+                            self.emit(PushInt(int(name.replace("Script_", "")))); resolved = True
+                        except: pass
+                
+                if resolved:
                     continue
-                else:
-                    # Si no está en el mapa, quizá sea un error o un ID literal en string?
-                    # Lo dejamos pasar como string (que probablemente fallará en el juego si no es lo esperado)
-                    pass
             
             self.expr(scope, arg)
                 
@@ -221,9 +295,13 @@ class Emitter:
                 ref = scope.lookup_name(s.invoke.func)
                 if ref:
                     self._emit_invoke_args(scope, s.invoke)
-                    self.emit(Call(ref.call_id))
                     if isinstance(ref, NameRefFunc):
+                        self.emit(Call(ref.call_id))
                         self.emit(Discard()) # Functions leave a value on stack, Procs do not
+                    elif isinstance(ref, NameRefProc):
+                        self.emit(Call(ref.call_id))
+                    else:
+                        self.errors.append(f"Symbol '{s.invoke.func}' is not a callable function or procedure.")
                 else:
                     self.errors.append(f"Undefined function/procedure: {s.invoke.func}")
                     
@@ -258,38 +336,50 @@ class Emitter:
                 self.stmts(for_scope, [s.tail])
                 self.emit(Jmp(loop_lbl))
                 self.emit(Label(body_lbl))
+                self.break_targets.append(nxt_lbl)
                 self.stmts(for_scope, s.body)
+                self.break_targets.pop()
                 self.emit(Jmp(tail_lbl))
                 self.emit(Label(nxt_lbl))
                 
             elif isinstance(s, StmtDoWhile):
                 loop_lbl = self.new_label()
+                nxt_lbl = self.new_label()
                 self.emit(Label(loop_lbl))
+                self.break_targets.append(nxt_lbl)
                 self.stmts(scope, s.body)
+                self.break_targets.pop()
                 self.expr(scope, s.condition)
                 self.emit(Bne(loop_lbl))
+                self.emit(Label(nxt_lbl))
                 
             elif isinstance(s, StmtSwitch):
                 switch_lbl = self.new_label()
                 nxt_lbl = self.new_label()
+                self.break_targets.append(nxt_lbl)
                 self.expr(scope, s.condition)
                 self.emit(Jmp(switch_lbl))
                 
                 for switch_case in s.cases:
                     if isinstance(switch_case, SwitchCaseCase):
                         for c_exp in switch_case.exprs:
-                            val = eval_expr(c_exp, scope)
+                            val = eval_expr(c_exp, scope, self)
                             if isinstance(val, ConstValInt):
                                 self.emit(Case(s.switch_id, CaseVal(val.value)))
+                            else:
+                                self.errors.append(f"Switch case value must be a constant integer or a resolvable name (Char/Item). Got: {val}")
+                                
                         self.stmts(scope, switch_case.stmts)
                         # omit jump if exit was issued
-                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], StmtExit):
+                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], StmtExit) and not isinstance(switch_case.stmts[-1], StmtBreak):
                             self.emit(Jmp(nxt_lbl))
                     elif isinstance(switch_case, SwitchCaseDefault):
                         self.emit(Case(s.switch_id, CaseDefault()))
                         self.stmts(scope, switch_case.stmts)
-                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], StmtExit):
+                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], StmtExit) and not isinstance(switch_case.stmts[-1], StmtBreak):
                             self.emit(Jmp(nxt_lbl))
+                            
+                self.break_targets.pop()
                             
                 self.emit(Jmp(nxt_lbl)) # dead code pad
                 self.emit(Label(switch_lbl))
@@ -299,6 +389,12 @@ class Emitter:
             elif isinstance(s, StmtExit):
                 self.emit(Exit())
                 
+            elif isinstance(s, StmtBreak):
+                if not self.break_targets:
+                    self.errors.append("Break statement outside of loop/switch")
+                else:
+                    self.emit(Jmp(self.break_targets[-1]))
+                
             elif isinstance(s, StmtEmpty):
                 pass
                 
@@ -307,7 +403,16 @@ class Emitter:
             raise CompileError("\n".join(self.errors))
         return Script(self.instructions, self.strings)
 
-def compile_script(stmts: List[Stmt], const_scope: ConstScope, item_resolver: Dict[str, int] = None) -> Script:
+def compile_script(stmts: List[Stmt], const_scope: ConstScope, 
+                   item_resolver: Dict[str, int] = None, 
+                   food_resolver: Dict[str, int] = None,
+                   tool_resolver: Dict[str, int] = None,
+                   char_resolver: Dict[str, int] = None, 
+                   candidate_resolver: Dict[str, int] = None,
+                   portrait_resolver: Dict[str, int] = None,
+                   map_resolver: Dict[str, int] = None,
+                   emote_resolver: Dict[str, int] = None,
+                   anim_resolver: Dict[str, int] = None) -> Script:
     # We allocate switch ids
     sid_alloc = 0
     def alloc_switches(stmt_list):
@@ -324,14 +429,30 @@ def compile_script(stmts: List[Stmt], const_scope: ConstScope, item_resolver: Di
                     alloc_switches(sc.stmts)
                     
     alloc_switches(stmts)
-    emitter = Emitter(item_resolver)
+    emitter = Emitter(item_resolver, food_resolver, tool_resolver, char_resolver, candidate_resolver, portrait_resolver, map_resolver, emote_resolver, anim_resolver)
     emitter.stmts(const_scope, stmts)
     return emitter.end()
 
-def eval_expr(expr: Expr, scope: ConstScope) -> Optional[ConstVal]:
+def eval_expr(expr: Expr, scope: ConstScope, emitter: Emitter = None) -> Optional[ConstVal]:
     if isinstance(expr, ExprInt):
         return ConstValInt(expr.value)
     if isinstance(expr, ExprStr):
+        if emitter:
+            name = expr.value.decode('windows-1252', errors='ignore').strip()
+            # Try resolving in order — Debe cubrir TODAS las decoraciones inversas
+            if name == "Player": return ConstValInt(0)
+            if name in emitter.char_resolver: return ConstValInt(emitter.char_resolver[name])
+            if name in emitter.item_resolver: return ConstValInt(emitter.item_resolver[name])
+            if name in emitter.food_resolver: return ConstValInt(emitter.food_resolver[name])
+            if name in emitter.tool_resolver: return ConstValInt(emitter.tool_resolver[name])
+            if name in emitter.candidate_resolver: return ConstValInt(emitter.candidate_resolver[name])
+            if name in emitter.map_resolver: return ConstValInt(emitter.map_resolver[name])
+            if name in emitter.emote_resolver: return ConstValInt(emitter.emote_resolver[name])
+            if name in emitter.anim_resolver: return ConstValInt(emitter.anim_resolver[name])
+            if name.startswith("Script_"):
+                try: return ConstValInt(int(name.replace("Script_", "")))
+                except: pass
+            
         return ConstValStr(expr.value)
     if isinstance(expr, ExprName):
         return scope.lookup_const(expr.name)

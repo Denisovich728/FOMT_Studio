@@ -1,0 +1,68 @@
+#include "lib_fomt.csv"
+
+script 1165 Unknown_Event_1165 {
+PlayBGM(1, 9);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(4, 0x55, 0x5B, 0);
+SetEntityAnim("Barley", "Barley_Stop_Base");
+SetEntityPosition(2, 0x82, 0x136, 0);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(3, 0x5A, 0x13F, 0);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+SetEntityPosition(0xD, 0x4C, 0x159, 3);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(5, 0x100, 0x73, 2);
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityPosition(0x10, 0xDC, 0x85, 1);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0x14, 0xC4, 0x5C, 0);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0x15, 0xEB, 0x57, 0);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0xC, 0x17C, 0x13C, 2);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0xA, 0x160, 0x14E, 1);
+SetEntityAnim("Basil", "Basil_Stop_Base");
+SetEntityPosition(0x16, 0x162, 0x121, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0x47, 0x63, 0x14F, 3);
+Spawn_Event_Entity(0x47, 2);
+SetEntityAnim(0x47, "Cow1_Stop_Base");
+SetEntityPosition(0x48, 0x15E, 0x132, 3);
+Spawn_Event_Entity(0x48, 2);
+SetEntityAnim(0x48, "Cow1_Stop_Base");
+SetEntityPosition(0x49, 0xDE, 0x6D, 2);
+Spawn_Event_Entity(0x49, 2);
+SetEntityAnim(0x49, "Cow1_Stop_Base");
+if ((GetEntityLocation(0x2B) == "Rose_Square")) {
+    SetEntityPosition(0x2B, 0x1A0, 0x85, 0);
+}
+if ((GetEntityLocation(0x4A) == "Rose_Square")) {
+    SetEntityPosition(0x4A, (0x1A0 + 0x10), 0x85, 0);
+}
+if ((GetEntityLocation(0x4B) == "Rose_Square")) {
+    SetEntityPosition(0x4B, (0x1A0 + 0x20), 0x85, 0);
+}
+End_Cinematic_State();
+Fade_In(2, 1);
+Set_Flag("Event_Cow_Festival_Active", 1);
+Routine_State_Override("Rick", "Script_1166");
+Routine_State_Override("Popuri", "Script_1167");
+Routine_State_Override("Barley", "Script_1176");
+Routine_State_Override("May", "Script_1175");
+Routine_State_Override("Basil", "Script_1169");
+Routine_State_Override("Mary", "Script_1170");
+Routine_State_Override("Huachito", "Script_1171");
+Routine_State_Override("Stu", "Script_1173");
+Routine_State_Override("Doctor", "Script_1168");
+Routine_State_Override("Elli", "Script_1172");
+Routine_State_Override("Carter", "Script_1174");
+Routine_State_Override(0x47, "Script_1189");
+Routine_State_Override(0x48, "Script_1189");
+Routine_State_Override(0x49, "Script_1189");
+exit;
+}

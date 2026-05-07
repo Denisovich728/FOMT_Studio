@@ -1,0 +1,56 @@
+#include "lib_fomt.csv"
+
+script 1190 Unknown_Event_1190 {
+const MESSAGE_0 = "And the winner is...\r\n\xFF% from \r\n\xFF$!\BRK\WAIT_CLICKIts fur is excellent, and \r\nits health is perfect!\BRK";
+
+var var_1;
+
+var_1 = Func11A(1);
+GetAnimalName(0, 1, var_1);
+Warp_Player("Rose_Square", 0xDC, 0x5E);
+StopBGM();
+SetEntityPosition(4, 0xDC, 0x4C, 0);
+SetEntityAnim("Barley", "Barley_Stop_Base");
+SetEntityPosition(0, 0xDC, 0x5E, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Hide_Entity(0x47);
+Hide_Entity(0x48);
+Hide_Entity(0x49);
+SetEntityPosition(0x46, 0xC8, 0x62, 1);
+Spawn_Event_Entity(0x46, 2);
+SetEntityAnim(0x46, "Cow1_Stop_Base");
+if ((GetEntityLocation(0x2B) == "Rose_Square")) {
+    SetEntityPosition(0x2B, 0x1A0, 0x85, 0);
+}
+Fade_In(2, 1);
+Make_Delay(0x3C);
+PlaySong(0, 0xB0);
+Make_Delay((0x3C * 4));
+PlayBGM(1, 9);
+TalkOpen();
+Set_Portrait("Barley_Neutral");
+Set_Name_Window("Barley");
+TalkMessage(0);
+TalkClose();
+PlaySong(0, 0xB5);
+Make_Delay((0x3C * 4));
+Fade_Out(2, 1);
+Give_Friendship_Points("Rick", 0x14);
+Give_Friendship_Points("Popuri", 0x14);
+Give_Friendship_Points("Barley", 0x14);
+Give_Friendship_Points("May", 0x14);
+Give_Friendship_Points("Basil", 0x14);
+Give_Friendship_Points("Mary", 0x14);
+Give_Friendship_Points("Huachito", 0x14);
+Give_Friendship_Points("Stu", 0x14);
+Give_Friendship_Points("Doctor", 0x14);
+Give_Friendship_Points("Elli", 0x14);
+Give_Friendship_Points("Carter", 0x14);
+Hide_Entity(0x46);
+Execute_Script(0x499);
+exit;
+}

@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 3 Unknown_Event_0003 {
+const MESSAGE_0 = "Nothing happened.\BRK";
+
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+exit;
+}

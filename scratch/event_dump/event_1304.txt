@@ -1,0 +1,87 @@
+#include "lib_fomt.csv"
+
+script 1304 Unknown_Event_1304 {
+const MESSAGE_0 = "Hi, \xFF!!\BRK";
+const MESSAGE_1 = "Karen was afraid you\r\nwouldn't come, \r\n\xFF!. \BRK";
+const MESSAGE_2 = "What do you mean, Karen was\r\nafraid \xFF!\r\nwouldn't come?\BRK";
+const MESSAGE_3 = "Um...\BRK";
+const MESSAGE_4 = "Just forget it!\BRK";
+const MESSAGE_5 = "All I said was that \r\nmaybe you forgot!\BRK";
+const MESSAGE_6 = "Spending the Starry Night\r\nFestival with Karen's \r\nfamily sure was fun. \BRK";
+
+Warp_Player("Jeff_Shop_Back_Room", 0x5C, 0x110);
+PlayBGM(1, 7);
+Spawn_Item_On_Grid(0, 0xA0, 0xC0, 1, Get_Item_Sprite_ID(0x8F));
+Spawn_Item_On_Grid(1, 0xB0, 0xC0, 1, Get_Item_Sprite_ID("Ann's Music Box"));
+SetEntityPosition(0, 0x5C, 0x140, 1);
+SetEntityPosition(0x13, 0x70, 0xE8, 3);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(0x11, 0xA8, 0xE0, 1);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+SetEntityPosition(0x12, 0xC8, 0xC0, 2);
+SetEntityAnim("Sasha", "Sasha_Stop_Base");
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x110, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityFacing(0x13, 0);
+SetEntityFacing(0x11, 0);
+SetEntityFacing(0x12, 0);
+Make_Delay(0xA);
+TalkOpen();
+Set_Name_Window("Karen");
+Set_Portrait("Karen_Happy");
+Set_Hearth_Anim("Karen");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Name_Window("Sasha");
+Set_Portrait("Sasha_Happy");
+TalkMessage(1);
+TalkClose();
+SetEntityFacing(0x11, 1);
+TalkOpen();
+Set_Name_Window("Jeff");
+Set_Portrait("Jeff_Afraid");
+TalkMessage(2);
+SetEntityFacing(0x11, 2);
+Set_Name_Window("Jeff");
+Set_Portrait("Jeff_Afraid");
+TalkMessage(3);
+TalkClose();
+SetEntityFacing(0x13, 3);
+TalkOpen();
+Set_Name_Window("Karen");
+Set_Portrait("Karen_Ruborized");
+Set_Hearth_Anim("Karen");
+TalkMessage(4);
+SetEntityFacing(0x13, 0);
+Set_Name_Window("Karen");
+Set_Portrait("Karen_Ruborized");
+Set_Hearth_Anim("Karen");
+TalkMessage(5);
+TalkClose();
+Give_Love_Points("Karen", 0x7D0);
+Give_Friendship_Points("Karen", 0x1E);
+Give_Friendship_Points("Jeff", 0x1E);
+Give_Friendship_Points("Sasha", 0x1E);
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(6);
+TalkClose();
+Despawn_Map_Item(0);
+Despawn_Map_Item(1);
+Set_Flag(0x1CB, 2);
+Set_Flag(0x1C2, 0);
+Execute_Script(0x3DC);
+exit;
+}

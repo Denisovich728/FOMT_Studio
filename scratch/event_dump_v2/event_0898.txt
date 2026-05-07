@@ -1,0 +1,118 @@
+#include "lib_fomt.csv"
+
+script 898 Unknown_Event_0898 {
+const MESSAGE_0 = "Hey, the wedding is about\r\nto start!\BRK";
+const MESSAGE_1 = "Whose wedding?\r\nMine and Popuri's, of \r\ncourse!\BRK\WAIT_CLICKYou didn't hear from Rick?\r\nIt starts right now. \r\nLet's go!\BRK";
+const MESSAGE_2 = "You may now kiss the bride.\BRK";
+const MESSAGE_3 = "To the newlyweds!\BRK";
+
+Set_Flag("Rival_Popuri_Kai_Event_2", 1);
+PlayBGM(1, 0x10);
+Warp_Player("Farm", 0xE4, 0xA0);
+SetEntityPosition(0, 0xE4, 0x78, 0);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1A, 0xE4, 0xA0, 1);
+SetEntityAnim("Kai", "Kai_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Kai_Neutral");
+Set_Name_Window("Kai");
+TalkMessage(0);
+Set_Portrait("Kai_Happy");
+Set_Name_Window("Kai");
+TalkMessage(1);
+TalkClose();
+Fade_Out(2, 1);
+StopBGM();
+Warp_Player("Church", 0xB8, 0xA0);
+SetEntityPosition(3, 0xC8, 0x98, 0);
+SetEntityAnim("Popuri", "Popuri_Weeding_Stop_Base");
+SetEntityPosition(0x1A, 0xA8, 0x98, 0);
+SetEntityAnim("Kai", "Kai_Weedig_Stop_Base");
+SetEntityPosition(0x16, 0xB8, 0x78, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0, 0x68, 0xC3, 3);
+Lock_Player_Input();
+SetEntityPosition(1, 0x108, 0x9B, 2);
+SetEntityAnim("Lillia", "Lilia_Stop_Base");
+SetEntityPosition(0x13, 0x128, 0xC3, 2);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(2, 0x108, 0xC3, 2);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+if ((GetEntityLocation("Cliff") == "Church")) {
+    Hide_Entity("Cliff");
+}
+if ((GetEntityLocation("Jeff") == "Church")) {
+    Hide_Entity("Jeff");
+}
+if ((GetEntityLocation("Doctor") == "Church")) {
+    Hide_Entity("Doctor");
+}
+if ((GetEntityLocation("Duke") == "Church")) {
+    Hide_Entity("Duke");
+}
+if ((GetEntityLocation("Manna") == "Church")) {
+    Hide_Entity("Manna");
+}
+StopAllSongs();
+Fade_In(2, 1);
+PlaySong(0, 0xB3);
+Make_Delay((0x3C * 3));
+PlaySong(0, 0xB3);
+Make_Delay((0x3C * 3));
+PlayBGM(1, 6);
+TalkOpen();
+Set_Portrait("Carter_Neutral");
+Set_Name_Window("Carter");
+TalkMessage(2);
+TalkClose();
+SetEntityFacing(0x1A, 3);
+SetEntityFacing(3, 2);
+Make_Delay(0x3C);
+SetEntityAnim("Kai", "Kai_Weedig_Base");
+Set_Vector_X("Kai", 0xB8, 1);
+Execute_Movement("Kai");
+SetEntityAnim("Kai", "Kai_Weedig_Stop_Base");
+SetEntityAnim("Kai", "Kai_Weedig_Kiss_Base");
+SetEntityAnim("Popuri", "Popuri_Weeding_Kiss_2");
+Make_Delay(0x5A);
+SetEntityAnim("Kai", "Kai_Weedig_Stop_Base");
+SetEntityAnim("Popuri", "Popuri_Weeding_Stop_Base");
+SetEntityAnim("Kai", "Kai_Weedig_Base");
+Set_Vector_X("Kai", 0xA8, 1);
+Execute_Movement("Kai");
+SetEntityAnim("Kai", "Kai_Weedig_Stop_Base");
+Make_Delay(0x3C);
+SetEntityFacing(0x1A, 0);
+SetEntityFacing(3, 0);
+Make_Delay(0x3C);
+SetEntityAnim("Kai", "Kai_Weedig_Base");
+SetEntityAnim("Popuri", "Popuri_Weeding_Walking_Base");
+Set_Vector_Y("Kai", 0xB3, 1);
+Set_Vector_Y("Popuri", 0xB3, 1);
+Execute_Movement("Kai");
+Execute_Movement("Popuri");
+SetEntityFacing(1, 0);
+Set_Vector_Y("Kai", 0xDB, 1);
+Set_Vector_Y("Popuri", 0xDB, 1);
+Execute_Movement("Kai");
+Execute_Movement("Popuri");
+SetEntityFacing(0, 0);
+SetEntityFacing(0x13, 0);
+SetEntityFacing(2, 0);
+Set_Vector_Y("Kai", 0x110, 1);
+Set_Vector_Y("Popuri", 0x110, 1);
+Make_Delay((0x3C * 3));
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(3);
+TalkClose();
+Free_Event_Entity("Kai");
+Set_Flag("Rival_Popuri_Kai_Event_2", 2);
+Execute_Script(0x3DC);
+exit;
+}

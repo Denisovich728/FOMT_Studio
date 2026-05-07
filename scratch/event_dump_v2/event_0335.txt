@@ -1,0 +1,32 @@
+#include "lib_fomt.csv"
+
+script 335 Unknown_Event_0335 {
+const MESSAGE_0 = "Refrigerator\BRK";
+const MESSAGE_1 = "There's a Jewel of Truth\r\nfallen in the Refrigerator.\BRK";
+const MESSAGE_2 = "There's a Jewel of Truth\r\nfallen in the Refrigerator.\BRK\WAIT_CLICK...But your hands are\r\nalready full, so you \r\ncan't hold it.\BRK";
+
+if ((Check_Flag("Flag_0x154") == 8)) {
+    if ((Check_Flag("Flag_0x20E") == 1)) {
+        TalkOpen();
+        Print_Message(0);
+    } else {
+        if ((Inventory_Check() == 1)) {
+            Give_Item("Jewel of Truth");
+            TalkOpen();
+            TalkMessage(1);
+            TalkClose();
+            Set_Flag("Flag_0x20E", 1);
+            Set_Flag("Flag_0x154", (Check_Flag(0x154) + 1));
+            Execute_Script(0x334);
+        } else {
+            TalkOpen();
+            TalkMessage(2);
+        }
+    }
+} else {
+    TalkOpen();
+    Print_Message(0);
+}
+TalkClose();
+exit;
+}

@@ -1,0 +1,16 @@
+#include "lib_fomt.csv"
+
+script 793 Unknown_Event_0793 {
+const MESSAGE_0 = "I love my daughter so much! \r\nI don't mind working,\r\n'cause I know it's for her!\BRK";
+
+SetEntityFacing(0x18, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doug_Happy");
+Set_Name_Window("Doug");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("Doug");
+SetEntityFacing(0x18, 0);
+exit;
+exit;
+}

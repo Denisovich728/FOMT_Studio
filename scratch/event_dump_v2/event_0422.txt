@@ -1,0 +1,11 @@
+#include "lib_fomt.csv"
+
+script 422 Unknown_Event_0422 {
+if ((GetEntityFacing(0) == 1)) {
+    Fade_Out(2, 1);
+    Warp_Player("Aja_Winery_Storage_Floor_01", 0x78, 0x50);
+    SetEntityPosition(0, 0x78, 0x50, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

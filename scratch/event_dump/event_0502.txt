@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 502 Unknown_Event_0502 {
+const MESSAGE_0 = "Mary's Library\r\nOpen: 10AM\r\nClosed: 4PM  Closed Thursdays\BRK";
+const MESSAGE_1 = "Mary's Library\r\nOpen: 10AM\r\nClosed: 4PM  Closed Mondays\BRK";
+
+TalkOpen();
+if (((Check_Flag(0x8E) == 2) || (Check_Flag(0x8F) == 2))) {
+    Print_Message(0);
+} else {
+    Print_Message(1);
+}
+TalkClose();
+exit;
+}

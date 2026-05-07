@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 895 Unknown_Event_0895 {
+const MESSAGE_0 = "What happened to Mom?!\r\nI'm against it!\BRK";
+
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Rick_Angry");
+Set_Name_Window("Rick");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(2, 2);
+Free_Event_Entity("Rick");
+exit;
+}

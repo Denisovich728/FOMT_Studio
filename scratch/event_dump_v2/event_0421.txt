@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 421 Unknown_Event_0421 {
+const MESSAGE_0 = "Shelf\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

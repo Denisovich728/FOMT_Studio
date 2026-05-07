@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 494 Unknown_Event_0494 {
+const MESSAGE_0 = "Woodcutter's \r\nOpen 11AM-4PM\r\nClosed Saturdays\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

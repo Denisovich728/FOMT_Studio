@@ -1,0 +1,16 @@
+#include "lib_fomt.csv"
+
+script 722 Unknown_Event_0722 {
+const MESSAGE_0 = "Manna really knows how to \r\ntalk, doesn't she?\BRK";
+
+SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Jeff");
+Set_Portrait("Jeff_Happy");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("Jeff");
+SetEntityFacing(0x11, 0);
+exit;
+exit;
+}

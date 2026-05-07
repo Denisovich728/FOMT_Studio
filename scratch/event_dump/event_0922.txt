@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 922 Unknown_Event_0922 {
+const MESSAGE_0 = "I'm kind of embarrassed \r\nto be all dressed up \r\nlike this!\BRK";
+const MESSAGE_1 = "You're happy for me too,\r\naren't you dad? \BRK";
+
+if ((Func083(0x19) == 0)) {
+    Free_Event_Entity("Ann");
+}
+if ((Has_NPC_Talked_Today("Ann") == 0)) {
+    SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Ann_Weeding");
+    Set_Name_Window("Ann");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x19, 0);
+    Free_Event_Entity("Ann");
+} else {
+    SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Ann_Weeding");
+    Set_Name_Window("Ann");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0x19, 0);
+    Free_Event_Entity("Ann");
+}
+exit;
+}

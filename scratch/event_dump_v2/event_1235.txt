@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1235 Unknown_Event_1235 {
+const MESSAGE_0 = "Tonight I can use the \r\nleftovers for dinner, so I\r\nwon't have to fix anything!\BRK";
+
+if ((Func083(0xB) == 0)) {
+    Free_Event_Entity("Anna");
+}
+SetEntityFacing(0xB, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Anna_Happy");
+Set_Name_Window("Anna");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Anna") == 0)) {
+    Give_Friendship_Points("Anna", 5);
+}
+SetEntityFacing(0xB, 0);
+Free_Event_Entity("Anna");
+exit;
+}

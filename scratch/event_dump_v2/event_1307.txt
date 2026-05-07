@@ -1,0 +1,104 @@
+#include "lib_fomt.csv"
+
+script 1307 Unknown_Event_1307 {
+const MESSAGE_0 = "Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKWait, there's no stocking \r\nhere!...\BRK\WAIT_CLICKThat means I can't leave my\r\npresent. Too bad!\BRK\WAIT_CLICKI guess I'll have to bring\r\nit back with me...\BRK";
+const MESSAGE_1 = "Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKGood, he remembered to put\r\na stocking up. \BRK\WAIT_CLICKBut it's so dark I can't\r\nsee which present is his!\BRK\WAIT_CLICKOh well, I'll just assume\r\nit's this one!\BRK";
+const MESSAGE_2 = "Thump!!...Phew, it's a lot\r\nharder to sneak into houses\r\nthan I thought!\BRK\WAIT_CLICKThe present is still there!\r\nSome people don't even \r\ncare for the trouble I go \BRK\r\nthrough to do this!\BRK\WAIT_CLICKHow depressing...I'll \r\njust go home, I guess...\BRK";
+
+PlayBGM(1, 0xE);
+switch (Check_Flag("Flag_0xE")) {
+    case 0:
+        Warp_Player("Farm_House_1", 0xC8, 0x30);
+        SetEntityPosition(0, 0xC8, -0x2E, 0);
+        break;
+    case 1:
+        Warp_Player("Farm_House_1", 0x140, 0x30);
+        SetEntityPosition(0, 0x140, -0x2E, 0);
+        break;
+    case 2:
+        Warp_Player("Farm_House_1", 0x180, 0x30);
+        SetEntityPosition(0, 0x180, -0x2E, 0);
+        break;
+}
+SetEntityAnim("Player", "Shadwow_AnimB_2");
+if ((Check_Flag("Karen_Marriage_State") == 2)) {
+    SetEntityPosition(0x13, 0x1B8, -0x30, 0);
+    SetEntityAnim("Karen", "Paddign_10");
+} else {
+    if ((Check_Flag("Popuri_Marriage_State") == 2)) {
+        SetEntityPosition(3, 0x1B8, -0x30, 0);
+        SetEntityAnim("Popuri", "Shadwo_Anim_6");
+        goto LBL_0008;
+    }
+    if ((Check_Flag("Ann_Marriage_State") == 2)) {
+        SetEntityPosition(0x19, 0x1B8, -0x30, 0);
+        SetEntityAnim("Ann", "Ann_Baby_Base");
+        goto LBL_0008;
+    }
+    if ((Check_Flag("Mary_Marriage_State") == 2)) {
+        SetEntityPosition(0xC, 0x1B8, -0x30, 0);
+        SetEntityAnim("Mary", "Padding_18");
+        goto LBL_0008;
+    }
+    if ((Check_Flag("Elli_Marriage_State") == 2)) {
+        SetEntityPosition(0x15, 0x1B8, -0x30, 0);
+        SetEntityAnim("Elli", "Padding_33");
+    }
+}
+if (((((((Check_Flag("Baby_Birth_Event_State") == 2) || (Check_Flag("Flag_0xC9") == 2)) || (Check_Flag("Flag_0xCA") == 2)) || (Check_Flag("Flag_0xCB") == 2)) || (Check_Flag("Flag_0xCC") == 2)) || (Check_Flag("Flag_0x17A") == 2))) {
+    if ((Check_Flag("Baby_Age_Days") >= 0x3C)) {
+        SetEntityPosition(0x23, 0x1A0, -0x30, 0);
+        SetEntityAnim("", "Shadwo_AnimB_14");
+    } else {
+        SetEntityPosition(0x23, 0x1A0, -0x30, 0);
+        SetEntityAnim("", 0xC);
+    }
+}
+Fade_In(2, 1);
+Set_Flag("Flag_0x1CE", 1);
+Make_Delay((0x3C * 2));
+Fade_Out(2, 1);
+Free_Event_Entity("Huachito");
+TalkOpen();
+Set_Name_Window("Huachito");
+if ((Check_Flag("Stocking_Event_Active") == 0)) {
+    TalkMessage(0);
+    TalkClose();
+    Set_Flag("Flag_0x1CE", 2);
+    Execute_Script(0x3DC);
+} else {
+    if ((Check_Flag("Stocking_Item_Given") == 0x5F)) {
+        TalkMessage(1);
+        TalkClose();
+        Set_Flag("Flag_0x1CE", 2);
+        switch (Check_Flag("Flag_0x1CF")) {
+            case 0:
+            case 1:
+                Set_Flag("Stocking_Item_Given", 0x15);
+                break;
+            case 2:
+                Set_Flag("Stocking_Item_Given", 0x16);
+                break;
+            case 3:
+                Set_Flag("Stocking_Item_Given", 0x18);
+                break;
+            case 4:
+                Set_Flag("Stocking_Item_Given", 0x19);
+                break;
+            case 5:
+                Set_Flag("Stocking_Item_Given", 0x1B);
+                break;
+        }
+        Set_Flag("Flag_0x1CF", 0);
+        Give_Friendship_Points("Huachito", 0x14);
+        Execute_Script(0x3DC);
+        goto LBL_002C;
+    }
+    TalkMessage(2);
+    TalkClose();
+    Set_Flag("Flag_0x1CE", 2);
+    Set_Flag("Flag_0x1CF", 0);
+    Execute_Script(0x3DC);
+}
+exit;
+}

@@ -1,0 +1,63 @@
+#include "lib_fomt.csv"
+
+script 376 Unknown_Event_0376 {
+const MESSAGE_0 = "It's locked...\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+var var_4;
+var var_5;
+var var_6;
+
+if ((GetEntityFacing(0) == 1)) {
+    var_0 = 0;
+    var_1 = Check_Flag("System_Season");
+    var_2 = Check_Flag("System_DayOfMonth");
+    var_4 = Check_Flag("System_Hour");
+    var_3 = Check_Flag("System_Weather_Tomorrow");
+    var_5 = Check_Flag("System_Weather_Today");
+    var_6 = Check_Flag("System_TotalShipments");
+    if ((((((((((((((((var_1 == 0) && (var_2 == 1)) || ((var_1 == 0) && (var_2 == 0x12))) || ((var_1 == 0) && (var_2 == 0x16))) || ((var_1 == 1) && (var_2 == 1))) || ((var_1 == 1) && (var_2 == 7))) || ((var_1 == 1) && (var_2 == 0x18))) || ((var_1 == 1) && (var_2 == 0x14))) || ((var_1 == 2) && (var_2 == 3))) || ((var_1 == 2) && (var_2 == 9))) || ((var_1 == 2) && (var_2 == 0xD))) || ((var_1 == 2) && (var_2 == 0x12))) || ((var_1 == 2) && (var_2 == 0x15))) || ((var_1 == 3) && (var_2 == 0x18))) || ((var_1 == 3) && (var_2 == 0x1E)))) {
+        var_0 = 0;
+    } else {
+        if ((GetEntityLocation("Mary") == "Mary_Library_Floor_01")) {
+            if (((var_4 >= 9) && (var_4 < 0x10))) {
+                var_0 = 1;
+            }
+        }
+    }
+    if ((var_0 == 1)) {
+        PlaySong(0, 0x9C);
+        Fade_Out(2, 1);
+        Warp_Player("Mary_Library_Floor_01", 0x78, 0xD0);
+        SetEntityPosition(0, 0x78, 0xD0, 1);
+        if (((((((((((((((((((((Check_Flag("Flag_0x61") == 0) && !(var_3 == 1)) && ((var_4 >= 0xA) && (var_4 < 0x10))) && (Check_Flag("Karen_Marriage_State") == 0)) && (Check_Flag("Popuri_Marriage_State") == 0)) && (Check_Flag("Ann_Marriage_State") == 0)) && (Check_Flag("Mary_Marriage_State") == 0)) && (Check_Flag("Elli_Marriage_State") == 0)) && (Check_Flag("Flag_0x173") == 0)) && (Check_Flag("Rival_Mary_Gray_Event_4") == 0)) && (Check_Flag("Rival_Mary_Gray_Married") == 0)) && (Check_Flag("Karen_Heart_Orange") == 0)) && (Check_Flag("Popuri_Heart_Orange") == 0)) && (Check_Flag("Ann_Heart_Orange") == 0)) && (Check_Flag("Mary_Heart_Orange") == 0)) && (Check_Flag("Elli_Heart_Orange") == 0)) && (Check_Flag("Flag_0x172") == 0)) && (Check_Flag("Rival_Mary_Gray_Event_3") == 0)) && (GetEntityLocation("Mary") == "Mary_Library_Floor_01")) && (Inventory_Check() == 1))) {
+            Set_Flag("Flag_0x61", 1);
+            Execute_Script(0x39);
+        } else {
+            if (((((((((((((((((((((((Check_Flag("Flag_0x61") == 2) && (Check_Flag("Mary_Heart_Black") == 0)) && !(((var_3 == 1) || (var_3 == 3)) || (var_3 == 5))) && ((var_4 >= 0xA) && (var_4 < 0x10))) && (Check_Flag("Karen_Marriage_State") == 0)) && (Check_Flag("Popuri_Marriage_State") == 0)) && (Check_Flag("Ann_Marriage_State") == 0)) && (Check_Flag("Mary_Marriage_State") == 0)) && (Check_Flag("Elli_Marriage_State") == 0)) && (Check_Flag("Flag_0x173") == 0)) && (Check_Flag("Rival_Mary_Gray_Event_4") == 0)) && (Check_Flag("Rival_Mary_Gray_Married") == 0)) && (Check_Flag("Karen_Heart_Orange") == 0)) && (Check_Flag("Popuri_Heart_Orange") == 0)) && (Check_Flag("Ann_Heart_Orange") == 0)) && (Check_Flag("Mary_Heart_Orange") == 0)) && (Check_Flag("Elli_Heart_Orange") == 0)) && (Check_Flag("Flag_0x172") == 0)) && (Check_Flag("Rival_Mary_Gray_Event_3") == 0)) && (Chek_Love_Points("Mary") >= 0x2710)) && (GetEntityLocation("Mary") == "Mary_Library_Floor_01")) && (Inventory_Check() == 1))) {
+                Set_Flag("Mary_Heart_Black", 1);
+                Execute_Script(0x3B);
+            } else {
+                if ((((((((((((Check_Flag("Flag_0x8A") == 2) && (Check_Flag("Rival_Mary_Gray_Event_1") == 0)) && !(var_3 == 1)) && ((var_4 >= 0xD) && (var_4 < 0x10))) && (Check_Flag("Mary_Marriage_State") == 0)) && (Check_Flag("Rival_Mary_Gray_Event_4") == 0)) && (Check_Flag("Rival_Mary_Gray_Married") == 0)) && (Check_Flag("Mary_Heart_Orange") == 0)) && (Chek_Love_Points("Mary") < 0x7530)) && (GetEntityLocation("Gray") == "Mary_Library_Floor_01")) && (GetEntityLocation("Mary") == "Mary_Library_Floor_01"))) {
+                    Set_Flag("Rival_Mary_Gray_Event_1", 1);
+                    Execute_Script(0x3A1);
+                } else {
+                    if (((((((((((((Check_Flag("Rival_Mary_Gray_Event_2") == 2) && (Check_Flag("Rival_Mary_Gray_Event_3") == 0)) && (var_6 >= 4)) && ((var_3 == 4) || (var_3 == 6))) && ((var_4 >= 0xD) && (var_4 < 0x10))) && (Check_Flag("Mary_Marriage_State") == 0)) && (Check_Flag("Rival_Mary_Gray_Event_4") == 0)) && (Check_Flag("Rival_Mary_Gray_Married") == 0)) && (Check_Flag("Mary_Heart_Orange") == 0)) && (Chek_Love_Points("Mary") < 0xEA60)) && (GetEntityLocation("Gray") == "Mary_Library_Floor_01")) && (GetEntityLocation("Mary") == "Mary_Library_Floor_01"))) {
+                        Set_Flag("Rival_Mary_Gray_Event_3", 1);
+                        Execute_Script(0x3A5);
+                    }
+                }
+            }
+        }
+        Fade_In(2, 1);
+    } else {
+        TalkOpen();
+        TalkMessage(0);
+        TalkClose();
+    }
+}
+exit;
+}

@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 1300 Unknown_Event_1300 {
+Warp_Player("Jeff_Shop", 0x91, 0x113);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x91, 0x112, 1);
+SetEntityAnim("Player", "Player_Stop_Base");
+SetEntityPosition(0x13, 0x91, 0xE3, 0);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(0x12, 0xAF, 0x73, 0);
+SetEntityAnim("Sasha", "Sasha_Stop_Base");
+SetEntityPosition(0x11, 0xE2, 0x73, 0);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+exit;
+}

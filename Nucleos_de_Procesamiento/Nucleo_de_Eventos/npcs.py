@@ -32,7 +32,7 @@ class Npc:
 
     def read_stats(self, lang='es'):
         return {
-            "ID": self.index,
+            "idx": f"0x{self.index + 1:02X}",
             "Nombre": self.name_str,
             "Rol": tr(self.role_key, lang),
             "Candidata": "Sí" if self.is_candidate else "No",

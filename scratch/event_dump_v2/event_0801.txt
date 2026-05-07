@@ -1,0 +1,85 @@
+#include "lib_fomt.csv"
+
+script 801 Unknown_Event_0801 {
+const MESSAGE_0 = "How goes the patrol, Harris?\BRK";
+const MESSAGE_1 = "Mineral Town is safe \r\nand peaceful, as always. \BRK";
+const MESSAGE_2 = "Good to hear...\r\nNothing wrong on the \r\nmountain, either. \BRK";
+const MESSAGE_3 = "It really should be me \r\npatrolling the mountain, \r\nnot you. \BRK\WAIT_CLICKThanks for helping out, \r\nGotz. \BRK";
+const MESSAGE_4 = "Don't worry about it. \r\nI know more about the \r\nmountain than you.\BRK\WAIT_CLICKBesides, patrolling it was\r\nmy idea. \BRK";
+const MESSAGE_5 = "...........\BRK\WAIT_CLICKIt's been quite a while\r\nsince your wife and \r\ndaughter died on the \BRK\r\nmountain. \BRK";
+const MESSAGE_6 = "...I think if I \r\ncan prevent others from\r\nmeeting the same fate...\BRK\WAIT_CLICKThose two will rest \r\na little bit more \r\npeacefully...\BRK";
+const MESSAGE_7 = "...I think so, too. \BRK";
+
+End_Cinematic_State();
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1B, 0x78, 0x50, 2);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+SetEntityPosition(0xE, 0x64, 0x50, 3);
+SetEntityAnim("Harris", "Harris_Stop_Base");
+Fade_In(2, 1);
+Pan_Camera_To(0x78, 0x64, 2);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x64, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Gotz_Happy");
+Set_Name_Window("Gotz");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Portrait("Harris_Happy");
+Set_Name_Window("Harris");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Gotz_Neutral");
+Set_Name_Window("Gotz");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Harris_Afraid");
+Set_Name_Window("Harris");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Gotz_Neutral");
+Set_Name_Window("Gotz");
+TalkMessage(4);
+TalkClose();
+TalkOpen();
+Set_Portrait("Harris_Afraid");
+Set_Name_Window("Harris");
+TalkMessage(5);
+TalkClose();
+Show_Emote("Gotz", "Thinking", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Gotz_Neutral");
+Set_Name_Window("Gotz");
+TalkMessage(6);
+TalkClose();
+TalkOpen();
+Set_Portrait("Harris_Neutral");
+Set_Name_Window("Harris");
+TalkMessage(7);
+TalkClose();
+End_Cinematic_State();
+Set_Flag("Flag_0x133", 1);
+Routine_State_Override("Gotz", "Script_803");
+Routine_State_Override("Harris", "Script_802");
+exit;
+exit;
+}

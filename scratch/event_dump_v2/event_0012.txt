@@ -1,0 +1,11 @@
+#include "lib_fomt.csv"
+
+script 12 Unknown_Event_0012 {
+const MESSAGE_0 = "Now play nicely with\r\n\xFF#, Hannah.\r\n\BRK";
+
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+PlaySong(0, 0xA9);
+exit;
+}

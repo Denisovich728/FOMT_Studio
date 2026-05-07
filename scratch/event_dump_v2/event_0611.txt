@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 611 Unknown_Event_0611 {
+const MESSAGE_0 = "Goo-goo.\BRK";
+
+SetEntityFacing(0x23, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("");
+Set_Portrait("Baby_Neutral");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("");
+SetEntityFacing(0x23, 0);
+exit;
+}

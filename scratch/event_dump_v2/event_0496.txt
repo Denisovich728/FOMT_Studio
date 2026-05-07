@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 496 Unknown_Event_0496 {
+const MESSAGE_0 = "Supermarket\r\nOpen 9AM-5PM\r\nClosed Tuesdays and Sundays\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

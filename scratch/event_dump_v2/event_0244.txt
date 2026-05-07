@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 244 Unknown_Event_0244 {
+const MESSAGE_0 = "Sofa\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

@@ -1,0 +1,22 @@
+#include "lib_fomt.csv"
+
+script 1074 Unknown_Event_1074 {
+const MESSAGE_0 = "So you're here too, \r\n\xFF!?\BRK\r\nI don't usually eat Rice \r\nCakes because they're \r\nfattening. Just this once, \BRK\r\nevery year, I let myself \r\nlose control. Tee-hee...\BRK";
+
+if ((Func083(9) == 0)) {
+    Free_Event_Entity("Manna");
+}
+SetEntityFacing(9, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Manna_Happy");
+Set_Name_Window("Manna");
+TalkMessage(0);
+Talk_Mini_Close();
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Manna") == 0)) {
+    Give_Friendship_Points("Manna", 5);
+}
+Free_Event_Entity("Manna");
+SetEntityFacing(9, 2);
+exit;
+}

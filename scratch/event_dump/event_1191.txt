@@ -1,0 +1,44 @@
+#include "lib_fomt.csv"
+
+script 1191 Unknown_Event_1191 {
+Warp_Player("Mineral_Beach", 0x18, 0x118);
+PlayBGM(1, 0xC);
+SetEntityPosition(0, 0x18, 0x118, 3);
+SetEntityAnim("Player", "Player_Stop_Base");
+SetEntityPosition(2, 0xF1, 0x7C, 3);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(7, 0xEA, 0xBA, 3);
+SetEntityAnim("Gray", "Gray_Stop_Base");
+SetEntityPosition(0x14, 0x102, 0x14A, 3);
+SetEntityAnim("Doctor", 0x320);
+if ((Check_Flag(0xF4) == 1)) {
+    SetEntityPosition(0x17, 0xA6, 0x169, 3);
+    SetEntityAnim("Cliff", "Clif_Stop_Base");
+}
+SetEntityPosition(0x1A, 0x3A, 0xE4, 3);
+SetEntityAnim("Kai", "Kai_Stop_Base");
+SetEntityPosition(0x13, 0xE7, 0x92, 3);
+SetEntityAnim("Karen", "Karen_Stop_Base");
+SetEntityPosition(0x15, 0xC0, 0x18E, 3);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x19, 0xC6, 0x159, 3);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+SetEntityPosition(3, 0x3A, 0xBC, 3);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+SetEntityPosition(0xC, 0xFA, 0xE2, 3);
+SetEntityAnim("Mary", 0x813);
+Fade_In(2, 1);
+End_Cinematic_State();
+Routine_State_Override("Elli", "Script_1200");
+Routine_State_Override("Doctor", "Script_1196");
+Routine_State_Override("Gray", "Script_1202");
+Routine_State_Override("Ann", "Script_1198");
+Routine_State_Override("Cliff", "Script_1195");
+Routine_State_Override("Karen", "Script_1197");
+Routine_State_Override("Kai", "Script_1201");
+Routine_State_Override("Mary", "Script_1199");
+Routine_State_Override("Rick", "Script_1193");
+Routine_State_Override("Popuri", "Script_1194");
+Set_Flag(0x19E, 1);
+exit;
+}

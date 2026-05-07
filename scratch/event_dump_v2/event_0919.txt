@@ -1,0 +1,112 @@
+#include "lib_fomt.csv"
+
+script 919 Unknown_Event_0919 {
+const MESSAGE_0 = "Hi there, \xFF!.\r\nToday is Cliff and Ann's \r\nwedding day!! \BRK\WAIT_CLICKCome celebrate with us! \BRK";
+const MESSAGE_1 = "OK!";
+const MESSAGE_2 = "I've got work to do.";
+const MESSAGE_3 = "Let's celebrate, then! \BRK";
+const MESSAGE_4 = "To the young couple! \BRK";
+const MESSAGE_5 = "Well, come by if you get \r\na chance. \BRK";
+
+var var_0;
+
+Warp_Player("Church", 0xB8, 0x140);
+PlayBGM(1, 6);
+SetEntityPosition(0x19, 0xC8, 0x98, 0);
+SetEntityAnim("Ann", "Ann_Singing_2");
+SetEntityPosition(0x17, 0xA8, 0x98, 0);
+SetEntityAnim("Cliff", "Clif_Weeding_Stop_Base");
+SetEntityPosition(0x16, 0x90, 0x98, 3);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0, 0xB8, 0x140, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(9, 0x68, 0x9B, 3);
+SetEntityAnim("Manna", "Manna_Stop_Base");
+SetEntityPosition(8, 0x48, 0xC3, 3);
+SetEntityAnim("Duke", "Duke_Stop_Base");
+SetEntityPosition(0x18, 0x108, 0x9B, 2);
+SetEntityAnim("Doug", "Baby_Horse_Deep_Sleep_Base");
+if ((GetEntityLocation("Jeff") == "Church")) {
+    Hide_Entity("Jeff");
+}
+if ((GetEntityLocation("Doctor") == "Church")) {
+    Hide_Entity("Doctor");
+}
+if ((GetEntityLocation("Popuri") == "Church")) {
+    Hide_Entity("Popuri");
+}
+if ((Check_Flag("Rival_Ann_Cliff_Married") == 0)) {
+    Fade_In(2, 1);
+    Pan_Camera_To(0xB8, 0xA0, 1);
+    Wait_Camera_Stop();
+    SetEntityFacing(0x16, 0);
+    TalkOpen();
+    Set_Portrait("Carter_Neutral");
+    Set_Name_Window("Carter");
+    TalkMessage(0);
+    TalkClose();
+    TalkOpen();
+    var_0 = TalkChoice2(1, 2);
+    switch (var_0) {
+        case 1:
+            Give_Friendship_Points("Carter", 0x14);
+            Give_Friendship_Points("Manna", 0x14);
+            Give_Friendship_Points("Duke", 0x14);
+            Give_Friendship_Points("Doug", 0x14);
+            Add_Rival_Points(0x19, 0xC8);
+            Add_Rival_Points(0x17, 0xC8);
+            TalkClose();
+            TalkOpen();
+            Set_Portrait("Carter_Happy");
+            Set_Name_Window("Carter");
+            TalkMessage(3);
+            TalkClose();
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(4);
+            TalkClose();
+            Free_Event_Entity("Carter");
+            Set_Flag("Rival_Ann_Cliff_Event_4", 2);
+            Set_Flag("Flag_0x89", 0);
+            Set_Flag("Flag_0x249", 0);
+            Execute_Script(0x3DC);
+            break;
+        case 2:
+            Set_Flag("Rival_Ann_Cliff_Married", 1);
+            TalkClose();
+            TalkOpen();
+            Set_Portrait("Carter_Neutral");
+            Set_Name_Window("Carter");
+            TalkMessage(5);
+            TalkClose();
+            SetEntityFacing(0x16, 3);
+            Pan_Camera_To(GetEntityX(0), GetEntityY(0), 1);
+            Wait_Camera_Stop();
+            End_Cinematic_State();
+            Free_Event_Entity("Carter");
+            Routine_State_Override("Cliff", "Script_920");
+            Routine_State_Override("Doug", "Script_921");
+            Routine_State_Override("Ann", "Script_922");
+            Routine_State_Override("Duke", "Script_923");
+            Routine_State_Override("Manna", "Script_924");
+            Routine_State_Override("Carter", "Script_925");
+            Set_Flag("Rival_Ann_Cliff_Event_4", 1);
+            break;
+    }
+} else {
+    End_Cinematic_State();
+    Fade_In(2, 1);
+    Routine_State_Override("Cliff", "Script_920");
+    Routine_State_Override("Doug", "Script_921");
+    Routine_State_Override("Ann", "Script_922");
+    Routine_State_Override("Duke", "Script_923");
+    Routine_State_Override("Manna", "Script_924");
+    Routine_State_Override("Carter", "Script_925");
+    Set_Flag("Rival_Ann_Cliff_Event_4", 1);
+}
+exit;
+}

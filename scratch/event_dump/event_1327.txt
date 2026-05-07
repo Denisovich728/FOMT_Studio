@@ -1,0 +1,5 @@
+#include "lib_fomt.csv"
+
+script 1327 Unknown_Event_1327 {
+exit;
+}

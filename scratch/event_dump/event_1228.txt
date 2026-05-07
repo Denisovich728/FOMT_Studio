@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1228 Unknown_Event_1228 {
+const MESSAGE_0 = "This kind of thing is what \r\nmakes this Festival so fun!\r\nHa ha ha...!!\BRK";
+const MESSAGE_1 = "It's fun when you eat with\r\nall your friends like this!\BRK";
+
+if ((Func083(0x16) == 0)) {
+    Free_Event_Entity("Carter");
+}
+SetEntityFacing(0x16, GetOppositeFacing(GetEntityFacing(0)));
+if ((Has_Spoken_To_NPC_Today("Carter") == 0)) {
+    Give_Friendship_Points("Carter", 5);
+}
+TalkOpen();
+Set_Name_Window("Carter");
+if ((Check_Flag(0x1A5) == 1)) {
+    Set_Portrait("Carter_Happy");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Carter");
+} else {
+    Set_Portrait("Carter_Neutral");
+    TalkMessage(1);
+    TalkClose();
+    Free_Event_Entity("Carter");
+}
+SetEntityFacing(0x16, 0);
+exit;
+}

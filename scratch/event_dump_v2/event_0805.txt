@@ -1,0 +1,20 @@
+#include "lib_fomt.csv"
+
+script 805 Unknown_Event_0805 {
+const MESSAGE_0 = "Zack seemed kind of sad\r\nto be leaving...\r\nI wonder why? \BRK";
+const MESSAGE_1 = "Zack always seems kind of \r\nnervous around me. \r\nI wonder why...\BRK";
+
+SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Neutral");
+if ((Has_NPC_Talked_Today("Lillia") == 0)) {
+    TalkMessage(0);
+} else {
+    TalkMessage(1);
+}
+TalkClose();
+SetEntityFacing(1, 2);
+exit;
+exit;
+}

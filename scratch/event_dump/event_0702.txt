@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 702 Unknown_Event_0702 {
+const MESSAGE_0 = "Tee-hee....\r\nI'm so happy!...\BRK";
+
+SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Lillia");
+Set_Portrait("Lilia_Happy");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(1, 0);
+exit;
+exit;
+}

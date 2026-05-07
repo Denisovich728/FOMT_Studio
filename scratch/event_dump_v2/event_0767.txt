@@ -1,0 +1,68 @@
+#include "lib_fomt.csv"
+
+script 767 Unknown_Event_0767 {
+const MESSAGE_0 = "Hi there.\r\nI look kind of down? \BRK\WAIT_CLICKI was just remembering\r\nmy parents, you see. \BRK";
+const MESSAGE_1 = "My family have always been \r\ndoctors. My father was a \r\ndoctor and my mother \BRK\r\na nurse. \BRK";
+const MESSAGE_2 = "They were so busy that they \r\ndidn't have much time for\r\nme when I was a child. \BRK\WAIT_CLICKI was lonely, and I blamed \r\nthem for not paying \r\nenough attention to me. \BRK";
+const MESSAGE_3 = "But, now that I'm a doctor\r\nmyself, I understand them\r\nmuch better. \BRK\WAIT_CLICKIt's a sacred duty, being \r\nresponsible for someone's\r\nlife! \BRK\WAIT_CLICKNow I wish I hadn't \r\nrebelled against them so \r\nmuch! What a fool I was!...\BRK";
+
+Warp_Player("Mothers_Hill_Middle", 0x1A6, 0x248);
+SetEntityPosition(0, 0x264, 0x248, 2);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x14, 0x1A6, 0x22C, 1);
+SetEntityAnim("Doctor", 0x320);
+if ((GetEntityLocation("Gotz") == "Mothers_Hill_Middle")) {
+    Hide_Entity("Gotz");
+}
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+    Set_Vector_X("Player", 0x1A6, 1);
+    Execute_Movement("Player");
+    SetEntityAnim("Player", "Player_Stop_Base");
+    SetEntityFacing(0, 1);
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+    Set_Vector_X("Player", 0x1A6, 1);
+    Execute_Movement("Player");
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+    SetEntityFacing(0, 1);
+}
+Make_Delay(0x1E);
+Show_Emote("Doctor", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityFacing(0x14, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Doctor_Afraid");
+Set_Name_Window("Doctor");
+TalkMessage(0);
+Set_Portrait("Doctor_Neutral");
+TalkMessage(1);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Doctor_Afraid");
+Set_Name_Window("Doctor");
+TalkMessage(2);
+Set_Portrait("Doctor_Happy");
+TalkMessage(3);
+TalkClose();
+SetEntityFacing(0x14, 1);
+Free_Event_Entity("Doctor");
+End_Cinematic_State();
+Set_Flag("Flag_0x11C", 1);
+Routine_State_Override("Doctor", "Script_768");
+exit;
+}

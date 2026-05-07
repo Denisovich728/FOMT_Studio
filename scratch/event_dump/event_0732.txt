@@ -1,0 +1,217 @@
+#include "lib_fomt.csv"
+
+script 732 Unknown_Event_0732 {
+const MESSAGE_0 = "Hi, \xFF!. \r\nCome on in. \BRK";
+const MESSAGE_1 = "Hello, \xFF!. \BRK";
+const MESSAGE_2 = "Are we ready to \r\nbegin the class? \BRK";
+const MESSAGE_3 = "Yes, Teacher. \r\nPlease begin!\BRK";
+const MESSAGE_4 = "Listen up, now...\BRK";
+const MESSAGE_5 = "Today's class will be on \r\nCookies. All of you who \r\nlike sweets will love this.\BRK\WAIT_CLICKThe Ingredients are Egg, \r\nFlour, Butter, and Sugar.\BRK\WAIT_CLICKYou also need a Rolling Pin\r\nand an Oven. \BRK\WAIT_CLICKIt will also taste better \r\nif you add Honey. \BRK\WAIT_CLICKAlso, if you add Chocolate,\r\nyou can make Chocolate\r\nCookies that are perfect\BRK\r\nfor the Spring \r\nThanksgiving Festival. \BRK";
+const MESSAGE_6 = "Thank you, Teacher!\BRK";
+const MESSAGE_7 = "Don't mention it. \r\nUntil next time. \BRK";
+const MESSAGE_8 = "I think Pudding is a good \r\nsubject for today's class. \BRK\WAIT_CLICKAll you need is Egg, Milk, \r\nSugar, and an Oven to \r\ncook it all in. \BRK\WAIT_CLICKThey taste even better with\r\nFruit or Corn Flakes. \r\nTry it out!\BRK";
+const MESSAGE_9 = "Today's lesson will be on \r\nCheese Cake. \r\nQuite a sophisticated \BRK\r\ndessert, don't you think?\BRK\WAIT_CLICKIt's made with Cheese, \r\nEggs, and Milk, along with \r\nSugar to sweeten it. \BRK\WAIT_CLICKYou'll need a Pot, a Whisk,\r\nand an Oven. \BRK\WAIT_CLICKYou can also add Honey \r\non special occasions. \BRK";
+const MESSAGE_10 = "Today's lesson will be on \r\nApple Pie. \BRK\WAIT_CLICKI know that Ellen likes \r\nthis recipe very well. \BRK\WAIT_CLICKShe'll love it if you \r\nbring her some. \BRK\WAIT_CLICKIngredients are Egg, Flour,\r\nand Butter. \r\nYou'll need a Knife, a Pot,\BRK\r\na Rolling Pin, and an Oven.\BRK\WAIT_CLICKIt's not easy, but it's \r\nvery delicious. \BRK";
+const MESSAGE_11 = "I'm afraid next time will be\r\nour final lesson. \BRK";
+const MESSAGE_12 = "Really? Why?\BRK";
+const MESSAGE_13 = "Yes, Basil is starting \r\nanother book, so I don't\r\nwant to disturb him.\BRK";
+const MESSAGE_14 = "That's too bad...\r\n\BRK";
+const MESSAGE_15 = "Sorry, \xFF!, \r\nbut that's all I can teach\r\nyou. \BRK";
+const MESSAGE_16 = "Our final lesson will be on \r\nIce Cream. \r\nEverybody loves Ice Cream. \BRK\WAIT_CLICKYou'll need Milk, Egg, \r\nand of course Sugar. \BRK\WAIT_CLICKYou'll also need a Pot \r\nand a Whisk. \BRK\WAIT_CLICKAll children love this!\BRK";
+const MESSAGE_17 = "That's it for my Dessert \r\nClassroom. \BRK";
+const MESSAGE_18 = "Don't mention it. I'm \r\nglad to be able to share\r\nthese recipes. \BRK";
+
+End_Cinematic_State();
+Warp_Player("Basil_House_Floor_01", 0x78, 0xD0);
+SetEntityPosition(0, 0x78, 0xD0, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xB, 0x70, 0x60, 0);
+SetEntityAnim("Anna", "Anna_Stop_Base");
+SetEntityPosition(9, 0x58, 0x78, 3);
+SetEntityAnim("Manna", "Manna_Stop_Base");
+Fade_In(2, 1);
+Pan_Camera_To(0x78, 0x78, 2);
+Wait_Camera_Stop();
+TalkOpen();
+Set_Portrait("Anna_Neutral");
+Set_Name_Window("Anna");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(9, 0);
+TalkOpen();
+Set_Portrait("Manna_Neutral");
+Set_Name_Window("Manna");
+TalkMessage(1);
+TalkClose();
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x98, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x1E);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Anna_Neutral");
+Set_Name_Window("Anna");
+TalkMessage(2);
+TalkClose();
+SetEntityFacing(9, 1);
+TalkOpen();
+Set_Portrait("Manna_Happy");
+Set_Name_Window("Manna");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Anna_Happy");
+Set_Name_Window("Anna");
+TalkMessage(4);
+TalkClose();
+switch (Check_Flag(0x103)) {
+    case 0:
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(5);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Happy");
+        Set_Name_Window("Manna");
+        TalkMessage(6);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Happy");
+        Set_Name_Window("Anna");
+        TalkMessage(7);
+        TalkClose();
+        break;
+    case 1:
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(8);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Happy");
+        Set_Name_Window("Manna");
+        TalkMessage(6);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Happy");
+        Set_Name_Window("Anna");
+        TalkMessage(7);
+        TalkClose();
+        break;
+    case 2:
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(9);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Happy");
+        Set_Name_Window("Manna");
+        TalkMessage(6);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Happy");
+        Set_Name_Window("Anna");
+        TalkMessage(7);
+        TalkClose();
+        break;
+    case 3:
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(10);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Happy");
+        Set_Name_Window("Manna");
+        TalkMessage(6);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Happy");
+        Set_Name_Window("Anna");
+        TalkMessage(11);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Angry");
+        Set_Name_Window("Manna");
+        TalkMessage(12);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(13);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Afraid");
+        Set_Name_Window("Manna");
+        TalkMessage(14);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(15);
+        TalkClose();
+        break;
+    case 4:
+        TalkOpen();
+        Set_Portrait("Anna_Neutral");
+        Set_Name_Window("Anna");
+        TalkMessage(16);
+        Set_Portrait("Anna_Happy");
+        TalkMessage(17);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Manna_Happy");
+        Set_Name_Window("Manna");
+        TalkMessage(6);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Anna_Happy");
+        Set_Name_Window("Anna");
+        TalkMessage(18);
+        TalkClose();
+        Give_Friendship_Points("Anna", 0x14);
+        Give_Friendship_Points("Manna", 0x14);
+        break;
+}
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x1E);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Free_Event_Entity("Anna");
+Free_Event_Entity("Manna");
+Refresh_Map_Entities();
+Set_Flag(0x102, 2);
+Set_Flag(0x103, (Check_Flag(0x103) + 1));
+Fade_Out(2, 1);
+Warp_Player("North_Side_Town", 0xC8, 0xA8);
+SetEntityPosition(0, 0xC8, 0xA8, 0);
+PlaySong(0, 0xCD);
+Set_Time(0xD, 0);
+Fade_In(2, 1);
+Refresh_Map_Entities();
+exit;
+exit;
+}

@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1151 Unknown_Event_1151 {
+const MESSAGE_0 = "Hi there, \xFF!. \r\nIt's an elimination \r\ntournament, you know. \BRK";
+const MESSAGE_1 = "Good luck. \BRK";
+
+if ((Func083(8) == 0)) {
+    Free_Event_Entity("Duke");
+}
+SetEntityFacing(8, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x197) == 0)) {
+    TalkOpen();
+    Set_Portrait("Duke_Neutral");
+    Set_Name_Window("Duke");
+    TalkMessage(0);
+} else {
+    TalkOpen();
+    Set_Portrait("Duke_Happy");
+    Set_Name_Window("Duke");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Duke") == 0)) {
+    Give_Friendship_Points("Duke", 5);
+}
+Free_Event_Entity("Duke");
+SetEntityFacing(8, 2);
+exit;
+}

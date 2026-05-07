@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 520 Unknown_Event_0520 {
+const MESSAGE_0 = "Water\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

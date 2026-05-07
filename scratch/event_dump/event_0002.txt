@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 2 Unknown_Event_0002 {
+const MESSAGE_0 = "The sickness is gone!\BRK";
+
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+exit;
+}

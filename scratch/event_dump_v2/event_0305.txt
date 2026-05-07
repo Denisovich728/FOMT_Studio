@@ -1,0 +1,27 @@
+#include "lib_fomt.csv"
+
+script 305 Unknown_Event_0305 {
+const MESSAGE_0 = "We're still arranging the\r\nbooks upstairs, so please\r\ndon't go up there.\BRK";
+
+if ((GetEntityFacing(0) == 1)) {
+    if (((((Check_Flag("Flag_0x61") == 1) || (Check_Flag("Mary_Heart_Black") == 1)) || (Check_Flag("Rival_Mary_Gray_Event_1") == 1)) || (Check_Flag("Rival_Mary_Gray_Event_3") == 1))) {
+        TalkOpen();
+        Set_Portrait("Mary_Neutral");
+        Set_Name_Window("Mary");
+        if (!(((((((Check_Flag("Karen_Marriage_State") == 2) || (Check_Flag("Popuri_Marriage_State") == 2)) || (Check_Flag("Ann_Marriage_State") == 2)) || (Check_Flag("Elli_Marriage_State") == 2)) || (Check_Flag("Flag_0x173") == 2)) || (Check_Flag("Rival_Mary_Gray_Event_4") == 2)) || (Check_Flag("Rival_Mary_Gray_Married") == 2))) {
+            Set_Hearth_Anim("Mary");
+        }
+        TalkMessage(0);
+        TalkClose();
+        Set_Vector_Y("Player", (GetEntityY(0) + 2), 1);
+        Pan_Camera_To(GetEntityX(0), (GetEntityY(0) + 2), 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Mary_Library_Floor_02", 0xD8, 0x60);
+    SetEntityPosition(0, 0xD8, 0x60, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

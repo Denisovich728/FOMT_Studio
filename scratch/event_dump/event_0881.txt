@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 881 Unknown_Event_0881 {
+const MESSAGE_0 = "Why is it so surprising how \r\nfast kids grow up?!...\BRK";
+const MESSAGE_1 = "If only I would get better\r\nso that my darling could\r\ncome home...\BRK\WAIT_CLICKIf he were here with me \r\neverything would be OK...\BRK";
+
+if ((Func083(1) == 0)) {
+    Free_Event_Entity("Lillia");
+}
+if ((Has_NPC_Talked_Today("Lillia") == 0)) {
+    SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Lilia_Neutral");
+    Set_Name_Window("Lillia");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(1, 3);
+    Free_Event_Entity("Lillia");
+} else {
+    SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Lilia_Happy");
+    Set_Name_Window("Lillia");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(1, 3);
+    Free_Event_Entity("Lillia");
+}
+exit;
+}

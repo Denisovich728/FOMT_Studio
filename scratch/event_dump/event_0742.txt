@@ -1,0 +1,147 @@
+#include "lib_fomt.csv"
+
+script 742 Unknown_Event_0742 {
+const MESSAGE_0 = "Hello, \xFF!. \BRK";
+const MESSAGE_1 = "Basil is supposed to come\r\ntoday, too. \BRK";
+const MESSAGE_2 = "Welcome, Basil. \BRK";
+const MESSAGE_3 = "Thanks for assisting \r\nme, Ellen. \BRK";
+const MESSAGE_4 = "Hi, \xFF!. \BRK";
+const MESSAGE_5 = "Today Ellen is going to tell\r\nme about a very rare plant. \BRK\WAIT_CLICKWhy don't you listen, too?\BRK";
+const MESSAGE_6 = "Alright?\BRK";
+const MESSAGE_7 = "I'm ready, Ellen. \BRK";
+const MESSAGE_8 = "When I was young, before \r\nboth of you were born...\BRK\WAIT_CLICKI heard someone talk of a \r\nbeautiful white flower that\r\nbloomed on a Summer night.\BRK";
+const MESSAGE_9 = "That flower was called the \r\nWhite Flower, and \r\nthere is no one left alive\BRK\r\nwho has seen it. \BRK";
+const MESSAGE_10 = "The White Flower, eh?\r\nI'd love to find it...\BRK";
+const MESSAGE_11 = "If you find it, \r\n\xFF!, will you \r\nbring it to Ellen for me? \BRK\WAIT_CLICKI'll try searching for it \r\nas well. \BRK";
+const MESSAGE_12 = "I'm going to research \r\nit more at home. \BRK";
+
+Warp_Player("Ellen_House", 0x80, 0x77);
+SetEntityPosition(0xF, 0x80, 0x60, 0);
+SetEntityAnim("Ellen", "Ellen_Stop_Base");
+SetEntityPosition(0xA, 0x80, 0xFA, 1);
+SetEntityAnim("Basil", "Basil_Stop_Base");
+SetEntityPosition(0, 0x80, 0x77, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellen_Happy");
+Set_Name_Window("Ellen");
+TalkMessage(0);
+Set_Portrait("Ellen_Neutral");
+TalkMessage(1);
+TalkClose();
+Make_Delay(0x3C);
+PlaySong(0, 0x9C);
+SetEntityFacing(0, 0);
+SetEntityAnim("Basil", "Basil_Base");
+Set_Vector_Y("Basil", 0x99, 1);
+Execute_Movement("Basil");
+SetEntityFacing(0xA, 3);
+Set_Vector_X("Basil", 0x97, 1);
+Execute_Movement("Basil");
+SetEntityFacing(0, 3);
+SetEntityFacing(0xA, 1);
+Set_Vector_Y("Basil", 0x60, 1);
+Execute_Movement("Basil");
+SetEntityFacing(0xA, 2);
+SetEntityFacing(0, 1);
+SetEntityAnim("Basil", "Basil_Stop_Base");
+TalkOpen();
+Set_Portrait("Ellen_Happy");
+Set_Name_Window("Ellen");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Basil_Happy");
+Set_Name_Window("Basil");
+TalkMessage(3);
+TalkClose();
+SetEntityFacing(0xA, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Basil_Happy");
+Set_Name_Window("Basil");
+TalkMessage(4);
+Set_Portrait("Basil_Neutral");
+TalkMessage(5);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Basil_Neutral");
+Set_Name_Window("Basil");
+TalkMessage(6);
+TalkClose();
+SetEntityFacing(0xA, 2);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Basil_Neutral");
+Set_Name_Window("Basil");
+TalkMessage(7);
+TalkClose();
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellen_Neutral");
+Set_Name_Window("Ellen");
+TalkMessage(8);
+Set_Portrait("Ellen_Happy");
+TalkMessage(9);
+TalkClose();
+TalkOpen();
+Set_Portrait("Basil_Happy");
+Set_Name_Window("Basil");
+TalkMessage(10);
+TalkClose();
+SetEntityFacing(0xA, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Basil_Neutral");
+Set_Name_Window("Basil");
+TalkMessage(11);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Basil_Neutral");
+Set_Name_Window("Basil");
+TalkMessage(12);
+TalkClose();
+Free_Event_Entity("Basil");
+SetEntityAnim("Basil", "Basil_Base");
+SetEntityFacing(0, 3);
+Set_Vector_Y("Basil", 0x99, 1);
+Execute_Movement("Basil");
+SetEntityFacing(0, 0);
+SetEntityFacing(0xA, 2);
+Set_Vector_X("Basil", 0x80, 1);
+Execute_Movement("Basil");
+SetEntityFacing(0xA, 0);
+Set_Vector_Y("Basil", 0xE0, 1);
+Execute_Movement("Basil");
+SetEntityAnim("Basil", "Basil_Stop_Base");
+PlaySong(0, 0xCD);
+Hide_Entity("Basil");
+Free_Event_Entity("Ellen");
+Free_Event_Entity("Basil");
+End_Cinematic_State();
+Pan_Camera_To(0x80, 0x77, 2);
+Wait_Camera_Stop();
+Set_Flag(0x10F, 1);
+Routine_State_Override("Ellen", "Script_743");
+exit;
+}

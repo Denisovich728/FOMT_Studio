@@ -1,0 +1,18 @@
+#include "lib_fomt.csv"
+
+script 914 Unknown_Event_0914 {
+const MESSAGE_0 = "Cliff is going to live here \r\nstarting today.\BRK";
+
+SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Ann_Happy");
+Set_Name_Window("Ann");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x6F) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x86) == 2)) || (Check_Flag(0x87) == 2))) {
+    Set_Hearth_Anim("Ann");
+}
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x19, 0);
+Free_Event_Entity("Ann");
+exit;
+}

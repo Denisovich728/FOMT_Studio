@@ -1,0 +1,60 @@
+#include "lib_fomt.csv"
+
+script 1177 Unknown_Event_1177 {
+const MESSAGE_0 = "The Cow Festival is now \r\nover. We will bring your Cow\r\nto your house for you,\BRK\r\nso you may go home now. \BRK";
+
+PlayBGM(1, 9);
+Set_Time(0x12, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(4, 0x55, 0x5B, 0);
+SetEntityAnim("Barley", "Barley_Stop_Base");
+SetEntityPosition(2, 0x82, 0x136, 0);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(3, 0x5A, 0x13F, 0);
+SetEntityAnim("Popuri", "Popuri_Stop_Base");
+SetEntityPosition(0xD, 0x4C, 0x159, 3);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(5, 0x100, 0x73, 2);
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityPosition(0x10, 0xDC, 0x85, 1);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0x14, 0xC4, 0x5C, 0);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0x15, 0xEB, 0x57, 0);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0xC, 0x17C, 0x13C, 2);
+SetEntityAnim("Mary", 0x813);
+SetEntityPosition(0xA, 0x160, 0x14E, 1);
+SetEntityAnim("Basil", "Basil_Stop_Base");
+SetEntityPosition(0x16, 0x162, 0x121, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(0x47, 0x63, 0x14F, 3);
+Spawn_Event_Entity(0x47, 2);
+SetEntityAnim(0x47, "Cow1_Stop_Base");
+SetEntityPosition(0x48, 0x15E, 0x132, 3);
+Spawn_Event_Entity(0x48, 2);
+SetEntityAnim(0x48, "Cow1_Stop_Base");
+SetEntityPosition(0x49, 0xDE, 0x6D, 2);
+Spawn_Event_Entity(0x49, 2);
+SetEntityAnim(0x49, "Cow1_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+Routine_State_Override("Rick", "Script_1178");
+Routine_State_Override("Popuri", "Script_1179");
+Routine_State_Override("Barley", "Script_1188");
+Routine_State_Override("May", "Script_1187");
+Routine_State_Override("Basil", "Script_1181");
+Routine_State_Override("Mary", "Script_1182");
+Routine_State_Override("Huachito", "Script_1183");
+Routine_State_Override("Stu", "Script_1185");
+Routine_State_Override("Doctor", "Script_1180");
+Routine_State_Override("Elli", "Script_1184");
+Routine_State_Override("Carter", "Script_1186");
+exit;
+}

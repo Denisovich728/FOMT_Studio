@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1273 Unknown_Event_1273 {
+const MESSAGE_0 = "Just looking at these \r\nSheep makes me want to \r\nput on a Wool sweater!\BRK";
+const MESSAGE_1 = "I bet your Sheep has a \r\ngood chance. \BRK";
+
+if ((Func083(7) == 0)) {
+    Free_Event_Entity("Gray");
+}
+SetEntityFacing(7, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag("Flag_0x1AF") == 0)) {
+    TalkOpen();
+    Set_Portrait("Gray_Neutral");
+    Set_Name_Window("Gray");
+    TalkMessage(0);
+} else {
+    TalkOpen();
+    Set_Portrait("Gray_Ruborized");
+    Set_Name_Window("Gray");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Gray") == 0)) {
+    Give_Friendship_Points("Gray", 5);
+}
+Free_Event_Entity("Gray");
+SetEntityFacing(7, 1);
+exit;
+}

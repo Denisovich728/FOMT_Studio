@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1238 Unknown_Event_1238 {
+const MESSAGE_0 = "Hi there, \xFF!. \r\nDid you bring something \r\nextra tasty from the farm\r\nfor the pot?\r\nWe're counting on you!\BRK";
+
+if ((Func083(9) == 0)) {
+    Free_Event_Entity("Manna");
+}
+SetEntityFacing(9, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Manna_Happy");
+Set_Name_Window("Manna");
+TalkMessageSlow(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Manna") == 0)) {
+    Give_Friendship_Points("Manna", 5);
+}
+SetEntityFacing(9, 3);
+Free_Event_Entity("Manna");
+exit;
+}

@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 770 Unknown_Event_0770 {
+const MESSAGE_0 = "This kind of error \r\nis very disturbing...\BRK";
+
+if ((Check_Flag("Flag_0x11D") == 1)) {
+    SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Doctor_Surprised");
+    Set_Name_Window("Doctor");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Doctor");
+    SetEntityFacing(0x14, 0);
+}
+exit;
+}

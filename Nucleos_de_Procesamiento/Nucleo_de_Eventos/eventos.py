@@ -10,7 +10,7 @@ try:
     from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.ir import *
     from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.decompiler.ins_decompiler import decompile_instructions
     from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.decompiler.formatter import format_script
-    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.decompiler.decorator import decorate_stmts_with_strings, decorate_stmts_with_items
+    from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.decompiler.decorator import decorate_stmts_with_strings, decorate_stmts_with_items, decorate_stmts_with_characters, decorate_stmts_with_flags
 except ImportError as e:
     # Fallback o Dummy temporal en caso de no correr en un módulo correctamente linkeado
     pass
@@ -24,7 +24,11 @@ class FoMTEventParser:
     def __init__(self, project):
         self.project = project
         self.super_lib = project.super_lib
-        self.scanned_sizes = {} # event_id -> size
+        self.scanned_sizes = {}
+        
+        # Caché para optimizar escaneo masivo (ej: búsqueda global)
+        self._cached_items = None
+        self._cached_npcs = None
         self._lib_scope = None # Cache para la librería de opcodes
 
     def get_event_count(self):
@@ -33,7 +37,8 @@ class FoMTEventParser:
         
     def get_event_name_and_offset(self, event_id):
         """Devuelve el Hint Name (stanhash / nlp) y el offset decodificado de la tabla."""
-        loc_rom = self.super_lib.table_offset + (event_id * 4)
+        # AJUSTE: El usuario indica que el primer evento es el ID 1, no el 0.
+        loc_rom = self.super_lib.table_offset + ((event_id - 1) * 4)
         
         # Leemos el Master Pointer de 4 bytes
         ptr_data = self.project.read_rom(loc_rom, 4)
@@ -75,10 +80,21 @@ class FoMTEventParser:
             while raw_len < 10000:
                 b = self.project.read_rom(script_off + raw_len, 1)
                 raw_len += 1
-                if b == b'\x0B': break
+                if b == b'\x0B': 
+                    # Escaneo de relleno posterior (00 o FF) para maximizar el espacio recuperable
+                    while raw_len < 10000:
+                        next_b = self.project.read_rom(script_off + raw_len, 1)
+                        if next_b not in (b'\x00', b'\xFF'):
+                            break
+                        raw_len += 1
+                    break
             chunk_data = self.project.read_rom(script_off, raw_len)
             total_len = raw_len
             
+        # Guardar el tamaño detectado para el gestor de memoria (In-Place recompilation)
+        key = event_id if event_id is not None else script_off
+        self.scanned_sizes[key] = total_len
+        
         try:
             if is_riff:
                 ast_script = decode_script(chunk_data)
@@ -94,12 +110,72 @@ class FoMTEventParser:
             
             if strings:
                 decorate_stmts_with_strings(stmts, strings, known_callables)
+            
+            # Decorar ítems (Give_Item, Give_Food) - No dependen del bloque STR
+            if self._cached_items is None and self.project.item_parser:
+                self._cached_items = self.project.item_parser.scan_foods()
+            
+            if self._cached_items:
+                item_map = {}
+                food_map = {}
+                tool_map = {}
+                for itm in self._cached_items:
+                    # Limpiar nombre igual que en el compilador para consistencia
+                    name = itm.name_str.replace('\n', ' ').strip('\x00').strip()
+                    if not name: name = f"Unknown_{itm.index}"
+                    rom_addr = itm.base_offset + 0x08000000
+                    if itm.category == "Artículo":
+                        item_map[itm.index] = name
+                    elif itm.category == "Consumible/Comida":
+                        food_map[itm.index] = name
+                    elif itm.category == "Herramienta":
+                        tool_map[itm.index] = name
+                decorate_stmts_with_items(stmts, item_map, food_map, tool_map, known_callables)
                 
-            # Decorar Give_Item con nombres reales
-            if self.project.item_parser:
-                items = self.project.item_parser.scan_foods()
-                item_map = {itm.index: itm.name_str.strip('\x00') for itm in items}
-                decorate_stmts_with_items(stmts, item_map, known_callables)
+            # Decorar comandos de personajes con nombres reales (ID 1-based)
+            if self.project.npc_parser:
+                if self._cached_npcs is None:
+                    self._cached_npcs = self.project.npc_parser.scan_npcs()
+                
+                if self._cached_npcs:
+                    char_map = {npc.index + 1: npc.name_str.strip('\x00') for npc in self._cached_npcs}
+                    candidate_map = {npc.index + 1: npc.name_str.strip('\x00') for npc in self._cached_npcs if npc.is_candidate}
+                    
+                    # Inversos de los mapas para el descompilador
+                    portrait_map_inv = {v: k for k, v in self.super_lib.portrait_map.items()}
+                    map_map_inv = {v: k for k, v in self.super_lib.map_map.items()}
+
+                    # Cargar emotes y animaciones
+                    emote_map = {}
+                    emote_path = get_data_path("emotes.csv")
+                    if os.path.exists(emote_path):
+                        with open(emote_path, 'r', encoding='utf-8') as f:
+                            import csv
+                            f.seek(0)
+                            reader = csv.DictReader(f)
+                            for row in reader:
+                                emote_map[int(row['Emote_ID'], 16)] = row['Emote_Name']
+
+                    anim_map = {v: k for k, v in self.super_lib.anim_map.items()}
+
+                    decorate_stmts_with_characters(stmts, char_map, candidate_map, portrait_map_inv, map_map_inv, emote_map, anim_map, known_callables)
+
+                # Decorar flags desde flags.csv
+                flag_path = get_data_path("flags.csv")
+                if os.path.exists(flag_path):
+                    with open(flag_path, 'r', encoding='utf-8') as f:
+                        import csv
+                        reader = csv.DictReader(f)
+                        flag_map = {}
+                        for row in reader:
+                            f_id = row.get('flag_id')
+                            f_name = row.get('Flag_name')
+                            if f_id and f_name:
+                                try:
+                                    flag_map[int(f_id, 16)] = f_name
+                                except: pass
+                        if flag_map:
+                            decorate_stmts_with_flags(stmts, flag_map, known_callables)
                 
             c_code = format_script(stmts)
             
@@ -120,7 +196,7 @@ class FoMTEventParser:
             output.append(f"script {event_id if event_id is not None else 'ROM'} {hint or 'Script'} {{")
             
             for line in c_code.splitlines():
-                output.append(f"    {line}")
+                output.append(line)
             
             output.append(f"}}")
             return ("\n".join(output), stmts)
@@ -178,11 +254,48 @@ class FoMTEventParser:
                     par = Parser(lex)
                     par.parse_program(self._lib_scope, allow_scripts=False)
 
-        # 2. Obtener mapa de ítems para resolución
-        item_map = {}
+        # 2. Obtener mapa de ítems para resolución (Índice/Puntero/Dirección -> Nombre)
+        item_map = {0: "ITEM_GIFT", 1: "FOOD_GIFT"} # Para etiquetas de contexto
+        food_map = {0: "ITEM_GIFT", 1: "FOOD_GIFT"}
+        tool_map = {}
+        
         if self.project.item_parser:
             items = self.project.item_parser.scan_foods()
-            item_map = {itm.name_str.strip('\x00'): itm.index for itm in items}
+            for itm in items:
+                name = itm.name_str.replace('\n', ' ').strip('\x00').strip()
+                if not name: name = f"Unknown_{itm.index}"
+                
+                # Mapeamos por todas las posibles formas en que el juego referencia al item
+                addr = itm.base_offset + 0x08000000
+                
+                if itm.category == "Artículo":
+                    item_map[itm.index] = name
+                    item_map[itm.name_ptr] = name
+                    item_map[addr] = name
+                    # Inverso para compilación
+                    item_map[name] = itm.real_id
+                elif itm.category == "Consumible/Comida":
+                    food_map[itm.index] = name
+                    food_map[itm.name_ptr] = name
+                    food_map[addr] = name
+                    food_map[name] = itm.real_id
+                elif itm.category == "Herramienta":
+                    tool_map[itm.index] = name
+                    tool_map[itm.name_ptr] = name
+                    tool_map[addr] = name
+                    tool_map[itm.real_id] = name
+                    tool_map[name] = itm.real_id
+            
+        char_map = {}
+        candidate_map = {}
+        if self.project.npc_parser:
+            npcs = self.project.npc_parser.scan_npcs()
+            # ID 1-based para personajes
+            for npc in npcs:
+                name = npc.name_str.replace('\n', ' ').strip('\x00').strip()
+                char_map[name] = npc.index + 1
+                if npc.is_candidate:
+                    candidate_map[name] = npc.index + 1
 
         # 3. Compilar
         lexer = Lexer(text)
@@ -196,12 +309,23 @@ class FoMTEventParser:
         # Tomamos el primer script (el IDE suele editar uno a la vez)
         sid, sname, script_obj = scripts[0]
         
-        # El compilador de SlipSpace ya tiene el hook para item_resolver que añadimos
-        compiled_script = compile_script(script_obj, self._lib_scope, item_map)
+        # 3. Resolutores para el compilador (Nombre -> ID)
+        emote_map_inv = {}
+        emote_path = get_data_path("emotes.csv")
+        if os.path.exists(emote_path):
+            with open(emote_path, 'r', encoding='utf-8') as f:
+                import csv
+                reader = csv.DictReader(f)
+                for row in reader:
+                    emote_map_inv[row['Emote_Name']] = int(row['Emote_ID'], 16)
+
+        anim_map_inv = self.super_lib.anim_map
+
+        compiled_script = compile_script(script_obj, self._lib_scope, item_map, food_map, tool_map, char_map, candidate_map, self.super_lib.portrait_map, self.super_lib.map_map, emote_map_inv, anim_map_inv)
         
         # FIX: target_size debe ser la suma de riff_len + 8 para representar el archivo RIFF completo
         # scanned_sizes ya contiene el valor total si es RIFF, o raw_len si no lo es.
-        return encode_script(compiled_script, target_size=old_size)
+        return encode_script(compiled_script)
 
     def get_last_scanned_size(self, key):
         """Puede recibir un event_id o un offset directo (para MapScripts)."""

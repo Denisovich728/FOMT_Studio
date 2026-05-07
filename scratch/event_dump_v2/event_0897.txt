@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 897 Unknown_Event_0897 {
+const MESSAGE_0 = "Things are going to get \r\nbusy around here! \r\nI only wish my darling\BRK\r\nwould come back...\BRK";
+
+SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Lilia_Happy");
+Set_Name_Window("Lillia");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(1, 0);
+Free_Event_Entity("Lillia");
+exit;
+}

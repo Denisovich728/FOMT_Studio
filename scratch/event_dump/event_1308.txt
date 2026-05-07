@@ -1,0 +1,45 @@
+#include "lib_fomt.csv"
+
+script 1308 Unknown_Event_1308 {
+PlayBGM(1, 7);
+Spawn_Item_On_Grid(0, ((0x14 * 8) + 8), ((0x12 * 8) + 8), 2, Get_Item_Sprite_ID(0x87));
+Spawn_Item_On_Grid(1, ((0x17 * 8) + 8), ((0x12 * 8) + 8), 2, Get_Item_Sprite_ID(0x87));
+Spawn_Item_On_Grid(2, ((0x1A * 8) + 8), ((0x12 * 8) + 8), 2, Get_Item_Sprite_ID(0x87));
+Spawn_Item_On_Grid(3, ((0x1D * 8) + 8), ((0x12 * 8) + 8), 2, Get_Item_Sprite_ID(0x87));
+Spawn_Item_On_Grid(4, ((0x20 * 8) + 8), ((0x12 * 8) + 8), 2, Get_Item_Sprite_ID(0x87));
+Spawn_Item_On_Grid(5, ((0x23 * 8) + 8), ((0x12 * 8) + 8), 2, Get_Item_Sprite_ID(0x87));
+if ((GetEntityLocation(0x4A) == "Rose_Square")) {
+    SetEntityPosition(0x4A, (0x1A0 + 0x10), 0x85, 0);
+}
+if ((GetEntityLocation(0x4B) == "Rose_Square")) {
+    SetEntityPosition(0x4B, (0x1A0 + 0x20), 0x85, 0);
+}
+SetEntityPosition(0xD, 0xDC, 0x80, 0);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(0x1B, 0x178, 0xF8, 2);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+SetEntityPosition(0x16, 0x174, 0x68, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+SetEntityPosition(8, 0x50, 0xB8, 3);
+SetEntityAnim("Duke", "Duke_Stop_Base");
+SetEntityPosition(9, 0x70, 0xC0, 3);
+SetEntityAnim("Manna", "Manna_Stop_Base");
+SetEntityPosition(0x11, 0x140, 0x170, 0);
+SetEntityAnim("Jeff", "Jeff_Stop_Base");
+SetEntityPosition(0x12, 0x130, 0x180, 3);
+SetEntityAnim("Sasha", "Sasha_Stop_Base");
+SetEntityPosition(0x19, 0x9C, 0x168, 2);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+End_Cinematic_State();
+Fade_In(2, 1);
+Set_Flag(0x1D0, 1);
+Routine_State_Override("Huachito", "Script_1313");
+Routine_State_Override("Gotz", "Script_1317");
+Routine_State_Override("Carter", "Script_1316");
+Routine_State_Override("Duke", "Script_1314");
+Routine_State_Override("Manna", "Script_1315");
+Routine_State_Override("Jeff", "Script_1310");
+Routine_State_Override("Sasha", "Script_1311");
+Routine_State_Override("Ann", "Script_1312");
+exit;
+}

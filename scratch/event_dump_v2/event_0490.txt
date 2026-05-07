@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 490 Unknown_Event_0490 {
+const MESSAGE_0 = "Hot Spring\r\nEffects: Recuperate \r\nStamina and Fatigue\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

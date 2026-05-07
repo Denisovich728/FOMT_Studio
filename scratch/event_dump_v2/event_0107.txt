@@ -1,0 +1,99 @@
+#include "lib_fomt.csv"
+
+script 107 Unknown_Event_0107 {
+const MESSAGE_0 = "Where are you going?\r\nThe fireworks are\r\nabout to start!\BRK";
+const MESSAGE_1 = "Where are you going?\r\nThe Beach Day\r\nis about to start!\BRK";
+const MESSAGE_2 = "That was fun!\r\nAlright, back to work...\BRK";
+
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+
+var_0 = Check_Flag("System_Season");
+var_1 = Check_Flag("System_DayOfMonth");
+var_2 = Check_Flag("System_Hour");
+var_3 = Check_Flag("System_Minute");
+if ((GetEntityFacing(0) == 1)) {
+    if ((Check_Flag("Event_Fireworks_Active") == 1)) {
+        TalkOpen();
+        Set_Portrait("Rick_Neutral");
+        Set_Name_Window("Rick");
+        TalkMessage(0);
+        TalkClose();
+        exit;
+    } else {
+        if ((Check_Flag("Rival_Karen_Rick_Married") == 1)) {
+            Set_Flag("Rival_Karen_Rick_Married", 2);
+            Add_Festival_Friendship_Bonus(3);
+            Add_Festival_Friendship_Bonus(0x1A);
+            Refresh_Map_Entities();
+        } else {
+            if ((Check_Flag("Flag_0x7B") == 1)) {
+                Set_Flag("Flag_0x7B", 2);
+                Add_Festival_Friendship_Bonus(0x1A);
+                Refresh_Map_Entities();
+            } else {
+                if ((Check_Flag("Flag_0x7C") == 1)) {
+                    Set_Flag("Flag_0x7C", 2);
+                    Add_Festival_Friendship_Bonus(3);
+                    Add_Festival_Friendship_Bonus(0x1A);
+                    Refresh_Map_Entities();
+                } else {
+                    if ((Check_Flag("Rival_Elli_Doctor_Event_4") == 1)) {
+                        Set_Flag("Rival_Elli_Doctor_Event_4", 2);
+                        Add_Festival_Friendship_Bonus(0x14);
+                        Add_Festival_Friendship_Bonus(0x15);
+                        Refresh_Map_Entities();
+                    }
+                }
+            }
+        }
+    }
+    if ((Check_Flag("Event_BeachDay_Active") == 1)) {
+        if (!((var_2 == 0x12) && (var_3 == 1))) {
+            TalkOpen();
+            Set_Portrait("Zack_Angry");
+            Set_Name_Window("Zack");
+            TalkMessage(1);
+            TalkClose();
+            SetEntityFacing(0, 0);
+            exit;
+        } else {
+            PlaySong(0, 0x9C);
+            Fade_Out(2, 1);
+            if ((Check_Flag("Flag_0x195") == 1)) {
+                Give_Friendship_Points("Huachito", 0x14);
+                Give_Friendship_Points("Jeff", 0x14);
+                Give_Friendship_Points("Sasha", 0x14);
+                Give_Friendship_Points("Kai", 0x14);
+                Give_Friendship_Points("Popuri", 0x14);
+                Give_Friendship_Points("Zack", 0x14);
+            }
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Set_Flag("Event_BeachDay_Active", 2);
+            Recalculate_Global_Schedules(4);
+            Set_Flag("Flag_0x193", 0);
+            Add_Festival_Friendship_Bonus(0xD);
+            Add_Festival_Friendship_Bonus(0x11);
+            Add_Festival_Friendship_Bonus(0x12);
+            Add_Festival_Friendship_Bonus(0x1A);
+            Add_Festival_Friendship_Bonus(3);
+            Add_Festival_Friendship_Bonus(0x1C);
+            Warp_Player("Beach_House", 0x78, 0xD0);
+            SetEntityPosition(0, 0x78, 0xD0, 1);
+            Fade_In(2, 1);
+            exit;
+        }
+    }
+    PlaySong(0, 0x9C);
+    Fade_Out(2, 1);
+    Warp_Player("Beach_House", 0x78, 0xD0);
+    SetEntityPosition(0, 0x78, 0xD0, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

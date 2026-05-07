@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1102 Unknown_Event_1102 {
+const MESSAGE_0 = "What should I make \r\nthis year...?\BRK";
+
+if ((Func083(1) == 0)) {
+    Free_Event_Entity("Lillia");
+}
+SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Lilia_Afraid");
+Set_Name_Window("Lillia");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Lillia") == 0)) {
+    Give_Friendship_Points("Lillia", 5);
+}
+SetEntityFacing(1, 2);
+Free_Event_Entity("Lillia");
+exit;
+}

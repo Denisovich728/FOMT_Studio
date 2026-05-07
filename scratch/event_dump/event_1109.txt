@@ -1,0 +1,24 @@
+#include "lib_fomt.csv"
+
+script 1109 Unknown_Event_1109 {
+const MESSAGE_0 = "I'm feeling confident today!\BRK";
+
+if ((Func083(0x19) == 0)) {
+    Free_Event_Entity("Ann");
+}
+SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Ann_Happy");
+Set_Name_Window("Ann");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x6F) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x86) == 2)) || (Check_Flag(0x87) == 2))) {
+    Set_Hearth_Anim("Ann");
+}
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Ann") == 0)) {
+    Give_Friendship_Points("Ann", 5);
+}
+SetEntityFacing(0x19, 2);
+Free_Event_Entity("Ann");
+exit;
+}

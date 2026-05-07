@@ -1,0 +1,33 @@
+#include "lib_fomt.csv"
+
+script 550 Unknown_Event_0550 {
+var var_0;
+var var_1;
+var var_2;
+var var_3;
+var var_4;
+
+if ((GetEntityFacing(0) == 0)) {
+    if ((Check_Flag("Flag_0x133") == 1)) {
+        Set_Flag("Flag_0x133", 2);
+        Add_Festival_Friendship_Bonus(0x1B);
+        Add_Festival_Friendship_Bonus(0xE);
+        Refresh_Map_Entities();
+    }
+    var_0 = Check_Flag("System_Season");
+    var_1 = Check_Flag("System_DayOfMonth");
+    var_3 = Check_Flag("System_Hour");
+    var_2 = Check_Flag("System_Weather_Tomorrow");
+    var_4 = Check_Flag("System_Weather_Today");
+    Fade_Out(2, 1);
+    Warp_Player("Forest", 0x264, 0xF8);
+    SetEntityPosition(0, 0x264, 0xF8, 0);
+    PlaySong(0, 0xCD);
+    if (((((((((((((Check_Flag("Flag_0x71") == 2) && (Check_Flag("Flag_0x72") == 0)) && !(var_0 == 0)) && (var_4 == 0)) && ((var_2 == 0) || (var_2 == 1))) && ((var_3 >= 0xB) && (var_3 < 0x12))) && (Check_Flag("Karen_Marriage_State") == 0)) && (Check_Flag("Flag_0x75") == 0)) && (Check_Flag("Rival_Karen_Rick_Event_1") == 0)) && (Check_Flag("Rival_Karen_Rick_Event_2") == 0)) && (Check_Flag("Karen_Heart_Orange") == 0)) && (Chek_Love_Points("Karen") < 0x7530))) {
+        Set_Flag("Flag_0x72", 1);
+        Execute_Script(0x36A);
+    }
+    Fade_In(2, 1);
+}
+exit;
+}

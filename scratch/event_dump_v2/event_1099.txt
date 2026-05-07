@@ -1,0 +1,38 @@
+#include "lib_fomt.csv"
+
+script 1099 Unknown_Event_1099 {
+const MESSAGE_0 = "The Cooking Festival is \r\ntomorrow at 10AM in Rose \r\nSquare, you know.\BRK\WAIT_CLICKIf you bring a dish, you\r\ncan enter it. \BRK";
+
+Warp_Player("Farm", 0xE4, 0x78);
+SetEntityPosition(0, 0xE4, 0x78, 0);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0xD, 0xE4, 0x91, 1);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+Fade_In(2, 1);
+Set_Flag("Flag_0x18B", 1);
+TalkOpen();
+Set_Portrait("Thomas_Neutral");
+Set_Name_Window("Huachito");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0xD, 3);
+SetEntityAnim("Huachito", "Thomas_Base");
+Set_Vector_X("Huachito", 0x13F, 1);
+Execute_Movement("Huachito");
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityFacing(0xD, 1);
+SetEntityAnim("Huachito", "Thomas_Base");
+SetEntityFacing(0, 3);
+Set_Vector_Y("Huachito", 0, 1);
+Execute_Movement("Huachito");
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+Hide_Entity("Huachito");
+Free_Event_Entity("Huachito");
+Set_Flag("Flag_0x18B", 2);
+exit;
+exit;
+}

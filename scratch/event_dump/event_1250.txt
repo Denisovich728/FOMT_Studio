@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1250 Unknown_Event_1250 {
+const MESSAGE_0 = "It's a perfect day \r\nfor Horse racing!\BRK";
+const MESSAGE_1 = "Are you racing? \r\nI hope you win! \BRK";
+
+if ((Func083(1) == 0)) {
+    Free_Event_Entity("Lillia");
+}
+SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x1AB) == 0)) {
+    TalkOpen();
+    Set_Portrait("Lilia_Happy");
+    Set_Name_Window("Lillia");
+    TalkMessage(0);
+} else {
+    TalkOpen();
+    Set_Portrait("Lilia_Neutral");
+    Set_Name_Window("Lillia");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Lillia") == 0)) {
+    Give_Friendship_Points("Lillia", 5);
+}
+Free_Event_Entity("Lillia");
+SetEntityFacing(1, 2);
+exit;
+}

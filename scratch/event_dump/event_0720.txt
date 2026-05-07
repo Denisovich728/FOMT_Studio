@@ -1,0 +1,16 @@
+#include "lib_fomt.csv"
+
+script 720 Unknown_Event_0720 {
+const MESSAGE_0 = "I have to apologize for \r\nfighting in front of you, \r\n\xFF!. \BRK\WAIT_CLICKIt's inexcusable...\BRK";
+
+SetEntityFacing(9, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Manna");
+Set_Portrait("Manna_Neutral");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("Manna");
+SetEntityFacing(9, 3);
+exit;
+exit;
+}

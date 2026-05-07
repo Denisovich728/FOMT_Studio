@@ -1,0 +1,66 @@
+#include "lib_fomt.csv"
+
+script 925 Unknown_Event_0925 {
+const MESSAGE_0 = "Are you done working? \BRK";
+const MESSAGE_1 = "Yes.";
+const MESSAGE_2 = "Not yet.";
+const MESSAGE_3 = "Let's celebrate then! \BRK";
+const MESSAGE_4 = "To the young couple!\BRK";
+const MESSAGE_5 = "Well, come when you can. \BRK";
+
+var var_0;
+
+SetEntityFacing(0x16, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Carter_Neutral");
+Set_Name_Window("Carter");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(1, 2);
+switch (var_0) {
+    case 1:
+        Give_Friendship_Points("Carter", 0x14);
+        Give_Friendship_Points("Manna", 0x14);
+        Give_Friendship_Points("Duke", 0x14);
+        Give_Friendship_Points("Doug", 0x14);
+        Add_Rival_Points(0x19, 0xC8);
+        Add_Rival_Points(0x17, 0xC8);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Carter_Happy");
+        Set_Name_Window("Carter");
+        TalkMessage(3);
+        TalkClose();
+        Fade_Out(2, 1);
+        TalkOpen();
+        TalkMessage(4);
+        TalkClose();
+        Free_Event_Entity("Carter");
+        Refresh_Map_Entities();
+        Add_Festival_Friendship_Bonus(0x17);
+        Add_Festival_Friendship_Bonus(0x18);
+        Add_Festival_Friendship_Bonus(0x19);
+        Add_Festival_Friendship_Bonus(8);
+        Add_Festival_Friendship_Bonus(9);
+        Add_Festival_Friendship_Bonus(0x16);
+        Set_Flag("Rival_Ann_Cliff_Event_4", 2);
+        Set_Flag("Flag_0x89", 0);
+        Set_Flag("Flag_0x249", 0);
+        Execute_Script(0x3DC);
+        break;
+    case 2:
+        Set_Flag("Rival_Ann_Cliff_Married", 1);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Carter_Neutral");
+        Set_Name_Window("Carter");
+        TalkMessage(5);
+        TalkClose();
+        SetEntityFacing(0x16, 3);
+        Free_Event_Entity("Carter");
+        Set_Flag("Rival_Ann_Cliff_Event_4", 1);
+        break;
+}
+exit;
+}

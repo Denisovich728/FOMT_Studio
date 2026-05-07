@@ -1,0 +1,25 @@
+#include "lib_fomt.csv"
+
+script 513 Unknown_Event_0513 {
+const MESSAGE_0 = "That's my room!\r\nDon't go in there!\BRK";
+
+var var_0;
+
+if ((Chek_Friendship_Points("Saibara") <= 0xC8)) {
+    var_0 = 0;
+} else {
+    if ((Chek_Friendship_Points("Saibara") > 0xC8)) {
+        var_0 = 1;
+    }
+}
+if ((var_0 == 1)) {
+    PlaySong(0, 0x9C);
+    Proc0C7(8);
+} else {
+    TalkOpen();
+    Set_Portrait("Saibara_Neutral");
+    TalkMessage(0);
+    TalkClose();
+}
+exit;
+}

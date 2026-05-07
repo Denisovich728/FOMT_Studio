@@ -1,0 +1,18 @@
+#include "lib_fomt.csv"
+
+script 71 Unknown_Event_0071 {
+const MESSAGE_0 = "There's never an end\r\nto work!\BRK";
+
+if ((Check_Flag("Elli_Heart_Black") == 1)) {
+}
+SetEntityFacing(0x15, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+Set_Hearth_Anim("Elli");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x15, 0);
+Free_Event_Entity("Elli");
+exit;
+}

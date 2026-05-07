@@ -1,0 +1,101 @@
+#include "lib_fomt.csv"
+
+script 821 Unknown_Event_0821 {
+const MESSAGE_0 = "Wow, shooting stars!\r\nI'll wish for...\BRK";
+const MESSAGE_1 = "Healthy animals.";
+const MESSAGE_2 = "Befriend townspeople.";
+const MESSAGE_3 = "Shipping for a high price.";
+const MESSAGE_4 = "I hope my wish \r\ncomes true...\BRK";
+
+var var_0;
+var var_2;
+
+Set_Flag("Flag_0x156", 1);
+Fade_In(3, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Pan_Camera_To(0xEC, 0x8C, 1);
+Set_Vector_Y("Player", 0xF8, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Wait_Camera_Stop();
+PlaySong(0, 0xBC);
+Trigger_Screen_Flash();
+TalkOpen();
+TalkMessage(0);
+var_0 = TalkChoice3(1, 2, 3);
+switch (var_0) {
+    case 1:
+        Set_Spouse_Nickname(0);
+        break;
+    case 2:
+        TalkClose();
+        Give_Friendship_Points("Lillia", 0xA);
+        Give_Friendship_Points("Rick", 0xA);
+        Give_Friendship_Points("Popuri", 0xA);
+        Give_Friendship_Points("Barley", 0xA);
+        Give_Friendship_Points("May", 0xA);
+        Give_Friendship_Points("Saibara", 0xA);
+        Give_Friendship_Points("Gray", 0xA);
+        Give_Friendship_Points("Duke", 0xA);
+        Give_Friendship_Points("Manna", 0xA);
+        Give_Friendship_Points("Basil", 0xA);
+        Give_Friendship_Points("Anna", 0xA);
+        Give_Friendship_Points("Mary", 0xA);
+        Give_Friendship_Points("Huachito", 0xA);
+        Give_Friendship_Points("Harris", 0xA);
+        Give_Friendship_Points("Ellen", 0xA);
+        Give_Friendship_Points("Stu", 0xA);
+        Give_Friendship_Points("Jeff", 0xA);
+        Give_Friendship_Points("Sasha", 0xA);
+        Give_Friendship_Points("Karen", 0xA);
+        Give_Friendship_Points("Doctor", 0xA);
+        Give_Friendship_Points("Elli", 0xA);
+        Give_Friendship_Points("Carter", 0xA);
+        Give_Friendship_Points("Cliff", 0xA);
+        Give_Friendship_Points("Doug", 0xA);
+        Give_Friendship_Points("Ann", 0xA);
+        Give_Friendship_Points("Kai", 0xA);
+        Give_Friendship_Points("Gotz", 0xA);
+        Give_Friendship_Points("Zack", 0xA);
+        Give_Friendship_Points("Won", 0xA);
+        Give_Friendship_Points("Gourmet", 0xA);
+        Give_Friendship_Points("H. Goddess", 0xA);
+        Give_Friendship_Points("Lou", 0xA);
+        Give_Friendship_Points("Lu", 0xA);
+        Give_Friendship_Points("", 0xA);
+        Give_Friendship_Points("Staid", 0xA);
+        Give_Friendship_Points("Nappy", 0xA);
+        Give_Friendship_Points("Bold", 0xA);
+        Give_Friendship_Points("Chef", 0xA);
+        Give_Friendship_Points("Aqua", 0xA);
+        Give_Friendship_Points("Hoggy", 0xA);
+        Give_Friendship_Points("Timid", 0xA);
+        break;
+    case 3:
+        Screen_Flash(0, 0, 0);
+        break;
+}
+TalkClose();
+var_2 = RNG_Generator(1, 4);
+do {
+    Trigger_Screen_Flash();
+    PlaySong(0, 0xBC);
+    Make_Delay(3);
+    var_2 = (var_2 - 1);
+} while ((var_2 >= 0));
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(4);
+TalkClose();
+Set_Flag("Flag_0x156", 2);
+Execute_Script(0x3DC);
+exit;
+}

@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 439 Unknown_Event_0439 {
+const MESSAGE_0 = "Table\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

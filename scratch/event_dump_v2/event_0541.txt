@@ -1,0 +1,43 @@
+#include "lib_fomt.csv"
+
+script 541 Unknown_Event_0541 {
+const MESSAGE_0 = "The wind is too strong\r\nto go outside.\BRK";
+const MESSAGE_1 = "The snow is too deep\r\nto go outside.\BRK";
+
+if ((GetEntityFacing(0) == 0)) {
+    if ((Check_Flag("System_Weather_Today") == 3)) {
+        TalkOpen();
+        TalkMessage(0);
+        TalkClose();
+        SetEntityFacing(0, 1);
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Walking_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+        }
+        Set_Vector_Y("Player", 0xC8, 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    if ((Check_Flag("System_Weather_Today") == 4)) {
+        TalkOpen();
+        TalkMessage(1);
+        TalkClose();
+        SetEntityFacing(0, 1);
+        if ((Inventory_Check() == 1)) {
+            SetEntityAnim("Player", "Player_Walking_Base");
+        } else {
+            SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+        }
+        Set_Vector_Y("Player", 0xC8, 1);
+        Execute_Movement("Player");
+        exit;
+    }
+    Fade_Out(2, 1);
+    Warp_Player("South_Side_Town", 0x224, 0x6A);
+    SetEntityPosition(0, 0x224, 0x6A, 0);
+    PlaySong(0, 0xCD);
+    Fade_In(2, 1);
+}
+exit;
+}

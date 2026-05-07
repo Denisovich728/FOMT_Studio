@@ -1,0 +1,98 @@
+#include "lib_fomt.csv"
+
+script 1294 Unknown_Event_1294 {
+const MESSAGE_0 = "This is from me. \r\nI hope you like it. \BRK";
+const MESSAGE_1 = "This is for the Cookies\r\nyou gave me in Spring. \BRK";
+const MESSAGE_2 = "I came to give you \r\nsomething. \BRK";
+
+var var_0;
+
+Set_Flag(0x1B6, 1);
+var_0 = GetEntityFacing(3);
+SetEntityFacing(3, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Popuri");
+if (Inventory_Check()) {
+    if ((Check_Flag(0x183) == 0)) {
+        Set_Portrait("Popuri_Happy");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(0);
+        TalkClose();
+        SetEntityAnim("Popuri", "Popuri_Hands_Middle_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+        PlaySong(0, 0x6A);
+        if ((Chek_Love_Points("Popuri") >= 0x9C40)) {
+            Proc049(0x90);
+        } else {
+            if ((Chek_Love_Points("Popuri") < 0x9C40)) {
+                Proc049(0x45);
+            }
+        }
+        Set_Flag(0x1B7, 1);
+        Give_Love_Points("Popuri", 0x3E8);
+        SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        if ((GetEntityX(3) != 0x154)) {
+            SetEntityFacing(3, 3);
+            SetEntityAnim("Popuri", "Popuri_Walking_Base");
+            Set_Vector_X("Popuri", 0x154, 1);
+            Execute_Movement("Popuri");
+            SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        }
+        SetEntityFacing(3, 1);
+        SetEntityAnim("Popuri", "Popuri_Walking_Base");
+        Set_Vector_Y("Popuri", 0, 1);
+        Execute_Movement("Popuri");
+        SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        Hide_Entity("Popuri");
+        Set_Flag(0x1B6, 2);
+        Finalize_Event();
+    } else {
+        Set_Portrait("Popuri_Happy");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(1);
+        TalkClose();
+        SetEntityAnim("Popuri", "Popuri_Hands_Middle_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+        PlaySong(0, 0x6A);
+        if ((Chek_Love_Points("Popuri") >= 0x9C40)) {
+            Proc049(0x90);
+        } else {
+            if ((Chek_Love_Points("Popuri") < 0x9C40)) {
+                Proc049(0x45);
+            }
+        }
+        Set_Flag(0x1B7, 1);
+        Set_Flag(0x183, 0);
+        Give_Love_Points("Popuri", 0x3E8);
+        SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+        if ((GetEntityX(3) != 0x154)) {
+            SetEntityFacing(3, 3);
+            SetEntityAnim("Popuri", "Popuri_Walking_Base");
+            Set_Vector_X("Popuri", 0x154, 1);
+            Execute_Movement("Popuri");
+            SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        }
+        SetEntityFacing(3, 1);
+        SetEntityAnim("Popuri", "Popuri_Walking_Base");
+        Set_Vector_Y("Popuri", 0, 1);
+        Execute_Movement("Popuri");
+        SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        Hide_Entity("Popuri");
+        Set_Flag(0x1B6, 2);
+        Finalize_Event();
+    }
+} else {
+    Set_Portrait("Popuri_Happy");
+    Set_Hearth_Anim("Popuri");
+    TalkMessage(2);
+    TalkClose();
+    Set_Flag(0x1B6, 0);
+}
+SetEntityFacing(3, var_0);
+Free_Event_Entity("Popuri");
+exit;
+}

@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 913 Unknown_Event_0913 {
+const MESSAGE_0 = "Hello, \xFF!.\r\nCliff'll be living here \r\nfull time from now on. \BRK";
+
+SetEntityFacing(0x18, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doug_Neutral");
+Set_Name_Window("Doug");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x18, 0);
+Free_Event_Entity("Doug");
+exit;
+}

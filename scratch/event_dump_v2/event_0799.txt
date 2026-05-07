@@ -1,0 +1,71 @@
+#include "lib_fomt.csv"
+
+script 799 Unknown_Event_0799 {
+const MESSAGE_0 = "Aaahh...I just don't feel \r\nlike working any more...\BRK";
+const MESSAGE_1 = "Oh, \xFF!, \r\nsorry I didn't notice you. \BRK";
+const MESSAGE_2 = "Did you come to ask about an\r\nexpansion? Sorry, but I \r\ncan't do it right now. \BRK";
+const MESSAGE_3 = "I just can't get excited \r\nabout it now. I'm in a \r\nslump, I guess. \BRK";
+const MESSAGE_4 = "I'll snap out of it  \r\neventually, but not now. \BRK\WAIT_CLICKSorry. \BRK";
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1B, 0x78, 0x50, 1);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+Fade_In(2, 1);
+Pan_Camera_To(0x78, 0x64, 2);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x60, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Gotz_Angry");
+Set_Name_Window("Gotz");
+TalkMessage(0);
+TalkClose();
+Set_Vector_Y("Player", 0x64, 1);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityFacing(0x1B, 0);
+TalkOpen();
+Set_Portrait("Gotz_Afraid");
+Set_Name_Window("Gotz");
+TalkMessage(1);
+TalkClose();
+SetEntityAnim("Player", "Player_Head_No_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Gotz_Neutral");
+Set_Name_Window("Gotz");
+TalkMessage(2);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Gotz_Afraid");
+Set_Name_Window("Gotz");
+TalkMessage(3);
+Set_Portrait("Gotz_Neutral");
+TalkMessage(4);
+TalkClose();
+Free_Event_Entity("Gotz");
+Set_Flag("Flag_0x130", 2);
+Set_Flag("Flag_0x131", 1);
+exit;
+exit;
+}

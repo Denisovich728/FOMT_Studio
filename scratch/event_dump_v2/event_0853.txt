@@ -1,0 +1,28 @@
+#include "lib_fomt.csv"
+
+script 853 Unknown_Event_0853 {
+Warp_Player("Farm_House_1", 0x130, 0xD0);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x130, 0xD0, 1);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1F, 0x147, 0x72, 0);
+SetEntityAnim("H. Goddess", "H.Goodes_Stop_Base");
+SetEntityPosition(0x23, 0x124, 0x54, 0);
+if ((Check_Flag("Baby_Growth_Stage") == 1)) {
+    SetEntityAnim("", "Baby_Stop_Base");
+} else {
+    SetEntityAnim("", "Baby_Sit_Base");
+}
+Spawn_Item_On_Grid(0, 0x120, 0x7B, 2, Get_Item_Sprite_ID(0x8F));
+Spawn_Item_On_Grid(1, 0x130, 0x7C, 2, Get_Item_Sprite_ID("Invitation"));
+Fade_In(2, 1);
+End_Cinematic_State();
+Routine_State_Override("H. Goddess", "Script_855");
+Routine_State_Override("", "Script_854");
+Set_Flag("Flag_0x176", 1);
+exit;
+}

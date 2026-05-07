@@ -1,0 +1,26 @@
+#include "lib_fomt.csv"
+
+script 1202 Unknown_Event_1202 {
+const MESSAGE_0 = "My grandfather said he made\r\na part of the fireworks.\BRK\WAIT_CLICKI hope they all work right!\BRK";
+
+if ((Func083(7) == 0)) {
+    Free_Event_Entity("Gray");
+}
+SetEntityFacing(7, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(0);
+TalkClose();
+if ((Has_NPC_Talked_Today("Gray") == 0)) {
+    Give_Friendship_Points("Gray", 5);
+}
+Free_Event_Entity("Gray");
+if ((((((((((Has_NPC_Talked_Today("Rick") && Has_NPC_Talked_Today("Gray")) && Has_NPC_Talked_Today("Doctor")) && ((Check_Flag(0xF4) == 0) || Has_NPC_Talked_Today("Cliff"))) && Has_NPC_Talked_Today("Kai")) && Has_NPC_Talked_Today("Karen")) && Has_NPC_Talked_Today("Elli")) && Has_NPC_Talked_Today("Ann")) && Has_NPC_Talked_Today("Popuri")) && Has_NPC_Talked_Today("Mary"))) {
+    Set_Flag(0x19F, 0);
+    Fade_Out(2, 1);
+    Execute_Script(0x4A8);
+}
+SetEntityFacing(7, 3);
+exit;
+}

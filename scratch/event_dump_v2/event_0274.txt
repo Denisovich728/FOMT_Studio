@@ -1,0 +1,7 @@
+#include "lib_fomt.csv"
+
+script 274 Unknown_Event_0274 {
+PlaySong(0, 0x9C);
+Anim_Door_Close(5);
+exit;
+}

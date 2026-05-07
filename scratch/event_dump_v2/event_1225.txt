@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1225 Unknown_Event_1225 {
+const MESSAGE_0 = "Since everybody helps\r\nmake it, it tastes, well...\BRK";
+const MESSAGE_1 = "Did you have fun? \r\nSome times it's fun to eat\r\nwith everyone, isn't it? \BRK";
+
+if ((Func083(0xD) == 0)) {
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+if ((Has_Spoken_To_NPC_Today("Huachito") == 0)) {
+    Give_Friendship_Points("Huachito", 5);
+}
+TalkOpen();
+Set_Name_Window("Huachito");
+if ((Check_Flag("Flag_0x1A5") == 1)) {
+    Set_Portrait("Thomas_Afraid");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Huachito");
+} else {
+    Set_Portrait("Thomas_Happy");
+    TalkMessage(1);
+    TalkClose();
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, 0);
+exit;
+}

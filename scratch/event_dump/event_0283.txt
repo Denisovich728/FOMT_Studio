@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 283 Unknown_Event_0283 {
+const MESSAGE_0 = "Vase\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

@@ -1,0 +1,51 @@
+#include "lib_fomt.csv"
+
+script 220 Unknown_Event_0220 {
+const MESSAGE_0 = "Mayonnaise Maker\r\nPlace Eggs here to\r\nmake Mayonnaise.\BRK";
+
+var var_0;
+var var_1;
+
+var_0 = 0;
+if (((!Inventory_Check() && (Compare_Gift() == 0)) && !Is_Item_Wrapped())) {
+    var_1 = Search_Food_Gift_Address();
+    switch (var_1) {
+        case 0xF:
+        case 0x10:
+        case 0x11:
+        case 0x12:
+        case 0x13:
+        case 0x14:
+            var_0 = 1;
+            break;
+    }
+}
+if (var_0) {
+    Drop_Held_Item();
+    switch (var_1) {
+        case 0xF:
+            Give_Food("Mayonnaise (S)");
+            break;
+        case 0x10:
+            Give_Food("Mayonnaise (M)");
+            break;
+        case 0x11:
+            Give_Food("Mayonnaise (L)");
+            break;
+        case 0x12:
+            Give_Food("Mayonnaise (G)");
+            break;
+        case 0x13:
+            Give_Food("Mayonnaise (P)");
+            break;
+        case 0x14:
+            Give_Food("Mayonnaise (X)");
+            break;
+    }
+} else {
+    TalkOpen();
+    Print_Message(0);
+    TalkClose();
+}
+exit;
+}

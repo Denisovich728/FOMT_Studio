@@ -1,0 +1,45 @@
+#include "lib_fomt.csv"
+
+script 798 Unknown_Event_0798 {
+const MESSAGE_0 = "Summer's over, so Popuri and \r\nI are leaving for the city.\BRK\WAIT_CLICKI just wanted to say \r\ngoodbye. \BRK";
+const MESSAGE_1 = "Summer's over, so \r\nI'm leaving for the city.\BRK\WAIT_CLICKI just wanted to say \r\ngoodbye. \BRK";
+const MESSAGE_2 = "See you next year!\BRK";
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1A, 0xE4, 0x91, 1);
+SetEntityAnim("Kai", "Kai_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Kai_Neutral");
+Set_Name_Window("Kai");
+if (((Check_Flag(0x7E) == 2) || (Check_Flag(0x7F) == 2))) {
+    TalkMessage(0);
+} else {
+    TalkMessage(1);
+}
+TalkClose();
+SetEntityFacing(0x1A, 3);
+SetEntityAnim("Kai", "Kai_Base");
+Set_Vector_X("Kai", 0x13F, 1);
+Execute_Movement("Kai");
+SetEntityAnim("Kai", "Kai_Stop_Base");
+SetEntityFacing(0x1A, 2);
+TalkOpen();
+Set_Portrait("Kai_Neutral");
+Set_Name_Window("Kai");
+TalkMessage(2);
+TalkClose();
+SetEntityFacing(0x1A, 1);
+SetEntityAnim("Kai", "Kai_Base");
+Set_Vector_Y("Kai", 0, 1);
+Execute_Movement("Kai");
+Hide_Entity("Kai");
+Free_Event_Entity("Kai");
+Set_Flag(0x12F, 2);
+exit;
+exit;
+}

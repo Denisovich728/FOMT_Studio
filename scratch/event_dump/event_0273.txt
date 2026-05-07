@@ -1,0 +1,42 @@
+#include "lib_fomt.csv"
+
+script 273 Unknown_Event_0273 {
+if ((GetEntityFacing(0) == 0)) {
+    if ((Check_Flag(0x57) == 1)) {
+        Set_Flag(0x57, 2);
+        Proc08A(0x19);
+        Proc08A(0x18);
+        Refresh_Map_Entities();
+    } else {
+        if ((Check_Flag(0x5C) == 1)) {
+            Set_Flag(0x5C, 2);
+            Proc08A(0x18);
+            Refresh_Map_Entities();
+        } else {
+            if ((Check_Flag(0x84) == 1)) {
+                Set_Flag(0x84, 2);
+                Proc08A(0x19);
+                Proc08A(0x18);
+                Proc08A(0x17);
+                Refresh_Map_Entities();
+            } else {
+                if ((Check_Flag(0x128) == 1)) {
+                    Set_Flag(0x128, 2);
+                    Proc08A(0x19);
+                    Proc08A(0x18);
+                    Proc08A(8);
+                    Proc08A(0xD);
+                    Proc08A(0xE);
+                    Refresh_Map_Entities();
+                }
+            }
+        }
+    }
+    Fade_Out(2, 1);
+    Warp_Player("North_Side_Town", 0x278, 0x1F0);
+    SetEntityPosition(0, 0x278, 0x1F0, 0);
+    PlaySong(0, 0xCD);
+    Fade_In(2, 1);
+}
+exit;
+}

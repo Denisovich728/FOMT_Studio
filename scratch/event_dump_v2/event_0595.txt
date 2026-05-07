@@ -1,0 +1,41 @@
+#include "lib_fomt.csv"
+
+script 595 Unknown_Event_0595 {
+const MESSAGE_0 = "Here you go.\BRK";
+const MESSAGE_1 = "I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK";
+
+SetEntityFacing(0x19, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Hearth_Anim("Ann");
+Set_Name_Window("Ann");
+if (Inventory_Check()) {
+    Set_Portrait("Ann_Happy");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityAnim("Ann", "Ann_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+    PlaySong(0, 0x6A);
+    SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+    Give_Item(Func122());
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+    Make_Delay(0x3C);
+    Set_Flag("Flag_0xAC", 2);
+    Refresh_Map_Entities();
+    Add_Festival_Friendship_Bonus(0x19);
+    if ((Check_Flag("Flag_0xC9") == 2)) {
+        Add_Festival_Friendship_Bonus(0x23);
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Farm_House_1", 0x147, 0x70);
+    SetEntityPosition(0, 0x147, 0x70, 2);
+    Fade_In(2, 1);
+} else {
+    Set_Portrait("Ann_Neutral");
+    TalkMessage(1);
+    TalkClose();
+}
+Free_Event_Entity("Ann");
+SetEntityFacing(0x19, 0);
+exit;
+}

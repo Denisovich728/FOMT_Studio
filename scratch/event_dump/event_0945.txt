@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 945 Unknown_Event_0945 {
+const MESSAGE_0 = "I wonder if Elli is OK?\r\nShe seems even worse now...\BRK";
+
+SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doctor_Afraid");
+Set_Name_Window("Doctor");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x14, 2);
+Free_Event_Entity("Doctor");
+exit;
+}

@@ -1,0 +1,86 @@
+#include "lib_fomt.csv"
+
+script 667 Unknown_Event_0667 {
+const MESSAGE_0 = "I have a surprise for you. \BRK";
+const MESSAGE_1 = "Come here and show\r\ndaddy, \xFF*.\BRK";
+const MESSAGE_2 = "Goo-goo.\BRK";
+const MESSAGE_3 = "Isn't that wonderful!?\BRK";
+const MESSAGE_4 = "He started walking just this\r\nmorning! I couldn't believe\r\nmy eyes!\BRK";
+const MESSAGE_5 = "I can't wait to watch \r\nhim grow up...!\BRK";
+
+Warp_Player("Farm_House_1", 0x14C, 0x7C);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x14C, 0x7C, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x19, 0x168, 0x7C, 2);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+SetEntityPosition(0x23, 0xB4, 0x7C, 3);
+SetEntityAnim("", "Baby_Stop_Base");
+Fade_In(2, 1);
+TalkOpen();
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Happy");
+Set_Hearth_Anim("Ann");
+TalkMessage(0);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Happy");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Name_Window("");
+Set_Portrait("Baby_Happy");
+TalkMessage(2);
+TalkClose();
+SetEntityFacing(0, 2);
+Make_Delay(0x3C);
+Show_Emote("Player", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityAnim("", "Baby_Walking_Base");
+Set_Vector_X("", 0xF5, 1);
+Execute_Movement("");
+SetEntityAnim("", "Baby_Stop_Base");
+Make_Delay(0x3C);
+SetEntityFacing(0, 3);
+TalkOpen();
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Neutral");
+Set_Hearth_Anim("Ann");
+TalkMessage(3);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x3C);
+TalkOpen();
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Neutral");
+Set_Hearth_Anim("Ann");
+TalkMessage(4);
+Set_Name_Window("Ann");
+Set_Portrait("Ann_Happy");
+Set_Hearth_Anim("Ann");
+TalkMessage(5);
+TalkClose();
+Free_Event_Entity("Ann");
+Free_Event_Entity("");
+Give_Love_Points("Ann", 0xBB8);
+Give_Friendship_Points("", 0x14);
+Set_Flag("Baby_Growth_Stage", 1);
+End_Cinematic_State();
+Routine_State_Override("Ann", "Script_669");
+Routine_State_Override("", "Script_668");
+Set_Flag("Flag_0xCE", 1);
+exit;
+}

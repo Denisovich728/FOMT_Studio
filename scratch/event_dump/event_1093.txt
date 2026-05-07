@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 1093 Unknown_Event_1093 {
+const MESSAGE_0 = "I always lose at \r\nthese races! I can never \r\npick the winners, it seems.\BRK\WAIT_CLICKOh well, it's just for \r\nfun, so who cares!\BRK";
+const MESSAGE_1 = "I'm going to bet on you, \r\n\xFF!! \r\nI'm counting on you to \BRK\r\nbring me good luck. \BRK\WAIT_CLICKI never know who to bet \r\non, so I just bet on people\r\nknow. \BRK";
+
+if ((Func083(9) == 0)) {
+    Free_Event_Entity("Manna");
+}
+SetEntityFacing(9, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x188) == 0)) {
+    TalkOpen();
+    Set_Portrait("Manna_Neutral");
+    Set_Name_Window("Manna");
+    TalkMessageSlow(0);
+} else {
+    TalkOpen();
+    Set_Portrait("Manna_Happy");
+    Set_Name_Window("Manna");
+    TalkMessage(1);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Manna") == 0)) {
+    Give_Friendship_Points("Manna", 5);
+}
+Free_Event_Entity("Manna");
+SetEntityFacing(9, 3);
+exit;
+}

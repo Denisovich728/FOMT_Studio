@@ -1,0 +1,708 @@
+from typing import List, Dict, Tuple, Optional, Any
+from ..ir import *
+from ..ast import *
+
+from .error import DecompileError
+
+class DecompileToken:
+    pass
+
+class TokenExpr(DecompileToken):
+    def __init__(self, expr: Expr): self.expr = expr
+
+class TokenFunctionCall(DecompileToken):
+    def __init__(self, invoke: Invoke): self.invoke = invoke
+
+class TokenPushVar(DecompileToken):
+    def __init__(self, var_id: VarId): self.var_id = var_id
+
+class TokenPushInt(DecompileToken):
+    def __init__(self, value: IntValue): self.value = value
+
+class TokenAssignExpr(DecompileToken):
+    def __init__(self, var_id: VarId, op: AssignOperation, expr: Expr):
+        self.var_id = var_id
+        self.op = op
+        self.expr = expr
+
+class TokenStmts(DecompileToken):
+    def __init__(self, stmts: List[Stmt]): self.stmts = stmts
+
+class TokenJump(DecompileToken):
+    def __init__(self, jump_id: JumpId): self.jump_id = jump_id
+
+class TokenBeq(DecompileToken):
+    def __init__(self, jump_id: JumpId): self.jump_id = jump_id
+
+class TokenBne(DecompileToken):
+    def __init__(self, jump_id: JumpId): self.jump_id = jump_id
+
+class TokenLabel(DecompileToken):
+    def __init__(self, jump_id: JumpId): self.jump_id = jump_id
+
+class TokenCase(DecompileToken):
+    def __init__(self, switch_id: SwitchId, case_enum: CaseEnum):
+        self.switch_id = switch_id
+        self.case_enum = case_enum
+
+class TokenSwitchCases(DecompileToken):
+    def __init__(self, switch_id: SwitchId, cases: List[Tuple['SwitchCase', Optional[JumpId]]]):
+        self.switch_id = switch_id
+        self.cases = cases
+
+class DecompileState:
+    def __init__(self, instructions: List[Ins]):
+        self.input = instructions[:]
+        self.stack: List[DecompileToken] = []
+
+class InsDecompiler:
+    def __init__(self, instructions: List[Ins], known_callables: Dict[CallId, Tuple[str, CallableShape]]):
+        self.state = DecompileState(instructions)
+        self.variables: Dict[VarId, str] = {}
+        self.jump_to_idx = {
+            ins.jump_id: idx 
+            for idx, ins in enumerate((i for i in instructions if not isinstance(i, Case))) 
+            if isinstance(ins, Label)
+        }
+        # Mapa de orden secuencial de Labels: JumpId -> posición ordinal
+        self.label_order: Dict[JumpId, int] = {}
+        order = 0
+        for ins in instructions:
+            if isinstance(ins, Label):
+                self.label_order[ins.jump_id] = order
+                order += 1
+        
+        # Cuenta de referencias JMP para cada Label: JumpId -> conteo de JMPs apuntando aquí.
+        # Un Label con refcount > 1 es un punto de convergencia compartido (goto CLEANUP).
+        # Un Label con refcount == 1 es probablemente el destino de un else-JMP local.
+        self.jmp_refcount: Dict[JumpId, int] = {}
+        jmp_targets_by_id: Dict[JumpId, int] = {}
+        # Primero, mapear cada Label a su jump_id
+        label_id_set = set()
+        for ins in instructions:
+            if isinstance(ins, Label):
+                label_id_set.add(ins.jump_id)
+        # Contar JMPs (no BEQ/BNE, solo JMP incondicional) que apuntan a cada label
+        for ins in instructions:
+            if isinstance(ins, Jmp) and ins.jump_id in label_id_set:
+                self.jmp_refcount[ins.jump_id] = self.jmp_refcount.get(ins.jump_id, 0) + 1
+        
+        self.known_callables = known_callables
+
+    def remaining(self) -> int:
+        return len(self.state.input)
+
+    def at_end(self) -> bool:
+        return self.remaining() == 0
+
+    def back(self) -> List[DecompileToken]:
+        return self.state.stack
+
+    def is_expr(self, tok) -> bool:
+        return isinstance(tok, (TokenExpr, TokenAssignExpr, TokenFunctionCall, TokenPushVar, TokenPushInt))
+
+    def token_to_expr(self, tok) -> Expr:
+        if isinstance(tok, TokenExpr):
+            return tok.expr
+        if isinstance(tok, TokenAssignExpr):
+            return ExprCmpEq(ExprName(self.variable_name(tok.var_id)), tok.expr)
+        if isinstance(tok, TokenFunctionCall):
+            return ExprCall(tok.invoke)
+        if isinstance(tok, TokenPushVar):
+            return ExprName(self.variable_name(tok.var_id))
+        if isinstance(tok, TokenPushInt):
+            return ExprInt(tok.value)
+        raise DecompileError(f"Token {tok} is not an expression")
+
+    def variable_name(self, var_id: VarId) -> str:
+        if var_id not in self.variables:
+            self.variables[var_id] = f"var_{var_id.id}"
+        return self.variables[var_id]
+
+    def pop_expr(self) -> Expr:
+        if not self.state.stack:
+            return ExprInt(IntValue(0))
+        token = self.state.stack.pop()
+        if isinstance(token, TokenExpr): return token.expr
+        elif isinstance(token, TokenFunctionCall): return ExprCall(token.invoke)
+        elif isinstance(token, TokenPushVar): return ExprName(self.variable_name(token.var_id))
+        elif isinstance(token, TokenPushInt): return ExprInt(token.value)
+        
+        # Fallback
+        self.state.stack.append(token)
+        return ExprInt(IntValue(0))
+
+    def pop_assign_params(self) -> Tuple[VarId, Expr]:
+        rhs = self.pop_expr()
+        if not self.state.stack:
+             return VarId(0), rhs
+        lhs = self.state.stack.pop()
+        if isinstance(lhs, TokenPushInt):
+            return VarId(lhs.value), rhs
+        return VarId(0), rhs
+
+    def pop_binop_params(self) -> Tuple[Expr, Expr]:
+        rhs = self.pop_expr()
+        lhs = self.pop_expr()
+        return lhs, rhs
+
+    def push_stmt(self, stmt: Stmt):
+        if self.state.stack and isinstance(self.state.stack[-1], TokenStmts):
+            self.state.stack[-1].stmts.append(stmt)
+        else:
+            self.state.stack.append(TokenStmts([stmt]))
+
+    def match_at_assign(self):
+        stack = self.state.stack
+        
+        # Necesitamos al menos 1 item (la expresión) para intentar algo
+        if len(stack) < 1:
+            self.state.input.pop(0)  # consumir el Assign
+            return
+        
+        # Si el top no es una expresión, consumir el Assign y seguir
+        if not self.is_expr(stack[-1]):
+            self.state.input.pop(0)
+            return
+
+        # Buscamos el ID de la variable (TokenPushInt) saltando Stmts/Labels
+        var_idx = -2
+        found_var = False
+        while abs(var_idx) <= len(stack):
+            if isinstance(stack[var_idx], TokenPushInt):
+                found_var = True
+                break
+            elif isinstance(stack[var_idx], (TokenStmts, TokenLabel, TokenJump)):
+                var_idx -= 1
+            else:
+                break
+        
+        if found_var:
+            # Caso normal: hay un PushInt con el ID de la variable
+            input_head = self.state.input.pop(0)
+            op = AssignOperation.NONE
+            if isinstance(input_head, AssignAdd): op = AssignOperation.ADD
+            elif isinstance(input_head, AssignSub): op = AssignOperation.SUB
+            elif isinstance(input_head, AssignMul): op = AssignOperation.MUL
+            elif isinstance(input_head, AssignDiv): op = AssignOperation.DIV
+            elif isinstance(input_head, AssignMod): op = AssignOperation.MOD
+            
+            expr = self.pop_expr()
+            # Sacamos los tokens intermedios (labels, stmts) para guardarlos
+            intermediates = []
+            while not isinstance(self.state.stack[-1], TokenPushInt):
+                intermediates.append(self.state.stack.pop())
+            
+            var_token = self.state.stack.pop()
+            # Restauramos los intermedios
+            while intermediates:
+                self.state.stack.append(intermediates.pop())
+                
+            self.state.stack.append(TokenAssignExpr(VarId(var_token.value), op, expr))
+            return
+        
+        # Fallback: No hay PushInt -> la función es un proc "suelto"
+        # Convertimos la llamada a función en una sentencia standalone
+        self.state.input.pop(0)  # consumir el Assign
+        expr = self.pop_expr()
+        self.push_stmt(StmtExpr(expr))
+
+    def match_at_binop(self):
+        if len(self.back()) >= 2 and self.is_expr(self.back()[-2]) and self.is_expr(self.back()[-1]):
+            input_head = self.state.input.pop(0)
+            lhs, rhs = self.pop_binop_params()
+            
+            if isinstance(input_head, Add): expr = ExprOpAdd(lhs, rhs)
+            elif isinstance(input_head, Sub): expr = ExprOpSub(lhs, rhs)
+            elif isinstance(input_head, Mul): expr = ExprOpMul(lhs, rhs)
+            elif isinstance(input_head, Div): expr = ExprOpDiv(lhs, rhs)
+            elif isinstance(input_head, Mod): expr = ExprOpMod(lhs, rhs)
+            elif isinstance(input_head, LogicalAnd): expr = ExprOpAnd(lhs, rhs)
+            elif isinstance(input_head, LogicalOr): expr = ExprOpOr(lhs, rhs)
+            else: raise DecompileError("Invalid binop")
+            self.state.stack.append(TokenExpr(expr))
+            return
+        raise DecompileError("Could not reduce binop")
+
+    def match_at_unop(self):
+        if len(self.back()) >= 1 and self.is_expr(self.back()[-1]):
+            input_head = self.state.input.pop(0)
+            inner = self.pop_expr()
+            
+            if isinstance(input_head, Neg): expr = ExprOpNeg(inner)
+            elif isinstance(input_head, LogicalNot): expr = ExprOpNot(inner)
+            else: raise DecompileError("Invalid unop")
+            self.state.stack.append(TokenExpr(expr))
+            return
+        raise DecompileError("Could not reduce unop")
+
+    def match_at_cmp(self):
+        if len(self.back()) >= 1 and self.is_expr(self.back()[-1]):
+            if len(self.state.input) >= 7:
+                p0, p1, p2, p3, p4, p5, p6 = self.state.input[:7]
+                if isinstance(p0, Cmp) and isinstance(p1, BranchIns) and isinstance(p2, PushInt) and p2.value == 0 \
+                   and isinstance(p3, Jmp) and isinstance(p4, Label) and isinstance(p5, PushInt) and p5.value == 1 and isinstance(p6, Label):
+                    target_branch = p1.branch_target()
+                    if target_branch == p4.jump_id and p3.jump_id == p6.jump_id:
+                        self.state.input = self.state.input[7:]
+                        lhs, rhs = self.pop_binop_params()
+                        
+                        if isinstance(p1, Blt): ex = ExprCmpLt(lhs, rhs)
+                        elif isinstance(p1, Ble): ex = ExprCmpLe(lhs, rhs)
+                        elif isinstance(p1, Beq): ex = ExprCmpEq(lhs, rhs)
+                        elif isinstance(p1, Bne): ex = ExprCmpNe(lhs, rhs)
+                        elif isinstance(p1, Bge): ex = ExprCmpGe(lhs, rhs)
+                        elif isinstance(p1, Bgt): ex = ExprCmpGt(lhs, rhs)
+                        else: raise DecompileError("Invalid cmp branch")
+                        
+                        self.state.stack.append(TokenExpr(ex))
+                        return
+        raise DecompileError("Could not reduce cmp")
+
+    def match_at_dupe_inc(self):
+        if len(self.back()) >= 1 and isinstance(self.back()[-1], TokenPushVar):
+            pushed_var_id = self.back()[-1].var_id
+            if len(self.state.input) >= 3:
+                i0, i1, i2 = self.state.input[:3]
+                if isinstance(i0, Dupe) and isinstance(i1, Inc) and isinstance(i2, PopVar) and i2.var_id == pushed_var_id:
+                    self.state.input = self.state.input[3:]
+                    self.state.stack.pop()
+                    self.state.stack.append(TokenExpr(ExprPostIncrement(self.variable_name(pushed_var_id))))
+                    return
+                elif isinstance(i0, Dupe) and isinstance(i1, Dec) and isinstance(i2, PopVar) and i2.var_id == pushed_var_id:
+                    self.state.input = self.state.input[3:]
+                    self.state.stack.pop()
+                    self.state.stack.append(TokenExpr(ExprPostDecrement(self.variable_name(pushed_var_id))))
+                    return
+                elif isinstance(i0, Inc) and isinstance(i1, Dupe) and isinstance(i2, PopVar) and i2.var_id == pushed_var_id:
+                    self.state.input = self.state.input[3:]
+                    self.state.stack.pop()
+                    self.state.stack.append(TokenExpr(ExprPreIncrement(self.variable_name(pushed_var_id))))
+                    return
+                elif isinstance(i0, Dec) and isinstance(i1, Dupe) and isinstance(i2, PopVar) and i2.var_id == pushed_var_id:
+                    self.state.input = self.state.input[3:]
+                    self.state.stack.pop()
+                    self.state.stack.append(TokenExpr(ExprPreDecrement(self.variable_name(pushed_var_id))))
+                    return
+        raise DecompileError("Could not reduce dupe inc")
+
+    def match_at_discard(self):
+        if len(self.back()) >= 1:
+            tok = self.back()[-1]
+            if isinstance(tok, TokenFunctionCall):
+                self.state.input.pop(0)
+                invoke = self.state.stack.pop().invoke
+                self.push_stmt(StmtCall(invoke))
+                return
+            elif self.is_expr(tok):
+                self.state.input.pop(0)
+                expr = self.pop_expr()
+                self.push_stmt(StmtExpr(expr))
+                return
+            elif isinstance(tok, TokenAssignExpr):
+                self.state.input.pop(0)
+                asg = self.state.stack.pop()
+                self.push_stmt(StmtAssign(asg.op, self.variable_name(asg.var_id), asg.expr))
+                return
+        raise DecompileError("Could not reduce discard")
+
+    def _collect_body_stmts(self, tokens: list) -> List[Stmt]:
+        """Convierte una lista de tokens intermedios en sentencias para el cuerpo de un if.
+        
+        Reconoce patrones de if no reducidos: [Expr] [Beq] [Stmts] -> StmtIf
+        """
+        body = []
+        i = 0
+        while i < len(tokens):
+            tok = tokens[i]
+            
+            # Patrón: [Expr] [Beq(X)] [Stmts] -> StmtIf(expr, stmts)
+            # Esto ocurre cuando un else-if interno no fue reducido por match_at_label
+            if self.is_expr(tok) and i + 2 < len(tokens):
+                next_tok = tokens[i + 1]
+                body_tok = tokens[i + 2]
+                if isinstance(next_tok, TokenBeq) and isinstance(body_tok, TokenStmts):
+                    cond = self.token_to_expr(tok)
+                    body.append(StmtIf(cond, body_tok.stmts))
+                    i += 3
+                    continue
+                elif isinstance(next_tok, TokenBeq):
+                    # Beq sin body (if vacío)
+                    cond = self.token_to_expr(tok)
+                    body.append(StmtIf(cond, []))
+                    i += 2
+                    continue
+            
+            if isinstance(tok, TokenStmts):
+                body.extend(tok.stmts)
+            elif isinstance(tok, TokenLabel):
+                pass  # Labels internos ya consumidos
+            elif isinstance(tok, TokenBeq):
+                pass  # Beqs huérfanos
+            elif isinstance(tok, TokenJump):
+                pass  # Jumps internos
+            elif isinstance(tok, TokenAssignExpr):
+                body.append(StmtAssign(tok.op, self.variable_name(tok.var_id), tok.expr))
+            elif self.is_expr(tok):
+                # Evitar añadir constantes simples como sentencias (como el "0;")
+                if not isinstance(tok, (TokenPushInt, TokenPushVar)):
+                    body.append(StmtExpr(self.token_to_expr(tok)))
+            elif isinstance(tok, TokenFunctionCall):
+                body.append(StmtCall(tok.invoke))
+            i += 1
+        return body
+
+    def match_at_label(self, label_jump_id: JumpId):
+        stack = self.back()
+        
+        # ── Patrón 1: if simple ──
+        # [Expr] [Beq(L)] [Stmts] ... Label(L)
+        if len(stack) >= 3 and getattr(stack[-2], 'jump_id', None) == label_jump_id and isinstance(stack[-2], TokenBeq) and isinstance(stack[-1], TokenStmts) and self.is_expr(stack[-3]):
+            self.state.input.pop(0)
+            stmts = self.state.stack.pop().stmts
+            self.state.stack.pop() # beq
+            cond = self.pop_expr()
+            self.push_stmt(StmtIf(cond, stmts))
+            return
+            
+        # ── Patrón 2: if vacío ──
+        # [Expr] [Beq(L)] ... Label(L)
+        if len(stack) >= 2 and getattr(stack[-1], 'jump_id', None) == label_jump_id and isinstance(stack[-1], TokenBeq) and self.is_expr(stack[-2]):
+            self.state.input.pop(0)
+            self.state.stack.pop()
+            cond = self.pop_expr()
+            self.push_stmt(StmtIf(cond, []))
+            return
+
+        # ── Patrón 3: if/else completo ──
+        # [Expr] [Beq(K)] [Stmts] [Jmp(L)] [Label(K)] [Stmts] ... Label(L)
+        if len(stack) >= 6 and isinstance(stack[-1], TokenStmts) and isinstance(stack[-2], TokenLabel) and isinstance(stack[-3], TokenJump) and isinstance(stack[-4], TokenStmts) and getattr(stack[-5], 'jump_id', None) == getattr(stack[-2], 'jump_id', None) and isinstance(stack[-5], TokenBeq) and self.is_expr(stack[-6]):
+            if stack[-3].jump_id == label_jump_id:
+                self.state.input.pop(0)
+                else_stmts = self.state.stack.pop().stmts
+                self.state.stack.pop() # label k
+                self.state.stack.pop() # jmp l
+                true_stmts = self.state.stack.pop().stmts
+                self.state.stack.pop() # beq
+                cond = self.pop_expr()
+                self.push_stmt(StmtIfElse(cond, true_stmts, else_stmts))
+                return
+
+        # ── Patrón 4: if con JMP en el body (busca Beq enterrado) ──
+        # [Expr] [Beq(L)] [body...] [posible Jmp(X)] ... Label(L)
+        # Cuando Label(L) llega y el Beq(L) está enterrado en la pila
+        # porque hay tokens intermedios (body + posible JMP al final).
+        #
+        # Regla clave para distinguir if/else vs goto:
+        # - Si el JMP apunta a un Label cuyo label_order es ADYACENTE (label_order del JMP target 
+        #   == label_order de L + 1), es un if/else real.
+        # - Si el JMP apunta MUCHO MÁS LEJOS (shared jump target / goto CLEANUP), 
+        #   es un bloque if independiente con un goto al final de su body.
+        if len(stack) >= 3:
+            beq_idx = None
+            for i in range(len(stack) - 1, -1, -1):
+                if isinstance(stack[i], TokenBeq) and stack[i].jump_id == label_jump_id:
+                    beq_idx = i
+                    break
+                if isinstance(stack[i], (TokenBeq, TokenBne)) and stack[i].jump_id != label_jump_id:
+                    break
+            
+            if beq_idx is not None and beq_idx > 0 and self.is_expr(stack[beq_idx - 1]):
+                body_tokens = stack[beq_idx + 1:]
+                
+                # Verificar si el último token del body es un Jump
+                jmp_end_id = None
+                is_local_else_jmp = False
+                if body_tokens and isinstance(body_tokens[-1], TokenJump):
+                    jmp_end_id = body_tokens[-1].jump_id
+                    
+                    # ¿Es un JMP local (if/else) o un JMP lejano (goto CLEANUP)?
+                    # Regla: Un Label que es destino de MUCHOS JMPs (refcount > 1) es un 
+                    # punto de convergencia compartido (goto). El JMP dentro del if-body
+                    # es entonces un "goto" y debe quedarse como parte del body del if.
+                    # Un Label con refcount == 1 es destino de UN solo JMP, lo que indica
+                    # que es el end-label de un if/else local.
+                    refcount = self.jmp_refcount.get(jmp_end_id, 0)
+                    
+                    # Adicionalmente, verificamos que el salto sea hacia adelante y "cerca"
+                    beq_label_order = self.label_order.get(label_jump_id, -1)
+                    jmp_label_order = self.label_order.get(jmp_end_id, -1)
+                    
+                    # Es un else legítimo si refcount == 1 Y el salto es hacia adelante
+                    is_local_else_jmp = (refcount == 1 and jmp_label_order > beq_label_order)
+                    
+                    if is_local_else_jmp:
+                        # Es parte de un if/else real
+                        body_tokens = body_tokens[:-1]
+                    else:
+                        # El JMP es un goto dentro del body del if
+                        jmp_end_id = None
+                
+                body_stmts = self._collect_body_stmts(body_tokens)
+                cond_expr = self.token_to_expr(stack[beq_idx - 1])
+                del self.state.stack[beq_idx - 1:]
+                
+                if is_local_else_jmp and jmp_end_id is not None:
+                    # if/else-if real: guardamos como StmtIf temporal + marcadores
+                    # para reducir cuando Label(END) llegue
+                    self.push_stmt(StmtIf(cond_expr, body_stmts))
+                    self.state.stack.append(TokenJump(jmp_end_id))
+                    self.state.stack.append(TokenLabel(label_jump_id))
+                    self.state.input.pop(0)
+                    return
+                else:
+                    # if simple (posiblemente con goto en el body)
+                    self.push_stmt(StmtIf(cond_expr, body_stmts))
+                    self.state.input.pop(0)
+                    return
+        
+        raise DecompileError("Could not reduce at label")
+
+    def match_at_backward_branch(self, jump_id: JumpId, is_bne: bool):
+        stack = self.back()
+        
+        # We need a condition expression at the top of the stack
+        if len(stack) < 2 or not self.is_expr(stack[-1]):
+            raise DecompileError("Backward branch without condition")
+            
+        # Scan backward to find TokenLabel(jump_id)
+        label_idx = -1
+        for i in range(len(stack) - 2, -1, -1):
+            if isinstance(stack[i], TokenLabel) and stack[i].jump_id == jump_id:
+                label_idx = i
+                break
+                
+        if label_idx == -1:
+            raise DecompileError("No matching backward label found")
+            
+        # Found backward label. Collect statements between label and condition
+        block_stmts = []
+        for i in range(label_idx + 1, len(stack) - 1):
+            tok = stack[i]
+            if isinstance(tok, TokenStmts):
+                block_stmts.extend(tok.stmts)
+            elif isinstance(tok, TokenLabel):
+                pass # ignore internal labels
+            else:
+                # Unreduced token, try to convert to statement
+                if self.is_expr(tok):
+                    block_stmts.append(StmtExpr(self.token_to_expr(tok)))
+                else:
+                    raise DecompileError(f"Unexpected token in backward loop body: {tok}")
+                    
+        cond_expr = self.pop_expr()
+        if not is_bne:
+            # If it's Beq (Branch if Equal to Zero), the loop continues when condition is FALSE.
+            # So the do-while condition is the negated expression.
+            cond_expr = ExprOpNot(cond_expr)
+            
+        stmt_loop = StmtDoWhile(cond_expr, block_stmts)
+        
+        # Clean stack from label onwards
+        del self.state.stack[label_idx:]
+        self.push_stmt(stmt_loop)
+        self.state.input.pop(0) # consume Beq/Bne
+
+    def match_at_switch(self, switch_id: SwitchId):
+        stack = self.back()
+        
+        if not isinstance(stack[-1], TokenLabel):
+            raise DecompileError("Switch must be preceded by a Label")
+            
+        switch_label_id = stack[-1].jump_id
+        
+        cases = []
+        idx = len(stack) - 2
+        
+        while idx >= 0:
+            token = stack[idx]
+            
+            if isinstance(token, TokenJump) and token.jump_id == switch_label_id:
+                break
+                
+            block_stmts = []
+            
+            while idx >= 0:
+                tok = stack[idx]
+                if isinstance(tok, TokenCase) and tok.switch_id == switch_id:
+                    break
+                if isinstance(tok, TokenJump) and tok.jump_id == switch_label_id:
+                    break
+                    
+                if isinstance(tok, TokenStmts):
+                    block_stmts = tok.stmts + block_stmts
+                elif isinstance(tok, TokenJump):
+                    if not block_stmts or not isinstance(block_stmts[0], StmtBreak):
+                        block_stmts.insert(0, StmtBreak())
+                elif isinstance(tok, TokenLabel):
+                    pass # Ignore internal dead labels
+                else:
+                    if self.is_expr(tok):
+                        block_stmts.insert(0, StmtExpr(self.token_to_expr(tok)))
+                idx -= 1
+                
+            if idx < 0:
+                break
+                
+            if isinstance(stack[idx], TokenJump) and stack[idx].jump_id == switch_label_id:
+                break
+
+            case_exprs = []
+            is_default = False
+            
+            while idx >= 0 and isinstance(stack[idx], TokenCase) and stack[idx].switch_id == switch_id:
+                c = stack[idx]
+                if isinstance(c.case_enum, CaseDefault):
+                    is_default = True
+                elif isinstance(c.case_enum, CaseVal):
+                    case_exprs.append(ExprInt(c.case_enum.val))
+                idx -= 1
+                
+            case_exprs.reverse()
+            if is_default:
+                cases.insert(0, SwitchCaseDefault(block_stmts))
+            else:
+                cases.insert(0, SwitchCaseCase(case_exprs, block_stmts))
+                
+        else:
+            raise DecompileError("Could not find Switch entry Jump")
+            
+        cond_idx = idx - 1
+        cond_expr = None
+        delete_from = cond_idx + 1
+        
+        if cond_idx >= 0:
+            if self.is_expr(stack[cond_idx]):
+                cond_expr = self.token_to_expr(stack[cond_idx])
+                delete_from = cond_idx
+            elif isinstance(stack[cond_idx], TokenStmts) and len(stack[cond_idx].stmts) > 0:
+                last_stmt = stack[cond_idx].stmts[-1]
+                if isinstance(last_stmt, StmtCall):
+                    cond_expr = ExprCall(last_stmt.invoke)
+                    stack[cond_idx].stmts.pop()
+                    if not stack[cond_idx].stmts:
+                        delete_from = cond_idx
+        
+        if cond_expr is None:
+            # Fallback if no valid condition is found
+            cond_expr = ExprInt(-1)
+            
+        stmt_switch = StmtSwitch(cond_expr, cases, switch_id)
+        
+        self.state.input.pop(0)
+        del self.state.stack[delete_from:]
+        self.push_stmt(stmt_switch)
+
+    def advance(self):
+        ins = self.state.input[0]
+        
+        # Single if/elif chain to prevent double-popping and ensure every instruction is handled once
+        try:
+            if isinstance(ins, (Assign, AssignAdd, AssignSub, AssignMul, AssignDiv, AssignMod)):
+                self.match_at_assign()
+            elif isinstance(ins, (Add, Sub, Mul, Div, Mod, LogicalAnd, LogicalOr)):
+                self.match_at_binop()
+            elif isinstance(ins, (Neg, LogicalNot)):
+                self.match_at_unop()
+            elif isinstance(ins, Cmp):
+                self.match_at_cmp()
+            elif isinstance(ins, (Dupe, Inc, Dec)):
+                self.match_at_dupe_inc()
+            elif isinstance(ins, PushVar):
+                self.state.stack.append(TokenPushVar(ins.var_id))
+                self.state.input.pop(0)
+            elif isinstance(ins, PushInt):
+                self.state.stack.append(TokenPushInt(ins.value))
+                self.state.input.pop(0)
+            elif isinstance(ins, PopVar):
+                if len(self.back()) >= 1 and self.is_expr(self.back()[-1]):
+                    expr = self.pop_expr()
+                    self.push_stmt(StmtAssign(AssignOperation.NONE, self.variable_name(ins.var_id.id), expr))
+                    self.state.input.pop(0)
+                else:
+                    raise DecompileError(f"Could not reduce PopVar. Stack tail: {[str(t) for t in self.back()[-3:]]}")
+            elif isinstance(ins, Discard):
+                self.match_at_discard()
+            elif isinstance(ins, Jmp):
+                self.state.stack.append(TokenJump(ins.jump_id))
+                self.state.input.pop(0)
+            elif isinstance(ins, Beq):
+                try:
+                    self.match_at_backward_branch(ins.jump_id, is_bne=False)
+                except DecompileError:
+                    self.state.stack.append(TokenBeq(ins.jump_id))
+                    self.state.input.pop(0)
+            elif isinstance(ins, Bne):
+                try:
+                    self.match_at_backward_branch(ins.jump_id, is_bne=True)
+                except DecompileError:
+                    self.state.stack.append(TokenBne(ins.jump_id))
+                    self.state.input.pop(0)
+            elif isinstance(ins, Call):
+                name, shape = self.known_callables.get(ins.call_id, (f"OpcodeUnknw_{ins.call_id.id:03X}", CallableShape.new_proc([])))
+                args = []
+                for _ in range(shape.num_parameters()):
+                    args.append(self.pop_expr())
+                args.reverse()
+                invoke = Invoke(name, args)
+                self.state.input.pop(0)
+                if shape.is_func():
+                    self.state.stack.append(TokenFunctionCall(invoke))
+                else:
+                    self.push_stmt(StmtCall(invoke))
+            elif isinstance(ins, Switch):
+                self.match_at_switch(ins.switch_id)
+            elif isinstance(ins, Case):
+                self.state.stack.append(TokenCase(ins.switch_id, ins.case_enum))
+                self.state.input.pop(0)
+            elif isinstance(ins, Exit):
+                self.push_stmt(StmtExit())
+                self.state.input.pop(0)
+            elif isinstance(ins, Label):
+                try:
+                    self.match_at_label(ins.jump_id)
+                except DecompileError:
+                    self.state.stack.append(TokenLabel(ins.jump_id))
+                    self.state.input.pop(0)
+            else:
+                # Catch-all for unknown opcodes
+                self.state.input.pop(0)
+        except DecompileError as e:
+            import traceback; traceback.print_exc()
+            print(f"Advance failed: {e}")
+            # If a reduction fails, we must at least consume the instruction to avoid infinite loops
+            self.state.input.pop(0)
+
+def decompile_instructions(instructions: List[Ins], known_callables: Dict[CallId, Tuple[str, CallableShape]]) -> List[Stmt]:
+    decompiler = InsDecompiler(instructions, known_callables)
+    while not decompiler.at_end():
+        decompiler.advance()
+        
+    stmts = []
+    # FIX: Collect ALL tokens from the stack, not just the first one.
+    for token in decompiler.state.stack:
+        if isinstance(token, TokenStmts):
+            stmts.extend(token.stmts)
+        elif isinstance(token, TokenExpr):
+            stmts.append(StmtExpr(token.expr))
+        elif isinstance(token, TokenFunctionCall):
+            stmts.append(StmtCall(token.invoke))
+        elif isinstance(token, TokenAssignExpr):
+            stmts.append(StmtAssign(token.op, decompiler.variable_name(token.var_id), token.expr))
+        elif isinstance(token, TokenPushVar):
+            stmts.append(StmtExpr(ExprName(decompiler.variable_name(token.var_id))))
+        elif isinstance(token, TokenPushInt):
+            stmts.append(StmtExpr(ExprInt(token.value)))
+    
+    # Prepend variable declarations
+    if decompiler.variables:
+        var_decls = []
+        max_id = max(vid.id for vid in decompiler.variables.keys())
+        for i in range(max_id + 1):
+            vid = VarId(i)
+            if vid in decompiler.variables:
+                var_decls.append((decompiler.variables[vid], None))
+        if var_decls:
+            stmts.insert(0, StmtVars(var_decls))
+            
+    return stmts

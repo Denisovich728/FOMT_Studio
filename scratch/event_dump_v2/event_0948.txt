@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 948 Unknown_Event_0948 {
+const MESSAGE_0 = "I'm so grateful to Elli \r\nand the Doctor. \BRK";
+
+SetEntityFacing(0xF, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Ellen_Happy");
+Set_Name_Window("Ellen");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0xF, 0);
+Free_Event_Entity("Ellen");
+exit;
+}

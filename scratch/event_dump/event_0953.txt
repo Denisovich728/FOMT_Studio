@@ -1,0 +1,112 @@
+#include "lib_fomt.csv"
+
+script 953 Unknown_Event_0953 {
+const MESSAGE_0 = "Doctor, is there some reason\r\nyou asked for me? \BRK";
+const MESSAGE_1 = "Ahem...Um...Let's see...\BRK";
+const MESSAGE_2 = "Doctor...?\BRK";
+const MESSAGE_3 = "I've never done this \r\nbefore, you see...\BRK";
+const MESSAGE_4 = "Done what...?\BRK";
+const MESSAGE_5 = "...How is your grandmother?\BRK";
+const MESSAGE_6 = "I'm trying to massage her\r\nlegs everyday. That makes\r\nit a little better...\BRK\WAIT_CLICKI still hope to heal her\r\ncompletely, though!\BRK";
+const MESSAGE_7 = "Elli, you are so strong...\r\nI think that's why I \r\nfell in love with you...\BRK";
+const MESSAGE_8 = "...Wh-what did you just say?\BRK";
+const MESSAGE_9 = "Elli. I want you to stay \r\nwith me always. I couldn't \r\ndo anything without you. \BRK";
+const MESSAGE_10 = "You...you really mean it? \BRK";
+const MESSAGE_11 = "Yes. I want you by my \r\nside... always. \BRK";
+
+Warp_Player("Mineral_Beach", 0xF0, 0x14E);
+PlayBGM(1, 0x10);
+SetEntityPosition(0, 0x18, 0x118, 3);
+if (Inventory_Check()) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x15, 0xF0, 0x15C, 3);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x14, 0xF0, 0x138, 3);
+SetEntityAnim("Doctor", 0x320);
+if ((GetEntityLocation("Karen") == "Mineral_Beach")) {
+    Hide_Entity("Karen");
+}
+if ((GetEntityLocation("Kai") == "Mineral_Beach")) {
+    Hide_Entity("Kai");
+}
+Fade_In(2, 1);
+SetEntityFacing(0x15, 1);
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x14, 0);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Surprised");
+Set_Name_Window("Doctor");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+TalkMessage(4);
+TalkClose();
+Show_Emote("Elli", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(5);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+TalkMessage(6);
+TalkClose();
+Show_Emote("Doctor", "Thinking", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(7);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Ruborized");
+Set_Name_Window("Elli");
+TalkMessage(8);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(9);
+TalkClose();
+Show_Emote("Elli", "Hearth", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellie_Ruborized");
+Set_Name_Window("Elli");
+TalkMessage(10);
+TalkClose();
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(11);
+TalkClose();
+Pan_Camera_To(0x18, 0x118, 2);
+Wait_Camera_Stop();
+End_Cinematic_State();
+Routine_State_Override("Doctor", "Script_954");
+Routine_State_Override("Elli", "Script_955");
+Set_Flag(0x95, 1);
+exit;
+exit;
+}

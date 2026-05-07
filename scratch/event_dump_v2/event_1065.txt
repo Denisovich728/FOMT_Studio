@@ -1,0 +1,51 @@
+#include "lib_fomt.csv"
+
+script 1065 Unknown_Event_1065 {
+PlayBGM(1, 7);
+if ((GetEntityLocation(0x4A) == "Rose_Square")) {
+    SetEntityPosition(0x4A, (0x1A0 + 0x10), 0x85, 0);
+}
+if ((GetEntityLocation(0x4B) == "Rose_Square")) {
+    SetEntityPosition(0x4B, (0x1A0 + 0x20), 0x85, 0);
+}
+SetEntityPosition(0xD, 0xDC, 0x80, 0);
+SetEntityAnim("Huachito", "Thomas_Stop_Base");
+SetEntityPosition(0x19, 0x9C, 0x168, 3);
+SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+SetEntityPosition(6, 0xFC, 0x58, 0);
+SetEntityAnim("Saibara", "Saibara_Stop_Base");
+SetEntityPosition(0x15, 0x50, 0x188, 1);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(5, 0x140, 0x170, 0);
+SetEntityAnim("May", "May_Stop_Base");
+SetEntityPosition(0x10, 0x130, 0x180, 3);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0x18, 0xA4, 0x148, 0);
+SetEntityAnim("Doug", "Baby_Horse_Deep_Sleep_Base");
+SetEntityPosition(8, 0x50, 0xB8, 0);
+SetEntityAnim("Duke", "Duke_Stop_Base");
+SetEntityPosition(9, 0x70, 0xC0, 2);
+SetEntityAnim("Manna", "Manna_Stop_Base");
+SetEntityPosition(0x1B, 0x178, 0xF8, 2);
+SetEntityAnim("Gotz", "Gotz_Stop_Base");
+SetEntityPosition(0x1C, 0x178, 0x168, 2);
+SetEntityAnim("Zack", "Zack_Stop_Base");
+SetEntityPosition(0x16, 0x174, 0x68, 0);
+SetEntityAnim("Carter", "Carter_Stop_Base");
+End_Cinematic_State();
+Fade_In(2, 1);
+Set_Flag("Event_NewYears_Day_Active", 1);
+Routine_State_Override("Huachito", "Script_1070");
+Routine_State_Override("Ann", "Script_1069");
+Routine_State_Override("Saibara", "Script_1076");
+Routine_State_Override("Elli", "Script_1071");
+Routine_State_Override("May", "Script_1078");
+Routine_State_Override("Stu", "Script_1072");
+Routine_State_Override("Doug", "Script_1068");
+Routine_State_Override("Duke", "Script_1073");
+Routine_State_Override("Manna", "Script_1074");
+Routine_State_Override("Gotz", "Script_1077");
+Routine_State_Override("Zack", "Script_1067");
+Routine_State_Override("Carter", "Script_1075");
+exit;
+}

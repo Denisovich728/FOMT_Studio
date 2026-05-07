@@ -128,6 +128,8 @@ TRANSLATIONS = {
         "btn_debug_mode": "Modo Debug",
         "msg_close_project": "Se cerrará el proyecto actual. Cualquier cambio no guardado se perderá.\n\n¿Deseas continuar?",
         "title_close_project": "Cambiar Proyecto",
+        "title_detection": "Detección de Juego",
+        "msg_fomt_detected": "Detecto que tu juego es {game}. ¿Quieres cargar la lista predeterminada de nombres de eventos?",
     },
     "en": {
         "menu_file": "File",
@@ -257,6 +259,8 @@ TRANSLATIONS = {
         "btn_debug_mode": "Debug Mode",
         "msg_close_project": "Current project will be closed. Any unsaved changes will be lost.\n\nDo you want to continue?",
         "title_close_project": "Change Project",
+        "title_detection": "Game Detection",
+        "msg_fomt_detected": "I detected your game is {game}. Do you want to load the default event name list?",
     },
     "jp": {
         "menu_file": "ファイル",

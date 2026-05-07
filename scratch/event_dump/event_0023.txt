@@ -1,0 +1,29 @@
+#include "lib_fomt.csv"
+
+script 23 Unknown_Event_0023 {
+const MESSAGE_0 = "Hmm...\r\nI think the Seeds I chose \r\nwere better.\BRK";
+const MESSAGE_1 = "You chose the same Seeds \r\nas me. Good choice. \BRK";
+
+if ((Check_Flag(0x47) == 1)) {
+}
+if ((Check_Flag(0x48) == 0)) {
+    SetEntityFacing(0x12, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Sasha_Afraid");
+    Set_Name_Window("Sasha");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x12, 3);
+    Free_Event_Entity("Sasha");
+} else {
+    SetEntityFacing(0x12, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Sasha_Happy");
+    Set_Name_Window("Sasha");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0x12, 3);
+    Free_Event_Entity("Sasha");
+}
+exit;
+}

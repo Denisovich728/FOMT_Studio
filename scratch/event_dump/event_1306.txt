@@ -1,0 +1,331 @@
+#include "lib_fomt.csv"
+
+script 1306 Unknown_Event_1306 {
+const MESSAGE_0 = "Today is the Starry Night \r\nFestival. It took a lot of \r\neffort to make all this\BRK\r\nfood, so eat up!\BRK";
+const MESSAGE_1 = "Today is the Starry Night\r\nFestival. I made some \r\ndelicious food, so \BRK\r\nlet's eat together!\BRK";
+const MESSAGE_2 = "Look at this feast! \r\nLet's start our \r\nStarry Night Festival.\BRK";
+const MESSAGE_3 = "Today my mom made some cake\r\nfor the Starry Night \r\nFestival. \BRK\r\nTell me what you think of\r\neverything!\BRK";
+const MESSAGE_4 = "Why do you look so \r\nsurprised? Even I can make\r\nsomething good for the \BRK\r\nStarry Night Festival. \BRK\WAIT_CLICKLet's eat!\BRK";
+const MESSAGE_5 = "I made a delicious feast for\r\nthe Starry Night Festival.\BRK\WAIT_CLICKLet's eat it together, \r\nalright?\BRK";
+const MESSAGE_6 = "It took all day to make this\r\nfeast for the Starry \r\nNight Festival. \BRK\WAIT_CLICKLet's us 3 eat up!\BRK";
+const MESSAGE_7 = "It took all day to make this\r\ndinner for the Starry \r\nNight Festival. \BRK\WAIT_CLICKLet's us 3 eat up!\BRK";
+const MESSAGE_8 = "It took all day to make this\r\nfeast for the Starry \r\nNight Festival. \BRK\WAIT_CLICKLet's us 3 enjoy it!\BRK";
+const MESSAGE_9 = "Goo-goo!\BRK";
+const MESSAGE_10 = "Let's go to the mountaintop!\r\nWe shouldn't spend the \r\nwhole Starry Night \BRK\r\nFestival indoors!\BRK";
+const MESSAGE_11 = "They say this is when the\r\nstars are the prettiest.\r\nLet's go look, OK?\BRK";
+const MESSAGE_12 = "You're already tired?\r\nCan't you at least \r\nclimb the mountain?\BRK";
+const MESSAGE_13 = "The stars should be \r\nout by now. Let's go\r\nto the mountaintop.\BRK";
+const MESSAGE_14 = "This is perfect star-viewing\r\nweather, isn't it?\BRK\WAIT_CLICKLet's go look later. \BRK";
+const MESSAGE_15 = "Want to go to the \r\nmountaintop to look at the \r\nbest stars of the year \BRK\r\nwith me? \BRK";
+const MESSAGE_16 = "I never get tired \r\nof looking at the stars\r\nfrom here. \BRK\WAIT_CLICKThey're so beautiful...\BRK";
+const MESSAGE_17 = "No matter how many times I\r\nsee them, they change. \BRK\WAIT_CLICKPeople don't think so, but\r\nthe mountain and stars are\r\nalive too, you know!\BRK";
+const MESSAGE_18 = "When I see a whole sky \r\nfull of stars like this,\r\nit fills me with wonder.\BRK";
+const MESSAGE_19 = "I wonder if there is \r\nsomeone out there looking\r\nat our star and thinking\BRK\r\nthe same thing...?\BRK";
+const MESSAGE_20 = "Look! A falling star..!!\BRK\r\nDid you see it?\BRK";
+const MESSAGE_21 = "Oh darn, I forgot \r\nto make a wish!\BRK";
+const MESSAGE_22 = "These stars we're looking at\r\nnow may not even \r\nexist any more...\BRK";
+const MESSAGE_23 = "But even though they may be\r\ngone, their light still \r\nreaches us...\BRK";
+const MESSAGE_24 = "Look at all the stars...\BRK\r\nWhen my parents died, my\r\ngrandmother could still \r\nwalk, so she took me \BRK\r\nup here one night...\BRK";
+const MESSAGE_25 = "She told me I could come up\r\nhere whenever I wanted and\r\nbe with my parents again.\BRK";
+const MESSAGE_26 = "It seems like I'm always \r\nstaring down at the ground.\BRK\WAIT_CLICKIt feels good to stare up \r\nat the sky once in a while!\BRK";
+const MESSAGE_27 = "I'd love to stay up here\r\nwith you forever, \r\n\xFF!.\BRK\WAIT_CLICKBut, the job of a Harvest\r\nGoddess never ends.\BRK\WAIT_CLICKI need a vacation! \BRK";
+const MESSAGE_28 = "That was fun! \r\nI know I'll sleep well\r\ntonight...\BRK";
+
+Warp_Player("Farm_House_1", 0x120, 0x98);
+PlayBGM(1, 7);
+Spawn_Item_On_Grid(0, 0x120, 0x70, 1, Get_Item_Sprite_ID(0x8F));
+Spawn_Item_On_Grid(1, 0x130, 0x70, 1, Get_Item_Sprite_ID("Ann's Music Box"));
+SetEntityPosition(0, 0x130, 0xD0, 1);
+if ((Check_Flag(0x4C) == 2)) {
+    SetEntityPosition(0x13, 0x120, 0x64, 0);
+    SetEntityAnim("Karen", "Karen_Stop_Base");
+}
+if ((Check_Flag(0x55) == 2)) {
+    SetEntityPosition(3, 0x120, 0x64, 0);
+    SetEntityAnim("Popuri", "Popuri_Stop_Base");
+}
+if ((Check_Flag(0x5F) == 2)) {
+    SetEntityPosition(0x19, 0x120, 0x64, 0);
+    SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+}
+if ((Check_Flag(0x67) == 2)) {
+    SetEntityPosition(0xC, 0x120, 0x64, 0);
+    SetEntityAnim("Mary", 0x813);
+}
+if ((Check_Flag(0x6F) == 2)) {
+    SetEntityPosition(0x15, 0x120, 0x64, 0);
+    SetEntityAnim("Elli", "Elli_Stop_Base");
+}
+if ((Check_Flag(0x173) == 2)) {
+    SetEntityPosition(0x1F, 0x120, 0x64, 0);
+    SetEntityAnim("H. Goddess", "H.Goodes_Stop_Base");
+}
+if ((Check_Flag(0x2F) == 1)) {
+    SetEntityPosition(0x23, 0x130, 0x60, 0);
+    SetEntityAnim("", "Baby_Stop_Base");
+}
+Fade_In(2, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x98, 1);
+Execute_Movement("Player");
+SetEntityFacing(0, 2);
+Set_Vector_X("Player", 0x120, 1);
+Execute_Movement("Player");
+SetEntityFacing(0, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+if ((Check_Flag(0x2F) == 0)) {
+    if ((Check_Flag(0x4C) == 2)) {
+        Set_Name_Window("Karen");
+        Set_Portrait("Karen_Happy");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(0);
+    }
+    if ((Check_Flag(0x55) == 2)) {
+        Set_Name_Window("Popuri");
+        Set_Portrait("Popuri_Happy");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(1);
+    }
+    if ((Check_Flag(0x5F) == 2)) {
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Happy");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(2);
+    }
+    if ((Check_Flag(0x67) == 2)) {
+        Set_Name_Window("Mary");
+        Set_Portrait("Mary_Happy");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(3);
+    }
+    if ((Check_Flag(0x6F) == 2)) {
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Happy");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(4);
+    }
+    if ((Check_Flag(0x173) == 2)) {
+        Set_Name_Window("H. Goddess");
+        Set_Portrait("H_Goddes_Happy");
+        Set_Hearth_Anim("H. Goddess");
+        TalkMessage(5);
+    }
+    TalkClose();
+    SetEntityAnim("Player", "Player_See_Base");
+    Make_Delay(0x1E);
+} else {
+    if ((Check_Flag(0x4C) == 2)) {
+        Set_Name_Window("Karen");
+        Set_Portrait("Karen_Happy");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(6);
+    }
+    if ((Check_Flag(0x55) == 2)) {
+        Set_Name_Window("Popuri");
+        Set_Portrait("Popuri_Happy");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(7);
+    }
+    if ((Check_Flag(0x5F) == 2)) {
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Happy");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(8);
+    }
+    if ((Check_Flag(0x67) == 2)) {
+        Set_Name_Window("Mary");
+        Set_Portrait("Mary_Happy");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(3);
+    }
+    if ((Check_Flag(0x6F) == 2)) {
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Happy");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(4);
+    }
+    if ((Check_Flag(0x173) == 2)) {
+        Set_Name_Window("H. Goddess");
+        Set_Portrait("H_Goddes_Happy");
+        Set_Hearth_Anim("H. Goddess");
+        TalkMessage(5);
+    }
+    TalkClose();
+    TalkOpen();
+    Set_Name_Window("");
+    Set_Portrait("Baby_Happy");
+    TalkMessage(9);
+    TalkClose();
+    Fade_Out(2, 1);
+    Fade_In(2, 1);
+    TalkOpen();
+    if ((Check_Flag(0x4C) == 2)) {
+        Set_Name_Window("Karen");
+        Set_Portrait("Karen_Happy");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(10);
+    }
+    if ((Check_Flag(0x55) == 2)) {
+        Set_Name_Window("Popuri");
+        Set_Portrait("Popuri_Happy");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(11);
+    }
+    if ((Check_Flag(0x5F) == 2)) {
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Happy");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(12);
+    }
+    if ((Check_Flag(0x67) == 2)) {
+        Set_Name_Window("Mary");
+        Set_Portrait("Mary_Happy");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(13);
+    }
+    if ((Check_Flag(0x6F) == 2)) {
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Happy");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(14);
+    }
+    if ((Check_Flag(0x173) == 2)) {
+        Set_Name_Window("H. Goddess");
+        Set_Portrait("H_Goddes_Happy");
+        Set_Hearth_Anim("H. Goddess");
+        TalkMessage(15);
+    }
+    TalkClose();
+    SetEntityAnim("Player", "Player_See_Base");
+    Make_Delay(0x1E);
+    FadeOutBGM();
+    Fade_Out(2, 1);
+    Set_Time(0x15, 0);
+    PlayBGM(1, 0xE);
+    Warp_Player("Mothers_Hill_Top", 0xE0, 0x100);
+    SetEntityPosition(0, 0xE0, 0x100, 3);
+    if ((Check_Flag(0x4C) == 2)) {
+        SetEntityPosition(0x13, 0xF0, 0x100, 2);
+        SetEntityAnim("Karen", "Karen_Stop_Base");
+    }
+    if ((Check_Flag(0x55) == 2)) {
+        SetEntityPosition(3, 0xF0, 0x100, 2);
+        SetEntityAnim("Popuri", "Popuri_Stop_Base");
+    }
+    if ((Check_Flag(0x5F) == 2)) {
+        SetEntityPosition(0x19, 0xF0, 0x100, 2);
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+    }
+    if ((Check_Flag(0x67) == 2)) {
+        SetEntityPosition(0xC, 0xF0, 0x100, 2);
+        SetEntityAnim("Mary", 0x813);
+    }
+    if ((Check_Flag(0x6F) == 2)) {
+        SetEntityPosition(0x15, 0xF0, 0x100, 2);
+        SetEntityAnim("Elli", "Elli_Stop_Base");
+    }
+    if ((Check_Flag(0x173) == 2)) {
+        SetEntityPosition(0x1F, 0xF0, 0x100, 2);
+        SetEntityAnim("H. Goddess", "H.Goodes_Stop_Base");
+    }
+    Fade_In(2, 1);
+    TalkOpen();
+    if ((Check_Flag(0x4C) == 2)) {
+        Set_Name_Window("Karen");
+        Set_Portrait("Karen_Happy");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(16);
+        SetEntityFacing(0x13, 1);
+        Set_Portrait("Karen_Neutral");
+        TalkMessage(17);
+    }
+    if ((Check_Flag(0x55) == 2)) {
+        Set_Name_Window("Popuri");
+        Set_Portrait("Popuri_Surprised");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(18);
+        SetEntityFacing(3, 1);
+        Set_Portrait("Popuri_Ruborized");
+        TalkMessage(19);
+    }
+    if ((Check_Flag(0x5F) == 2)) {
+        Set_Name_Window("Ann");
+        Set_Portrait("Ann_Angry");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(20);
+        SetEntityFacing(0x19, 1);
+        Set_Portrait("Ann_Angry");
+        TalkMessage(21);
+    }
+    if ((Check_Flag(0x67) == 2)) {
+        Set_Name_Window("Mary");
+        Set_Portrait("Mary_Afraid");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(22);
+        SetEntityFacing(0xC, 1);
+        Set_Portrait("Mary_Happy");
+        TalkMessage(23);
+    }
+    if ((Check_Flag(0x6F) == 2)) {
+        Set_Name_Window("Elli");
+        Set_Portrait("Ellie_Surprised");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(24);
+        SetEntityFacing(0x15, 1);
+        Set_Portrait("Ellie_Afraid");
+        TalkMessage(25);
+    }
+    if ((Check_Flag(0x173) == 2)) {
+        Set_Name_Window("H. Goddess");
+        Set_Portrait("H_Goddes_Happy");
+        Set_Hearth_Anim("H. Goddess");
+        TalkMessage(26);
+        SetEntityFacing(0x1F, 1);
+        TalkMessage(27);
+    }
+    TalkClose();
+    SetEntityAnim("Player", "Player_See_Base");
+    Make_Delay(0x1E);
+    SetEntityFacing(0, 1);
+    Make_Delay(0x1E);
+}
+if ((Check_Flag(0x4C) == 2)) {
+    Give_Love_Points("Karen", 0x3E8);
+}
+if ((Check_Flag(0x55) == 2)) {
+    Give_Love_Points("Popuri", 0x3E8);
+}
+if ((Check_Flag(0x5F) == 2)) {
+    Give_Love_Points("Ann", 0x3E8);
+}
+if ((Check_Flag(0x67) == 2)) {
+    Give_Love_Points("Mary", 0x3E8);
+}
+if ((Check_Flag(0x6F) == 2)) {
+    Give_Love_Points("Elli", 0x3E8);
+}
+if ((Check_Flag(0x173) == 2)) {
+    Give_Love_Points("H. Goddess", 0x3E8);
+}
+if (((((((Check_Flag(0xC8) == 2) || (Check_Flag(0xC9) == 2)) || (Check_Flag(0xCA) == 2)) || (Check_Flag(0xCB) == 2)) || (Check_Flag(0xCC) == 2)) || (Check_Flag(0x17A) == 2))) {
+    Give_Friendship_Points("", 0x14);
+}
+Fade_Out(2, 1);
+TalkOpen();
+TalkMessage(28);
+TalkClose();
+Despawn_Map_Item(0);
+Despawn_Map_Item(1);
+Set_Flag(0x1CD, 2);
+Execute_Script(0x3DC);
+exit;
+}

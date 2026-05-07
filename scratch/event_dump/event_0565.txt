@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 565 Unknown_Event_0565 {
+const MESSAGE_0 = "Chair\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

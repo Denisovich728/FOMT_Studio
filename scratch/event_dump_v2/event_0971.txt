@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 971 Unknown_Event_0971 {
+const MESSAGE_0 = "Your Hammer can't crush\r\nthis Stone unless it's\r\nLV3 or higher.\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

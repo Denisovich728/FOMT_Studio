@@ -1,0 +1,16 @@
+#include "lib_fomt.csv"
+
+script 675 Unknown_Event_0675 {
+const MESSAGE_0 = "Babies grow up so quickly!\BRK";
+
+SetEntityFacing(0x13, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Karen");
+Set_Portrait("Karen_Neutral");
+Set_Hearth_Anim("Karen");
+TalkMessage(0);
+TalkClose();
+Free_Event_Entity("Karen");
+SetEntityFacing(0x13, 2);
+exit;
+}

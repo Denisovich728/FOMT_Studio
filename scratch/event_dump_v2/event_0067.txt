@@ -1,0 +1,17 @@
+#include "lib_fomt.csv"
+
+script 67 Unknown_Event_0067 {
+const MESSAGE_0 = "I understand how Stu\r\nfeels, though. \BRK\WAIT_CLICKAll children want lots of \r\nattention, so they bother \r\npeople they like. \BRK";
+
+if ((Check_Flag("Flag_0x69") == 1)) {
+}
+SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(0x14, 0);
+Free_Event_Entity("Doctor");
+exit;
+}

@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 882 Unknown_Event_0882 {
+const MESSAGE_0 = "Karen...\BRK";
+const MESSAGE_1 = "Karen's so pretty...\BRK";
+
+if ((Func083(0x11) == 0)) {
+    Free_Event_Entity("Jeff");
+}
+if ((Has_NPC_Talked_Today("Jeff") == 0)) {
+    SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Jeff_Afraid");
+    Set_Name_Window("Jeff");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(0x11, 2);
+    Free_Event_Entity("Jeff");
+} else {
+    SetEntityFacing(0x11, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Jeff_Neutral");
+    Set_Name_Window("Jeff");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(0x11, 2);
+    Free_Event_Entity("Jeff");
+}
+exit;
+}

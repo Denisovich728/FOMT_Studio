@@ -1,0 +1,78 @@
+#include "lib_fomt.csv"
+
+script 806 Unknown_Event_0806 {
+const MESSAGE_0 = "Hmm...What should I do \r\nwith this....?\BRK";
+const MESSAGE_1 = "Hey, \xFF!! \BRK\WAIT_CLICKYou came at a great time!\BRK";
+const MESSAGE_2 = "You see, a friend of mine \r\nleft me this Fishing Rod. \BRK\WAIT_CLICKI don't fish, but I don't\r\nwant to throw it away, \r\neither. \BRK\WAIT_CLICKWill you use it? You look \r\nlike a good fisher to me!\BRK";
+const MESSAGE_3 = "You got a \r\nFishing Rod!\BRK";
+
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x1C, 0xD7, 0x73, 0);
+SetEntityAnim("Zack", "Zack_Stop_Base");
+if ((Check_Flag("Flag_0x137") == 2)) {
+    SetEntityPosition(0x1D, 0xBF, 0x8D, 2);
+    SetEntityAnim("Won", "Won_Stop_Base");
+}
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Zack_Neutral");
+Set_Name_Window("Zack");
+TalkMessage(0);
+TalkClose();
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x6F, 1);
+Execute_Movement("Player");
+SetEntityFacing(0, 3);
+Set_Vector_X("Player", 0xA9, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+Show_Emote("Zack", "Exclamation", 0);
+Make_Delay(0x3C);
+SetEntityFacing(0x1C, 2);
+TalkOpen();
+Set_Portrait("Zack_Neutral");
+Set_Name_Window("Zack");
+TalkMessage(1);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Zack_Neutral");
+Set_Name_Window("Zack");
+TalkMessage(2);
+TalkClose();
+Free_Event_Entity("Zack");
+if ((Check_Equped_Tool() == -1)) {
+    Give_Tool_In_ToolBox("Fishing Rod", 1);
+} else {
+    Give_Tool_In_Inventory("Fishing Rod", 1);
+}
+PlaySong(0, 0xB6);
+Animation_Tool_Give("Fishing Rod");
+TalkOpen();
+TalkMessage(3);
+TalkClose();
+Pan_Camera_To(0xA9, 0x6F, 1);
+Wait_Camera_Stop();
+Free_Event_Entity("Zack");
+End_Cinematic_State();
+Set_Flag("Flag_0x135", 1);
+Routine_State_Override("Zack", "Script_807");
+if ((Check_Flag("Flag_0x137") == 2)) {
+    Routine_State_Override("Won", "Script_808");
+}
+exit;
+}

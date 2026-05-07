@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1082 Unknown_Event_1082 {
+const MESSAGE_0 = "Everyone's gone home now.\r\nIf you want to exchange \r\nyour medal for a prize, \BRK\r\ncome see me. \BRK";
+
+if ((Func083(0xD) == 0)) {
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Thomas_Neutral");
+Set_Name_Window("Huachito");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Huachito") == 0)) {
+    Give_Friendship_Points("Huachito", 5);
+}
+Free_Event_Entity("Huachito");
+SetEntityFacing(0xD, 0);
+exit;
+}

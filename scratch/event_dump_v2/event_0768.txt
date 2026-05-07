@@ -1,0 +1,20 @@
+#include "lib_fomt.csv"
+
+script 768 Unknown_Event_0768 {
+const MESSAGE_0 = ".............................\BRK";
+
+if ((Check_Flag("Flag_0x11C") == 1)) {
+    SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+    if ((Func083(0x14) == 0)) {
+        Free_Event_Entity("Doctor");
+    }
+    TalkOpen();
+    Set_Portrait("Doctor_Neutral");
+    Set_Name_Window("Doctor");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Doctor");
+    SetEntityFacing(0x14, 1);
+}
+exit;
+}

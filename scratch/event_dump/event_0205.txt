@@ -1,0 +1,43 @@
+#include "lib_fomt.csv"
+
+script 205 Unknown_Event_0205 {
+const MESSAGE_0 = "It's locked...\BRK";
+
+var var_0;
+
+if ((GetEntityFacing(0) == 1)) {
+    var_0 = 0;
+    if (((((((Check_Flag(0x46) == 1) || (Check_Flag(0x47) == 1)) || (Check_Flag(0x49) == 1)) || (Check_Flag(0x4A) == 1)) || (Check_Flag(0xFC) == 1)) || (Check_Flag(0x117) == 1))) {
+        var_0 = 0;
+    } else {
+        if ((Check_Flag(0x4C) == 2)) {
+            if ((GetEntityLocation("Sasha") == "Jeff_Shop_Back_Room")) {
+                var_0 = 1;
+            }
+        } else {
+            if ((GetEntityLocation("Sasha") == "Jeff_Shop_Back_Room")) {
+                if ((Chek_Friendship_Points("Sasha") <= 0x64)) {
+                    var_0 = 0;
+                } else {
+                    if ((Chek_Friendship_Points("Sasha") > 0x64)) {
+                        var_0 = 1;
+                    }
+                }
+            }
+        }
+    }
+    if ((var_0 == 1)) {
+        PlaySong(0, 0x9C);
+        Proc0C7(9);
+        Fade_Out(2, 1);
+        Warp_Player("Jeff_Shop_Back_Room", 0x5C, 0x140);
+        SetEntityPosition(0, 0x5C, 0x140, 1);
+        Fade_In(2, 1);
+    } else {
+        TalkOpen();
+        TalkMessage(0);
+        TalkClose();
+    }
+}
+exit;
+}

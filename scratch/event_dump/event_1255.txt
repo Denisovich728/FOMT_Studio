@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 1255 Unknown_Event_1255 {
+const MESSAGE_0 = "This is where you can place \r\nyour bets or exchange race\r\nmedals for prizes.\BRK\WAIT_CLICKAlso, come to me when \r\nyou're ready to race. \BRK";
+const MESSAGE_1 = "You can bet even if you\r\nrace, you know. Most people\r\nbet on themselves. \BRK";
+
+if ((Func083(0xD) == 0)) {
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag(0x1AB) == 0)) {
+    TalkOpen();
+    Set_Portrait("Thomas_Happy");
+    Set_Name_Window("Huachito");
+    TalkMessage(0);
+    TalkClose();
+} else {
+    TalkOpen();
+    Set_Portrait("Thomas_Happy");
+    Set_Name_Window("Huachito");
+    TalkMessage(1);
+    TalkClose();
+}
+if ((Has_Spoken_To_NPC_Today("Huachito") == 0)) {
+    Give_Friendship_Points("Huachito", 5);
+}
+Free_Event_Entity("Huachito");
+SetEntityFacing(0xD, 0);
+exit;
+}

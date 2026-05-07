@@ -1,0 +1,24 @@
+#include "lib_fomt.csv"
+
+script 1234 Unknown_Event_1234 {
+const MESSAGE_0 = "Is it just me, or is the \r\nwhole thing out of control? \BRK";
+
+if ((Func083(0xC) == 0)) {
+    Free_Event_Entity("Mary");
+}
+SetEntityFacing(0xC, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Mary_Angry");
+Set_Name_Window("Mary");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x6F) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x8E) == 2)) || (Check_Flag(0x8F) == 2))) {
+    Set_Hearth_Anim("Mary");
+}
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Mary") == 0)) {
+    Give_Friendship_Points("Mary", 5);
+}
+SetEntityFacing(0xC, 1);
+Free_Event_Entity("Mary");
+exit;
+}

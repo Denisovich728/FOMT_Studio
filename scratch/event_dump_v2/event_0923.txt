@@ -1,0 +1,30 @@
+#include "lib_fomt.csv"
+
+script 923 Unknown_Event_0923 {
+const MESSAGE_0 = "I think of Cliff just like \r\nmy own son. \BRK\WAIT_CLICKI'm so glad for him. \BRK";
+const MESSAGE_1 = "Ann is a good girl, so I'm\r\nhappy, too. \r\nDoug is a good guy. \BRK";
+
+if ((Func083(8) == 0)) {
+    Free_Event_Entity("Duke");
+}
+if ((Has_NPC_Talked_Today("Duke") == 0)) {
+    SetEntityFacing(8, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Duke_Happy");
+    Set_Name_Window("Duke");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityFacing(8, 3);
+    Free_Event_Entity("Duke");
+} else {
+    SetEntityFacing(8, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Portrait("Duke_Happy");
+    Set_Name_Window("Duke");
+    TalkMessage(1);
+    TalkClose();
+    SetEntityFacing(8, 3);
+    Free_Event_Entity("Duke");
+}
+exit;
+}

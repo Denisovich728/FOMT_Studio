@@ -79,7 +79,7 @@ class NpcEditorWidget(QWidget):
             if not stats:
                 continue
                 
-            c_id = QStandardItem(f"[{stats.get('ID', 0):03d}]")
+            c_id = QStandardItem(stats.get('idx', '0x01'))
             c_id.setEditable(False)
             
             c_name = QStandardItem(stats.get('Nombre', 'Desconocido'))
@@ -159,7 +159,7 @@ class NpcDetailDialog(QDialog):
         app = parent.window() if parent else None
         lang = getattr(app, 'current_lang', 'es') if app else 'es'
         role_label = npc.get_translated_role(lang)
-        header = QLabel(f"<h2>{name}</h2><b>{role_label}</b><br>ID Motor: [{npc.index:03d}]")
+        header = QLabel(f"<h2>{name}</h2><b>{role_label}</b><br>ID Motor: 0x{npc.index + 1:02X}")
         layout.addWidget(header)
         
         ptr_str = f"0x{getattr(npc, 'personality_ptr', 0):08X}"

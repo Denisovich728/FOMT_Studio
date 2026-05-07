@@ -1,0 +1,230 @@
+#include "lib_fomt.csv"
+
+script 776 Unknown_Event_0776 {
+const MESSAGE_0 = "Let's go have the Doctor\r\nlook at you, Stu. \BRK";
+const MESSAGE_1 = "I think we'd better...\BRK";
+const MESSAGE_2 = "But I feel fine!\BRK";
+const MESSAGE_3 = "You have a fever!\BRK";
+const MESSAGE_4 = "You worry about me too much,\r\nSis!\BRK";
+const MESSAGE_5 = "Please come with me \r\nto the Clinic?...\BRK";
+const MESSAGE_6 = "Well, since you \r\nbeg like that...OK. \BRK";
+const MESSAGE_7 = "Ah, \xFF!. \r\nGood timing. \BRK";
+const MESSAGE_8 = "all of a sudden. \BRK\WAIT_CLICKWill you do me a favor and\r\ntake him to the Clinic? \BRK\WAIT_CLICKI'll go find the Doctor. \r\nIt's his day off, but he'll\r\nhelp us out, I'm sure. \BRK";
+const MESSAGE_9 = "Thanks a lot. \r\nI owe you one!\BRK";
+const MESSAGE_10 = "It's just a cold.\r\nGive him rest and plenty of\r\nfluids, and he'll be fine.\BRK";
+const MESSAGE_11 = "Really? I'm so relieved!\BRK";
+const MESSAGE_12 = "See? I told you so!\BRK";
+const MESSAGE_13 = "Is that what I get \r\nfor worrying about you? \BRK";
+const MESSAGE_14 = "Sorry, Sis...\BRK";
+const MESSAGE_15 = "Don't forget to thank\r\n\xFF!. \BRK";
+const MESSAGE_16 = "Thank you, \xFF!. \BRK";
+const MESSAGE_17 = "Will you take Stu back to \r\nhis house now, please? \BRK";
+
+Warp_Player("Ellen_House", 0x98, 0x78);
+SetEntityPosition(0xF, 0x7F, 0x61, 0);
+SetEntityAnim("Ellen", "Ellen_Stop_Base");
+SetEntityPosition(0x15, 0x9A, 0x61, 0);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x10, 0x9D, 0x7F, 2);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0, 0x79, 0x104, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Ellie_Afraid");
+Set_Name_Window("Elli");
+TalkMessage(0);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellen_Afraid");
+Set_Name_Window("Ellen");
+TalkMessage(1);
+TalkClose();
+TalkOpen();
+Set_Portrait("Stu_Neutral");
+Set_Name_Window("Stu");
+TalkMessage(2);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Angry");
+Set_Name_Window("Elli");
+TalkMessage(3);
+TalkClose();
+TalkOpen();
+Set_Portrait("Stu_Neutral");
+Set_Name_Window("Stu");
+TalkMessage(4);
+TalkClose();
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Ellie_Afraid");
+Set_Name_Window("Elli");
+TalkMessage(5);
+TalkClose();
+Show_Emote("Stu", "Thinking", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Stu_Neutral");
+Set_Name_Window("Stu");
+TalkMessage(6);
+TalkClose();
+Make_Delay(0x1E);
+PlaySong(0, 0x9C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Walking_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Walk_Base");
+}
+Set_Vector_Y("Player", 0x7F, 1);
+Execute_Movement("Player");
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Ellie_Surprised");
+Set_Name_Window("Elli");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x96) == 2)) || (Check_Flag(0x97) == 2))) {
+    Set_Hearth_Anim("Elli");
+}
+TalkMessage(7);
+TalkClose();
+Show_Emote("Player", "Question", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Ellie_Surprised");
+Set_Name_Window("Elli");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x96) == 2)) || (Check_Flag(0x97) == 2))) {
+    Set_Hearth_Anim("Elli");
+}
+TalkMessage(8);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x96) == 2)) || (Check_Flag(0x97) == 2))) {
+    Set_Hearth_Anim("Elli");
+}
+TalkMessage(9);
+TalkClose();
+SetEntityAnim("Elli", "Elli_Base");
+SetEntityFacing(0x15, 3);
+Set_Vector_X("Elli", 0xB1, 1);
+Execute_Movement("Elli");
+SetEntityFacing(0x15, 0);
+Set_Vector_Y("Elli", 0x96, 1);
+Execute_Movement("Elli");
+SetEntityFacing(0x15, 2);
+Set_Vector_X("Elli", 0x79, 1);
+Execute_Movement("Elli");
+SetEntityFacing(0x15, 0);
+Set_Vector_Y("Elli", 0xDC, 1);
+Execute_Movement("Elli");
+Hide_Entity("Elli");
+PlaySong(0, 0xCD);
+Fade_Out(2, 1);
+Warp_Player("Mineral_Clinic_Floor_01", 0xD3, 0x55);
+SetEntityPosition(0x14, 0xED, 0x55, 2);
+SetEntityAnim("Doctor", 0x320);
+SetEntityPosition(0x15, 0xC3, 0x55, 3);
+SetEntityAnim("Elli", "Elli_Stop_Base");
+SetEntityPosition(0x10, 0xD8, 0x55, 3);
+SetEntityAnim("Stu", "Stu_Stop_Base");
+SetEntityPosition(0, 0xC8, 0x6A, 3);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Fade_In(2, 1);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(10);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Happy");
+Set_Name_Window("Elli");
+TalkMessage(11);
+TalkClose();
+SetEntityFacing(0x10, 2);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Stu_Happy");
+Set_Name_Window("Stu");
+TalkMessage(12);
+TalkClose();
+TalkOpen();
+Set_Portrait("Ellie_Angry");
+Set_Name_Window("Elli");
+TalkMessage(13);
+TalkClose();
+TalkOpen();
+Set_Portrait("Stu_Neutral");
+Set_Name_Window("Stu");
+TalkMessage(14);
+TalkClose();
+SetEntityFacing(0x15, 0);
+SetEntityFacing(0x10, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Ellie_Neutral");
+Set_Name_Window("Elli");
+TalkMessage(15);
+TalkClose();
+SetEntityFacing(0, 1);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Stu_Happy");
+Set_Name_Window("Stu");
+TalkMessage(16);
+TalkClose();
+Make_Delay(0x1E);
+SetEntityFacing(0x14, 0);
+Make_Delay(0x1E);
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(17);
+TalkClose();
+SetEntityAnim("Player", "Player_See_Base");
+Make_Delay(0x3C);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Make_Delay(0x1E);
+Fade_Out(2, 1);
+Warp_Player("North_Side_Town", 0x190, 0xA8);
+SetEntityPosition(0, 0x190, 0xA8, 0);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+Give_Love_Points("Elli", 0xBB8);
+Give_Friendship_Points("Stu", 0x14);
+Give_Friendship_Points("Ellen", 0x14);
+Give_Friendship_Points("Doctor", 0x14);
+Free_Event_Entity("Elli");
+Free_Event_Entity("Stu");
+Free_Event_Entity("Doctor");
+Set_Time(0xF, 0);
+Set_Flag(0x11F, 2);
+Fade_In(2, 1);
+exit;
+}

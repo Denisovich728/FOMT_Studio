@@ -1,0 +1,37 @@
+#include "lib_fomt.csv"
+
+script 1285 Unknown_Event_1285 {
+const MESSAGE_0 = "I felt warm just \r\nlooking at those Sheep!\BRK";
+const MESSAGE_1 = "Did you win? Would you save\r\nsome of your Wool for me?\r\nIt looks so warm!\BRK";
+const MESSAGE_2 = "Your Sheep lost?\r\nTry not to get too upset. \BRK";
+
+if ((Func083(0x1B) == 0)) {
+    Free_Event_Entity("Gotz");
+}
+SetEntityFacing(0x1B, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag("Flag_0x1AF") == 0)) {
+    TalkOpen();
+    Set_Portrait("Gotz_Happy");
+    Set_Name_Window("Gotz");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag("Flag_0x1B1") == 1)) {
+        TalkOpen();
+        Set_Portrait("Gotz_Neutral");
+        Set_Name_Window("Gotz");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Gotz_Neutral");
+    Set_Name_Window("Gotz");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Gotz") == 0)) {
+    Give_Friendship_Points("Gotz", 5);
+}
+Free_Event_Entity("Gotz");
+SetEntityFacing(0x1B, 0);
+exit;
+}

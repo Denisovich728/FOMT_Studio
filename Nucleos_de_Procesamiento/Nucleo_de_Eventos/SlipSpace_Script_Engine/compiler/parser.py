@@ -248,23 +248,52 @@ class Parser:
                     while True:
                         exprs.append(self.parse_expr())
                         if not self.match(TokenType.COMMA): break
-                    block = self.parse_stmt_block()
+                    
+                    # Soporte opcional para ':' (estilo C)
+                    self.match(TokenType.COLON)
+                    
+                    # Si hay una llave, es un bloque. Si no, leemos hasta el próximo case/default/RCURLY
+                    if self.peek().type == TokenType.LCURLY:
+                        block = self.parse_stmt_block()
+                    else:
+                        block = []
+                        while self.peek().type not in (TokenType.KW_CASE, TokenType.KW_DEFAULT, TokenType.RCURLY, TokenType.EOF):
+                            block.append(self.parse_stmt())
+                    
                     cases.append(SwitchCaseCase(exprs, block))
+                    
                 elif self.match(TokenType.KW_DEFAULT):
-                    block = self.parse_stmt_block()
+                    self.match(TokenType.COLON)
+                    
+                    if self.peek().type == TokenType.LCURLY:
+                        block = self.parse_stmt_block()
+                    else:
+                        block = []
+                        while self.peek().type not in (TokenType.KW_CASE, TokenType.KW_DEFAULT, TokenType.RCURLY, TokenType.EOF):
+                            block.append(self.parse_stmt())
+                    
                     cases.append(SwitchCaseDefault(block))
                 else:
-                    raise ParseError("Expected case or default in switch")
+                    # En caso de basura o comentarios no detectados entre cases
+                    t_err = self.next_token()
+                    # Si no es un case o default, lanzamos error
+                    raise ParseError(f"Expected case or default in switch, got {t_err.type}", t_err.line, t_err.column)
+                    
             return StmtSwitch(cond, cases, SwitchId(0))
             
         elif t.type == TokenType.KW_EXIT:
             self.next_token()
+            self.expect(TokenType.SEMICOLON)
             return StmtExit()
             
         elif t.type == TokenType.SEMICOLON:
             self.next_token()
             return StmtEmpty()
             
+        elif t.type == TokenType.KW_BREAK:
+            self.next_token()
+            self.expect(TokenType.SEMICOLON)
+            return StmtBreak()
         elif t.type == TokenType.PLUSPLUS:
             self.next_token()
             name = self.expect(TokenType.NAME).value
@@ -287,40 +316,54 @@ class Parser:
                 self.expect(TokenType.LPAREN)
                 text = self.expect(TokenType.STRING_LIT).value
                 self.expect(TokenType.RPAREN)
-                # Opcional: permitir punto y coma
                 self.match(TokenType.SEMICOLON)
                 return StmtMessage(idx, text)
 
-            # could be assignment, postincr/decr, or call
-            # lookahead
-            n = self.tokens[self.pos+1]
-            if n.type == TokenType.LPAREN:
-                return StmtCall(self.parse_call())
-            elif n.type in (TokenType.EQUAL, TokenType.ADD_EQUAL, TokenType.SUB_EQUAL, 
-                            TokenType.MUL_EQUAL, TokenType.DIV_EQUAL, TokenType.MOD_EQUAL):
-                name = self.expect(TokenType.NAME).value
-                op_tok = self.next_token()
-                exp = self.parse_expr()
-                
-                op_map = {
-                    TokenType.EQUAL: AssignOperation.NONE,
-                    TokenType.ADD_EQUAL: AssignOperation.ADD,
-                    TokenType.SUB_EQUAL: AssignOperation.SUB,
-                    TokenType.MUL_EQUAL: AssignOperation.MUL,
-                    TokenType.DIV_EQUAL: AssignOperation.DIV,
-                    TokenType.MOD_EQUAL: AssignOperation.MOD,
-                }
-                return StmtAssign(op_map[op_tok.type], name, exp)
-                
-            elif n.type == TokenType.PLUSPLUS:
-                name = self.next_token().value
-                self.next_token()
-                return StmtExpr(ExprPostIncrement(name))
-            elif n.type == TokenType.MINUSMINUS:
-                name = self.next_token().value
-                self.next_token()
-                return StmtExpr(ExprPostDecrement(name))
-                
+            # Lookahead para comandos, asignaciones o incrementos
+            if self.pos + 1 < len(self.tokens):
+                n = self.tokens[self.pos+1]
+                if n.type == TokenType.LPAREN:
+                    call = self.parse_call()
+                    self.match(TokenType.SEMICOLON)
+                    return StmtCall(call)
+                elif n.type in (TokenType.EQUAL, TokenType.ADD_EQUAL, TokenType.SUB_EQUAL, 
+                                TokenType.MUL_EQUAL, TokenType.DIV_EQUAL, TokenType.MOD_EQUAL):
+                    name = self.expect(TokenType.NAME).value
+                    op_tok = self.next_token()
+                    exp = self.parse_expr()
+                    self.match(TokenType.SEMICOLON)
+                    
+                    op_map = {
+                        TokenType.EQUAL: AssignOperation.NONE,
+                        TokenType.ADD_EQUAL: AssignOperation.ADD,
+                        TokenType.SUB_EQUAL: AssignOperation.SUB,
+                        TokenType.MUL_EQUAL: AssignOperation.MUL,
+                        TokenType.DIV_EQUAL: AssignOperation.DIV,
+                        TokenType.MOD_EQUAL: AssignOperation.MOD,
+                    }
+                    return StmtAssign(op_map[op_tok.type], name, exp)
+                elif n.type == TokenType.PLUSPLUS:
+                    name = self.expect(TokenType.NAME).value
+                    self.next_token()
+                    self.match(TokenType.SEMICOLON)
+                    return StmtExpr(ExprPostIncrement(name))
+                elif n.type == TokenType.MINUSMINUS:
+                    name = self.expect(TokenType.NAME).value
+                    self.next_token()
+                    self.match(TokenType.SEMICOLON)
+                    return StmtExpr(ExprPostDecrement(name))
+
+            # Fallback: Cualquier otra expresión (incluyendo llamadas a función)
+            exp = self.parse_expr()
+            self.match(TokenType.SEMICOLON)
+            return StmtExpr(exp)
+
+        elif t.type == TokenType.LPAREN:
+            # Soporte para expresiones entre paréntesis al inicio de la línea (e.g. comparaciones huérfanas)
+            exp = self.parse_expr()
+            self.match(TokenType.SEMICOLON)
+            return StmtExpr(exp)
+        
         raise ParseError(f"Unexpected token {t.type} starting statement", t.line, t.column)
 
     def parse_program(self, const_scope: 'ConstScope', allow_scripts=True):

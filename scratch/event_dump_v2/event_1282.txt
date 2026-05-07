@@ -1,0 +1,37 @@
+#include "lib_fomt.csv"
+
+script 1282 Unknown_Event_1282 {
+const MESSAGE_0 = "All the Sheep are always\r\nso impressive. \BRK";
+const MESSAGE_1 = "Congratulations on winning!\r\nYour efforts paid off. \BRK";
+const MESSAGE_2 = "It's too bad about this \r\nyear,but now you have a \r\ngoal for next year!\BRK";
+
+if ((Func083(0xD) == 0)) {
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag("Flag_0x1AF") == 0)) {
+    TalkOpen();
+    Set_Portrait("Thomas_Happy");
+    Set_Name_Window("Huachito");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag("Flag_0x1B1") == 1)) {
+        TalkOpen();
+        Set_Portrait("Thomas_Happy");
+        Set_Name_Window("Huachito");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Thomas_Neutral");
+    Set_Name_Window("Huachito");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Huachito") == 0)) {
+    Give_Friendship_Points("Huachito", 5);
+}
+Free_Event_Entity("Huachito");
+SetEntityFacing(0xD, 3);
+exit;
+}

@@ -72,6 +72,9 @@ class FoMTProject:
         for offset, data in self.patches.items():
             self.virtual_rom[offset : offset + len(data)] = data
             
+        # Inicialización dinámica post-parches
+        self.super_lib.dynamic_init(self.virtual_rom)
+            
         return self.game_version
 
     def step_2_scan_events(self):
@@ -95,6 +98,25 @@ class FoMTProject:
         self.songs = self.sappy_engine.scan_songs()
         return len(self.songs)
 
+    def open_rom_session(self, rom_path):
+        """
+        Crea un proyecto de sesión automático al abrir una ROM.
+        Evita bloqueos de archivo y organiza las ediciones por fecha.
+        """
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Carpeta de sesión en Documentos
+        docs_dir = os.path.join(os.path.expanduser("~"), "Documents", "FoMTStudio", "Sessions")
+        proj_name = f"Session_{timestamp}"
+        proj_dir = os.path.join(docs_dir, proj_name)
+        
+        if not os.path.exists(proj_dir):
+            os.makedirs(proj_dir)
+            
+        self.create_new(rom_path, proj_dir)
+        return proj_dir
+
     def create_new(self, rom_path, proj_dir):
         """
         Inicialización de un nuevo proyecto con aislamiento.
@@ -109,6 +131,7 @@ class FoMTProject:
         local_rom_name = "source.gba"
         local_rom_path = os.path.join(proj_dir, local_rom_name)
         
+        # IMPORTANTE: Cerrar cualquier handle si existiera (aunque aquí es nuevo)
         shutil.copy2(rom_path, local_rom_path)
         
         # 2. Configurar el proyecto para usar esta copia local

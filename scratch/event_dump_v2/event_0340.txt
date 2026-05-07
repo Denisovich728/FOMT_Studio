@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 340 Unknown_Event_0340 {
+const MESSAGE_0 = "Stairs to Basement\BRK";
+
+TalkOpen();
+TalkMessage(0);
+TalkClose();
+exit;
+}

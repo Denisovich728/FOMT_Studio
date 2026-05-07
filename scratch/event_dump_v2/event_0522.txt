@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 522 Unknown_Event_0522 {
+const MESSAGE_0 = "Mailbox\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

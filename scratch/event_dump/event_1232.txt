@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1232 Unknown_Event_1232 {
+const MESSAGE_0 = "Hey!! Everyone don't stuff \r\nin everything at once!\BRK\WAIT_CLICKYou there, get back!\r\n...What's this fish doing \r\nhere...?!?\BRK";
+
+if ((Func083(0x18) == 0)) {
+    Free_Event_Entity("Doug");
+}
+SetEntityFacing(0x18, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doug_Angry");
+Set_Name_Window("Doug");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Doug") == 0)) {
+    Give_Friendship_Points("Doug", 5);
+}
+SetEntityFacing(0x18, 2);
+Free_Event_Entity("Doug");
+exit;
+}

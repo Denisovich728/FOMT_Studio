@@ -1,0 +1,18 @@
+#include "lib_fomt.csv"
+
+script 92 Unknown_Event_0092 {
+if ((GetEntityFacing(0) == 1)) {
+    Fade_Out(2, 1);
+    if ((Check_Flag(0x11C) == 1)) {
+        Refresh_Map_Entities();
+        Proc08A(0x14);
+        Give_Friendship_Points("Doctor", 0x14);
+        Set_Flag(0x11C, 2);
+    }
+    Proc134(1, 0);
+    Warp_Player(0x134, 0x78, 0xC0);
+    SetEntityPosition(0, 0x78, 0xC0, 1);
+    Fade_In(2, 1);
+}
+exit;
+}

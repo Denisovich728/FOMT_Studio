@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1104 Unknown_Event_1104 {
+const MESSAGE_0 = "I came because I heard \r\nLillia was going to compete.\BRK\WAIT_CLICKI should be near her in \r\ncase she gets sick. \BRK";
+
+if ((Func083(0x14) == 0)) {
+    Free_Event_Entity("Doctor");
+}
+SetEntityFacing(0x14, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Doctor_Neutral");
+Set_Name_Window("Doctor");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Doctor") == 0)) {
+    Give_Friendship_Points("Doctor", 5);
+}
+SetEntityFacing(0x14, 1);
+Free_Event_Entity("Doctor");
+exit;
+}

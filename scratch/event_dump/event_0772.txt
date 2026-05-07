@@ -1,0 +1,20 @@
+#include "lib_fomt.csv"
+
+script 772 Unknown_Event_0772 {
+const MESSAGE_0 = "Even doctors make mistakes! \BRK\WAIT_CLICKI always assumed they \r\ndidn't, but they're \r\nhuman too, I guess!\BRK";
+
+if ((Check_Flag(0x11D) == 1)) {
+    SetEntityFacing(0x15, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    Set_Name_Window("Elli");
+    if (!(((((((Check_Flag(0x4C) == 2) || (Check_Flag(0x55) == 2)) || (Check_Flag(0x5F) == 2)) || (Check_Flag(0x67) == 2)) || (Check_Flag(0x173) == 2)) || (Check_Flag(0x96) == 2)) || (Check_Flag(0x97) == 2))) {
+        Set_Hearth_Anim("Elli");
+    }
+    Set_Portrait("Ellie_Neutral");
+    TalkMessage(0);
+    TalkClose();
+    Free_Event_Entity("Elli");
+    SetEntityFacing(0x15, 0);
+}
+exit;
+}

@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1112 Unknown_Event_1112 {
+const MESSAGE_0 = "I love to see everybody's\r\ndifferent styles of cooking.\r\nIt's so mouth-watering!\BRK";
+
+if ((Func083(0x16) == 0)) {
+    Free_Event_Entity("Carter");
+}
+SetEntityFacing(0x16, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Carter_Neutral");
+Set_Name_Window("Carter");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Carter") == 0)) {
+    Give_Friendship_Points("Carter", 5);
+}
+SetEntityFacing(0x16, 0);
+Free_Event_Entity("Carter");
+exit;
+}

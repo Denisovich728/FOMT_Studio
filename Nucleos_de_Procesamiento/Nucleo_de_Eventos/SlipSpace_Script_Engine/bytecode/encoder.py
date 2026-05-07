@@ -214,14 +214,7 @@ def encode_script(script: Script, target_size: int = 0) -> bytes:
         chunk_len = len(vec.data) - chunk_hook - 8
         vec.write_u32_at(chunk_hook + 4, chunk_len)
     
-    # Relleno opcional para mantener el tamaño original (padding)
-    # Si el nuevo script es más pequeño, rellenamos con 00 (NOPs)
-    # Si es más grande, crecerá naturalmente (repunteo necesario).
-    if target_size > 0:
-        while len(vec.data) < target_size:
-            vec.push_u8(0)
-    
-    # FIX: Recalcular total_len DESPUÉS del padding para que el RIFF header sea exacto
+    # FIX: Recalcular total_len para que el RIFF header sea exacto
     total_len = len(vec.data)
     vec.write_u32_at(4, total_len - 8) # RIFF size is total - 8
     

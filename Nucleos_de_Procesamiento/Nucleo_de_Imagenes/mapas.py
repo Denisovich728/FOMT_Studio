@@ -80,13 +80,40 @@ FOMT_MAP_LABELS = {
     23: "Goddess Pond",
     24: "Harvest Sprite",
     25: "Connor's Cart",
+    26: "Saibara House",
+    27: "Town House",
+    28: "Gotz House",
+    29: "Barley House 1F",
+    30: "Barley House 2F",
+    31: "Mine Lake",
+    32: "Mother's Hill",
+    33: "Summit",
+    34: "Mineral Mine",
+    35: "Spring Mine",
+    38: "Lake",
+    47: "Tutorial Field",
+    83: "Mineral Clinic",
+    120: "Supermarket",
+    121: "Inn 1F",
+    122: "Inn 2F",
+    123: "Library 1F",
+    124: "Library 2F",
 }
 
 # Tabla de permisos de movimiento (behaviour_data_ptr)
 # Valores estándar GBA — confirmados en BlueSpider
-MOVEMENT_LABEL  = {0x00: "0", 0x01: "1", 0x02: "1", 0x04: "~", 0x08: "^"}
-MOVEMENT_LABELS = MOVEMENT_LABEL   # alias para compatibilidad con map_editor.py
-MOVEMENT_BLOCKED = {0x01, 0x02}
+MOVEMENT_LABEL  = {
+    0x00: "0", # Libre
+    0x01: "1", # Bloqueado
+    0x02: "1", # Bloqueado (NPC?)
+    0x04: "~", # Agua
+    0x08: "^", # Salto/Borde
+    0x10: "S", # Silla/Sentarse
+    0x20: "M", # Mostrador
+    0x40: "H", # Hierba/Cultivo
+}
+MOVEMENT_LABELS = MOVEMENT_LABEL
+MOVEMENT_BLOCKED = {0x01, 0x02, 0x20}
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -293,30 +320,28 @@ class Block:
 # ═══════════════════════════════════════════════════════════════════
 class Warp:
     """
-    Punto de teletransporte. Estructura de 8 bytes (warp_event en BlueSpider):
-      [X:2LE][Y:2LE][TargetMap:1][TargetX:1][TargetY:1][FaceDir:1]
+    Punto de teletransporte o Losa (Trigger). Estructura de 8 bytes:
+    [X:1][Y:1][ScriptID:2][Metadata:4]
     """
     STRIDE = 8
     def __init__(self, data: bytes, warp_id: int, rom_offset: int = 0):
         self.id = warp_id
         self.rom_offset = rom_offset
         if len(data) >= 8:
-            self.x          = struct.unpack_from('<H', data, 0)[0]
-            self.y          = struct.unpack_from('<H', data, 2)[0]
-            self.target_map = data[4]
-            self.target_x   = data[5]
-            self.target_y   = data[6]
-            self.face_dir   = data[7]
+            self.x          = data[0]
+            self.y          = data[1]
+            self.script_id  = struct.unpack_from('<H', data, 2)[0]
+            self.metadata   = data[4:8]
         else:
-            self.x = self.y = self.target_map = self.target_x = self.target_y = self.face_dir = 0
+            self.x = self.y = self.script_id = 0
+            self.metadata = b'\x00\x00\x00\x00'
 
     def to_bytes(self) -> bytes:
-        return struct.pack('<HHBBBB', self.x, self.y,
-                           self.target_map, self.target_x,
-                           self.target_y, self.face_dir)
+        return struct.pack('<BBH', self.x, self.y, self.script_id) + self.metadata
 
     def get_label(self) -> str:
-        return FOMT_MAP_LABELS.get(self.target_map, f"Map {self.target_map}")
+        # En FoMT un Warp dispara un Script (que a su vez hace Warp_Player)
+        return f"Script_0x{self.script_id:04X}"
 
     def __repr__(self):
         return f"Warp#{self.id}({self.x},{self.y})→{self.get_label()}"
@@ -324,34 +349,29 @@ class Warp:
 
 class ScriptTrigger:
     """
-    Trigger de script en el mapa (cartel 'S', mueble 'S').
+    Trigger de Interacción en el mapa (Carteles, NPCs).
     Estructura de 8 bytes:
-      [X:2LE][Y:2LE][ScriptID:2LE][Kind:1][Flags:1]
+      [X:1][Y:1][ScriptID:2][Metadata:4]
     """
     STRIDE = 8
-    KIND_NAMES = {0: "Cartel", 1: "Mueble", 2: "Oculto"}
 
     def __init__(self, data: bytes, tid: int, rom_offset: int = 0):
         self.id = tid
         self.rom_offset = rom_offset
         if len(data) >= 8:
-            self.x         = struct.unpack_from('<H', data, 0)[0]
-            self.y         = struct.unpack_from('<H', data, 2)[0]
-            self.script_id = struct.unpack_from('<H', data, 4)[0]
-            self.kind      = data[6]
-            self.flags     = data[7]
+            self.x         = data[0]
+            self.y         = data[1]
+            self.script_id = struct.unpack_from('<H', data, 2)[0]
+            self.metadata  = data[4:8]
         else:
-            self.x = self.y = self.script_id = self.kind = self.flags = 0
+            self.x = self.y = self.script_id = 0
+            self.metadata = b'\x00\x00\x00\x00'
 
     def to_bytes(self) -> bytes:
-        return struct.pack('<HHHBB', self.x, self.y,
-                           self.script_id, self.kind, self.flags)
-
-    def kind_name(self) -> str:
-        return self.KIND_NAMES.get(self.kind, "?")
+        return struct.pack('<BBH', self.x, self.y, self.script_id) + self.metadata
 
     def __repr__(self):
-        return f"Script#{self.id}({self.x},{self.y}) {self.kind_name()} → 0x{self.script_id:04X}"
+        return f"Script#{self.id}({self.x},{self.y}) → 0x{self.script_id:04X}"
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -446,9 +466,22 @@ class MapHeader:
 
         # 2. Tiles GFX (LZ77 comprimido)
         self.tiles = []
+        
+        # [NUEVO] FoMT usa un sistema Dual Tileset: 
+        # Tiles 0-639 vienen del Tileset Global (Map 0)
+        # Tiles 640+ vienen del Tileset Local
+        base_tiles_ptr = 0x836800 if len(rom) > 0x836800 else 0
+        if base_tiles_ptr and rom[base_tiles_ptr] == 0x10:
+            raw_base = decompress_lz77(rom, base_tiles_ptr)
+            n_base = len(raw_base) // GBATile.BYTES
+            for i in range(n_base):
+                self.tiles.append(GBATile(raw_base[i*GBATile.BYTES:]))
+
         if img_data_ptr and rom[img_data_ptr] == 0x10:
             raw_tiles = decompress_lz77(rom, img_data_ptr)
             n_tiles = len(raw_tiles) // GBATile.BYTES
+            # Si ya cargamos base, los locales empiezan después (offset 640 aprox)
+            # Para simplificar, los añadimos al final. El motor GBA maneja el offset.
             for i in range(n_tiles):
                 self.tiles.append(GBATile(raw_tiles[i*GBATile.BYTES:]))
 
@@ -456,18 +489,17 @@ class MapHeader:
         self.blocks = []
         if block_data_ptr:
             # Los bloques son datos crudos (no comprimidos)
+            # Heurística: leer hasta encontrar un bloque vacío o llegar a un límite
             i = block_data_ptr
-            while i + Block.BYTES <= len(rom):
+            max_blocks = 1024 # Aumentado de 512
+            for _ in range(max_blocks):
+                if i + Block.BYTES > len(rom):
+                    break
                 raw_block = rom[i:i+Block.BYTES]
-                # Validar que el bloque no sea todo ceros (fin de tabla)
-                if all(b == 0 for b in raw_block):
-                    # Algunos bloques vacíos son válidos, parar tras 8 consecutivos
-                    pass
+                # Si encontramos 8 bloques seguidos de solo ceros, probablemente terminó la tabla
+                # Pero en FoMT el bloque 0 es legítimamente transparente.
                 self.blocks.append(Block(raw_block))
                 i += Block.BYTES
-                # Límite razonable
-                if len(self.blocks) >= 512:
-                    break
 
         # 4. Colisiones (behaviour_data_ptr: 1 byte por tile del mapa)
         self.collision = None
@@ -485,10 +517,11 @@ class MapHeader:
         if not self.layout_offset:
             return
         header_byte = rom[self.layout_offset] if self.layout_offset < len(rom) else 0
-        if header_byte not in (0x10, 0x70):
+        if header_byte not in (0x10, 0x70, 0x00):
             return
 
         raw = decompress_auto(rom, self.layout_offset)
+        if not raw: return
         n_tiles = self.width * self.height
         # Cada índice = 2 bytes → total = n_tiles * 2 para c/capa
         lo_size = n_tiles * 2
@@ -497,33 +530,42 @@ class MapHeader:
 
     def _load_objects(self, rom: bytes):
         """
-        Parsea la tabla de objetos (warps + scripts).
-        Header de 4 bytes: [n_warps:1][n_scripts:1][padding:2]
+        Parsea la tabla de objetos (warps + scripts) usando el nuevo protocolo.
+        El bloque puede estar comprimido con Popuri (0x70).
         """
         self.warps   = []
         self.scripts = []
-        if not self.objects_offset:
+        if not self.objects_offset or self.objects_offset >= len(rom):
             return
-        hdr = rom[self.objects_offset: self.objects_offset+4]
-        if len(hdr) < 4:
+            
+        header_byte = rom[self.objects_offset]
+        if header_byte == 0x70:
+            data = decompress_auto(rom, self.objects_offset)
+        elif header_byte == 0x10:
+            data = decompress_auto(rom, self.objects_offset)
+        else:
+            # Si no está comprimido, asumimos un bloque de tamaño fijo o leemos hasta llenar un buffer
+            data = rom[self.objects_offset : self.objects_offset + 1024]
+            
+        if not data or len(data) < 4:
             return
 
-        n_warps   = hdr[0]
-        n_scripts = hdr[1]
-        base = self.objects_offset + 4
+        n_warps   = data[0]
+        n_scripts = data[1]
+        base = 4
 
         for i in range(n_warps):
             off = base + i * Warp.STRIDE
-            if off + Warp.STRIDE > len(rom):
+            if off + Warp.STRIDE > len(data):
                 break
-            self.warps.append(Warp(rom[off:off+Warp.STRIDE], i, off))
+            self.warps.append(Warp(data[off:off+Warp.STRIDE], i, self.objects_offset))
         base += n_warps * Warp.STRIDE
 
         for i in range(n_scripts):
             off = base + i * ScriptTrigger.STRIDE
-            if off + ScriptTrigger.STRIDE > len(rom):
+            if off + ScriptTrigger.STRIDE > len(data):
                 break
-            self.scripts.append(ScriptTrigger(rom[off:off+ScriptTrigger.STRIDE], i, off))
+            self.scripts.append(ScriptTrigger(data[off:off+ScriptTrigger.STRIDE], i, self.objects_offset))
 
     # ── Warp CRUD ────────────────────────────────────────────────────
     def add_warp(self, x, y, target_map, tx, ty, face=0) -> Warp:
@@ -547,10 +589,31 @@ class MapHeader:
                 buf += w.to_bytes()
             for s in self.scripts:
                 buf += s.to_bytes()
-            project.write_bytes(self.objects_offset, bytes(buf))
+                
+            from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.compression import compress_popuri
+            compressed_buf = compress_popuri(bytes(buf))
+            project.write_patch(self.objects_offset, compressed_buf)
             return True
         except Exception as e:
             print(f"[MapHeader] save_warps: {e}")
+            return False
+
+    def save_layout_to_rom(self, project) -> bool:
+        """Comprime y guarda el layout (tilemap) de vuelta a la ROM."""
+        if not self.layout_offset or self.tilemap_lo is None:
+            return False
+        try:
+            buf = bytearray(self.tilemap_lo)
+            if self.tilemap_hi:
+                buf += self.tilemap_hi
+            
+            # En FoMT el layout suele usar Popuri (0x70) o LZ77 (0x10)
+            from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.compression import compress_popuri
+            compressed_buf = compress_popuri(bytes(buf))
+            project.write_patch(self.layout_offset, compressed_buf)
+            return True
+        except Exception as e:
+            print(f"[MapHeader] save_layout: {e}")
             return False
 
     # ── Renderizado (BlocksData.draw_block_layers de BlueSpider) ────
@@ -607,9 +670,9 @@ class MapParser:
     Implementa el algoritmo get_map_headers de BlueSpider.
     """
     # Offsets verificados de la tabla maestra USA (@USATH confirmado)
-    KNOWN_OFFSETS_USA   = [0x105EDC, 0x106E74, 0x11776C, 0x10FF2C, 0x10FF14]
+    KNOWN_OFFSETS_USA   = [0x0E5DB0, 0x105EDC, 0x106E74, 0x11776C, 0x10FF2C, 0x10FF14]
     KNOWN_OFFSETS_EUR   = [0x127048, 0x117A00, 0x110200]
-    KNOWN_OFFSETS_MFOMT = [0x10FF14, 0x110200]
+    KNOWN_OFFSETS_MFOMT = [0x0E5DB0, 0x10FF14, 0x110200]
 
     STRIDE = MapHeader.STRIDE
 
@@ -640,11 +703,21 @@ class MapParser:
             return MapHeader(i, off, chunk)
 
         with ThreadPoolExecutor() as ex:
-            results = list(ex.map(_parse, range(256)))
+            results = list(ex.map(_parse, range(512)))
 
         for r in results:
             if r is None:
-                break
+                continue
+            # Intentar obtener nombre bautizado desde la SuperLibrary
+            if hasattr(self.project, 'super_lib'):
+                name_hint = self.project.super_lib.get_map_name_hint(r.map_id)
+                # Si el nombre es genérico "[ID] Map ID", intentar buscar en el CSV cargado en map_map
+                if "Map " in name_hint and r.map_id in self.project.super_lib.map_map.values():
+                    # Buscar el nombre por ID
+                    for name, mid in self.project.super_lib.map_map.items():
+                        if mid == r.map_id:
+                            name_hint = f"[{mid:03d}] {name}"
+                            break
             self.maps.append(r)
 
         print(f"MapParser: {len(self.maps)} mapas desde 0x{self._table_offset:X}")

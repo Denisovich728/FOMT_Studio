@@ -1,0 +1,41 @@
+#include "lib_fomt.csv"
+
+script 607 Unknown_Event_0607 {
+const MESSAGE_0 = "Here you are, \xFF).\BRK";
+const MESSAGE_1 = "I'm going to give you a \r\npresent, so empty your \r\nhands, OK?\BRK";
+
+SetEntityFacing(0xC, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Hearth_Anim("Mary");
+Set_Name_Window("Mary");
+if (Inventory_Check()) {
+    Set_Portrait("Mary_Happy");
+    TalkMessage(0);
+    TalkClose();
+    SetEntityAnim("Mary", "Mary_Hands_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Mary", 0x813);
+    PlaySong(0, 0x6A);
+    SetEntityAnim("Player", "Player_Hands_Middle_Stop_Base");
+    Give_Item(Func122());
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+    Make_Delay(0x3C);
+    Set_Flag(0xB2, 2);
+    Refresh_Map_Entities();
+    Proc08A(0xC);
+    if ((Check_Flag(0xCC) == 2)) {
+        Proc08A(0x23);
+    }
+    Fade_Out(2, 1);
+    Warp_Player("Farm_House_1", 0x147, 0x70);
+    SetEntityPosition(0, 0x147, 0x70, 2);
+    Fade_In(2, 1);
+} else {
+    Set_Portrait("Mary_Neutral");
+    TalkMessage(1);
+    TalkClose();
+}
+Free_Event_Entity("Mary");
+SetEntityFacing(0xC, 0);
+exit;
+}

@@ -39,10 +39,13 @@ def main():
             stdin=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
+            text=True,  # Esto hace que p.stdin sea de texto directamente
+            bufsize=1,  # Line buffering
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
         # Redirigir el stderr de Python directamente al stdin del monitor
-        sys.stderr = os.fdopen(p.stdin.fileno(), 'w', buffering=1)
+        sys._original_stderr = sys.stderr
+        sys.stderr = p.stdin
     except Exception as e:
         print(f"No se pudo iniciar el monitor de errores: {e}")
 

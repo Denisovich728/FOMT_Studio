@@ -1,0 +1,141 @@
+#include "lib_fomt.csv"
+
+script 57 Unknown_Event_0057 {
+const MESSAGE_0 = "I wonder what I should do \r\nwith this?...No...Hmm....\BRK";
+const MESSAGE_1 = "Oh! \r\nI'm sorry I didn't see\r\nyou there. \BRK";
+const MESSAGE_2 = "I've never seen you \r\nbefore...Are you a \r\ntourist or something? \BRK";
+const MESSAGE_3 = "Oh, you're the new fellow\r\nup at the farm...!\BRK\r\n\xFF!, right? \r\nI'm Mary. Nice to meet you.\BRK";
+const MESSAGE_4 = "Hi, \xFF!. \r\nWelcome to the Library. \BRK";
+const MESSAGE_5 = "Not many people come to the\r\nLibrary, I'm glad you came!\BRK";
+const MESSAGE_6 = "Sorry about that before...\r\nWhen I get lost in thought,\r\nI don't notice anything. \BRK";
+const MESSAGE_7 = "Can I help?";
+const MESSAGE_8 = "Be careful.";
+const MESSAGE_9 = "I'm writing a novel, \r\nyou see. I was just having\r\na case of writer's block,\BRK\r\nthat's all.\BRK";
+const MESSAGE_10 = "Just let me know if you \r\nwant to read anything.\BRK\WAIT_CLICKI bet I have lots of books\r\nyou'd like!\BRK";
+const MESSAGE_11 = "I'll try to be more\r\ncareful from now on. \BRK";
+
+var var_0;
+
+Warp_Player("Mary_Library_Floor_01", 0x78, 0x90);
+PlayBGM(1, 0x11);
+SetEntityPosition(0, 0x78, 0xD0, 1);
+SetEntityAnim("Player", "Player_Stop_Base");
+SetEntityPosition(0xC, 0xD8, 0xA8, 2);
+SetEntityAnim("Mary", 0x813);
+Fade_In(2, 1);
+SetEntityAnim("Player", "Player_Walking_Base");
+Set_Vector_Y("Player", 0xA8, 1);
+Execute_Movement("Player");
+SetEntityAnim("Player", "Player_Stop_Base");
+SetEntityFacing(0, 3);
+TalkOpen();
+Set_Portrait("Mary_Surprised");
+Set_Name_Window("Mary");
+TalkMessage(0);
+TalkClose();
+SetEntityAnim("Mary", "Mary_Base");
+Set_Vector_X("Mary", 0x88, 1);
+Execute_Movement("Mary");
+SetEntityAnim("Mary", 0x813);
+Show_Emote("Mary", "Exclamation", 0);
+Make_Delay(0x3C);
+TalkOpen();
+Set_Portrait("Mary_Afraid");
+Set_Name_Window("Mary");
+Set_Hearth_Anim("Mary");
+TalkMessage(1);
+TalkClose();
+SetEntityAnim("Player", "Player_Head_No_Base");
+Make_Delay(0x3C);
+SetEntityAnim("Player", "Player_Stop_Base");
+Show_Emote("Mary", "Exclamation", 0);
+Make_Delay(0x3C);
+if ((Func083(0xC) == 0)) {
+    TalkOpen();
+    Set_Portrait("Mary_Neutral");
+    Set_Name_Window("Mary");
+    Set_Hearth_Anim("Mary");
+    TalkMessage(2);
+    TalkClose();
+    SetEntityAnim("Player", "Player_Head_No_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Player", "Player_Stop_Base");
+    TalkOpen();
+    Set_Portrait("Mary_Neutral");
+    Set_Name_Window("Mary");
+    Set_Hearth_Anim("Mary");
+    TalkMessage(3);
+    TalkClose();
+    SetEntityAnim("Player", "Player_See_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    TalkOpen();
+    Set_Portrait("Mary_Happy");
+    Set_Name_Window("Mary");
+    Set_Hearth_Anim("Mary");
+    TalkMessage(4);
+    TalkClose();
+    SetEntityAnim("Player", "Player_See_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Player", "Player_Stop_Base");
+    TalkOpen();
+    Set_Portrait("Mary_Happy");
+    Set_Name_Window("Mary");
+    Set_Hearth_Anim("Mary");
+    TalkMessage(5);
+    TalkClose();
+    SetEntityAnim("Player", "Player_See_Base");
+    Make_Delay(0x3C);
+    SetEntityAnim("Player", "Player_Stop_Base");
+}
+TalkOpen();
+Set_Portrait("Mary_Neutral");
+Set_Name_Window("Mary");
+Set_Hearth_Anim("Mary");
+TalkMessage(6);
+TalkClose();
+TalkOpen();
+var_0 = TalkChoice2(7, 8);
+switch (var_0) {
+    case 1:
+        Give_Love_Points("Mary", 0xBB8);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Mary_Happy");
+        Set_Name_Window("Mary");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(9);
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Mary_Neutral");
+        Set_Name_Window("Mary");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(10);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        Free_Event_Entity("Mary");
+        Routine_State_Override("Mary", "Script_58");
+        Set_Flag("Flag_0x61", 1);
+        break;
+    case 2:
+        TalkClose();
+        TalkOpen();
+        Set_Portrait("Mary_Afraid");
+        Set_Name_Window("Mary");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(11);
+        TalkClose();
+        SetEntityAnim("Player", "Player_See_Base");
+        Make_Delay(0x3C);
+        SetEntityAnim("Player", "Player_Stop_Base");
+        Free_Event_Entity("Mary");
+        Routine_State_Override("Mary", "Script_58");
+        Set_Flag("Flag_0x61", 1);
+        break;
+}
+End_Cinematic_State();
+exit;
+}

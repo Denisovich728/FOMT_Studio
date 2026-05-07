@@ -1,0 +1,1024 @@
+#include "lib_fomt.csv"
+
+script 1005 Unknown_Event_1005 {
+const MESSAGE_0 = "Err...Hello, budum...\r\nYou're \xFF!?\BRK\WAIT_CLICKMy name's Hoggy. \r\nIt's a pleasure, budum.\BRK";
+const MESSAGE_1 = "Our Tea Party is in \r\nthe Spring, budum.\BRK";
+const MESSAGE_2 = "Did you bring an invitation?\r\nEveryone! Get the Tea Set\r\nready!...\BRK";
+const MESSAGE_3 = "Sorry, but not everyone\r\nis here, budum, so we can't \r\nhave the Tea Party now.\BRK";
+const MESSAGE_4 = "Now isn't the time for a\r\nTea Party, budum.\r\nCome at the right time!\BRK";
+const MESSAGE_5 = "We can't have a \r\nTea Party here, budum!\BRK";
+const MESSAGE_6 = "Today's my birthday, budum!\r\nThank you!\BRK";
+const MESSAGE_7 = "Yipee!! \r\nThis is wonderful, budum!\r\nThank you!\BRK";
+const MESSAGE_8 = "Thanks!\r\nThis is great, budum!\BRK";
+const MESSAGE_9 = "Thanks, budum...\BRK";
+const MESSAGE_10 = "This isn't so great, \r\nbudum...\BRK";
+const MESSAGE_11 = ".......!!\r\nThis is the worst present\r\never, budum...\BRK";
+const MESSAGE_12 = "Awww...It's so cute, budum!\BRK";
+const MESSAGE_13 = "Wh-why...does it look\r\nlike it wants to eat\r\nme, budum...?\BRK";
+const MESSAGE_14 = "Thanks much!\r\nIs this really for me, \r\nbudum?\BRK";
+const MESSAGE_15 = "Thank you!\r\nI'm happy!";
+const MESSAGE_16 = "This is a great feather,\r\nbut it won't fill me \r\nup, budum.\BRK";
+const MESSAGE_17 = "I heard a rumor that \r\nthere are friends of ours in\r\nForget-me-not Valley, budum?\BRK";
+const MESSAGE_18 = "Spring is the season for\r\nTea Parties. Everyone loves\r\nTea Parties, budum.\BRK";
+const MESSAGE_19 = "Spring is the season for\r\nTea Parties. We send \r\ninvitations to our friends.\BRK";
+const MESSAGE_20 = "Spring is the season for\r\nTea Parties. Do you  \r\nlike tea?\BRK";
+const MESSAGE_21 = "Spring is the season for\r\nTea Parties. If you come,\r\nwe'll have them every\r\nday, budum!\BRK";
+const MESSAGE_22 = "I like Tea Parties \r\nbecause of the delicious\r\ntreats, budum.\BRK";
+const MESSAGE_23 = "Chef makes the treats\r\nfor our Tea Parties, budum.\BRK";
+const MESSAGE_24 = "We only invite our\r\ntrue friends to \r\nTea Parties, budum!\BRK";
+const MESSAGE_25 = "I wish everyday is the\r\nSpring so that we can have\r\na tea party everyday.\BRK";
+const MESSAGE_26 = "I'm getting hungry, budum...\BRK";
+const MESSAGE_27 = "Did you bring anything\r\nfor me to eat, budum?\BRK";
+const MESSAGE_28 = "Ah, \xFF!.\r\nWhat will you give me\r\ntoday, budum?\BRK";
+const MESSAGE_29 = "Whenever I get hungry,\r\nyou seem to come along, \r\nbudum.\BRK";
+const MESSAGE_30 = "I just love to eat!...\BRK";
+const MESSAGE_31 = "If I don't eat, I don't\r\nhave any energy, budum...\BRK";
+const MESSAGE_32 = "You know what I like\r\nto eat, \xFF!.\BRK";
+const MESSAGE_33 = "If it were for you,\r\n\xFF!, I'd be willing\r\nto work even if I got \r\nhungry!\BRK";
+const MESSAGE_34 = "Did you need something?\BRK";
+const MESSAGE_35 = "Can you help me?";
+const MESSAGE_36 = "Let's play.";
+const MESSAGE_37 = "Nothing in particular.";
+const MESSAGE_38 = "I'll get started \r\ntomorrow, budum.\BRK";
+const MESSAGE_39 = "I'll help you if we become\r\nbetter friends, budum.\BRK";
+const MESSAGE_40 = "What should I do?\BRK";
+const MESSAGE_41 = "Watering";
+const MESSAGE_42 = "Harvest";
+const MESSAGE_43 = "Animals";
+const MESSAGE_44 = "Exit";
+const MESSAGE_45 = "How long do you\r\nwant me to water for, budum?\BRK";
+const MESSAGE_46 = "1 day";
+const MESSAGE_47 = "3 days";
+const MESSAGE_48 = "1 week";
+const MESSAGE_49 = "Got it.\r\nI'll water for 1 day, budum.\BRK";
+const MESSAGE_50 = "Got it.\r\nI'll water for 3 days, \r\nbudum.\BRK";
+const MESSAGE_51 = "Got it.\r\nI'll water for 1 week, \r\nbudum.\BRK";
+const MESSAGE_52 = "How many days do you\r\nwant me to harvest \r\nfor, budum?\BRK";
+const MESSAGE_53 = "Got it.\r\nI'll harvest for \r\n1 day, budum.\BRK";
+const MESSAGE_54 = "Got it.\r\nI'll harvest for \r\n3 days, budum.\BRK";
+const MESSAGE_55 = "Got it.\r\nI'll harvest for \r\n1 week, budum.\BRK";
+const MESSAGE_56 = "How long do you\r\nwant me to look after \r\nthe animals for, budum?\BRK";
+const MESSAGE_57 = "Got it.\r\nI'll look after the animals\r\nfor 1 day, budum.\BRK";
+const MESSAGE_58 = "Got it.\r\nI'll look after the animals\r\nfor 3 days, budum.\BRK";
+const MESSAGE_59 = "Got it.\r\nI'll look after the animals\r\nfor 1 week, budum.\BRK";
+const MESSAGE_60 = "Really, budum?\r\nIs that so...?\BRK";
+const MESSAGE_61 = "We already played today!\r\nLet's play tomorrow, budum.\BRK";
+const MESSAGE_62 = "I'll play if we become\r\nbetter friends, budum.\BRK";
+const MESSAGE_63 = "How should we play?\BRK";
+const MESSAGE_64 = "Let's play the\r\nwatering game, budum!\BRK";
+const MESSAGE_65 = "I think I've gotten \r\nbetter than before, budum!\BRK";
+const MESSAGE_66 = "I hope I don't make \r\ntoo many mistakes...\BRK";
+const MESSAGE_67 = "Let's play the\r\nharvest game, budum!\BRK";
+const MESSAGE_68 = "Let's play the\r\nanimal husbandry game,\r\nbudum!\BRK";
+const MESSAGE_69 = "What? You don't want to\r\nplay, budum? \r\nThat's too bad...\BRK";
+const MESSAGE_70 = "No?\BRK";
+const MESSAGE_71 = "We're already done\r\nworking for the day!\BRK";
+const MESSAGE_72 = "I haven't gotten very\r\ngood at it yet, budum...\BRK";
+const MESSAGE_73 = "I think I'm getting the\r\nhang of it, budum...!\BRK";
+const MESSAGE_74 = "Harvesting is fun, budum!\r\nLet's do more!\BRK";
+const MESSAGE_75 = "Now I'm a master harvester!\r\nJust leave it to me, budum!\BRK";
+const MESSAGE_76 = "Watering is fun, budum!\r\nLet's do more!\BRK";
+const MESSAGE_77 = "Now I'm a master waterer!\r\nJust leave it to me, budum!\BRK";
+const MESSAGE_78 = "Taking care of animals\r\nis fun, budum!\r\nLet's do more!\BRK";
+const MESSAGE_79 = "Now I'm great at\r\ntaking care of the animals!\r\nJust leave it to me, budum!\BRK";
+const MESSAGE_80 = "Let's do more tomorrow!";
+const MESSAGE_81 = "Your job is done for now.";
+const MESSAGE_82 = "I'll do my best, budum.\BRK";
+const MESSAGE_83 = "OK. Tomorrow I'll rest,\r\nbudum.\BRK";
+
+var var_0;
+var var_1;
+var var_3;
+var var_4;
+var var_5;
+var var_6;
+
+SetEntityAnim("Hoggy", "Hoggy_Stop_Base");
+Wait_For_Animation("Hoggy");
+var_5 = GetEntityFacing(0x29);
+SetEntityFacing(0x29, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Name_Window("Hoggy");
+if ((Func083(0x29) == 0)) {
+    Set_Portrait("Hoggy_Scared");
+    TalkMessage(0);
+    Free_Event_Entity("Hoggy");
+} else {
+    if (Inventory_Check()) {
+        var_0 = 6;
+    } else {
+        switch (Compare_Gift()) {
+            case 0:
+                switch (Search_Food_Gift_Address()) {
+                    case "Spa-Boiled Egg":
+                    case "Milk (S)":
+                    case "Milk (M)":
+                    case "Milk (L)":
+                    case "Milk (G)":
+                    case "Milk (P)":
+                    case "Milk (X)":
+                    case "Honey":
+                    case "Wild Grapes":
+                    case "Yellow Grass":
+                    case "Bodigizer":
+                    case "Bodigizer XL":
+                    case "Turbojolt":
+                    case "Turbojolt XL":
+                    case "Wine":
+                    case "Bread":
+                    case "Flower":
+                    case "Relax Tea Leaves":
+                    case "Wild Grape Juice":
+                    case "French Fries":
+                    case "Popcorn":
+                    case "Corn Flakes":
+                    case "Baked Corn":
+                    case "Pumpkin Pudding":
+                    case "Sweet Potatoes":
+                    case "Omelet":
+                    case "Hot Milk":
+                    case "Butter":
+                    case "Apple Pie":
+                    case "Apple Jam":
+                    case "Sushi":
+                    case "Raisin Bread":
+                    case "Grape Jam":
+                    case "Sashimi":
+                    case "Pizza":
+                    case "Curry Noodles":
+                    case "Tempura":
+                    case "Relaxation Tea":
+                    case "Toast":
+                    case "Elli Leaves":
+                    case "Tempura Rice":
+                    case "Candied Potato":
+                        var_0 = 1;
+                        break;
+                    case "Turnip":
+                    case "Potato":
+                    case "Cucumber":
+                    case "Tomato":
+                    case "Corn":
+                    case "Onion":
+                    case "Pumpkin":
+                    case "Pineapple":
+                    case "Eggplant":
+                    case "Carrot":
+                    case "Sweet Potato":
+                    case "Green Pepper":
+                    case "Regular Quality Egg":
+                    case "Good Quality Egg":
+                    case "High Quality Egg":
+                    case "Golden Egg":
+                    case "P Egg":
+                    case "X Egg":
+                    case "Cheese (S)":
+                    case "Cheese (M)":
+                    case "Cheese (L)":
+                    case "Cheese (G)":
+                    case "Cheese (P)":
+                    case "Cheese (X)":
+                    case "Apple":
+                    case "Truffle":
+                    case "Blue Grass":
+                    case "Green Grass":
+                    case "Red Grass":
+                    case "Orange Grass":
+                    case "Purple Grass":
+                    case "Indigo Grass":
+                    case "Grape Juice":
+                    case "Rice Ball":
+                    case "Oil":
+                    case "Curry Powder":
+                    case "Chocolate":
+                    case "SUGDW Apple":
+                    case "HMSGB Apple":
+                    case "AEPFE Apple":
+                    case "Salad":
+                    case "Curry Rice":
+                    case "Stew":
+                    case "Miso Soup":
+                    case "Stir Fry":
+                    case "Pickled Turnip":
+                    case "Ketchup":
+                    case "Pineapple Juice":
+                    case "Pumpkin Stew":
+                    case "Omelet Rice":
+                    case "Boiled Egg":
+                    case "Cheese Cake":
+                    case "Cheese Fondue":
+                    case "Apple Souffl?":
+                    case "Mushroom Rice":
+                    case "Jam Bun":
+                    case "Grilled Fish":
+                    case "Chirashi Sushi":
+                    case "Tempura Noodles":
+                    case "Noodles w/ Tempura":
+                    case "Fried Noodles":
+                    case "Ice Cream":
+                    case "Pudding":
+                    case "Rice Cake":
+                    case "Roasted Rice Cake":
+                    case "Toasted Rice Ball":
+                    case "Egg Over Rice":
+                    case "Rice Gruel":
+                    case "Potato Pancakes":
+                        var_0 = 2;
+                        break;
+                    case "Strawberry":
+                    case "Cabbage":
+                    case "Spinach":
+                    case "Mayonnaise (S)":
+                    case "Mayonnaise (M)":
+                    case "Mayonnaise (L)":
+                    case "Mayonnaise (G)":
+                    case "Mayonnaise (P)":
+                    case "Mayonnaise (X)":
+                    case "Bamboo Shoot":
+                    case "Mushroom":
+                    case "Poisonous Mushroom":
+                    case "White Grass":
+                    case "Muffin Mix":
+                    case "Fried Rice":
+                    case "Savory Pancake":
+                    case "Sandwich":
+                    case "Fruit Juice":
+                    case "Vegetable Juice":
+                    case "Mixed Juice":
+                    case "Fruit Latte":
+                    case "Vegetable Latte":
+                    case "Mixed Latte":
+                    case "Strawberry Milk":
+                    case "Strawberry Jam":
+                    case "Tomato Juice":
+                    case "Pickles":
+                    case "Happy Eggplant":
+                    case "Baked Sweet Potato":
+                    case "Bamboo Rice":
+                    case "Truffle Rice":
+                    case "Dinner Role":
+                    case "Curry Bread":
+                    case "Noodles":
+                    case "Fried Noodles":
+                    case "Buckwheat Noodles":
+                    case "Buckwheat Chips":
+                    case "Cookies":
+                    case "Chocolate Cookies":
+                    case "Cake":
+                    case "Chocolate Cake":
+                    case "French Toast":
+                    case "Mountain Stew":
+                    case "Moon Dumplings":
+                    case "Small Fish":
+                    case "Medium Fish":
+                    case "Large Fish":
+                    case "Pancakes":
+                    case "Fish Sticks":
+                        var_0 = 3;
+                        break;
+                    case "Black Grass":
+                    case "Buckwheat Flour":
+                    case "Greens":
+                    case "Scrambled Eggs":
+                    case "Failed Dish":
+                    case "Failed Drink":
+                    case "Failed Pot Dish":
+                    case "Failed Dessert":
+                    case "Failed Bread":
+                    case "Failed Noodles":
+                        var_0 = 4;
+                        break;
+                }
+                break;
+            case 1:
+                switch (Search_Item_Gift_Address()) {
+                    case "Orichalc":
+                        var_0 = 1;
+                        break;
+                    case "Yarn (S)":
+                    case "Yarn (M)":
+                    case "Yarn (L)":
+                    case "Yarn (G)":
+                    case "Yarn (P)":
+                    case "Yarn (X)":
+                    case "The Spring Sun":
+                    case "The Summer Sun":
+                    case "The Autumn Sun":
+                    case "The Winter Sun":
+                    case "Lithograph":
+                    case "Ball":
+                    case "Lumber":
+                        var_0 = 3;
+                        break;
+                    case "Moon Drop Grass":
+                    case "Pink Cat Grass":
+                    case "Blue Magic Grass":
+                    case "Red Magic Grass":
+                    case "Toy Flower":
+                    case "Wool (S)":
+                    case "Wool (M)":
+                    case "Wool (L)":
+                    case "Wool (G)":
+                    case "Wool (P)":
+                    case "Wool (P)":
+                    case "Moon Stone":
+                    case "Sand Rose":
+                    case "Pink Diamond":
+                    case "Alexandrite":
+                    case "Mythic Stone":
+                    case "Diamond":
+                    case "Emerald":
+                    case "Ruby":
+                    case "Topaz":
+                    case "Peridot":
+                    case "Fluorite":
+                    case "Agate":
+                    case "Amethyst":
+                        var_0 = 4;
+                        break;
+                    case "Junk Ore":
+                    case "Copper":
+                    case "Silver":
+                    case "Gold":
+                    case "Mystrile":
+                    case "Adamantite":
+                    case "Weeds":
+                    case "Stones":
+                    case "Branches":
+                    case "Message in a Bottle":
+                    case "Pirate Treasure":
+                    case "Fossil of Fish":
+                    case "Empty Can":
+                    case "Boots":
+                    case "Fish Bones":
+                    case "Golden Lumber":
+                    case "Animal Fodder":
+                    case "Chicken Feed":
+                        var_0 = 5;
+                        break;
+                    case "Harvest Goddess Jewel":
+                    case "Kappa Jewel":
+                    case "Jewel of Truth":
+                    case "Karen's Wine":
+                    case "Popuri's Mud Ball":
+                    case "Ann's Music Box":
+                    case "Mary's Great Book":
+                    case "Elli's Pressed Flwr":
+                    case "Album 1":
+                    case "Album 2":
+                    case "Album 3":
+                    case "Album 4":
+                    case "Album 5":
+                    case "Album 6":
+                    case "Album 7":
+                    case "Album 8":
+                    case "Album 9":
+                    case "Album 10":
+                    case "Album 11":
+                    case "Album 12":
+                    case "Album 13":
+                    case "Album 14":
+                    case "Album 15":
+                    case "Book":
+                    case "Photo":
+                    case "Lottery":
+                    case "Frisbee":
+                        var_0 = 6;
+                        break;
+                    case "Invitation":
+                        var_0 = 0xC;
+                        break;
+                    case "Bracelet":
+                    case "Necklace":
+                    case "Earrings":
+                    case "Broach":
+                        var_0 = 9;
+                        break;
+                    case "Dress":
+                    case "Facial Pack":
+                    case "Skin Lotion":
+                    case "Sunblock":
+                        var_0 = 0xA;
+                        break;
+                    case "Perfume":
+                        var_0 = 0xB;
+                        break;
+                }
+                break;
+            case 4:
+                var_0 = 6;
+                break;
+            case 2:
+                if ((Check_Flag("Flag_0x41") == 0)) {
+                    var_0 = 7;
+                    goto LBL_001E;
+                }
+                var_0 = 8;
+                break;
+            case 3:
+                var_6 = Func044();
+                if ((Func10D(3, var_6) == 0)) {
+                    var_0 = 7;
+                    goto LBL_0023;
+                }
+                var_0 = 8;
+                break;
+        }
+    }
+    if ((var_0 != 6)) {
+        if ((var_0 == 0xC)) {
+            if ((Check_Flag("System_Season") != 0)) {
+                Set_Portrait("Hoggy_Scared");
+                TalkMessage(1);
+            } else {
+                if ((GetEntityLocation("Hoggy") == "Harvest_Sprites_House")) {
+                    if (((Check_Flag("System_Hour") >= 0xA) && (Check_Flag("System_Hour") < 0x11))) {
+                        if (((((((GetEntityLocation("Nappy") == "Harvest_Sprites_House") && (GetEntityLocation("Bold") == "Harvest_Sprites_House")) && (GetEntityLocation("Chef") == "Harvest_Sprites_House")) && (GetEntityLocation("Aqua") == "Harvest_Sprites_House")) && (GetEntityLocation("Staid") == "Harvest_Sprites_House")) && (GetEntityLocation("Timid") == "Harvest_Sprites_House"))) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(2);
+                            TalkClose();
+                            Fade_Out(2, 1);
+                            Drop_Held_Item();
+                            Execute_Script(0x32F);
+                        } else {
+                            Set_Portrait("Hoggy_Scared");
+                            TalkMessage(3);
+                        }
+                    } else {
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(4);
+                    }
+                } else {
+                    Set_Portrait("Hoggy_Scared");
+                    TalkMessage(5);
+                }
+            }
+        } else {
+            if (((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) && Is_NPC_Birthday("Hoggy"))) {
+                Set_Portrait("Hoggy_Neutral");
+                TalkMessage(6);
+            } else {
+                switch (var_0) {
+                    case 1:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(7);
+                        break;
+                    case 2:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(8);
+                        break;
+                    case 3:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(9);
+                        break;
+                    case 4:
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(10);
+                        break;
+                    case 5:
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(11);
+                        break;
+                    case 7:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(12);
+                        break;
+                    case 8:
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(13);
+                        break;
+                    case 9:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(14);
+                        break;
+                    case 0xA:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(14);
+                        break;
+                    case 0xB:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(15);
+                        break;
+                }
+            }
+        }
+        if ((Has_NPC_Talked_Today_2("Hoggy") == 0)) {
+            switch (var_0) {
+                case 1:
+                    var_1 = 9;
+                    break;
+                case 2:
+                    var_1 = 3;
+                    break;
+                case 3:
+                    var_1 = 1;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 1;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = 9;
+                    break;
+                case 0xA:
+                    var_1 = 9;
+                    break;
+                case 0xB:
+                    var_1 = 3;
+                    break;
+            }
+        } else {
+            switch (var_0) {
+                case 1:
+                    var_1 = 3;
+                    break;
+                case 2:
+                    var_1 = 1;
+                    break;
+                case 3:
+                    var_1 = 0;
+                    break;
+                case 4:
+                    var_1 = -3;
+                    break;
+                case 5:
+                    var_1 = -9;
+                    break;
+                case 7:
+                    var_1 = 0;
+                    break;
+                case 8:
+                    var_1 = -3;
+                    break;
+                case 9:
+                    var_1 = 3;
+                    break;
+                case 0xA:
+                    var_1 = 3;
+                    break;
+                case 0xB:
+                    var_1 = 1;
+                    break;
+            }
+        }
+        if (Is_NPC_Birthday("Hoggy")) {
+            var_1 *= 5;
+        }
+        if (Is_Item_Wrapped()) {
+            var_1 = (var_1 + (var_1 / 4));
+        }
+        Give_Friendship_Points("Hoggy", var_1);
+        TalkClose();
+        if (((((((((var_0 == 1) || (var_0 == 2)) || (var_0 == 3)) || (var_0 == 4)) || (var_0 == 5)) || (var_0 == 9)) || (var_0 == 0xA)) || (var_0 == 0xB))) {
+            Drop_Held_Item();
+        }
+        Warp_Entity_To_Map("Barley_House_Floor_01");
+        goto LBL_0003;
+    }
+    if (Func05C(0)) {
+        switch (Check_Equped_Tool()) {
+            case "Blue Feather":
+                Set_Portrait("Hoggy_Neutral");
+                TalkMessage(16);
+                break;
+        }
+        goto LBL_0003;
+    }
+    if ((GetEntityLocation("Hoggy") == "Harvest_Sprites_House")) {
+        if ((Check_Flag("Flag_0x1F9") == 1)) {
+            Set_Portrait("Hoggy_Neutral");
+            TalkMessage(17);
+            Set_Flag("Flag_0x1F9", 0);
+        } else {
+            if ((Check_Flag("System_Season") == 0)) {
+                if ((Has_NPC_Talked_Today("Hoggy") == 0)) {
+                    if ((Chek_Friendship_Points("Hoggy") <= 0x32)) {
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(18);
+                    } else {
+                        if ((Chek_Friendship_Points("Hoggy") <= 0x64)) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(19);
+                        } else {
+                            if ((Chek_Friendship_Points("Hoggy") <= 0x96)) {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(20);
+                            } else {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(21);
+                            }
+                        }
+                    }
+                } else {
+                    if ((Chek_Friendship_Points("Hoggy") <= 0x32)) {
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(22);
+                    } else {
+                        if ((Chek_Friendship_Points("Hoggy") <= 0x64)) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(23);
+                        } else {
+                            if ((Chek_Friendship_Points("Hoggy") <= 0x96)) {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(24);
+                            } else {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(25);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if ((Has_NPC_Talked_Today("Hoggy") == 0)) {
+                    if ((Chek_Friendship_Points("Hoggy") <= 0x32)) {
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(26);
+                    } else {
+                        if ((Chek_Friendship_Points("Hoggy") <= 0x64)) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(27);
+                        } else {
+                            if ((Chek_Friendship_Points("Hoggy") <= 0x96)) {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(28);
+                            } else {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(29);
+                            }
+                        }
+                    }
+                } else {
+                    if ((Chek_Friendship_Points("Hoggy") <= 0x32)) {
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(30);
+                    } else {
+                        if ((Chek_Friendship_Points("Hoggy") <= 0x64)) {
+                            Set_Portrait("Hoggy_Scared");
+                            TalkMessage(31);
+                        } else {
+                            if ((Chek_Friendship_Points("Hoggy") <= 0x96)) {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(32);
+                            } else {
+                                Set_Portrait("Hoggy_Neutral");
+                                TalkMessage(33);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TalkMessage(34);
+        TalkClose();
+        TalkOpen();
+        var_3 = TalkChoice3(0x23, 0x24, 0x25);
+        switch (var_3) {
+            case 1:
+                if ((Func0CC(0x29) != 0)) {
+                    TalkClose();
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(38);
+                    goto LBL_00D9;
+                }
+                if ((Chek_Friendship_Points("Hoggy") <= 0x4A)) {
+                    TalkClose();
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Scared");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(39);
+                    goto LBL_00DD;
+                }
+                TalkClose();
+                TalkOpen();
+                Set_Portrait("Hoggy_Neutral");
+                Set_Name_Window("Hoggy");
+                TalkMessage(40);
+                TalkClose();
+                TalkOpen();
+                var_3 = TalkChoice4(0x29, 0x2A, 0x2B, 0x2C);
+                switch (var_3) {
+                    case 1:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(45);
+                        TalkClose();
+                        TalkOpen();
+                        var_3 = TalkChoice3(0x2E, 0x2F, 0x30);
+                        switch (var_3) {
+                            case 1:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(49);
+                                Hire_Harvest_Sprite(0x29, 1, 1);
+                                break;
+                            case 2:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(50);
+                                Hire_Harvest_Sprite(0x29, 1, 3);
+                                break;
+                            case 3:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(51);
+                                Hire_Harvest_Sprite(0x29, 1, 7);
+                                break;
+                        }
+                        break;
+                    case 2:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(52);
+                        TalkClose();
+                        TalkOpen();
+                        var_3 = TalkChoice3(0x2E, 0x2F, 0x30);
+                        switch (var_3) {
+                            case 1:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(53);
+                                Hire_Harvest_Sprite(0x29, 0, 1);
+                                break;
+                            case 2:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(54);
+                                Hire_Harvest_Sprite(0x29, 0, 3);
+                                break;
+                            case 3:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(55);
+                                Hire_Harvest_Sprite(0x29, 0, 7);
+                                break;
+                        }
+                        break;
+                    case 3:
+                        Set_Portrait("Hoggy_Neutral");
+                        TalkMessage(56);
+                        TalkClose();
+                        TalkOpen();
+                        var_3 = TalkChoice3(0x2E, 0x2F, 0x30);
+                        switch (var_3) {
+                            case 1:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(57);
+                                Hire_Harvest_Sprite(0x29, 2, 1);
+                                break;
+                            case 2:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(58);
+                                Hire_Harvest_Sprite(0x29, 2, 3);
+                                break;
+                            case 3:
+                                Set_Portrait("Hoggy_Neutral");
+                                Set_Name_Window("Hoggy");
+                                TalkMessage(59);
+                                Hire_Harvest_Sprite(0x29, 2, 7);
+                                break;
+                        }
+                        break;
+                    case 4:
+                        Set_Portrait("Hoggy_Scared");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(60);
+                        break;
+                }
+                break;
+            case 2:
+                if ((Func0CE(0x29) == 1)) {
+                    TalkClose();
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(61);
+                    goto LBL_00F7;
+                }
+                if ((Chek_Friendship_Points("Hoggy") <= 0x4A)) {
+                    TalkClose();
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Scared");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(62);
+                    goto LBL_00FB;
+                }
+                TalkClose();
+                TalkOpen();
+                Set_Portrait("Hoggy_Neutral");
+                TalkMessage(63);
+                TalkClose();
+                TalkOpen();
+                var_3 = TalkChoice4(0x29, 0x2A, 0x2B, 0x2C);
+                switch (var_3) {
+                    case 1:
+                        TalkClose();
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(64);
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        var_4 = Func0D5(0x29);
+                        Fade_In(3, 1);
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        if (var_4) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(65);
+                            goto LBL_00FE;
+                        }
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(66);
+                        TalkClose();
+                        break;
+                    case 2:
+                        TalkClose();
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(67);
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        var_4 = Func0D4(0x29);
+                        Fade_In(3, 1);
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        if (var_4) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(65);
+                            goto LBL_0101;
+                        }
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(66);
+                        TalkClose();
+                        break;
+                    case 3:
+                        TalkClose();
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(68);
+                        TalkClose();
+                        Fade_Out(3, 1);
+                        var_4 = Func0D3(0x29);
+                        Fade_In(3, 1);
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        if (var_4) {
+                            Set_Portrait("Hoggy_Neutral");
+                            TalkMessage(65);
+                            goto LBL_0104;
+                        }
+                        Set_Portrait("Hoggy_Scared");
+                        TalkMessage(66);
+                        TalkClose();
+                        break;
+                    case 4:
+                        TalkClose();
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Scared");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(69);
+                        break;
+                }
+                break;
+            case 3:
+                TalkClose();
+                TalkOpen();
+                Set_Portrait("Hoggy_Neutral");
+                Set_Name_Window("Hoggy");
+                TalkMessage(70);
+                break;
+        }
+    } else {
+        if ((Func0D2(0x29) == 1)) {
+            Set_Portrait("Hoggy_Neutral");
+            Set_Name_Window("Hoggy");
+            TalkMessage(71);
+        } else {
+            switch (Func0CB(0x29)) {
+                case 0:
+                    if ((Func0CD(0x29, 0) <= 0x32)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Scared");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(72);
+                        goto LBL_0114;
+                    }
+                    if ((Func0CD(0x29, 0) <= 0x64)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(73);
+                        goto LBL_0118;
+                    }
+                    if ((Func0CD(0x29, 0) <= 0x96)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(74);
+                        goto LBL_011C;
+                    }
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(75);
+                    break;
+                case 1:
+                    if ((Func0CD(0x29, 1) <= 0x32)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(72);
+                        goto LBL_0121;
+                    }
+                    if ((Func0CD(0x29, 1) <= 0x64)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(73);
+                        goto LBL_0125;
+                    }
+                    if ((Func0CD(0x29, 1) <= 0x96)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(76);
+                        goto LBL_0129;
+                    }
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(77);
+                    break;
+                case 2:
+                    if ((Func0CD(0x29, 2) <= 0x32)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(72);
+                        goto LBL_012E;
+                    }
+                    if ((Func0CD(0x29, 2) <= 0x64)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(73);
+                        goto LBL_0132;
+                    }
+                    if ((Func0CD(0x29, 2) <= 0x96)) {
+                        TalkOpen();
+                        Set_Portrait("Hoggy_Neutral");
+                        Set_Name_Window("Hoggy");
+                        TalkMessage(78);
+                        goto LBL_0136;
+                    }
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(79);
+                    break;
+            }
+        }
+        if ((Func0CC(0x29) > 1)) {
+            TalkClose();
+            TalkOpen();
+            var_3 = TalkChoice2(0x50, 0x51);
+            switch (var_3) {
+                case 1:
+                    TalkClose();
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(82);
+                    break;
+                case 2:
+                    TalkClose();
+                    TalkOpen();
+                    Set_Portrait("Hoggy_Neutral");
+                    Set_Name_Window("Hoggy");
+                    TalkMessage(83);
+                    Cancel_Harvest_Sprite_Work(0x29);
+                    break;
+            }
+        }
+    }
+    Free_Event_Entity("Hoggy");
+}
+TalkClose();
+SetEntityFacing(0x29, var_5);
+exit;
+}

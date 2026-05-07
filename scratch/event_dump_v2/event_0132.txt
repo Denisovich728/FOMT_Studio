@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 132 Unknown_Event_0132 {
+const MESSAGE_0 = "Photograph\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

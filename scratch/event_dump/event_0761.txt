@@ -1,0 +1,24 @@
+#include "lib_fomt.csv"
+
+script 761 Unknown_Event_0761 {
+const MESSAGE_0 = "It's nice to have your\r\nhusband by your side all \r\nthe time, isn't it? \BRK";
+const MESSAGE_1 = "You two really do make\r\na cute couple. \BRK";
+
+if ((Check_Flag(0x119) == 1)) {
+    SetEntityFacing(1, GetOppositeFacing(GetEntityFacing(0)));
+    TalkOpen();
+    if ((Has_NPC_Talked_Today("Lillia") == 0)) {
+        Set_Portrait("Lilia_Neutral");
+        Set_Name_Window("Lillia");
+        TalkMessage(0);
+    } else {
+        Set_Portrait("Lilia_Happy");
+        Set_Name_Window("Lillia");
+        TalkMessage(1);
+    }
+    TalkClose();
+    Free_Event_Entity("Lillia");
+    SetEntityFacing(1, 2);
+}
+exit;
+}

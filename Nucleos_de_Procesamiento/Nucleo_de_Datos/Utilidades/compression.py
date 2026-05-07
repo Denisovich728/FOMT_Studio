@@ -80,7 +80,51 @@ def is_lz77_block(data, offset=0):
     if (first_flag & 0x80):
         return False
         
+        
     return True
+
+def compress_popuri(data: bytes) -> bytes:
+    """
+    Compresor RLE (0x70) para el motor Popuri (FoMT).
+    Este algoritmo comprime los triggers y layouts del mapa.
+    """
+    size = len(data)
+    out = bytearray()
+    out.append(0x70)
+    
+    # 3 bytes para el tamaño descomprimido (Little Endian)
+    out.extend(struct.pack('<I', size)[:3])
+    
+    pos = 0
+    while pos < size:
+        # Buscar repeticiones (RLE match)
+        match_len = 1
+        while pos + match_len < size and data[pos] == data[pos + match_len] and match_len < 128:
+            match_len += 1
+            
+        if match_len >= 3:
+            # Comprimir repetición: byte de control (0x80 | (count-1)) seguido del byte
+            out.append(0x80 | (match_len - 1))
+            out.append(data[pos])
+            pos += match_len
+        else:
+            # Literal run
+            lit_len = 0
+            while pos + lit_len < size and lit_len < 128:
+                # Si encontramos un match de al menos 3 caracteres, rompemos el literal run
+                if pos + lit_len + 2 < size and data[pos + lit_len] == data[pos + lit_len + 1] == data[pos + lit_len + 2]:
+                    break
+                lit_len += 1
+                
+            out.append(lit_len - 1)
+            out.extend(data[pos : pos + lit_len])
+            pos += lit_len
+            
+    # Pad a múltiplo de 4
+    while len(out) % 4 != 0:
+        out.append(0)
+        
+    return bytes(out)
 
 # Alias para compatibilidad con código legado (SuperLibrary)
 decompress_lz77 = decompress_lz10

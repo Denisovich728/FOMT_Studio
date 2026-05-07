@@ -1,0 +1,45 @@
+#include "lib_fomt.csv"
+
+script 1163 Unknown_Event_1163 {
+const MESSAGE_0 = "Congratulations on winning!\r\nI've never seen such a\r\nstrong Chicken! \BRK\WAIT_CLICKThanks again for a\r\ngreat set of bouts! \BRK";
+
+Warp_Player("Rose_Square", 0xDC, 0x5E);
+StopBGM();
+SetEntityPosition(2, 0xDC, 0x4C, 0);
+SetEntityAnim("Rick", "Rick_Stop_Base");
+SetEntityPosition(0, 0xDC, 0x5E, 1);
+if ((Inventory_Check() == 1)) {
+    SetEntityAnim("Player", "Player_Stop_Base");
+} else {
+    SetEntityAnim("Player", "Player_Item_Hands_Stop_Base");
+}
+SetEntityPosition(0x46, 0xC8, 0x62, 1);
+Spawn_Event_Entity(0x46, 0);
+SetEntityAnim(0x46, "White2_Chiken_Stop_Base");
+if ((GetEntityLocation(0x2B) == "Rose_Square")) {
+    SetEntityPosition(0x2B, 0x1A0, 0x85, 0);
+}
+Fade_In(3, 1);
+Make_Delay(0x3C);
+PlaySong(0, 0xB0);
+Make_Delay((0x3C * 4));
+PlayBGM(1, 7);
+TalkOpen();
+Set_Portrait("Rick_Happy");
+Set_Name_Window("Rick");
+TalkMessage(0);
+TalkClose();
+PlaySong(0, 0xB5);
+Make_Delay((0x3C * 4));
+Fade_Out(2, 1);
+Give_Friendship_Points("Rick", 0x14);
+Give_Friendship_Points("Barley", 0x14);
+Give_Friendship_Points("Saibara", 0x14);
+Give_Friendship_Points("Duke", 0x14);
+Give_Friendship_Points("Huachito", 0x14);
+Give_Friendship_Points("Popuri", 0x14);
+Give_Friendship_Points("Doug", 0x14);
+Hide_Entity(0x46);
+Execute_Script(0x48A);
+exit;
+}

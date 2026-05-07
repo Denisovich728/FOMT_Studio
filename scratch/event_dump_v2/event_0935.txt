@@ -1,0 +1,15 @@
+#include "lib_fomt.csv"
+
+script 935 Unknown_Event_0935 {
+const MESSAGE_0 = "I just have to pass \r\nthat test! \BRK";
+
+SetEntityFacing(7, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Gray_Neutral");
+Set_Name_Window("Gray");
+TalkMessage(0);
+TalkClose();
+SetEntityFacing(7, 3);
+Free_Event_Entity("Gray");
+exit;
+}

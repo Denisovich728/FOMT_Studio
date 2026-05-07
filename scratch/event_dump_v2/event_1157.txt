@@ -1,0 +1,41 @@
+#include "lib_fomt.csv"
+
+script 1157 Unknown_Event_1157 {
+const MESSAGE_0 = "That was fun! \r\nYou should have joined in,\r\n\xFF!. \BRK";
+const MESSAGE_1 = "That was a great match!\r\nBring \xFF% back \r\nnext year! \BRK";
+const MESSAGE_2 = "That was a great bout!\BRK";
+
+var var_0;
+
+var_0 = Func11A(3);
+GetAnimalName(0, 3, var_0);
+if ((Func083(0xD) == 0)) {
+    Free_Event_Entity("Huachito");
+}
+SetEntityFacing(0xD, GetOppositeFacing(GetEntityFacing(0)));
+if ((Check_Flag("Flag_0x197") == 0)) {
+    TalkOpen();
+    Set_Portrait("Thomas_Neutral");
+    Set_Name_Window("Huachito");
+    TalkMessage(0);
+} else {
+    if ((Check_Flag("Flag_0x199") == 1)) {
+        TalkOpen();
+        Set_Portrait("Thomas_Happy");
+        Set_Name_Window("Huachito");
+        TalkMessage(1);
+        goto LBL_0006;
+    }
+    TalkOpen();
+    Set_Portrait("Thomas_Neutral");
+    Set_Name_Window("Huachito");
+    TalkMessage(2);
+}
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Huachito") == 0)) {
+    Give_Friendship_Points("Huachito", 5);
+}
+Free_Event_Entity("Huachito");
+SetEntityFacing(0xD, 0);
+exit;
+}

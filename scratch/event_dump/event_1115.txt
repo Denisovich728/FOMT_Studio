@@ -1,0 +1,21 @@
+#include "lib_fomt.csv"
+
+script 1115 Unknown_Event_1115 {
+const MESSAGE_0 = "I hope my mom is alright.\r\nI tried to convince her\r\nnot to come, you know. \BRK";
+
+if ((Func083(2) == 0)) {
+    Free_Event_Entity("Rick");
+}
+SetEntityFacing(2, GetOppositeFacing(GetEntityFacing(0)));
+TalkOpen();
+Set_Portrait("Rick_Afraid");
+Set_Name_Window("Rick");
+TalkMessage(0);
+TalkClose();
+if ((Has_Spoken_To_NPC_Today("Rick") == 0)) {
+    Give_Friendship_Points("Rick", 5);
+}
+SetEntityFacing(2, 3);
+Free_Event_Entity("Rick");
+exit;
+}

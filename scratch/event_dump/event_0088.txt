@@ -1,0 +1,9 @@
+#include "lib_fomt.csv"
+
+script 88 Unknown_Event_0088 {
+Fade_Out(2, 1);
+Warp_Player("Forest", 0x18, 0x108);
+SetEntityPosition(0, 0x18, 0x108, 3);
+Fade_In(2, 1);
+exit;
+}

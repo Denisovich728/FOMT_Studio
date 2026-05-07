@@ -1,0 +1,408 @@
+#include "lib_fomt.csv"
+
+script 1192 Unknown_Event_1192 {
+const MESSAGE_0 = "I just love fireworks. \r\nThey're so beautiful, but \r\nthe disappear so quickly. \BRK\WAIT_CLICKThe colors are so pretty, \r\ntoo. It's like magic. \BRK";
+const MESSAGE_1 = "Wasn't the finale grand? \r\nNobody could take \r\ntheir eyes off it. \BRK";
+const MESSAGE_2 = "I love watching fireworks\r\nfrom Mineral Beach. \BRK";
+const MESSAGE_3 = "I wonder how they make \r\nall those colors and shapes! \BRK";
+const MESSAGE_4 = "Too bad they're over!\BRK";
+const MESSAGE_5 = "In the town I used to live,\r\nthey had fireworks all the \r\ntime. \BRK\WAIT_CLICKSomehow they look most \r\nbeautiful here once a \r\nyear, though. \BRK";
+const MESSAGE_6 = "I can't wait until \r\nnext year! \BRK";
+const MESSAGE_7 = "I used to be afraid of \r\nfireworks when I was a kid.\BRK\WAIT_CLICKNow I think they're pretty,\r\nbut it still seems like \r\nthey're about to fall on \BRK\r\ntop of me!\BRK";
+const MESSAGE_8 = "That was fun! \r\nNow I can get back to work \r\ntomorrow all refreshed! \BRK";
+const MESSAGE_9 = "Just once a year the \r\nsky gets so bright and \r\nloud...\BRK\WAIT_CLICKI always wonder what the \r\nfish think is happening!\BRK";
+const MESSAGE_10 = "My neck hurts from \r\nlooking up so much! \r\nTime to go home. \BRK";
+
+Warp_Player("Mineral_Beach", 0x181, 0x7C);
+PlayBGM(1, 0xC);
+SetEntityPosition(0, 0x181, 0x7C, 3);
+if ((Check_Flag(0x19F) == 1)) {
+    SetEntityPosition(0x13, 0x181, 0x8E, 3);
+    SetEntityAnim("Karen", "Karen_Stop_Base");
+} else {
+    if ((Check_Flag(0x19F) == 2)) {
+        SetEntityPosition(3, 0x181, 0x8E, 3);
+        SetEntityAnim("Popuri", "Popuri_Stop_Base");
+        goto LBL_0003;
+    }
+    if ((Check_Flag(0x19F) == 3)) {
+        SetEntityPosition(0xC, 0x181, 0x8E, 3);
+        SetEntityAnim("Mary", 0x813);
+        goto LBL_0003;
+    }
+    if ((Check_Flag(0x19F) == 4)) {
+        SetEntityPosition(0x15, 0x181, 0x8E, 3);
+        SetEntityAnim("Elli", "Elli_Stop_Base");
+        goto LBL_0003;
+    }
+    if ((Check_Flag(0x19F) == 5)) {
+        SetEntityPosition(0x19, 0x181, 0x8E, 3);
+        SetEntityAnim("Ann", "Doug_Hands_Middle_Base");
+    }
+}
+Fade_In(2, 1);
+PlaySong(0, 0xB1);
+Make_Delay((0x3C * 3));
+PlaySong(0, 0xB2);
+Proc127(0x1F, 0, 0);
+PlaySong(0, 0xB1);
+Make_Delay((0x3C * 3));
+PlaySong(0, 0xB2);
+Proc127(0, 0, 0x1F);
+PlaySong(0, 0xB1);
+Make_Delay((0x3C * 3));
+PlaySong(0, 0xB2);
+Proc127(0, 0x1F, 0);
+if ((Check_Flag(0x19F) == 1)) {
+    TalkOpen();
+    Set_Portrait("Karen_Neutral");
+    Set_Name_Window("Karen");
+    Set_Hearth_Anim("Karen");
+    TalkMessage(0);
+    TalkClose();
+    PlaySong(0, 0xB1);
+    Make_Delay((0x3C * 3));
+    PlaySong(0, 0xB2);
+    Proc127(0x1F, 0, 0);
+    PlaySong(0, 0xB1);
+    Make_Delay((0x3C * 3));
+    PlaySong(0, 0xB2);
+    Proc127(0, 0, 0x1F);
+    PlaySong(0, 0xB1);
+    Make_Delay((0x3C * 3));
+    PlaySong(0, 0xB2);
+    Proc127(0, 0x1F, 0);
+    if ((Check_Flag(0x4C) == 2)) {
+        SetEntityFacing(0x13, 1);
+        SetEntityFacing(0, 0);
+        TalkOpen();
+        Set_Portrait("Karen_Happy");
+        Set_Name_Window("Karen");
+        Set_Hearth_Anim("Karen");
+        TalkMessage(1);
+        TalkClose();
+        Fade_Out(2, 1);
+        TalkOpen();
+        TalkMessage(2);
+        TalkClose();
+        Refresh_Map_Entities();
+        Proc08A(0x15);
+        Proc08A(0x14);
+        Proc08A(7);
+        Proc08A(0x19);
+        Proc08A(0x17);
+        Proc08A(0x13);
+        Proc08A(0x1A);
+        Proc08A(0xC);
+        Proc08A(2);
+        Proc08A(3);
+        Set_Flag(0x19E, 2);
+    } else {
+        Fade_Out(2, 1);
+        TalkOpen();
+        TalkMessage(2);
+        TalkClose();
+        Refresh_Map_Entities();
+        Refresh_Map_Entities();
+        Proc08A(0x15);
+        Proc08A(0x14);
+        Proc08A(7);
+        Proc08A(0x19);
+        Proc08A(0x17);
+        Proc08A(0x13);
+        Proc08A(0x1A);
+        Proc08A(0xC);
+        Proc08A(2);
+        Proc08A(3);
+        Set_Flag(0x19E, 2);
+    }
+} else {
+    if ((Check_Flag(0x19F) == 2)) {
+        TalkOpen();
+        Set_Portrait("Popuri_Angry");
+        Set_Name_Window("Popuri");
+        Set_Hearth_Anim("Popuri");
+        TalkMessage(3);
+        TalkClose();
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0x1F, 0, 0);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0, 0x1F);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0x1F, 0);
+        if ((Check_Flag(0x55) == 2)) {
+            SetEntityFacing(3, 1);
+            SetEntityFacing(0, 0);
+            TalkOpen();
+            Set_Portrait("Popuri_Happy");
+            Set_Name_Window("Popuri");
+            Set_Hearth_Anim("Popuri");
+            TalkMessage(4);
+            TalkClose();
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        } else {
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        }
+        goto LBL_001A;
+    }
+    if ((Check_Flag(0x19F) == 3)) {
+        TalkOpen();
+        Set_Portrait("Mary_Neutral");
+        Set_Name_Window("Mary");
+        Set_Hearth_Anim("Mary");
+        TalkMessage(5);
+        TalkClose();
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0x1F, 0, 0);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0, 0x1F);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0x1F, 0);
+        if ((Check_Flag(0x67) == 2)) {
+            SetEntityFacing(0xC, 1);
+            SetEntityFacing(0, 0);
+            TalkOpen();
+            Set_Portrait("Mary_Happy");
+            Set_Name_Window("Mary");
+            Set_Hearth_Anim("Mary");
+            TalkMessage(6);
+            TalkClose();
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        } else {
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        }
+        goto LBL_001A;
+    }
+    if ((Check_Flag(0x19F) == 4)) {
+        TalkOpen();
+        Set_Portrait("Ellie_Ruborized");
+        Set_Name_Window("Elli");
+        Set_Hearth_Anim("Elli");
+        TalkMessage(7);
+        TalkClose();
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0x1F, 0, 0);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0, 0x1F);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0x1F, 0);
+        if ((Check_Flag(0x6F) == 2)) {
+            SetEntityFacing(0x15, 1);
+            SetEntityFacing(0, 0);
+            TalkOpen();
+            Set_Portrait("Ellie_Neutral");
+            Set_Name_Window("Elli");
+            Set_Hearth_Anim("Elli");
+            TalkMessage(8);
+            TalkClose();
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        } else {
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        }
+        goto LBL_001A;
+    }
+    if ((Check_Flag(0x19F) == 5)) {
+        TalkOpen();
+        Set_Flag(0x19F, 5);
+        Set_Portrait("Ann_Neutral");
+        Set_Name_Window("Ann");
+        Set_Hearth_Anim("Ann");
+        TalkMessage(9);
+        TalkClose();
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0x1F, 0, 0);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0, 0x1F);
+        PlaySong(0, 0xB1);
+        Make_Delay((0x3C * 3));
+        PlaySong(0, 0xB2);
+        Proc127(0, 0x1F, 0);
+        if ((Check_Flag(0x5F) == 2)) {
+            SetEntityFacing(0x19, 1);
+            SetEntityFacing(0, 0);
+            TalkOpen();
+            Set_Portrait("Ann_Surprised");
+            Set_Name_Window("Ann");
+            Set_Hearth_Anim("Ann");
+            TalkMessage(10);
+            TalkClose();
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        } else {
+            Fade_Out(2, 1);
+            TalkOpen();
+            TalkMessage(2);
+            TalkClose();
+            Refresh_Map_Entities();
+            Proc08A(0x15);
+            Proc08A(0x14);
+            Proc08A(7);
+            Proc08A(0x19);
+            Proc08A(0x17);
+            Proc08A(0x13);
+            Proc08A(0x1A);
+            Proc08A(0xC);
+            Proc08A(2);
+            Proc08A(3);
+            Set_Flag(0x19E, 2);
+        }
+        goto LBL_001A;
+    }
+    PlaySong(0, 0xB1);
+    Make_Delay((0x3C * 3));
+    PlaySong(0, 0xB2);
+    Proc127(0x1F, 0, 0);
+    PlaySong(0, 0xB1);
+    Make_Delay((0x3C * 3));
+    PlaySong(0, 0xB2);
+    Proc127(0, 0, 0x1F);
+    PlaySong(0, 0xB1);
+    Make_Delay((0x3C * 3));
+    PlaySong(0, 0xB2);
+    Proc127(0, 0x1F, 0);
+    Fade_Out(2, 1);
+    TalkOpen();
+    TalkMessage(2);
+    TalkClose();
+    Refresh_Map_Entities();
+    Proc08A(0x15);
+    Proc08A(0x14);
+    Proc08A(7);
+    Proc08A(0x19);
+    Proc08A(0x17);
+    Proc08A(0x13);
+    Proc08A(0x1A);
+    Proc08A(0xC);
+    Proc08A(2);
+    Proc08A(3);
+    Set_Flag(0x19E, 2);
+}
+Execute_Script(0x3DC);
+exit;
+}

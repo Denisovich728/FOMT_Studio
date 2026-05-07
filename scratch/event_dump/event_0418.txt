@@ -1,0 +1,10 @@
+#include "lib_fomt.csv"
+
+script 418 Unknown_Event_0418 {
+const MESSAGE_0 = "Large Barrel\BRK";
+
+TalkOpen();
+Print_Message(0);
+TalkClose();
+exit;
+}

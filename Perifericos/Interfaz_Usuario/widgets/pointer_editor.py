@@ -32,10 +32,15 @@ class MasterPointerEditor(QWidget):
         btn_save.setStyleSheet("background-color: #388e3c; color: white; font-weight: bold;")
         btn_save.clicked.connect(self.save_pointers)
         
+        btn_relocate = QPushButton("Expandir Tabla (Relocalizar)")
+        btn_relocate.setStyleSheet("background-color: #ff9800; color: black; font-weight: bold;")
+        btn_relocate.clicked.connect(self.relocate_table)
+        
         toolbar.addWidget(lbl)
         toolbar.addStretch()
         toolbar.addWidget(btn_refresh)
         toolbar.addWidget(btn_save)
+        toolbar.addWidget(btn_relocate)
         layout.addLayout(toolbar)
         
         # Table Grid
@@ -134,3 +139,26 @@ class MasterPointerEditor(QWidget):
             lang = self.lang
             msg = tr('msg_pointers_saved', lang).format(count=cambios)
             QMessageBox.information(self, tr('btn_save_ptr', lang), msg)
+
+    def relocate_table(self):
+        """Maneja el diálogo y la llamada a la reubicación de la tabla."""
+        from PyQt6.QtWidgets import QInputDialog, QMessageBox
+        
+        old_limit = self.project.super_lib.event_limit
+        new_capacity, ok = QInputDialog.getInt(
+            self, 
+            "Expandir Tabla de Eventos", 
+            f"Límite actual: {old_limit}\nIngresa el nuevo límite de eventos (ej: {old_limit + 500}):", 
+            value=old_limit + 500, 
+            min=old_limit + 1, 
+            max=10000
+        )
+        
+        if ok:
+            new_offset, msg = self.project.memory.relocate_master_event_table(new_capacity)
+            if new_offset:
+                self.project.save()  # Guardar el parche
+                QMessageBox.information(self, "Éxito", msg)
+                self.load_pointers()  # Recargar tabla con nuevos límites
+            else:
+                QMessageBox.warning(self, "Error", msg)
