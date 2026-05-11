@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -269,25 +269,24 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
         )
         candidate_funcs = ("Set_Hearth_Anim", "Give_Love_Points", "Chek_Love_Points")
 
-        if invoke.func in char_funcs and len(invoke.args) >= 1:
+        # Priorizar funciones con múltiples argumentos que decorar
+        if invoke.func == "Show_Emote" and len(invoke.args) >= 2:
             self.stringify_expr(invoke.args, 0, self.char_names)
-        elif invoke.func == "Set_Portrait" and len(invoke.args) >= 1:
-            self.stringify_expr(invoke.args, 0, self.portrait_names)
+            self.stringify_expr(invoke.args, 1, self.emote_names)
+        elif invoke.func == "SetEntityAnim" and len(invoke.args) >= 2:
+            self.stringify_expr(invoke.args, 0, self.char_names)
+            self.stringify_expr(invoke.args, 1, self.anim_names)
         elif invoke.func in ("Warp_Player", "Warp_Entity_To_Map") and len(invoke.args) >= 1:
-            # Warp_Player(MAP_ID, X, Y) -> Arg 0 es MAPA
-            # Warp_Entity_To_Map(ENTITY_ID, MAP_ID, X, Y) -> Arg 0 es ENTIDAD, Arg 1 es MAPA
             if invoke.func == "Warp_Player":
                 self.stringify_expr(invoke.args, 0, self.map_names)
             else:
                 self.stringify_expr(invoke.args, 0, self.char_names)
                 if len(invoke.args) >= 2:
                     self.stringify_expr(invoke.args, 1, self.map_names)
-        elif invoke.func == "Show_Emote" and len(invoke.args) >= 2:
+        elif invoke.func in char_funcs and len(invoke.args) >= 1:
             self.stringify_expr(invoke.args, 0, self.char_names)
-            self.stringify_expr(invoke.args, 1, self.emote_names)
-        elif invoke.func == "SetEntityAnim" and len(invoke.args) >= 2:
-            self.stringify_expr(invoke.args, 0, self.char_names)
-            self.stringify_expr(invoke.args, 1, self.anim_names)
+        elif invoke.func == "Set_Portrait" and len(invoke.args) >= 1:
+            self.stringify_expr(invoke.args, 0, self.portrait_names)
         elif invoke.func == "Make_Delay" and len(invoke.args) >= 1:
             arg = invoke.args[0]
             if isinstance(arg, ExprInt):
@@ -323,13 +322,13 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
             if idx_x is not None and len(invoke.args) > idx_x:
                 arg = invoke.args[idx_x]
                 if isinstance(arg, ExprInt):
-                    val_str = f"pos_x0x{arg.value:X}".encode('windows-1252', errors='replace')
+                    val_str = f"pos_x{arg.value}".encode('windows-1252', errors='replace')
                     invoke.args[idx_x] = ExprStr(val_str)
                     
             if idx_y is not None and len(invoke.args) > idx_y:
                 arg = invoke.args[idx_y]
                 if isinstance(arg, ExprInt):
-                    val_str = f"pos_y0x{arg.value:X}".encode('windows-1252', errors='replace')
+                    val_str = f"pos_y{arg.value}".encode('windows-1252', errors='replace')
                     invoke.args[idx_y] = ExprStr(val_str)
 
     def visit_stmt(self, stmt: Stmt):

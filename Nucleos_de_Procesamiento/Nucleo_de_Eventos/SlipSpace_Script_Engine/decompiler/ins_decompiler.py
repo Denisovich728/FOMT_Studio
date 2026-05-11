@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -72,7 +72,8 @@ class ASTOptimizer:
         # 4. Resolver breaks implícitos (goto al final del switch)
         stmts = self._resolve_breaks(stmts)
         # 5. Eliminar saltos redundantes (Phantom Jumps)
-        stmts = self._remove_phantom_jumps(stmts)
+        # NOTA: Desactivado a petición del usuario para mantener 1:1 exacto con el engine de GBA.
+        # stmts = self._remove_phantom_jumps(stmts)
         # 6. Eliminar etiquetas inútiles y huérfanas
         return self._cleanup(stmts)
 

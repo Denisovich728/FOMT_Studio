@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -333,12 +333,22 @@ class FoMTEventParser:
                     emote_map_inv[row['Emote_Name']] = int(row['Emote_ID'], 16)
 
         anim_map_inv = self.super_lib.anim_map
+        
+        flag_map_inv = {}
+        flags_path = get_data_path(mode, f"{prefix}Flags.csv")
+        if os.path.exists(flags_path):
+            with open(flags_path, 'r', encoding='utf-8') as f:
+                import csv
+                reader = csv.DictReader(f)
+                for row in reader:
+                    flag_map_inv[row['Flag_name']] = int(row['flag_id'], 16)
 
-        compiled_script = compile_script(script_obj, self._lib_scope, item_map, food_map, tool_map, char_map, candidate_map, self.super_lib.portrait_map, self.super_lib.map_map, emote_map_inv, anim_map_inv)
+        compiled_script = compile_script(script_obj, self._lib_scope, item_map, food_map, tool_map, char_map, candidate_map, self.super_lib.portrait_map, self.super_lib.map_map, emote_map_inv, anim_map_inv, flag_map_inv)
         
         # FIX: target_size debe ser la suma de riff_len + 8 para representar el archivo RIFF completo
         # scanned_sizes ya contiene el valor total si es RIFF, o raw_len si no lo es.
-        return encode_script(compiled_script)
+        target_size = old_size if old_size > 0 else self.get_last_scanned_size(sid)
+        return encode_script(compiled_script, target_size)
 
     def get_last_scanned_size(self, key):
         """Puede recibir un event_id o un offset directo (para MapScripts)."""

@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -24,17 +24,24 @@ class EncoderHelper:
     def write_u32_at(self, offset: int, val: int):
         struct.pack_into('<I', self.data, offset, val & 0xFFFFFFFF)
 
+    def align(self, n: int):
+        """Pad with NOPs until length is a multiple of n."""
+        while len(self.data) % n != 0:
+            self.data.append(0x00) # OPCODE_NOP
+
 def write_push(vec: EncoderHelper, val: int):
-    val = val & 0xFFFFFFFF
-    if val < 0x80:
+    val_signed = val
+    val_unsigned = val & 0xFFFFFFFF
+    
+    if -128 <= val_signed <= 127:
         vec.push_u8(OPCODE_PUSH8)
-        vec.push_u8(val)
-    elif val < 0x8000:
+        vec.push_u8(val_unsigned & 0xFF)
+    elif -32768 <= val_signed <= 32767:
         vec.push_u8(OPCODE_PUSH16)
-        vec.push_u16(val)
+        vec.push_u16(val_unsigned & 0xFFFF)
     else:
         vec.push_u8(OPCODE_PUSH32)
-        vec.push_u32(val)
+        vec.push_u32(val_unsigned)
 
 @dataclass
 class JumpTables:
@@ -44,6 +51,7 @@ def encode_instructions(vec: EncoderHelper, instructions: List[Ins]) -> JumpTabl
     label_map = {}
     jump_map = {}
     
+    # Determinar el ID máximo de switch para mantener la tabla de saltos exacta
     switch_id_max = 0
     for ins in instructions:
         if isinstance(ins, Switch):
@@ -128,12 +136,7 @@ def encode_instructions(vec: EncoderHelper, instructions: List[Ins]) -> JumpTabl
         if target in label_map:
             vec.write_u32_at(off, label_map[target])
             
-    # Solo añadir END si el último byte generado NO fue ya un END (0x20)
-    # Esto previene que el script crezca 1 byte en cada guardado.
-    if len(vec.data) > begin and vec.data[-1] != OPCODE_END:
-        vec.push_u8(OPCODE_END)
-    elif len(vec.data) == begin: # Script vacío
-        vec.push_u8(OPCODE_END)
+    vec.push_u8(OPCODE_END)
     
     len_aligned = (len(vec.data) - begin + 3) & ~3
     while len(vec.data) - begin < len_aligned:
@@ -176,10 +179,11 @@ def encode_jump(vec: EncoderHelper, jump_tables: JumpTables):
         for val, off in values:
             vec.push_u32(val)
             vec.push_u32(off)
-            
+
 def encode_str(vec: EncoderHelper, str_tab: List[bytes]):
     vec.push_u32(len(str_tab))
     table_begin = len(vec.data)
+    chunk_start = len(vec.data) - 4
     for _ in range(len(str_tab)): vec.push_u32(0)
     data_begin = len(vec.data)
     
@@ -195,14 +199,15 @@ def encode_script(script: Script, target_size: int = 0) -> bytes:
     vec.push_u32(0)
     vec.data.extend(b"SCR ")
     
+    # CODE Chunk
     chunk_hook = len(vec.data)
     vec.data.extend(b"CODE")
     vec.push_u32(0)
-    
     jump_tables = encode_instructions(vec, script.instructions)
     chunk_len = len(vec.data) - chunk_hook - 8
     vec.write_u32_at(chunk_hook + 4, chunk_len)
     
+    # JUMP Chunk
     if len(jump_tables.tables) > 0:
         chunk_hook = len(vec.data)
         vec.data.extend(b"JUMP")
@@ -211,16 +216,21 @@ def encode_script(script: Script, target_size: int = 0) -> bytes:
         chunk_len = len(vec.data) - chunk_hook - 8
         vec.write_u32_at(chunk_hook + 4, chunk_len)
         
-    if script.strings:
-        chunk_hook = len(vec.data)
-        vec.data.extend(b"STR ")
-        vec.push_u32(0)
-        encode_str(vec, script.strings)
-        chunk_len = len(vec.data) - chunk_hook - 8
-        vec.write_u32_at(chunk_hook + 4, chunk_len)
+    # STR Chunk
+    chunk_hook = len(vec.data)
+    vec.data.extend(b"STR ")
+    vec.push_u32(0)
+    encode_str(vec, script.strings)
+    chunk_len = len(vec.data) - chunk_hook - 8
+    vec.write_u32_at(chunk_hook + 4, chunk_len)
     
-    # FIX: Recalcular total_len para que el RIFF header sea exacto
+    # Final RIFF size
     total_len = len(vec.data)
-    vec.write_u32_at(4, total_len - 8) # RIFF size is total - 8
+    vec.write_u32_at(4, total_len)
+    
+    # Rellenar con 0x00 para alcanzar el target_size (si encogió por optimizaciones del AST o de-duplicación)
+    if target_size > total_len:
+        while len(vec.data) < target_size:
+            vec.data.append(0x00)
     
     return bytes(vec.data)

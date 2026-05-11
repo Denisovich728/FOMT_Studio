@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -51,7 +51,8 @@ class MemoryManager:
         new_offset = self._align_to_4(new_offset)
         
         table_base = self.proyecto.super_lib.table_offset
-        ptr_location = table_base + (event_id * 4)
+        # Ajuste de índice 1-based (el primer evento es el ID 1)
+        ptr_location = table_base + ((event_id - 1) * 4)
         
         # Escribir puntero en formato GBA Little Endian
         gba_le_bytes = self._offset_to_gba_le(new_offset)
@@ -113,6 +114,23 @@ class MemoryManager:
         print(f"Repoint Virtual: 0x{ptr_location:08X} → 0x{aligned_offset:08X}")
         return aligned_offset
 
+    def repoint_and_write(self, ptr_location, new_data, cleaning_limit=0):
+        """
+        Lectura del puntero original, escritura de nuevos datos y actualización del puntero.
+        """
+        import struct
+        ptr_bytes = self.proyecto.read_rom(ptr_location, 4)
+        old_ptr = struct.unpack('<I', ptr_bytes)[0]
+        
+        old_offset = (old_ptr & 0x01FFFFFF) if (old_ptr & 0x08000000) else 0
+        old_size = len(new_data) # Estimación segura para forzar In-Place si caben
+        
+        def repoint_callback(new_off):
+            self.repoint_with_alignment(ptr_location, new_off)
+            
+        new_off = self._re_point_generic_script(new_data, old_offset, old_size, repoint_callback, cleaning_limit)
+        return True, new_off | 0x08000000
+
     def re_point_master_event(self, event_id: int, old_offset: int, old_size: int, new_data: bytes) -> int:
         """Repuntea un evento de la Master Table."""
         return self._re_point_generic_script(
@@ -140,11 +158,6 @@ class MemoryManager:
     def _re_point_generic_script(self, new_data: bytes, old_offset: int, old_size: int, repoint_callback, cleaning_limit: int = 0) -> int:
         """Lógica de repunteo quirúrgica: solo limpia hasta el cleaning_limit si se provee."""
         
-        # FORZAR ALINEACIÓN A 4 BYTES (Padding)
-        remainder = len(new_data) % 4
-        if remainder > 0:
-            new_data += b'\x00' * (4 - remainder)
-            
         new_size = len(new_data)
         
         # 0. Verificación de escritura In-Place (SÓLO SI ESTÁ ALINEADO)

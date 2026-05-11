@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -356,8 +356,8 @@ class SuperLibrary:
         total_len = len(rom_data) - 8
         if total_len <= 0: return
 
-        # Dejar un núcleo libre si es posible
-        num_cores = max(1, multiprocessing.cpu_count() - 1)
+        from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.sistema import get_safe_worker_count
+        num_cores = get_safe_worker_count()
         chunk_size = (total_len // num_cores)
         chunk_size = (chunk_size // 4) * 4 # Alinear a 4 bytes
 

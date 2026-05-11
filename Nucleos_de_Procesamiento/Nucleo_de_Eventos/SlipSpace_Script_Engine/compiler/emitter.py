@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -57,7 +57,17 @@ class ConstScope(BlockScope):
         self.names[name] = NameRefProc(call_id, shape)
 
 class Emitter:
-    def __init__(self, item_resolver: Dict[str, int] = None, food_resolver: Dict[str, int] = None, tool_resolver: Dict[str, int] = None, char_resolver: Dict[str, int] = None, candidate_resolver: Dict[str, int] = None, portrait_resolver: Dict[str, int] = None, map_resolver: Dict[str, int] = None, emote_resolver: Dict[str, int] = None, anim_resolver: Dict[str, int] = None):
+    def __init__(self, item_resolver: Dict[str, int] = None, food_resolver: Dict[str, int] = None, tool_resolver: Dict[str, int] = None, char_resolver: Dict[str, int] = None, candidate_resolver: Dict[str, int] = None, portrait_resolver: Dict[str, int] = None, map_resolver: Dict[str, int] = None, emote_resolver: Dict[str, int] = None, anim_resolver: Dict[str, int] = None, flag_resolver: Dict[str, int] = None):
+        self.item_resolver = item_resolver or {}
+        self.food_resolver = food_resolver or {}
+        self.tool_resolver = tool_resolver or {}
+        self.char_resolver = char_resolver or {}
+        self.candidate_resolver = candidate_resolver or {}
+        self.portrait_resolver = portrait_resolver or {}
+        self.map_resolver = map_resolver or {}
+        self.emote_resolver = emote_resolver or {}
+        self.anim_resolver = anim_resolver or {}
+        self.flag_resolver = flag_resolver or {}
         self.instructions: List[Ins] = []
         self.strings: List[bytes] = []
         self.location_counter = 0
@@ -81,11 +91,9 @@ class Emitter:
         self.instructions.append(ins)
         
     def emit_str_id(self, string: bytes) -> IntValue:
-        # Primero buscamos si ya existe (incluyendo las de CONST_MESSAGE)
-        for i, s in enumerate(self.strings):
-            if s == string:
-                return i
-        # Si no, la añadimos al final
+        # IMPORTANTE: No podemos de-duplicar strings. 
+        # En la traducción de ROMs, cada caja de texto necesita su propia entrada
+        # independiente, incluso si el texto es idéntico, para permitir traducciones contextuales.
         self.strings.append(string)
         return len(self.strings) - 1
 
@@ -98,6 +106,15 @@ class Emitter:
 
     def expr(self, scope: BlockScope, expr: Expr):
         if isinstance(expr, ExprName):
+            # SOPORTE DIRECTO PARA MESSAGE_X
+            if expr.name.startswith("MESSAGE_"):
+                try:
+                    idx_str = expr.name.replace("MESSAGE_", "")
+                    idx = int(idx_str, 16 if idx_str.startswith("0x") else 10)
+                    self.emit(PushInt(idx))
+                    return
+                except: pass
+                
             ref = scope.lookup_name(expr.name)
             if isinstance(ref, NameRefVar): self.emit(PushVar(ref.var_id))
             elif isinstance(ref, NameRefConst): self.const_value(ref.val)
@@ -105,9 +122,14 @@ class Emitter:
         elif isinstance(expr, ExprInt):
             self.emit(PushInt(expr.value))
         elif isinstance(expr, ExprStr):
-            sid = self.emit_str_id(expr.value)
-            self.emit(PushInt(sid))
-            
+            # Usar eval_expr para resolver decoraciones (Player, pos_x, etc.)
+            resolved = eval_expr(expr, scope, self)
+            if isinstance(resolved, ConstValInt):
+                self.emit(PushInt(resolved.value))
+            else:
+                sid = self.emit_str_id(expr.value)
+                self.emit(PushInt(sid))
+
         elif isinstance(expr, ExprOpAdd): self.expr(scope, expr.lhs); self.expr(scope, expr.rhs); self.emit(Add())
         elif isinstance(expr, ExprOpSub): self.expr(scope, expr.lhs); self.expr(scope, expr.rhs); self.emit(Sub())
         elif isinstance(expr, ExprOpMul): self.expr(scope, expr.lhs); self.expr(scope, expr.rhs); self.emit(Mul())
@@ -207,8 +229,16 @@ class Emitter:
                             self.emit(PushInt(self.char_resolver[name])); resolved = True
                     
                     elif is_map_func:
-                        if name in self.map_resolver:
-                            self.emit(PushInt(self.map_resolver[name])); resolved = True
+                        # Warp_Player(MAP, X, Y) -> i=0 es MAPA
+                        # Warp_Entity_To_Map(ENTITY, MAP, X, Y) -> i=0 es ENTIDAD
+                        if invoke.func == "Warp_Player":
+                            if name in self.map_resolver:
+                                self.emit(PushInt(self.map_resolver[name])); resolved = True
+                        else: # Warp_Entity_To_Map
+                            if name == "Player":
+                                self.emit(PushInt(0)); resolved = True
+                            elif name in self.char_resolver:
+                                self.emit(PushInt(self.char_resolver[name])); resolved = True
                 
                 elif i == 1:
                     if invoke.func == "Show_Emote":
@@ -217,6 +247,9 @@ class Emitter:
                     elif invoke.func == "SetEntityAnim":
                         if name in self.anim_resolver:
                             self.emit(PushInt(self.anim_resolver[name])); resolved = True
+                    elif invoke.func == "Warp_Entity_To_Map":
+                        if name in self.map_resolver:
+                            self.emit(PushInt(self.map_resolver[name])); resolved = True
                 
                 # Segundo argumento de Routine_State_Override: "Script_XXXX" → int
                 if not resolved and i == 1 and is_routine_override:
@@ -417,7 +450,8 @@ def compile_script(stmts: List[Stmt], const_scope: ConstScope,
                    portrait_resolver: Dict[str, int] = None,
                    map_resolver: Dict[str, int] = None,
                    emote_resolver: Dict[str, int] = None,
-                   anim_resolver: Dict[str, int] = None) -> Script:
+                   anim_resolver: Dict[str, int] = None,
+                   flag_resolver: Dict[str, int] = None) -> Script:
     # We allocate switch ids
     sid_alloc = 0
     def alloc_switches(stmt_list):
@@ -434,7 +468,7 @@ def compile_script(stmts: List[Stmt], const_scope: ConstScope,
                     alloc_switches(sc.stmts)
                     
     alloc_switches(stmts)
-    emitter = Emitter(item_resolver, food_resolver, tool_resolver, char_resolver, candidate_resolver, portrait_resolver, map_resolver, emote_resolver, anim_resolver)
+    emitter = Emitter(item_resolver, food_resolver, tool_resolver, char_resolver, candidate_resolver, portrait_resolver, map_resolver, emote_resolver, anim_resolver, flag_resolver)
     emitter.stmts(const_scope, stmts)
     return emitter.end()
 
@@ -442,21 +476,66 @@ def eval_expr(expr: Expr, scope: ConstScope, emitter: Emitter = None) -> Optiona
     if isinstance(expr, ExprInt):
         return ConstValInt(expr.value)
     if isinstance(expr, ExprStr):
+        name = expr.value.decode('windows-1252', errors='ignore').strip()
+        
+        # Resolución PRIORITARIA de nombres especiales para evitar inflado de STR chunk
+        if name == "Player": return ConstValInt(0)
+        
         if emitter:
-            name = expr.value.decode('windows-1252', errors='ignore').strip()
-            # Try resolving in order — Debe cubrir TODAS las decoraciones inversas
-            if name == "Player": return ConstValInt(0)
             if name in emitter.char_resolver: return ConstValInt(emitter.char_resolver[name])
             if name in emitter.item_resolver: return ConstValInt(emitter.item_resolver[name])
             if name in emitter.food_resolver: return ConstValInt(emitter.food_resolver[name])
             if name in emitter.tool_resolver: return ConstValInt(emitter.tool_resolver[name])
             if name in emitter.candidate_resolver: return ConstValInt(emitter.candidate_resolver[name])
+            if name in emitter.portrait_resolver: return ConstValInt(emitter.portrait_resolver[name])
             if name in emitter.map_resolver: return ConstValInt(emitter.map_resolver[name])
             if name in emitter.emote_resolver: return ConstValInt(emitter.emote_resolver[name])
             if name in emitter.anim_resolver: return ConstValInt(emitter.anim_resolver[name])
-            if name.startswith("Script_"):
-                try: return ConstValInt(int(name.replace("Script_", "")))
+            if name in emitter.flag_resolver: return ConstValInt(emitter.flag_resolver[name])
+            
+        if name.startswith("Script_"):
+            try: return ConstValInt(int(name.replace("Script_", "")))
+            except: pass
+            
+        if name.startswith("Delay_Sec_"):
+            try: return ConstValInt(int(name.replace("Delay_Sec_", "")))
+            except: pass
+            
+        if name.startswith("Delay_Frames_"):
+            try: return ConstValInt(int(name.replace("Delay_Frames_", "")))
+            except: pass
+            
+        if name.endswith(" Frames"):
+            try: return ConstValInt(int(name.replace(" Frames", "")))
+            except: pass
+            
+        if "(" in name and name.endswith(")"):
+            try:
+                num_str = name.split("(")[-1].replace(")", "").strip()
+                if num_str.startswith("0x") or num_str.startswith("-0x"):
+                    return ConstValInt(int(num_str, 16))
+                return ConstValInt(int(num_str))
+            except: pass
+            
+        # Fallback de decoradores del de-compilador para entidades no mapeadas
+        prefixes = ["Char_", "Item_", "Food_", "Tool_", "Candidate_", "Portrait_", "Map_", "Emote_", "Anim_", "Flag_"]
+        for p in prefixes:
+            if name.startswith(p):
+                try:
+                    num_str = name.replace(p, "")
+                    if num_str.startswith("0x") or num_str.startswith("-0x"):
+                        return ConstValInt(int(num_str, 16))
+                    return ConstValInt(int(num_str))
                 except: pass
+        
+        # Resolución de coordenadas decoradas (pos_x305 -> 305)
+        if name.startswith("pos_x") or name.startswith("pos_y"):
+            try:
+                num_str = name.replace("pos_x", "").replace("pos_y", "")
+                if num_str.startswith("0x") or num_str.startswith("-0x"):
+                    return ConstValInt(int(num_str, 16))
+                return ConstValInt(int(num_str))
+            except: pass
             
         return ConstValStr(expr.value)
     if isinstance(expr, ExprName):

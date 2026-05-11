@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -210,8 +210,8 @@ class CodeEditor(QPlainTextEdit):
         full_tc.movePosition(QTextCursor.MoveOperation.StartOfLine, QTextCursor.MoveMode.KeepAnchor)
         line = full_tc.selectedText()
         
-        # Encontrar la palabra que termina en la posición actual
-        match = re.search(r'([a-zA-Z0-9_]+)$', line)
+        # Encontrar la palabra que termina en la posición actual (incluyendo backslash para escapes)
+        match = re.search(r'([\\a-zA-Z0-9_]+)$', line)
         if match:
             return match.group(1)
             
@@ -313,7 +313,7 @@ class CodeEditor(QPlainTextEdit):
         if re.search(r'Give_Item\(\s*[^,)]*$', line_text):
             filter_type = "item"
         # Funciones de entidades y personajes que toman un NPC ID como primer argumento
-        elif re.search(r'(Set_Name_Window|Give_Friendship_Points|Free_Event_Entity|Set_Entity_Position|Get_Entity_X|Get_Entity_Y|Set_Entity_Facing|Get_Entity_Facing|Despawn_Entity|Is_NPC_Birthday|Chek_Friendship_Points|Has_NPC_Talked_Today|Has_NPC_Talked_Today_2|Kill_NPC|Execute_Movement|Hide_Entity|GetEntityLocation|Wait_For_Animation|Has_Met_NPC|Has_Spoken_To_NPC_Today|Routine_State_Override)\(\s*[^,)]*$', line_text):
+        elif re.search(r'(Set_Name_Window|Give_Friendship_Points|Free_Event_Entity|SetEntityPosition|GetEntityX|GetEntityY|SetEntityFacing|GetEntityFacing|Despawn_Entity|Is_NPC_Birthday|Chek_Friendship_Points|Has_NPC_Talked_Today|Has_NPC_Talked_Today_2|Kill_NPC|Execute_Movement|Hide_Entity|GetEntityLocation|Wait_For_Animation|Has_Met_NPC|Has_Spoken_To_NPC_Today|Routine_State_Override|Set_Vector_X|Set_Vector_Y|Show_Emote|Force_Entity_Move_To|Player_Hold_Entity|Initialize_Animal_Stats|Force_Entity_Seat_State|Warp_Entity_To_Map)\(\s*[^,)]*$', line_text):
             filter_type = "npc"
         # SetEntityAnim(entity, anim)
         elif re.search(r'SetEntityAnim\(\s*[^,)]*$', line_text):
@@ -598,7 +598,10 @@ class ScriptIDEWidget(QWidget):
                 print(f"Error cargando librería de comandos: {e}")
 
         # 3. Palabras clave y estructuras
-        keywords = ["if", "else", "for", "while", "do", "switch", "case", "default", "var", "const", "script", "exit"]
+        keywords = [
+            "if", "else", "for", "while", "do", "switch", "case", "default", "var", "const", "script", "exit",
+            "\\r", "\\n", "\\BRK", "\\WAIT_CLICK", "True", "False"
+        ]
         for kw in keywords:
             q_item = QStandardItem(kw)
             q_item.setData("kw", Qt.ItemDataRole.UserRole)

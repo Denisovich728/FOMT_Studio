@@ -1,6 +1,6 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Versión 3.3.1 "Actualización La Imposibilidad"
+## Versión 3.3.2 "Actualización La Imposibilidad"
 **Fecha:** 2026-05-11
 **Estado:** Lanzamiento Estable / Internacionalización Completa
 
@@ -18,6 +18,10 @@
 - **Estabilidad de la Suite:**
     - Corrección de `NameError` en el Bulk Item Editor (importación de `QFont`).
     - Optimización del editor hexadecimal para sincronización inmediata con el canvas.
+- **Motor de Scripts SlipSpace (v3.3.2):**
+    - **Alineación Atómica de 4 Bytes:** Implementación de alineación forzada en el bytecode para instrucciones y argumentos de 16/32 bits, garantizando compatibilidad con el hardware GBA.
+    - **Remapeo de Coordenadas:** Mejora estética en la decoración de coordenadas (`pos_x`, `pos_y`) ahora en formato decimal para facilitar la edición visual.
+    - **Resolución Inversa:** El compilador ahora resuelve automáticamente los nombres decorados de emotes, animaciones y coordenadas a sus valores binarios originales.
 
 
 

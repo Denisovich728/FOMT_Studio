@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -110,7 +110,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v3.3.1 - Soberanía de la Ñ")
+        self.setWindowTitle("FoMT Studio v3.3.4 - Soberanía de la Ñ")
         self.setMinimumSize(800, 600)
         self.showMaximized()
         
@@ -544,25 +544,17 @@ class FoMTStudioApp(QMainWindow):
         except: pass
         self.tree_view.doubleClicked.connect(self._on_tree_double_click)
         
-        # ── Restauración de Editores Core ────────────────────────────
-        self.item_editor = ItemEditorWidget(self.project, self)
-        self.tabs.addTab(self.item_editor, tr("tab_items", self.current_lang))
+        # ── Preparación de Pestañas (Lazy Loading) ───────────────────
+        self.tabs.addTab(QWidget(), tr("tab_items", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_npcs", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_pointers", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_menu_editor", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_visual", self.current_lang))
         
-        self.npc_editor = NpcEditorWidget(self.project, self)
-        self.tabs.addTab(self.npc_editor, tr("tab_npcs", self.current_lang))
-        
-        self.pointer_editor = MasterPointerEditor(self.project, self)
-        self.tabs.addTab(self.pointer_editor, tr("tab_pointers", self.current_lang))
-        
-        self.menu_editor = MenuEditorWidget(self.project, self)
-        self.tabs.addTab(self.menu_editor, tr("tab_menu_editor", self.current_lang))
-        
-        self.visual_maker = VisualEventMaker(self.project, self)
-        self.tabs.addTab(self.visual_maker, tr("tab_visual", self.current_lang))
-        
-        # Abrir módulos adicionales según el flujo de carga
-        self._populate_ui_step(3) # Gráficos (Inicia Tile Editor Extreme)
-        self._populate_ui_step(4) # Audio
+        # Conectar el cambio de pestaña para cargar el editor bajo demanda
+        try: self.tabs.currentChanged.disconnect()
+        except: pass
+        self.tabs.currentChanged.connect(self._on_tab_changed)
         
         self.apply_theme(self.current_theme)
 
@@ -606,6 +598,7 @@ class FoMTStudioApp(QMainWindow):
         if not self.project: return
         
         if step == 2:
+            from PyQt6.QtWidgets import QApplication
             # NPCs
             self.cat_npcs.removeRows(0, self.cat_npcs.rowCount())
             for i, npc in enumerate(self.project.npc_parser.npcs):
@@ -613,6 +606,7 @@ class FoMTStudioApp(QMainWindow):
                 item.setData("NPC", Qt.ItemDataRole.UserRole + 1)
                 item.setData(i, Qt.ItemDataRole.UserRole)
                 self.cat_npcs.appendRow(item)
+                if i % 20 == 0: QApplication.processEvents()
             
             # Events
             self.cat_events_item.removeRows(0, self.cat_events_item.rowCount())
@@ -622,16 +616,18 @@ class FoMTStudioApp(QMainWindow):
                 ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
                 ev_item.setData(i, Qt.ItemDataRole.UserRole)
                 self.cat_events_item.appendRow(ev_item)
+                if i % 50 == 0: QApplication.processEvents()
             
             # Maps
             self.cat_maps.removeRows(0, self.cat_maps.rowCount())
-            for m in self.project.map_parser.maps:
+            for i, m in enumerate(self.project.map_parser.maps):
                 m_name = self.project.super_lib.get_map_name_hint(m.map_id)
                 map_label = "MAPA" if self.current_lang == "es" else "MAP"
                 map_item = QStandardItem(f"{map_label} {m.map_id:03d}: {m_name}")
                 map_item.setData("MAP", Qt.ItemDataRole.UserRole + 1)
                 map_item.setData(m.map_id, Qt.ItemDataRole.UserRole)
                 self.cat_maps.appendRow(map_item)
+                if i % 20 == 0: QApplication.processEvents()
             self.tree_view.expand(self.cat_events_item.index())
 
         elif step == 3:
@@ -983,3 +979,46 @@ class FoMTStudioApp(QMainWindow):
                 self.tree_view.setExpanded(index, True)
         
         return visible
+
+    def _on_tab_changed(self, index):
+        """Inicializa los editores pesados bajo demanda para evitar el congelamiento al abrir la ROM."""
+        if not self.project: return
+        
+        tab_text = self.tabs.tabText(index)
+        lang = self.current_lang
+        
+        # Si la pestaña tiene un widget vacío (placeholder), lo reemplazamos con el editor real
+        current_widget = self.tabs.widget(index)
+        if current_widget and current_widget.layout() is None:
+            from PyQt6.QtWidgets import QApplication
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+            try:
+                if tab_text == tr("tab_items", lang):
+                    self.item_editor = ItemEditorWidget(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.item_editor, tr("tab_items", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_npcs", lang):
+                    self.npc_editor = NpcEditorWidget(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.npc_editor, tr("tab_npcs", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_pointers", lang):
+                    self.pointer_editor = MasterPointerEditor(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.pointer_editor, tr("tab_pointers", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_menu_editor", lang):
+                    self.menu_editor = MenuEditorWidget(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.menu_editor, tr("tab_menu_editor", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_visual", lang):
+                    self.visual_maker = VisualEventMaker(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.visual_maker, tr("tab_visual", lang))
+                    self.tabs.setCurrentIndex(index)
+                
+                self.apply_theme(self.current_theme)
+            finally:
+                QApplication.restoreOverrideCursor()
