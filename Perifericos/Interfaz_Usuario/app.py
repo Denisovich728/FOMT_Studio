@@ -105,7 +105,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v2.0.0 - The Shiao_Fujikawa Update")
+        self.setWindowTitle("FoMT Studio v3.0.0 - The Imposibility Update")
         self.setMinimumSize(800, 600)
         self.showMaximized()
         
