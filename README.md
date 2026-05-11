@@ -7,30 +7,38 @@
 FOMT Studio es un entorno de desarrollo de bajo nivel diseñado para la investigación, desensamblado y modificación (ROM Hacking) del ecosistema "Harvest Moon: Friends of Mineral Town" (GBA).
 
 ------------------------------------------------------------
-ESTADO ACTUAL DEL PROYECTO (v2.0.0 - The Shiao_Fujikawa Update)
+ESTADO ACTUAL DEL PROYECTO (v3.0.0 - The Imposibility Update)
 ------------------------------------------------------------
-La herramienta ha evolucionado de un visor a una suite de inyección integral con arquitectura profesional:
+La herramienta ha alcanzado su madurez técnica con una reconstrucción total de su arquitectura de datos y soporte multi-juego:
 
-1. MOTOR DE SCRIPTS (SLIPSPACE ENGINE):
-   - Descompilación y recompilación avanzada de eventos.
+1. ARQUITECTURA CILIXES (NUEVA):
+   - Migración total a un sistema de datos modular y escalable.
+   - Soporte nativo y simultáneo para FoMT (Harvest Moon) y MFoMT (More Friends of Mineral Town).
+   - Detección quirúrgica de ROM mediante el header de 16 bytes (A0-AF), garantizando carga de recursos 100% precisa.
+   - Resolución dinámica de rutas según la versión detectada para evitar conflictos de activos.
+
+2. MOTOR DE SCRIPTS (SLIPSPACE ENGINE v3):
+   - Descompilación y recompilación avanzada con inyección dinámica de librerías (Lib_Fomt / Lib_MFomt).
    - Lógica de mensajes "Mary & Popuri" con soporte de constantes `const MESSAGE_X`.
    - Soporte de escapes legibles: `\BRK` (0x05) y `\WAIT_CLICK` (0x0C).
    - IDE con autocompletado inteligente y resaltado de sintaxis dinámico.
 
-2. GESTIÓN GRÁFICA Y MULTIMEDIA:
+3. GESTIÓN GRÁFICA Y MULTIMEDIA:
    - Editor de Sprites integrado con descompresión basada en el estándar GBA-GE.
+   - Visor de Sprites actualizado para el pipeline de Cilixes.
    - Motor de Audio optimizado con integración de `gba-mus-ripper`.
    - Soporte para 8 idiomas (ES, EN, JP, RU, DE, ZH, HI, PT).
 
-3. INGENIERÍA DE MEMORIA:
+4. INGENIERÍA DE MEMORIA Y SEGURIDAD:
    - Buscador de espacio libre y sistema de repunteo inteligente.
    - Reciclaje de bancos de datos y alineación estricta de 4 bytes para evitar crasheos.
-   - Escaneo de precisión basado en la Tabla Maestra (Master Table).
+   - Blindaje de API Keys (IA) mediante almacenamiento en registro local, fuera del código fuente.
+   - Purga masiva de archivos temporales y optimización de repositorio para despliegues limpios.
 
 ------------------------------------------------------------
 CRÉDITOS Y COLABORACIONES
 ------------------------------------------------------------
-El desarrollo de la versión 2.0.0 ha sido posible gracias a la comunidad. Un agradecimiento especial a:
+El desarrollo de esta suite ha sido posible gracias a la comunidad. Un agradecimiento especial a:
 
 * **u/MelodyCrystel (Reddit)**: Por proporcionar los offsets críticos y las paletas maestras de los sprites, fundamentales para la reconstrucción gráfica del motor.
 
