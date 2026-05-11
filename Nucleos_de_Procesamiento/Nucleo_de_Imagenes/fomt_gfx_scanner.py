@@ -1,3 +1,8 @@
+# ============================================================
+# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# "The Imposibility Update"
+# Desarrollado por: Denisovich728
+# ============================================================
 """
 fomt_gfx_scanner.py — Motor de Escaneo de Gráficos de FoMT
 ══════════════════════════════════════════════════════════════

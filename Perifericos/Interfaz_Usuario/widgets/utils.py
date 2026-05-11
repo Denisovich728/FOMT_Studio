@@ -1,3 +1,8 @@
+# ============================================================
+# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# "The Imposibility Update"
+# Desarrollado por: Denisovich728
+# ============================================================
 
 from PyQt6.QtWidgets import QStyledItemDelegate, QLineEdit, QLabel, QVBoxLayout, QWidget, QToolTip
 from PyQt6.QtCore import Qt, QPoint, QTimer

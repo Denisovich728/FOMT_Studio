@@ -1,3 +1,8 @@
+# ============================================================
+# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# "The Imposibility Update"
+# Desarrollado por: Denisovich728
+# ============================================================
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Union
 from enum import Enum, auto
