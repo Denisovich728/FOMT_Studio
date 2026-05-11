@@ -1,5 +1,19 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
+## Versión 3.3.4 "Estabilización y Paridad de Bytecode"
+**Fecha:** 2026-05-11
+**Estado:** Lanzamiento Estable
+
+### Estabilización del Motor SlipSpace (v3.3.4)
+- **Corrección de Inflación de Bytecode:** Se optimizó la codificación de instrucciones `PUSH` para números negativos. Ahora los valores pequeños se emiten como `PUSH8` o `PUSH16` en lugar de forzar siempre `PUSH32`, restaurando la paridad 1:1 en ediciones In-Place.
+- **Inyección Inteligente 1:1:** Se eliminó el padding forzado de 4 bytes en el MemoryManager que causaba repunteos innecesarios al final de la ROM cuando el script conservaba su tamaño original.
+- **Sincronización de Tabla de Punteros:** Se corrigió un error de desfase (off-by-one) en el cálculo de la Master Table de eventos, asegurando que los repunteos actualicen la ranura de ID correcta.
+- **Mejoras de Autocompletado IDE:**
+    - Filtrado contextual dinámico para comandos de entidad (`SetEntityPosition`, `Show_Emote`, etc.).
+    - Inserción automática de comillas `""` para nombres de personajes.
+    - Soporte de autocompletado para secuencias de escape (`\r`, `\n`, `\BRK`, `\WAIT_CLICK`).
+- **Robustez del Compilador:** Implementación de fallbacks para identificadores no mapeados (`Char_`, `Map_`, etc.) y corrección del parsing matemático para valores hexadecimales negativos.
+
 ## Versión 3.3.2 "Actualización La Imposibilidad"
 **Fecha:** 2026-05-11
 **Estado:** Lanzamiento Estable / Internacionalización Completa
