@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 from PyQt6.QtWidgets import (
@@ -87,7 +87,7 @@ class NpcEditorWidget(QWidget):
             c_id = QStandardItem(stats.get('idx', '0x01'))
             c_id.setEditable(False)
             
-            c_name = QStandardItem(stats.get('Nombre', 'Desconocido'))
+            c_name = QStandardItem(stats.get('Nombre', tr('unknown', lang)))
             c_name.setEditable(True) 
             c_name.setData(i, Qt.ItemDataRole.UserRole)
             
@@ -139,7 +139,8 @@ class NpcDetailDialog(QDialog):
     def __init__(self, npc, parent=None):
         super().__init__(parent)
         name = npc.name_str.strip('\x00')
-        self.setWindowTitle(f"Perfil de Personalidad: {name}")
+        lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
+        self.setWindowTitle(tr('npc_profile', lang).format(name=name))
         self.resize(600, 500)
         
         self.layout_main = QHBoxLayout(self)
@@ -164,7 +165,7 @@ class NpcDetailDialog(QDialog):
         app = parent.window() if parent else None
         lang = getattr(app, 'current_lang', 'es') if app else 'es'
         role_label = npc.get_translated_role(lang)
-        header = QLabel(f"<h2>{name}</h2><b>{role_label}</b><br>ID Motor: 0x{npc.index + 1:02X}")
+        header = QLabel(f"<h2>{name}</h2><b>{role_label}</b><br>{tr('engine_id', lang).format(id=f'{npc.index + 1:02X}')}")
         layout.addWidget(header)
         
         ptr_str = f"0x{getattr(npc, 'personality_ptr', 0):08X}"
@@ -179,12 +180,12 @@ class NpcDetailDialog(QDialog):
         if schedule_parser:
             cpp, pseudo = schedule_parser.decode_npc_schedule(npc)
             base_info = f"{tr('lbl_routine', lang)}\n\n"
-            base_info += "--- 1. CÓDIGO CRUTO GBA (C++ Macros) ---\n"
+            base_info += f"{tr('raw_gba_code', lang)}\n"
             base_info += cpp + "\n\n"
             base_info += f"--- 2. {tr('sched_analysis', lang).format(name='AI')} ---\n"
             base_info += pseudo
         else:
-            base_info = "[Error] Motor de Rutinas desconectado."
+            base_info = tr('err_routine_engine', lang)
             
         self.txt_data.setPlainText(base_info)
         layout.addWidget(self.txt_data)
@@ -205,8 +206,9 @@ class NpcDetailDialog(QDialog):
             
             # Motor RAW: cargamos 2KB directamente
             raw_data = project.read_rom(p_offset, 2048)
+            lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
             if not raw_data: 
-                self.lbl_portrait.setText("No ROM Data")
+                self.lbl_portrait.setText(tr('no_rom_data', lang))
                 return
             
             # Cargar Paleta Maestra (0x58B3E0)
@@ -240,7 +242,8 @@ class NpcDetailDialog(QDialog):
             self.lbl_portrait.setPixmap(pix)
         except Exception as e:
             print(f"Portrait Error: {e}")
-            self.lbl_portrait.setText("Render Error")
+            lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
+            self.lbl_portrait.setText(tr('render_error', lang))
 
     def _on_close(self):
         self.close()

@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 import os
@@ -110,7 +110,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v3.1.0 - The Imposibility Update")
+        self.setWindowTitle("FoMT Studio v3.3.1 - Soberanía de la Ñ")
         self.setMinimumSize(800, 600)
         self.showMaximized()
         
@@ -175,7 +175,8 @@ class FoMTStudioApp(QMainWindow):
         self.status.showMessage(message, 5000)
 
     def unlock_gemini_ia(self):
-        self.log("PROTOCOL: KONAMI ACTIVATED. UNLOCKING AETHER AI TERMINAL...")
+        lang = self.current_lang
+        self.log(tr('msg_konami_activated', lang))
         self.ai_terminal.show()
         # El splitter se ajusta dinámicamente empujando el centro
         # Intentamos mantener el explorador pequeño y dar espacio a la IA
@@ -183,7 +184,7 @@ class FoMTStudioApp(QMainWindow):
         self.main_splitter.setSizes([200, int(width*0.5), int(width*0.3)])
         self.main_splitter.setStretchFactor(2, 2)
         self.ai_terminal.refresh_context()
-        self.status.showMessage("TERMINAL AETHER DESBLOQUEADA.")
+        self.status.showMessage(tr('msg_aether_unlocked', lang))
         
     def _toggle_explorer(self, visible):
         """Oculta o muestra el panel lateral dinámicamente."""
@@ -202,18 +203,19 @@ class FoMTStudioApp(QMainWindow):
         self.addToolBar(self.toolbar)
         
         # Menú Desplegable "HERRAMIENTAS DE VOLCADO"
-        self.btn_bulk_menu = QPushButton("🛠️ VOLCADO DE ITEMS")
+        lang = self.current_lang
+        self.btn_bulk_menu = QPushButton(tr('menu_bulk_items', lang))
         self.btn_bulk_menu.setStyleSheet("padding: 5px; font-weight: bold; background: #34495E; color: white;")
         bulk_menu = QMenu(self)
-        bulk_menu.addAction("🛠️ Herramientas", lambda: self.open_bulk_items("Herramientas", "Herramienta"))
-        bulk_menu.addAction("🍎 Comestibles", lambda: self.open_bulk_items("Comestibles", "Consumible/Comida"))
-        bulk_menu.addAction("📦 Artículos", lambda: self.open_bulk_items("Artículos", "Artículo"))
+        bulk_menu.addAction(tr('bulk_tools', lang), lambda: self.open_bulk_items(tr('bulk_tools', lang), "Herramienta"))
+        bulk_menu.addAction(tr('bulk_foods', lang), lambda: self.open_bulk_items(tr('bulk_foods', lang), "Consumible/Comida"))
+        bulk_menu.addAction(tr('bulk_misc', lang), lambda: self.open_bulk_items(tr('bulk_misc', lang), "Artículo"))
         self.btn_bulk_menu.setMenu(bulk_menu)
         self.toolbar.addWidget(self.btn_bulk_menu)
         
         self.toolbar.addSeparator()
-        self.toolbar.addAction("🖥️ Textos Interfaz", self.open_menu_editor)
-        self.toolbar.addAction("📝 Textos Intro", self.open_intro_editor)
+        self.toolbar.addAction(tr('menu_ui_texts', lang), self.open_menu_editor)
+        self.toolbar.addAction(tr('menu_intro_texts', lang), self.open_intro_editor)
         self.toolbar.addSeparator()
         
         # Botón para colapsar/expandir explorador
@@ -230,7 +232,7 @@ class FoMTStudioApp(QMainWindow):
         
         left_panel = QVBoxLayout()
         
-        self.btn_n = QPushButton("¡Instalar Ñ!")
+        self.btn_n = QPushButton(tr('btn_install_n', lang))
         self.btn_n.setStyleSheet("""
             QPushButton {
                 background-color: #E74C3C;

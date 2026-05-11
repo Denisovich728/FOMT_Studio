@@ -1,5 +1,55 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
+## Versión 3.3.1 "Actualización La Imposibilidad"
+**Fecha:** 2026-05-11
+**Estado:** Lanzamiento Estable / Internacionalización Completa
+
+### La Soberanía de la Ñ (Core v3.3)
+- **Extensión de Glifos Nativos:** Implementación de soporte nativo para caracteres del español (**Ñ, á, é, í, ó, ú**) mediante inyección directa en el font 1bpp de la pantalla de nombres.
+- **Corrección de Alineación de Font:** Re-ingeniería del espaciado vertical. Se ha desplazado el abecedario completo (A-z) para permitir tildes de 2 píxeles sin colisiones, estandarizando la estética con el patrón diagonal `0x0C/0x10`.
+- **Restauración de ID 0x7E (Ó):** Creación del glifo de la 'Ó' mayúscula a partir de una base corregida de la 'Q', manteniendo el valor `0x4F` (O normal) intacto para evitar colisiones de software nativo.
+- **Sincronización de IDs:** Alineación de offsets en `0x4F9A50` para evitar el desplazamiento de IDs y la impresión errónea de Kanjis.
+
+### Mejoras en Suite Cilixes
+- **Tile Editor Extreme v2.1:**
+    - Implementación de panel lateral scrolleable para mejorar la visibilidad en bajas resoluciones.
+    - Aumento de escala de edición (Zoom x50) para trabajos de precisión en glifos.
+    - Nuevo preset **Keyboard** configurado automáticamente a 1bpp con stride desactivado.
+- **Estabilidad de la Suite:**
+    - Corrección de `NameError` en el Bulk Item Editor (importación de `QFont`).
+    - Optimización del editor hexadecimal para sincronización inmediata con el canvas.
+
+
+
+## Versión 3.2.0 "Actualización La Imposibilidad"
+**Fecha:** 2026-05-11
+**Estado:** Lanzamiento Estable / Expansión de Herramientas de Edición
+
+### Evolución del SlipSpace Engine (v2.0 Core)
+- **Abstracción de Control de Flujo:** Refactorización del motor de saltos dinámicos. Las instrucciones de bajo nivel ahora se abstraen en estructuras de control de alto nivel (`GOTO`, `IF`, `SWITCH/CASE` y bucles algorítmicos), optimizando la legibilidad de la lógica de eventos.
+- **Mapeo de Identificadores:** Indexación completa de IDs para animaciones de NPCs y disparadores de *emotes*.
+- **Desacoplamiento de UI:** El motor ahora expone las cadenas de texto de la interfaz de usuario para su edición externa, facilitando la localización sin tocar el binario del motor.
+- **Optimización de Renderizado:** Mejoras en el manejo de resolución dinámica y escalado de ventana.
+
+### Nuevos Módulos y Herramientas (Suite Cilixes)
+- **Tilemap Editor v1.0:** Implementación de un nuevo editor de tiles nativo con soporte para capas y colisiones.
+- **Localización (Instalador de Glifos):** Adición de módulo de inyección de caracteres especiales (Ñ, tildes) y activos gráficos en español.
+- **Entorno de Trabajo Multitarea:** Implementación de un sistema de pestañas flotantes y acoplables (Docking System), permitiendo la edición simultánea de múltiples scripts y activos.
+
+### Interfaz y Experiencia (UX)
+- **Tema "Forerunner":** Nueva paleta visual basada en tonos cian de alta intensidad y estética neón sobre fondos oscuros.
+- **Ofuscación de Integración AI:** Se han eliminado las referencias explícitas a servicios externos en la documentación pública y UI para mantener la integridad del "Easter Egg" técnico.
+
+### Refactorización y Deuda Técnica
+- **Normalización de Referencias:** Corrección de punteros y referencias cruzadas en la base de datos de objetos.
+- **Embellecimiento de Código (Decoración):** Aplicación de estándares de legibilidad para facilitar el mantenimiento autónomo del repositorio.
+- **Mejora en Pipeline de Traducción:** Optimización de los diccionarios de internacionalización para soporte multi-idioma.
+
+> [!NOTE]
+> **Análisis de Sistema:** La transición de saltos dinámicos a estructuras de control (`IF/SWITCH`) reduce significativamente la complejidad ciclomática del código descompilado, facilitando la depuración de eventos complejos en las ROMs. El sistema de pestañas flotantes requiere una gestión estricta de los estados de los archivos para evitar condiciones de carrera al guardar múltiples scripts simultáneamente.
+
+---
+
 ## Versión 3.1.0 "The Imposibility Update"
 **Fecha:** 2026-05-11
 **Estado:** Lanzamiento Estable / Refactorización Profesional
@@ -11,8 +61,6 @@
 
 ### Mejoras en el Motor SlipSpace
 - **Documentación Técnica:** Actualización de los comentarios en el compilador y descompilador para reflejar la lógica del motor sin ambigüedades.
-- **Sanitización de Prompts:** Refactorización de las instrucciones del Nexo Gemini para un flujo de trabajo más profesional y directo.
-
 ---
 
 ## Versión 3.0.0 "The Imposibility Update"

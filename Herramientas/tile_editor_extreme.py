@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 import sys
@@ -19,7 +19,7 @@ class TileCanvas(QWidget):
     pixelChanged = pyqtSignal()
     colorPicked = pyqtSignal(int)
 
-    def __init__(self, scale=40):
+    def __init__(self, scale=50):
         super().__init__()
         self.scale = scale
         self.tile_h = 16
@@ -257,7 +257,11 @@ class TileEditorWidget(QWidget):
         self.scroll.setWidget(self.grid_w); l_lay.addWidget(self.scroll)
         layout.addWidget(left, 7)
 
-        right = QWidget(); right.setFixedWidth(380); r_lay = QVBoxLayout(right)
+        right_scroll = QScrollArea()
+        right_scroll.setWidgetResizable(True)
+        right_scroll.setFixedWidth(400)
+        right_container = QWidget()
+        r_lay = QVBoxLayout(right_container)
         
         tools_lay = QHBoxLayout()
         self.btn_brush = QPushButton("🖌️ Pincel"); self.btn_brush.setCheckable(True); self.btn_brush.setChecked(True)
@@ -305,7 +309,7 @@ class TileEditorWidget(QWidget):
         r_lay.addLayout(c_grid)
         
         r_lay.addWidget(QLabel("Raw Hex Data:"))
-        self.edit_hex = QPlainTextEdit(); self.edit_hex.setFixedHeight(80)
+        self.edit_hex = QPlainTextEdit(); self.edit_hex.setFixedHeight(120)
         self.edit_hex.setStyleSheet("font-family: 'Consolas'; background: #1a1a1a; color: #00ff00;")
         r_lay.addWidget(self.edit_hex)
         r_lay.addWidget(QPushButton("🔗 Sincronizar Hex -> Canvas", clicked=self._apply_hex))
@@ -319,7 +323,9 @@ class TileEditorWidget(QWidget):
         r_lay.addWidget(QLabel("--- PRESETS ---"))
         p1 = QHBoxLayout(); p1.addWidget(QPushButton("🅰️ Font Main", clicked=self._preset_main)); p1.addWidget(QPushButton("⌨️ Keyboard", clicked=self._preset_kb)); r_lay.addLayout(p1)
         p2 = QHBoxLayout(); p2.addWidget(QPushButton("📝 UI Naming", clicked=self._preset_naming)); p2.addWidget(QPushButton("⚧️ Symbols", clicked=self._preset_symbols)); r_lay.addLayout(p2)
-        layout.addWidget(right, 3)
+        
+        right_scroll.setWidget(right_container)
+        layout.addWidget(right_scroll, 3)
 
     def _open_file_standalone(self):
         path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM GBA", "", "GBA ROM (*.gba);;All Files (*)")
@@ -467,7 +473,13 @@ class TileEditorWidget(QWidget):
         except Exception as e: QMessageBox.critical(self, "Error", f"Hex inválido: {e}")
 
     def _preset_main(self): self.edit_off.setText("75A440"); self.spin_h.setValue(8); self.combo_bpp.setCurrentIndex(2); self.chk_inter_rows.setChecked(False); self.chk_stride.setChecked(False); self._refresh()
-    def _preset_kb(self): self.edit_off.setText("4F97EC"); self.spin_h.setValue(12); self.combo_bpp.setCurrentIndex(2); self.chk_inter_rows.setChecked(True); self.chk_stride.setChecked(True); self._refresh()
+    def _preset_kb(self): 
+        self.edit_off.setText("4F97EC")
+        self.spin_h.setValue(12)
+        self.combo_bpp.setCurrentIndex(0) # 1 bpp
+        self.chk_inter_rows.setChecked(True)
+        self.chk_stride.setChecked(False) # Desactivar Stride
+        self._refresh()
     def _preset_naming(self): self.edit_off.setText("4F8F70"); self.spin_h.setValue(8); self.combo_bpp.setCurrentIndex(0); self.chk_inter_rows.setChecked(False); self.chk_stride.setChecked(False); self._refresh()
     def _preset_symbols(self): self.edit_off.setText("117448"); self.spin_h.setValue(12); self.combo_bpp.setCurrentIndex(0); self.chk_inter_rows.setChecked(False); self.chk_stride.setChecked(False); self._refresh()
 

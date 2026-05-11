@@ -1,14 +1,10 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 """
-TileViewerWidget v2.0 — Visor de Gráficos BlueSpider
-══════════════════════════════════════════════════════
-Reemplaza completamente el visor antiguo que producía basura.
-Usa el motor BlueSpider (GBATile, GBAPalette) de mapas.py
-para renderizar tilesets LZ77 correctamente.
+TileViewerWidget v2.0 — Visor de Gráficos
 """
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea,

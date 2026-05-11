@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 from PyQt6.QtWidgets import (
@@ -37,7 +37,7 @@ class MasterPointerEditor(QWidget):
         btn_save.setStyleSheet("background-color: #388e3c; color: white; font-weight: bold;")
         btn_save.clicked.connect(self.save_pointers)
         
-        btn_relocate = QPushButton("Expandir Tabla (Relocalizar)")
+        btn_relocate = QPushButton(tr('btn_relocate', lang))
         btn_relocate.setStyleSheet("background-color: #ff9800; color: black; font-weight: bold;")
         btn_relocate.clicked.connect(self.relocate_table)
         
@@ -150,10 +150,11 @@ class MasterPointerEditor(QWidget):
         from PyQt6.QtWidgets import QInputDialog, QMessageBox
         
         old_limit = self.project.super_lib.event_limit
+        lang = self.lang
         new_capacity, ok = QInputDialog.getInt(
             self, 
-            "Expandir Tabla de Eventos", 
-            f"Límite actual: {old_limit}\nIngresa el nuevo límite de eventos (ej: {old_limit + 500}):", 
+            tr('title_expand', lang), 
+            tr('msg_expand_limit', lang).format(old_limit=old_limit, new_hint=old_limit + 500), 
             value=old_limit + 500, 
             min=old_limit + 1, 
             max=10000
@@ -163,7 +164,7 @@ class MasterPointerEditor(QWidget):
             new_offset, msg = self.project.memory.relocate_master_event_table(new_capacity)
             if new_offset:
                 self.project.save()  # Guardar el parche
-                QMessageBox.information(self, "Éxito", msg)
+                QMessageBox.information(self, tr('success', lang), msg)
                 self.load_pointers()  # Recargar tabla con nuevos límites
             else:
-                QMessageBox.warning(self, "Error", msg)
+                QMessageBox.warning(self, tr('error', lang), msg)

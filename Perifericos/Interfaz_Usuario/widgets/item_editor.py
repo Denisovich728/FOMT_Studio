@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 from PyQt6.QtWidgets import (
@@ -38,7 +38,7 @@ class ItemEditorWidget(QWidget):
         self.btn_refresh.clicked.connect(self.load_data)
         toolbar.addWidget(self.btn_refresh)
         
-        self.btn_save_all = QPushButton("Guardar Todo")
+        self.btn_save_all = QPushButton(tr('btn_save_all', lang))
         self.btn_save_all.setStyleSheet("background-color: #2e7d32; color: white;")
         self.btn_save_all.clicked.connect(self.save_data)
         toolbar.addWidget(self.btn_save_all)
@@ -63,14 +63,14 @@ class ItemEditorWidget(QWidget):
         layout.addWidget(self.tabs)
         
         # Panel de Edición de Descripción (Abajo)
-        self.desc_group = QGroupBox("Editor de Descripción")
+        self.desc_group = QGroupBox(tr('desc_editor_title', lang))
         desc_layout = QVBoxLayout(self.desc_group)
         
         self.desc_edit = QTextEdit()
-        self.desc_edit.setPlaceholderText("Selecciona un objeto para editar su descripción...")
+        self.desc_edit.setPlaceholderText(tr('desc_placeholder', lang))
         desc_layout.addWidget(self.desc_edit)
         
-        self.btn_compile_desc = QPushButton("Compilar y Repuntear Descripción")
+        self.btn_compile_desc = QPushButton(tr('btn_compile_desc', lang))
         self.btn_compile_desc.clicked.connect(self.compile_description)
         desc_layout.addWidget(self.btn_compile_desc)
         
@@ -107,7 +107,7 @@ class ItemEditorWidget(QWidget):
         lang = self.lang
         model.setHorizontalHeaderLabels([
             tr('col_class', lang), tr('col_id', lang), tr('col_name', lang), 
-            "Precio (V)", "Precio (C)", "Stamina", "Fatiga"
+            tr('col_price_sell', lang), tr('col_price_buy', lang), tr('col_stamina', lang), tr('col_fatigue', lang)
         ])
         
         for i, itm in enumerate(self.items):
@@ -142,7 +142,8 @@ class ItemEditorWidget(QWidget):
         item_obj = current_table.model().item(row, 1).data(Qt.ItemDataRole.UserRole)
         
         self.desc_edit.setText(item_obj.desc_str)
-        self.desc_group.setTitle(f"Descripción de: {item_obj.name_str}")
+        lang = self.lang
+        self.desc_group.setTitle(tr('desc_of', lang).format(name=item_obj.name_str))
 
     def compile_description(self):
         current_table = self.tabs.currentWidget()
@@ -157,9 +158,10 @@ class ItemEditorWidget(QWidget):
             item_obj.save_desc_in_place(new_desc)
             # Refrescar el objeto en la vista
             self.on_selection_changed()
-            QMessageBox.information(self, "Éxito", f"Descripción de '{item_obj.name_str}' compilada y repunteada correctamente.")
+            lang = self.lang
+            QMessageBox.information(self, tr('success', lang), tr('msg_desc_success', lang).format(name=item_obj.name_str))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo compilar la descripción: {e}")
+            QMessageBox.critical(self, tr('error', lang), f"{tr('error', lang)}: {e}")
 
     def save_data(self):
         # Guardar nombres y stats básicos de todas las tablas
@@ -176,4 +178,5 @@ class ItemEditorWidget(QWidget):
                 
                 # ... lógica de precios y stats ...
                 
-        QMessageBox.information(self, "Proyecto Guardado", f"Se han aplicado {total_cambios} cambios de nombres.")
+        lang = self.lang
+        QMessageBox.information(self, tr('title_project_saved', lang), tr('msg_changes_applied', lang).format(count=total_cambios))

@@ -1,9 +1,10 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
-# "The Imposibility Update"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.3.1)
+# "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 import os
+from Nucleos_de_Procesamiento.Nucleo_de_Datos.parche_font import apply_font_patch
 
 # ============================================================================
 # SOBERANÍA DE LA Ñ - Inyector de Hardware v3.0
@@ -183,6 +184,11 @@ def aplicar_parche_n(project):
 
     # ── Fase 5: Firma de Ñ Mode (Espacio Libre del Sistema) ──────────
     project.write_patch(0x0013AA24, b'N_MODE')
+
+    # ── Fase 6: Parcheo de Font (Acentos y O) ───────────────────────
+    # Esta fase corrige el offset de las mayúsculas, inserta la 'O' 
+    # y añade las vocales con tilde (ÁÉÍÓÚ áéíóú)
+    vowel_ids = apply_font_patch(project)
 
     # ── Fase 6: Días de la Semana (HUD Chunky) ─────────────────────
     # Cada día ocupa 3 tiles de 32 bytes (96 bytes total por día)
