@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -177,4 +177,3 @@ class ItemEditorWidget(QWidget):
                 # ... lógica de precios y stats ...
                 
         QMessageBox.information(self, "Proyecto Guardado", f"Se han aplicado {total_cambios} cambios de nombres.")
-

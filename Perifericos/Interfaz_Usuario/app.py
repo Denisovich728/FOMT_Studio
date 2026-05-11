@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -110,7 +110,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v3.0.0 - The Imposibility Update")
+        self.setWindowTitle("FoMT Studio v3.1.0 - The Imposibility Update")
         self.setMinimumSize(800, 600)
         self.showMaximized()
         

@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -214,7 +214,7 @@ def cmd_decompile(args):
         print(f"Decompile Error: {e}")
 
 def main():
-    parser = argparse.ArgumentParser(description="SlipSpace_Engine (Mary python port) GBA Script Tool")
+    parser = argparse.ArgumentParser(description="SlipSpace_Engine (GBA Script Tool) - Implementación Python")
     subparsers = parser.add_subparsers(dest="command")
     
     # Compile

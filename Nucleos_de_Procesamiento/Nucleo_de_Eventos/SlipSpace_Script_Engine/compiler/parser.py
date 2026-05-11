@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -171,7 +171,7 @@ class Parser:
 
     def parse_expr(self) -> Expr:
         # assignment or conditional
-        # mary ast only has conditional_expr resolving to or_expr. assignments are statements.
+        # El AST del motor SlipSpace solo gestiona expresiones condicionales...
         return self.parse_or_expr()
 
     def parse_stmt_block(self) -> List[Stmt]:
@@ -311,7 +311,7 @@ class Parser:
             return StmtGoto(label_name)
             
         elif t.type == TokenType.NAME:
-            # Soporte para CONST_MESSAGE_X(...) [Mary & Popuri style]
+            # Soporte para CONST_MESSAGE_X(...) [Convención de constantes de mensajes]
             if t.value.startswith("CONST_MESSAGE_") or t.value.startswith("MESSAGE_"):
                 name = self.next_token().value
                 idx_str = name.replace("CONST_MESSAGE_", "").replace("MESSAGE_", "")

@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -21,8 +21,8 @@ from Nucleos_de_Procesamiento.Nucleo_de_Datos.gestor_memoria import MemoryManage
 class FoMTProject:
     """
     Gestiona el estado completo de un proyecto modificado (Parches, Base ROM, y Configs).
-    Aprende de los errores anteriores: nunca altera la ROM base hasta que le das a 'Compilar'.
-    Mantiene los cambios virtualmente en Project_Data.json (como AdvanceMap).
+    Garantiza la integridad de la ROM original, operando sobre un buffer virtual hasta la compilación final.
+    Mantiene los cambios de forma persistente en los archivos de proyecto (.fsp).
     """
     def __init__(self):
         self.name = "My_Patch"

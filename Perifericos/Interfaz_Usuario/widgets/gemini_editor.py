@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -522,7 +522,7 @@ class GeminiEditorWidget(QWidget):
         2. NO ESCAPES: Usa UN SOLO BACKSLASH en tu respuesta. No uses doble barra (\\).
         3. ENTIDADES: Respeta el carácter que sigue a \xFF (ej: \xFF!, \xFF\", \xFF%).
         4. LÓGICA DE SCRIPTS: En comandos como SetEntityPosition, el primer argumento es el ID: 0 siempre es el PLAYER, los demás corresponden a la tabla de NPCs (Lillia=0, Rick=1, Popuri=2, etc.).
-        5. REGLA DE SALIDA: Devuelve solo los strings legibles para el IDE sin dar explicaciones hasta el final. Si opinas que hay mejoras también dímelo amigo al terminar la lista."""
+        5. REGLA DE SALIDA: Devuelve solo los strings legibles para el IDE sin dar explicaciones hasta el final. Si existen sugerencias de optimización, incluirlas al final del listado JSON."""
         
         self.progress.setMaximum(len(matches))
         self.progress.setValue(0)

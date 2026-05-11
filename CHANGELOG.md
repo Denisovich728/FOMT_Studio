@@ -1,5 +1,20 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
+## Versión 3.1.0 "The Imposibility Update"
+**Fecha:** 2026-05-11
+**Estado:** Lanzamiento Estable / Refactorización Profesional
+
+### Profesionalización de la Base de Código
+- **Refactorización de Comentarios:** Se han eliminado todas las referencias informales y comentarios personales, sustituyéndolos por documentación técnica en tercera persona.
+- **Normalización de Nombres:** Renombrado de métodos internos y variables para seguir estándares de ingeniería (ej. `_parse_mary_bible` -> `_load_opcode_library`).
+- **Limpieza de Activos:** Eliminación de archivos `.json` huérfanos y scripts de inspección obsoletos en la raíz y subcarpetas de datos.
+
+### Mejoras en el Motor SlipSpace
+- **Documentación Técnica:** Actualización de los comentarios en el compilador y descompilador para reflejar la lógica del motor sin ambigüedades.
+- **Sanitización de Prompts:** Refactorización de las instrucciones del Nexo Gemini para un flujo de trabajo más profesional y directo.
+
+---
+
 ## Versión 3.0.0 "The Imposibility Update"
 **Fecha:** 2026-05-11
 **Estado:** Lanzamiento Crítico / Arquitectura Cilixes

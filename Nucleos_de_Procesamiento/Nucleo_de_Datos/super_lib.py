@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -68,8 +68,8 @@ def _scan_chunk_worker_wrapper(args):
 
 class SuperLibrary:
     """
-    Base de conocimiento monolítica (La Super Librería) que absorbe la 
-    magia de Carter NLP, StanHash y los topes lógicos documentados por Mary.
+    Base de conocimiento centralizada que gestiona los offsets, constantes y 
+    mapeos de recursos para las diferentes versiones de la ROM.
     """
     
     # Offsets y Tamaños
@@ -99,7 +99,7 @@ class SuperLibrary:
         "MISC_TABLE": (0x0, 0x0),
     }
 
-    # NLP Keywords extraídos de Carter.py
+    # Palabras clave extraídas para la identificación de personajes.
     CHARACTER_KEYWORDS = {
         "Ann": ["Ann", "Doug"],
         "Elli": ["Elli", "Ellen", "Stu", "Doctor"],
@@ -131,7 +131,7 @@ class SuperLibrary:
         self._load_maps()
         self._load_animations()
         
-        self._parse_mary_bible()
+        self._load_opcode_library()
 
     def dynamic_init(self, rom_data: bytes):
         """
@@ -299,7 +299,7 @@ class SuperLibrary:
             print(f"Error cargando nombres de eventos desde CSV ({filename}): {e}")
             return False
 
-    def _parse_mary_bible(self):
+    def _load_opcode_library(self):
         import csv
         mode = "mfomt" if self.is_mfomt else "fomt"
         filename = "MFomt_Lib.csv" if self.is_mfomt else "Fomt_Lib.csv"

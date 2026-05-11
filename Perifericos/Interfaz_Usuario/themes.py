@@ -1,9 +1,8 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
-
 def get_forerunner_theme():
     return """
         QMainWindow, QDialog { background-color: #050B15; color: #00E5FF; }

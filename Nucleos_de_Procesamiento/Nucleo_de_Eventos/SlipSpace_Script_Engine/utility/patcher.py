@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.0.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.1.0)
 # "The Imposibility Update"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -19,7 +19,7 @@ def patch_pregnant_typo(rom_path: str):
         with open(rom_path, 'rb') as f:
             rom_data = bytearray(f.read())
             
-        # Secuencia a buscar (asumiendo ASCII/Mary encoding)
+        # Secuencia a buscar (asumiendo codificación ASCII estándar del juego)
         # "\xFF%is \r\nprengant!\x05"
         # Bytes: FF 25 69 73 20 0D 0A 70 72 65 6E 67 61 6E 74 21 05
         target = b'\xff%is \r\nprengant!\x05'
