@@ -122,7 +122,7 @@ class Lexer:
         self.next_char() # skip the opening "
         buf = bytearray()
         
-        # Mapa Inverso para Compilación (FoMT USA)
+        # Mapa Inverso para Compilación (FoMT USA - Spanish Extension)
         reverse_charmap = {
             "{PLAYER}": 0x01,
             "{VALUE1}": 0x02,
@@ -133,7 +133,10 @@ class Lexer:
             "{BREAK2}": 0x07,
             "{VALUE8}": 0x08,
             "{VALUE9}": 0x09,
-            "{HORSE}": 0x19
+            "{HORSE}": 0x19,
+            "Á": 0xF0, "É": 0xF1, "Í": 0xF2, "Ó": 0xF3, "Ú": 0xF4,
+            "á": 0xF5, "é": 0xF6, "í": 0xF7, "ó": 0xF8, "ú": 0xF9,
+            "Ñ": 0x2B, "ñ": 0x2D
         }
 
         while True:
@@ -155,23 +158,18 @@ class Lexer:
                     tag_buf += '}'
                     if tag_buf in reverse_charmap:
                         buf.append(reverse_charmap[tag_buf])
-                        # Avanzar la posición real del lexer
                         for _ in range(len(tag_buf)): self.next_char()
                         continue
-                # Si no es un tag válido, se trata como texto normal
-                if c == 'Ñ':
-                    buf.append(0xB2)
-                elif c == 'ñ':
-                    buf.append(0xB1)
-                else:
-                    buf.extend(c.encode('windows-1252'))
+            
+            if c in reverse_charmap:
+                buf.append(reverse_charmap[c])
                 self.next_char()
             elif c == '\\':
                 self.next_char() # consume slash
                 nc = self.peek_char()
                 
                 if nc == 'n': 
-                    buf.append(0x0A) # \n estándar
+                    buf.append(0x0A)
                     self.next_char()
                 elif self.source.startswith("BRK", self.pos):
                     buf.append(0x05)
@@ -201,14 +199,8 @@ class Lexer:
                 else:
                     buf.append(ord(nc))
                     self.next_char()
-            elif c == 'Ñ':
-                buf.append(0xB2)
-                self.next_char()
-            elif c == 'ñ':
-                buf.append(0xB1)
-                self.next_char()
             else:
-                buf.extend(c.encode('windows-1252'))
+                buf.extend(c.encode('windows-1252', errors='replace'))
                 self.next_char()
                 
         return bytes(buf)
