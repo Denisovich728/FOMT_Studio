@@ -17,8 +17,10 @@ def get_resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-def get_data_path(filename):
+def get_data_path(game_mode, filename):
     """
-    Acceso rápido a archivos dentro de Nucleos_de_Procesamiento/data
+    Acceso rápido a archivos dentro de Nucleos_de_Procesamiento/Cilixes/
+    game_mode debe ser 'fomt' o 'mfomt'
     """
-    return get_resource_path(os.path.join("Nucleos_de_Procesamiento", "data", filename))
+    subfolder = "Mfomt" if game_mode.lower() == "mfomt" else "fomt"
+    return get_resource_path(os.path.join("Nucleos_de_Procesamiento", "Cilixes", subfolder, filename))

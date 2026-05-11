@@ -1,0 +1,10 @@
+ID,Offset_ROM,GBA_Addr,Descripcion,Categoria
+MASTER_TABLE,0x0F89D4,0x080F89D4,Tabla Maestra de Despacho del Motor,Sistema
+MENU_POINTER_TABLE,0x0E8704,0x080E8704,Tabla de Punteros de Menú y Textos,Interfaz
+TOOLS_TABLE_START,0x1116A8,0x081116A8,Inicio de Tabla de Herramientas (GToolInfo),Items
+FOODS_TABLE_START,0x111B90,0x08111B90,Inicio de Tabla de Comestibles (GFoodInfo),Items
+NPC_NAMES_TABLE,0x104128,0x08104128,Tabla de Nombres de PNJs,Personajes
+MAP_HEADER_TABLE,0x105EDC,0x08105EDC,Tabla Maestra de Cabeceras de Mapas,Mapas
+EMPTY_SPACE_OFFSET,0x75C244,0x0875C244,Inicio de Espacio Libre (Bloque SlipSpace),Memoria
+EVENT_SCRIPTS_START,0x1004E0,0x081004E0,Inicio de scripts de eventos de diálogo,Scripts
+FLAGS_STATE_TABLE,0x020000,0x08020000,Tabla de estados de Flags en RAM/ROM,Sistema

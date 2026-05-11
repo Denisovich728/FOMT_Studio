@@ -20,6 +20,7 @@ class TokenType(Enum):
     KW_EXIT = "exit"
     KW_STRING = "string"
     KW_INTEGER = "integer"
+    KW_GOTO = "goto"
 
     LPAREN = "("
     RPAREN = ")"
@@ -154,9 +155,9 @@ class Lexer:
                         continue
                 # Si no es un tag válido, se trata como texto normal
                 if c == 'Ñ':
-                    buf.append(0xCB)
+                    buf.append(0xB2)
                 elif c == 'ñ':
-                    buf.append(0xCC)
+                    buf.append(0xB1)
                 else:
                     buf.extend(c.encode('windows-1252'))
                 self.next_char()
@@ -196,10 +197,10 @@ class Lexer:
                     buf.append(ord(nc))
                     self.next_char()
             elif c == 'Ñ':
-                buf.append(0xCB)
+                buf.append(0xB2)
                 self.next_char()
             elif c == 'ñ':
-                buf.append(0xCC)
+                buf.append(0xB1)
                 self.next_char()
             else:
                 buf.extend(c.encode('windows-1252'))

@@ -1,5 +1,6 @@
-0x000 Unk000(/* ... */) // unreferenced
-0x001 Unk001(/* ... */) // unreferenced
+Nombre_Mfomt,Nombre_MFomt,Argumentos
+0x000, Unk000, "/* ... */" 
+0x001, Unk001, "/* ... */" 
 proc0x002, SetEntityPosition, "which_entity, x, y, facing"
 func0x003, GetEntityX,"(which_entity)"
 func0x004, GetEntityY,"(which_entity)"

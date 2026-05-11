@@ -1,6 +1,0 @@
-#include "lib_fomt.csv"
-
-script 1189 Unknown_Event_1189 {
-PlaySong(0, 0xA1);
-exit;
-}

@@ -199,7 +199,9 @@ def decompress_auto(data: bytes, offset: int) -> bytes:
         return decompress_popuri(data, offset)
     elif header == 0x00:
         # Sin compresión — datos crudos (rare pero válido en FoMT)
+        if offset + 4 > len(data): return b""
         size = struct.unpack_from('<I', data, offset)[0] >> 8
+        if offset + 4 + size > len(data): size = len(data) - (offset + 4)
         return data[offset+4:offset+4+size]
     else:
         raise ValueError(f"Formato desconocido 0x{header:02X} en 0x{offset:06X}")
@@ -237,8 +239,11 @@ class GBATile:
     BYTES = TILE_BYTES_4BPP  # 32
 
     def __init__(self, raw: bytes):
-        assert len(raw) >= self.BYTES
-        self._data = raw[:self.BYTES]
+        # Asegurar que tenemos al menos 32 bytes, rellenando con ceros si es necesario
+        if len(raw) < self.BYTES:
+            self._data = raw.ljust(self.BYTES, b'\x00')
+        else:
+            self._data = raw[:self.BYTES]
 
     def get_pixel(self, x: int, y: int) -> int:
         """Retorna el índice de color (0-15) del píxel en (x, y)."""
@@ -467,15 +472,14 @@ class MapHeader:
         # 2. Tiles GFX (LZ77 comprimido)
         self.tiles = []
         
-        # [NUEVO] FoMT usa un sistema Dual Tileset: 
         # Tiles 0-639 vienen del Tileset Global (Map 0)
         # Tiles 640+ vienen del Tileset Local
-        base_tiles_ptr = 0x836800 if len(rom) > 0x836800 else 0
-        if base_tiles_ptr and rom[base_tiles_ptr] == 0x10:
+        base_tiles_ptr = 0x836800
+        if len(rom) > base_tiles_ptr and rom[base_tiles_ptr] == 0x10:
             raw_base = decompress_lz77(rom, base_tiles_ptr)
             n_base = len(raw_base) // GBATile.BYTES
             for i in range(n_base):
-                self.tiles.append(GBATile(raw_base[i*GBATile.BYTES:]))
+                self.tiles.append(GBATile(raw_base[i*GBATile.BYTES : (i+1)*GBATile.BYTES]))
 
         if img_data_ptr and rom[img_data_ptr] == 0x10:
             raw_tiles = decompress_lz77(rom, img_data_ptr)
@@ -483,7 +487,7 @@ class MapHeader:
             # Si ya cargamos base, los locales empiezan después (offset 640 aprox)
             # Para simplificar, los añadimos al final. El motor GBA maneja el offset.
             for i in range(n_tiles):
-                self.tiles.append(GBATile(raw_tiles[i*GBATile.BYTES:]))
+                self.tiles.append(GBATile(raw_tiles[i*GBATile.BYTES : (i+1)*GBATile.BYTES]))
 
         # 3. Bloques (block_data_ptr: datos crudos, 16 bytes cada uno)
         self.blocks = []
@@ -514,9 +518,9 @@ class MapHeader:
         BlueSpider guarda ambas capas concatenadas bajo el mismo puntero.
         Cada entrada del tilemap es un uint16 LE = índice de bloque.
         """
-        if not self.layout_offset:
+        if not self.layout_offset or self.layout_offset >= len(rom):
             return
-        header_byte = rom[self.layout_offset] if self.layout_offset < len(rom) else 0
+        header_byte = rom[self.layout_offset]
         if header_byte not in (0x10, 0x70, 0x00):
             return
 

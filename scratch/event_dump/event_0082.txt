@@ -1,5 +1,0 @@
-#include "lib_fomt.csv"
-
-script 82 Unknown_Event_0082 {
-exit;
-}

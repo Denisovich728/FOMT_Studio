@@ -472,6 +472,7 @@ class ScriptIDEWidget(QWidget):
         super().__init__(parent)
         self.project = project
         self.current_event_id = None
+        self.mode = "script" # Modo por defecto
         self.lang = getattr(parent, 'current_lang', 'es') if parent else 'es'
         self.setup_ui()
         
@@ -564,8 +565,9 @@ class ScriptIDEWidget(QWidget):
         self.completer_model = QStandardItemModel(self)
         
         # 1. Cargar Opcodes Dinámicos desde lib_*.csv
-        lib_name = "lib_mfomt.csv" if self.project.is_mfomt else "lib_fomt.csv"
-        lib_path = get_data_path(lib_name)
+        mode = "mfomt" if self.project.is_mfomt else "fomt"
+        lib_name = "MFomt_Lib.csv" if self.project.is_mfomt else "Fomt_Lib.csv"
+        lib_path = get_data_path(mode, lib_name)
         
         if os.path.exists(lib_path):
             import csv
@@ -713,6 +715,10 @@ class ScriptIDEWidget(QWidget):
         self.editor.setPlainText(code)
         
     def on_compile_clicked(self):
+        if self.mode == "bulk_items":
+            self.compile_bulk_items()
+            return
+
         if self.current_event_id is None: return
         
         code = self.editor.toPlainText()
@@ -786,6 +792,61 @@ class ScriptIDEWidget(QWidget):
             f"Tamaño Original: {old_size} bytes\\n"
             f"Tamaño Nuevo: {len(new_data)} bytes"
         )
+
+    def compile_bulk_items(self):
+        """Parser masivo para Ítems, Comidas y Herramientas por separado."""
+        from PyQt6.QtWidgets import QMessageBox
+        text = self.editor.toPlainText()
+        lines = text.split("\n")
+        
+        # Mapeo de modo a filtro de categoría
+        cat_map = {
+            "bulk_tools": "Herramienta",
+            "bulk_foods": "Consumible/Comida",
+            "bulk_misc": "Artículo"
+        }
+        target_category = cat_map.get(self.mode)
+        
+        # Obtener solo los items de esta categoría
+        cat_items = [itm for itm in self.project.item_parser.items if itm.category == target_category]
+        
+        current_item = None
+        changes_count = 0
+        
+        for line in lines:
+            line = line.strip()
+            # Detectar cabecera de ítem: // --- ITEM 0xXX ---
+            if line.startswith("// --- ITEM"):
+                import re
+                match = re.search(r'ITEM 0x([A-Fa-f0-9]+)', line)
+                if match:
+                    idx = int(match.group(1), 16)
+                    # Buscar el item con ese índice LOCAL dentro de la categoría
+                    current_item = next((it for it in cat_items if it.index == idx), None)
+                continue
+            
+            if not current_item: continue
+            
+            # Repunteo independiente de Nombre y Descripción
+            if line.startswith("NAME:"):
+                new_name = line.replace("NAME:", "").strip()
+                if new_name != current_item.name_str:
+                    current_item.save_name_in_place(new_name)
+                    changes_count += 1
+            elif line.startswith("DESC:"):
+                new_desc = line.replace("DESC:", "").strip()
+                if new_desc != current_item.desc_str:
+                    current_item.save_desc_in_place(new_desc)
+                    changes_count += 1
+
+        QMessageBox.information(self, f"Guardado Finalizado", 
+                                f"Se han procesado {changes_count} cambios en la categoría {target_category}.\n"
+                                "Los punteros se han actualizado en sus tablas siguiendo el mapeo del CSV.")
+        
+        # Refrescar el ItemEditor si está abierto
+        main_win = self.window()
+        if hasattr(main_win, 'item_editor') and main_win.item_editor:
+            main_win.item_editor.load_data()
 
     def on_debug_toggle_clicked(self):
         # Lógica para alternar el modo debug (Calendario -> Script 0x080E)

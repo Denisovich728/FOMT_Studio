@@ -1,6 +1,0 @@
-#include "lib_fomt.csv"
-
-script 837 Unknown_Event_0837 {
-exit;
-exit;
-}

@@ -1,8 +1,0 @@
-#include "lib_fomt.csv"
-
-script 313 Unknown_Event_0313 {
-Fade_Out(3, 1);
-Show_Document_UI(0xB);
-Fade_In(3, 1);
-exit;
-}

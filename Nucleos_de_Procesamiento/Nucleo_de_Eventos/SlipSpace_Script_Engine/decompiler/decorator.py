@@ -250,45 +250,82 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
     def visit_invoke(self, invoke: Invoke):
         # Funciones que usan IDs de personajes/entidades en su primer argumento
         char_funcs = (
-            "Set_Name_Window", "Give_Friendship_Points", "Free_Event_Entity",
-            "Set_Entity_Position", "Get_Entity_X", "Get_Entity_Y",
-            "Set_Entity_Facing", "Set_Entit_y_Facing", "Get_Entity_Facing", 
-            "Get_Entity_X_Facing", "Despawn_Entity",
-            "Is_NPC_Birthday", "Chek_Friendship_Points", "Has_NPC_Talked_Today", 
-            "Has_NPC_Talked_Today_2", "Kill_NPC", "Execute_Movement", "SetEntityAnim",
-            "Hide_Entity", "GetEntityLocation", "Wait_For_Animation",
-            "Set_Vector_X", "Set_Vector_Y", "Has_Met_NPC", "Has_Spoken_To_NPC_Today",
-            "Routine_State_Override"
+            "SetEntityPosition", "GetEntityX", "GetEntityY",
+            "SetEntityFacing", "GetEntityFacing", "Execute_Movement",
+            "SetEntityAnim", "Hide_Entity", "Spawn_Event_Entity",
+            "Show_Emote", "Wait_For_Animation", "GetEntityLocation",
+            "Entity_Action", "Warp_Entity_To_Map", "Set_Name_Window",
+            "Is_NPC_Birthday", "Chek_Friendship_Points", "Give_Friendship_Points",
+            "Free_Event_Entity", "Has_Spoken_To_NPC_Today", "Has_NPC_Talked_Today",
+            "Has_NPC_Talked_Today_2", "Chek_Love_Points", "Give_Love_Points",
+            "Routine_State_Override", "Add_Festival_Friendship_Bonus",
+            "Reset_NPC_Schedule", "Kill_NPC", "Has_Met_NPC", "Player_Hold_Entity",
+            "Initialize_Animal_Stats", "Set_Vector_X", "Set_Vector_Y", "Set_Vector_Z"
         )
         candidate_funcs = ("Set_Hearth_Anim", "Give_Love_Points", "Chek_Love_Points")
 
         if invoke.func in char_funcs and len(invoke.args) >= 1:
             self.stringify_expr(invoke.args, 0, self.char_names)
-        elif invoke.func in candidate_funcs and len(invoke.args) >= 1:
-            self.stringify_expr(invoke.args, 0, self.candidate_names)
-        
-        # El segundo argumento de Routine_State_Override debe ser decorado con "Script_ID"
-        if invoke.func == "Routine_State_Override" and len(invoke.args) >= 2:
-            if isinstance(invoke.args[1], ExprInt):
-                val = invoke.args[1].value
-                script_str = f"Script_{val}".encode('windows-1252', errors='replace')
-                invoke.args[1] = ExprStr(script_str)
-            
-        if invoke.func == "Set_Portrait" and len(invoke.args) >= 1:
+        elif invoke.func == "Set_Portrait" and len(invoke.args) >= 1:
             self.stringify_expr(invoke.args, 0, self.portrait_names)
         elif invoke.func in ("Warp_Player", "Warp_Entity_To_Map") and len(invoke.args) >= 1:
-            self.stringify_expr(invoke.args, 0, self.map_names)
+            # Warp_Player(MAP_ID, X, Y) -> Arg 0 es MAPA
+            # Warp_Entity_To_Map(ENTITY_ID, MAP_ID, X, Y) -> Arg 0 es ENTIDAD, Arg 1 es MAPA
+            if invoke.func == "Warp_Player":
+                self.stringify_expr(invoke.args, 0, self.map_names)
+            else:
+                self.stringify_expr(invoke.args, 0, self.char_names)
+                if len(invoke.args) >= 2:
+                    self.stringify_expr(invoke.args, 1, self.map_names)
         elif invoke.func == "Show_Emote" and len(invoke.args) >= 2:
             self.stringify_expr(invoke.args, 0, self.char_names)
             self.stringify_expr(invoke.args, 1, self.emote_names)
         elif invoke.func == "SetEntityAnim" and len(invoke.args) >= 2:
             self.stringify_expr(invoke.args, 0, self.char_names)
             self.stringify_expr(invoke.args, 1, self.anim_names)
+        elif invoke.func == "Make_Delay" and len(invoke.args) >= 1:
+            arg = invoke.args[0]
+            if isinstance(arg, ExprInt):
+                val_str = f"{arg.value} Frames".encode('windows-1252', errors='replace')
+                invoke.args[0] = ExprStr(val_str)
         elif invoke.func in ("Take_Money", "Check_Money", "Give_Money") and len(invoke.args) >= 1:
             if isinstance(invoke.args[0], ExprInt):
                 invoke.args[0].force_decimal = True
-        else:
-            super().visit_invoke(invoke)
+        
+        # --- NUEVO: DECORACIÓN DE COORDENADAS ---
+        self._decorate_coords(invoke)
+        
+        super().visit_invoke(invoke)
+
+    def _decorate_coords(self, invoke: Invoke):
+        """Añade prefijos pos_x y pos_y a los argumentos de coordenadas."""
+        # Mapeo: nombre_func -> (idx_x, idx_y) o solo idx_x
+        coord_map = {
+            "SetEntityPosition": (1, 2),
+            "AddEntity": (1, 2),
+            "Set_Actor_Pos": (1, 2),
+            "Warp_Player": (1, 2),
+            "Warp_Entity_To_Map": (2, 3),
+            "Set_Vector_X": (1, None),
+            "Set_Vector_Y": (None, 1), # El arg 1 de Vector_Y es Y
+            "EntityMoveTo": (1, 2),
+            "EntityMoveTo_Immediate": (1, 2),
+        }
+        
+        if invoke.func in coord_map:
+            idx_x, idx_y = coord_map[invoke.func]
+            
+            if idx_x is not None and len(invoke.args) > idx_x:
+                arg = invoke.args[idx_x]
+                if isinstance(arg, ExprInt):
+                    val_str = f"pos_x0x{arg.value:X}".encode('windows-1252', errors='replace')
+                    invoke.args[idx_x] = ExprStr(val_str)
+                    
+            if idx_y is not None and len(invoke.args) > idx_y:
+                arg = invoke.args[idx_y]
+                if isinstance(arg, ExprInt):
+                    val_str = f"pos_y0x{arg.value:X}".encode('windows-1252', errors='replace')
+                    invoke.args[idx_y] = ExprStr(val_str)
 
     def visit_stmt(self, stmt: Stmt):
         if isinstance(stmt, StmtSwitch):

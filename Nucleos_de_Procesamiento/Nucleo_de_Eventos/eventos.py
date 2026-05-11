@@ -146,8 +146,10 @@ class FoMTEventParser:
                     map_map_inv = {v: k for k, v in self.super_lib.map_map.items()}
 
                     # Cargar emotes y animaciones
+                    mode = "mfomt" if self.project.is_mfomt else "fomt"
+                    prefix = "MFomt_" if self.project.is_mfomt else "Fomt_"
                     emote_map = {}
-                    emote_path = get_data_path("emotes.csv")
+                    emote_path = get_data_path(mode, f"{prefix}Emotes.csv")
                     if os.path.exists(emote_path):
                         with open(emote_path, 'r', encoding='utf-8') as f:
                             import csv
@@ -161,7 +163,7 @@ class FoMTEventParser:
                     decorate_stmts_with_characters(stmts, char_map, candidate_map, portrait_map_inv, map_map_inv, emote_map, anim_map, known_callables)
 
                 # Decorar flags desde flags.csv
-                flag_path = get_data_path("flags.csv")
+                flag_path = get_data_path(mode, f"{prefix}Flags.csv")
                 if os.path.exists(flag_path):
                     with open(flag_path, 'r', encoding='utf-8') as f:
                         import csv
@@ -188,7 +190,7 @@ class FoMTEventParser:
             
             # El decorador ya inyectó los 'const CONST_MESSAGE_0xHEX' al AST como código activo.
             # Añadimos un comentario informativo al principio para el usuario.
-            lib_name = "lib_mfomt.csv" if self.project.is_mfomt else "lib_fomt.csv"
+            lib_name = "MFomt_Lib.csv" if self.project.is_mfomt else "Fomt_Lib.csv"
             output = [
                 f"#include \"{lib_name}\"\n",
             ]
@@ -218,10 +220,11 @@ class FoMTEventParser:
         # 1. Preparar librería de opcodes
         if not self._lib_scope:
             self._lib_scope = ConstScope()
-            lib_name = "lib_mfomt.csv" if self.project.is_mfomt else "lib_fomt.csv"
+            mode = "mfomt" if self.project.is_mfomt else "fomt"
+            lib_name = "MFomt_Lib.csv" if self.project.is_mfomt else "Fomt_Lib.csv"
             
             # Usar la utilidad de rutas para encontrar el CSV
-            lib_path = get_data_path(lib_name)
+            lib_path = get_data_path(mode, lib_name)
             
             if os.path.exists(lib_path):
                 # Leer la librería como un script de declaraciones (KW_FUNC/KW_PROC)
@@ -290,9 +293,12 @@ class FoMTEventParser:
         candidate_map = {}
         if self.project.npc_parser:
             npcs = self.project.npc_parser.scan_npcs()
-            # ID 1-based para personajes
+            # ID 1-based para personajes + Hardcode Player=0
+            char_map["Player"] = 0
+            char_map["PLAYER"] = 0
             for npc in npcs:
                 name = npc.name_str.replace('\n', ' ').strip('\x00').strip()
+                if not name: name = f"NPC_{npc.index + 1}"
                 char_map[name] = npc.index + 1
                 if npc.is_candidate:
                     candidate_map[name] = npc.index + 1
@@ -310,8 +316,10 @@ class FoMTEventParser:
         sid, sname, script_obj = scripts[0]
         
         # 3. Resolutores para el compilador (Nombre -> ID)
+        mode = "mfomt" if self.project.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.project.is_mfomt else "Fomt_"
         emote_map_inv = {}
-        emote_path = get_data_path("emotes.csv")
+        emote_path = get_data_path(mode, f"{prefix}Emotes.csv")
         if os.path.exists(emote_path):
             with open(emote_path, 'r', encoding='utf-8') as f:
                 import csv

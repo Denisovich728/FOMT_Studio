@@ -1,5 +1,26 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
+## Versión 3.0.0 "The Imposibility Update"
+**Fecha:** 2026-05-11
+**Estado:** Lanzamiento Crítico / Arquitectura Cilixes
+
+### Reconstrucción de la Arquitectura de Datos (Cilixes)
+- **Migración Total:** Eliminación de la carpeta legacy `data` y transición completa a la suite de datos **Cilixes**.
+- **Multitenencia:** Soporte nativo para FoMT y MFoMT mediante subcarpetas dedicadas (`fomt/`, `Mfomt/`) y prefijos de archivos (`Fomt_`, `MFomt_`).
+- **Detección por Header (A0-AF):** Identificación quirúrgica de la ROM mediante el header de 16 bytes, permitiendo una carga de recursos 100% precisa.
+- **Rutas Dinámicas:** Refactorización de `get_data_path` para soportar la resolución dinámica de activos según la versión detectada.
+
+### Optimización y Limpieza
+- **Purga de Repositorio:** Eliminación masiva de archivos temporales, rastros de depuración y logs para un despliegue limpio.
+- **Seguridad:** Verificación y blindaje de API Keys mediante almacenamiento en sistema de registro local (fuera del código fuente).
+- **Control de Versiones:** Implementación de un `.gitignore` profesional para evitar la subida de binarios y cache.
+
+### Herramientas y IDE
+- **Script IDE v3:** El autocompletado y el descompilador ahora inyectan dinámicamente las librerías correctas (`Fomt_Lib.csv` / `MFomt_Lib.csv`).
+- **Visor de Sprites:** Actualizado para el pipeline de Cilixes, garantizando la carga de `Sprite_data.csv` sin errores de ruta.
+
+---
+
 ## Versión 2.0.0 "The Shiao_Fujikawa Update"
 **Fecha:** 2026-04-26
 **Estado:** Estable / Nueva Generación

@@ -150,6 +150,8 @@ class ItemEditorWidget(QWidget):
         new_desc = self.desc_edit.toPlainText()
         try:
             item_obj.save_desc_in_place(new_desc)
+            # Refrescar el objeto en la vista
+            self.on_selection_changed()
             QMessageBox.information(self, "Éxito", f"Descripción de '{item_obj.name_str}' compilada y repunteada correctamente.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"No se pudo compilar la descripción: {e}")

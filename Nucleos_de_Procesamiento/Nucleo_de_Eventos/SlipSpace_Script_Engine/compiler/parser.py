@@ -299,10 +299,11 @@ class Parser:
             name = self.expect(TokenType.NAME).value
             return StmtExpr(ExprPreIncrement(name))
             
-        elif t.type == TokenType.MINUSMINUS:
+        elif t.type == TokenType.KW_GOTO:
             self.next_token()
-            name = self.expect(TokenType.NAME).value
-            return StmtExpr(ExprPreDecrement(name))
+            label_name = self.expect(TokenType.NAME).value
+            self.match(TokenType.SEMICOLON)
+            return StmtGoto(label_name)
             
         elif t.type == TokenType.NAME:
             # Soporte para CONST_MESSAGE_X(...) [Mary & Popuri style]
@@ -342,6 +343,11 @@ class Parser:
                         TokenType.MOD_EQUAL: AssignOperation.MOD,
                     }
                     return StmtAssign(op_map[op_tok.type], name, exp)
+                elif n.type == TokenType.COLON:
+                    # Definición de etiqueta LBL_XXX:
+                    self.next_token() # consume nombre (t)
+                    self.next_token() # consume : (n)
+                    return StmtLabel(t.value)
                 elif n.type == TokenType.PLUSPLUS:
                     name = self.expect(TokenType.NAME).value
                     self.next_token()

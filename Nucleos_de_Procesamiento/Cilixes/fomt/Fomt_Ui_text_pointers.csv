@@ -1,0 +1,142 @@
+PointerOffset,Label,Category
+0xE8704,Save: Diary,Menú Diario / Save
+0xE8708,Save: Save,Menú Diario / Save
+0xE870C,Save: Load,Menú Diario / Save
+0xE8710,Save: Empty,Menú Diario / Save
+0xE8714,Save: Data 1,Menú Diario / Save
+0xE8718,Save: Data 2,Menú Diario / Save
+0xE871C,Save: Buttons,Menú Diario / Save
+0xE8720,Save: 1,Menú Diario / Save
+0xE8724,Save: 2,Menú Diario / Save
+0xE8728,Save: Clock,Menú Diario / Save
+0xE872C,Save: On,Menú Diario / Save
+0xE8730,Save: Off,Menú Diario / Save
+0xE8734,Save: On (2),Menú Diario / Save
+0xE8738,Save: Off (2),Menú Diario / Save
+0xE873C,Save: Portrait,Menú Diario / Save
+0xE8740,Save: On (3),Menú Diario / Save
+0xE8744,Save: Off (3),Menú Diario / Save
+0xE8748,Save: Extra: 17,Menú Diario / Save
+0x3F30,Help: Slot 0,Sistema / Ayuda
+0x3F38,Help: Slot 1,Sistema / Ayuda
+0x3F40,Help: Slot 2,Sistema / Ayuda
+0x3F48,Help: Slot 3,Sistema / Ayuda
+0x3F50,Help: Slot 4,Sistema / Ayuda
+0x3F58,Help: Slot 5,Sistema / Ayuda
+0x3F60,Help: Slot 6,Sistema / Ayuda
+0x3F68,Help: Slot 7,Sistema / Ayuda
+0x3F70,Help: Slot 8,Sistema / Ayuda
+0x3F78,Help: Slot 9,Sistema / Ayuda
+0x3F80,Help: Slot 10,Sistema / Ayuda
+0x3F88,Help: Slot 11,Sistema / Ayuda
+0x3F90,Help: Slot 12,Sistema / Ayuda
+0x3F98,Help: Slot 13,Sistema / Ayuda
+0x3FA0,Help: Slot 14,Sistema / Ayuda
+0x3FA8,Help: Slot 15,Sistema / Ayuda
+0x3FB0,Help: Slot 16,Sistema / Ayuda
+0x3FB8,Help: Slot 17,Sistema / Ayuda
+0x3FC0,Help: Slot 18,Sistema / Ayuda
+0x3FC8,Help: Slot 19,Sistema / Ayuda
+0x3FD0,Help: Slot 20,Sistema / Ayuda
+0x3FD8,Help: Slot 21,Sistema / Ayuda
+0x3FE0,Help: Slot 22,Sistema / Ayuda
+0x3FE8,Help: Slot 23,Sistema / Ayuda
+0x3FF0,Help: Slot 24,Sistema / Ayuda
+0x4EE8,Naming: Your,Sistema / Naming
+0x4EEC,Naming: Farm's,Sistema / Naming
+0x4EF0,Naming: Dog's,Sistema / Naming
+0x4EF4,Naming: Name Question,Sistema / Naming
+0x4EF8,Naming: Birthday Question,Sistema / Naming
+0x4F00,Property: 0,Sistema / Propiedades
+0x4F08,Property: 1,Sistema / Propiedades
+0x4F10,Property: 2,Sistema / Propiedades
+0x4F18,Property: 3,Sistema / Propiedades
+0x4F20,Property: 4,Sistema / Propiedades
+0x4F28,Property: 5,Sistema / Propiedades
+0x4F30,Property: 6,Sistema / Propiedades
+0x4F38,Property: 7,Sistema / Propiedades
+0xFD9B4,Shop: 0,Sistema / Tiendas
+0xFD9B8,Shop: 1,Sistema / Tiendas
+0xFD9BC,Shop: 2,Sistema / Tiendas
+0xFD9C0,Shop: 3,Sistema / Tiendas
+0xFD9C4,Shop: 4,Sistema / Tiendas
+0xFD9C8,Shop: 5,Sistema / Tiendas
+0xFD9CC,Shop: 6,Sistema / Tiendas
+0xFD9D0,Shop: 7,Sistema / Tiendas
+0xFD9D4,Shop: 8,Sistema / Tiendas
+0xFD9D8,Shop: 9,Sistema / Tiendas
+0xFD9DC,Shop: 10,Sistema / Tiendas
+0xFD9E0,Shop: 11,Sistema / Tiendas
+0xFD9E4,Shop: 12,Sistema / Tiendas
+0xFD9E8,Shop: 13,Sistema / Tiendas
+0xFD9EC,Shop: 14,Sistema / Tiendas
+0xF1A34,UI: Diary,Sistema / Menú Pausa
+0xF1A38,UI: Rucksack,Sistema / Menú Pausa
+0xF1A3C,UI: World Map,Sistema / Menú Pausa
+0xF1A40,UI: Earnings,Sistema / Menú Pausa
+0xF1A44,UI: Farm Degree,Sistema / Menú Pausa
+0xF1A48,UI: Memo,Sistema / Menú Pausa
+0xF1A4C,UI: Tutorial,Sistema / Menú Pausa
+0x3B24,HUD: 0,HUD / Tiempo
+0x3B28,HUD: 1,HUD / Tiempo
+0x3B2C,HUD: 2,HUD / Tiempo
+0x3B30,HUD: 3,HUD / Tiempo
+0x3B34,HUD: 4,HUD / Tiempo
+0x3B38,HUD: 5,HUD / Tiempo
+0x3F60,Help Text: 0,Sistema / Ayuda Controles
+0x3F68,Help Text: 1,Sistema / Ayuda Controles
+0x3F70,Help Text: 2,Sistema / Ayuda Controles
+0x3F78,Help Text: 3,Sistema / Ayuda Controles
+0x3F90,Help Text: 4,Sistema / Ayuda Controles
+0x41d8,Load Failed,Diario / Save
+0x409C,Save Failed,Sistema / Alertas Save
+0x4834,Load?,Sistema / Alertas Save
+0x4894,Overwrite?,Sistema / Alertas Save
+0x4860,No Data Message,Sistema / Alertas Save
+0x5F18,Naming UI: Name/End,Sistema / Naming
+0x54B8,Label: Your Name,Sistema / Naming
+0x54BC,Label: Your Birthday,Sistema / Naming
+0x54C0,Label: Farm Name,Sistema / Naming
+0x54C4,Label: Dog Name,Sistema / Naming
+0x5904,Question: Is this OK?,Sistema / Naming
+0x5908,Yes (OK),Sistema / Naming
+0x590C,No (OK),Sistema / Naming
+0x7028,Question: Name correct?,Sistema / Naming
+0x702C,Yes (Correct),Sistema / Naming
+0x7030,No (Correct),Sistema / Naming
+0x0600A8,Label: Property,Sistema / Resumen Granja
+0x060878,Label: G (Gold),Sistema / Resumen Granja
+0x062FB0,Label: Healthy,Sistema / Resumen Granja
+0x06313C,Label: Unhappy,Sistema / Resumen Granja
+0x063388,Season: Spring,Sistema / Resumen Granja
+0x0634A4,Season: Summer,Sistema / Resumen Granja
+0x0635C0,Season: Fall,Sistema / Resumen Granja
+0x0636DC,Season: Winter,Sistema / Resumen Granja
+0x0637F4,Label: yr,Sistema / Resumen Granja
+0x064384,Header: Chickens,Sistema / Resumen Granja
+0x064458,Header: Cattle,Sistema / Resumen Granja
+0x064568,Header: Sheep,Sistema / Resumen Granja
+0x0646BC,Header: Sprites,Sistema / Resumen Granja
+0x0646CC,Label: D (Days),Sistema / Resumen Granja
+0x064824,Label: left,Sistema / Resumen Granja
+0x064948,Label: work,Sistema / Resumen Granja
+0x064A6C,Label: N/A,Sistema / Resumen Granja
+0x066578,Title: Earnings Report,Sistema / Reporte Ganancias
+0x06658C,Label: D (Days),Sistema / Reporte Ganancias
+0x066774,Label: G (Gold),Sistema / Reporte Ganancias
+0x0668A4,Symbol: +,Sistema / Reporte Ganancias
+0x0669DC,Symbol: -,Sistema / Reporte Ganancias
+0x066B0C,Season: Spring,Sistema / Reporte Ganancias
+0x066C28,Season: Summer,Sistema / Reporte Ganancias
+0x066D48,Season: Fall,Sistema / Reporte Ganancias
+0x066E68,Season: Winter,Sistema / Reporte Ganancias
+0x066F9C,Label: Year,Sistema / Reporte Ganancias
+0x0670D8,Label: Income,Sistema / Reporte Ganancias
+0x067210,Label: Expenses,Sistema / Reporte Ganancias
+0x0683FC,Label: Tool Lev,Sistema / Tiendas
+0x068410,Label: Shop,Sistema / Tiendas
+0x068568,Label: Upgrade?,Sistema / Tiendas
+0x0E3FA8,Season: Spring (Alt),HUD / Tiempo
+0x0E3FD8,Season: Summer (Alt),HUD / Tiempo
+0x0E3FDC,Season: Fall (Alt),HUD / Tiempo
+0x0E4010,Season: Winter (Alt),HUD / Tiempo

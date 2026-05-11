@@ -1,4 +1,37 @@
 
+def get_forerunner_theme():
+    return """
+        QMainWindow, QDialog { background-color: #050B15; color: #00E5FF; }
+        QWidget { background-color: #050B15; color: #00E5FF; font-family: 'Consolas', 'Segoe UI', sans-serif; }
+        
+        QSplitter::handle { background-color: #003B4F; }
+        
+        QMenuBar { background-color: #050B15; color: #00E5FF; border-bottom: 2px solid #00E5FF; }
+        QMenu { background-color: #050B15; color: #00E5FF; border: 1px solid #00E5FF; }
+        QMenu::item:selected { background-color: rgba(0, 229, 255, 0.2); }
+        
+        QTabWidget::pane { border: 1px solid #00E5FF; background-color: rgba(0, 229, 255, 0.05); }
+        QTabBar::tab { background: #0A192F; color: #00B8D4; border: 1px solid #003B4F; padding: 10px 15px; margin-right: 2px; border-top-left-radius: 4px; border-top-right-radius: 4px; }
+        QTabBar::tab:selected { background: rgba(0, 229, 255, 0.1); color: #00E5FF; border-bottom: 2px solid #00E5FF; font-weight: bold; }
+        
+        QTableView { background-color: #0A192F; color: #00E5FF; gridline-color: #003B4F; border: 1px solid #00E5FF; selection-background-color: rgba(0, 229, 255, 0.2); }
+        QHeaderView::section { background-color: #050B15; color: #00B8D4; padding: 4px; border: 1px solid #003B4F; }
+        
+        QTreeView { background-color: #050B15; color: #00E5FF; border: none; selection-background-color: rgba(0, 229, 255, 0.2); }
+        
+        QPushButton { background-color: transparent; color: #00E5FF; border: 1px solid #00E5FF; padding: 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        QPushButton:hover { background-color: rgba(0, 229, 255, 0.1); border-color: #00F2FF; }
+        QPushButton:pressed { background-color: rgba(0, 229, 255, 0.3); }
+        
+        QLineEdit, QTextEdit, QPlainTextEdit { background-color: rgba(0, 229, 255, 0.05); color: #00E5FF; border: 1px solid #003B4F; selection-background-color: #003B4F; }
+        
+        QStatusBar { background-color: #050B15; color: #00E5FF; border-top: 1px solid #00E5FF; }
+        
+        QScrollBar:vertical { border: none; background: #050B15; width: 10px; margin: 0px; }
+        QScrollBar::handle:vertical { background: #00E5FF; min-height: 20px; border-radius: 5px; }
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+    """
+
 def get_matrix_theme():
     return """
         QMainWindow, QDialog { background-color: #000000; color: #00FF41; }
@@ -104,6 +137,14 @@ def get_highlighter_colors(theme_name):
             "string": "#CE9178",
             "number": "#B5CEA8",
             "comment": "#6A9955"
+        }
+    elif theme_name == "forerunner":
+        return {
+            "command": "#00E5FF",
+            "variable": "#00B8D4",
+            "string": "#80DEEA",
+            "number": "#B2EBF2",
+            "comment": "#006064"
         }
     else: # Light
         return {

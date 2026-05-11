@@ -278,7 +278,8 @@ class VisorSprites(QWidget):
 
     def set_project(self, project):
         self.project = project
-        self._load_sprite_data()
+        mode = "mfomt" if project.is_mfomt else "fomt"
+        self._load_sprite_data(mode)
         self._populate_list()
 
     def reset(self):
@@ -293,15 +294,16 @@ class VisorSprites(QWidget):
     #  CARGA DESDE CSV
     # ═══════════════════════════════════════════════════════════
 
-    def _load_sprite_data(self):
+    def _load_sprite_data(self, mode):
         """Carga sprite_data.csv con soporte para múltiples formatos y secciones."""
         self._sprites = []
         
         # Usar la utilidad de rutas para encontrar el CSV
-        csv_path = get_data_path("sprite_data.csv")
+        prefix = "MFomt_" if mode == "mfomt" else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Sprite_data.csv")
         
         if not os.path.exists(csv_path):
-            print(f"⚠️ [VisorSprites] sprite_data.csv no encontrado")
+            print(f"⚠️ [VisorSprites] {csv_path} no encontrado")
             return
 
         try:

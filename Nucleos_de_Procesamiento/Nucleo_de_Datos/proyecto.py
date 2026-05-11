@@ -54,16 +54,28 @@ class FoMTProject:
             # Memoria Virtual: Un buffer que contiene la ROM + parches aplicados
             self.virtual_rom = bytearray(self.base_rom_data)
             
-        header = self.base_rom_data[0:0xC0]
-        game_name = header[0xA0:0xAC]
-        if b"HARVESTMOGBA" in game_name:
+        # Detección por Header (0xA0 - 0xAF)
+        header_16 = self.base_rom_data[0xA0:0xB0]
+        
+        if header_16 == b"HARVESTMOGBAA4NE":
             self.game_version = "Harvest Moon FoMT"
             self.is_mfomt = False
-        elif b"HM MFOM USA\0" in game_name:
+            print(f"🎯 Detectada ROM: {self.game_version} (A0-AF: {header_16.hex().upper()})")
+        elif header_16 == b"HM MFOM USA\0BFGE":
             self.game_version = "Harvest Moon MFoMT"
             self.is_mfomt = True
+            print(f"🎯 Detectada ROM: {self.game_version} (A0-AF: {header_16.hex().upper()})")
         else:
-            raise ValueError("La ROM no es compatible con el FoMT Studio System.")
+            # Fallback por si hay ligeras variaciones (ej: versiones EU)
+            game_name = header_16[:12]
+            if b"HARVESTMOGBA" in game_name:
+                self.game_version = "Harvest Moon FoMT (Legacy Detect)"
+                self.is_mfomt = False
+            elif b"HM MFOM USA" in game_name:
+                self.game_version = "Harvest Moon MFoMT (Legacy Detect)"
+                self.is_mfomt = True
+            else:
+                raise ValueError(f"La ROM no es compatible. Header detectado: {header_16.hex().upper()}")
             
         self.super_lib = SuperLibrary(self.is_mfomt)
         self.memory = MemoryManager(self)
@@ -257,5 +269,8 @@ class FoMTProject:
             ba = bytearray(self.base_rom_data)
             ba[offset : offset + len(data)] = data
             self.base_rom_data = bytes(ba)
+            
+        if hasattr(self, 'virtual_rom'):
+            self.virtual_rom[offset : offset + len(data)] = data
             
         print(f"Direct Overwrite: 0x{offset:08X} -> {len(data)} bytes escritos en la ROM base.")

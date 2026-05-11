@@ -1,6 +1,0 @@
-=== REPORTE DE ANALISIS DE OPCODES ===
-Total de eventos analizados: 1328
-Versión detectada: Harvest Moon FoMT
-
---- OPCODES SIN MAPEARE (Ordenados por frecuencia) ---
-¡Increíble! No se encontraron opcodes desconocidos.

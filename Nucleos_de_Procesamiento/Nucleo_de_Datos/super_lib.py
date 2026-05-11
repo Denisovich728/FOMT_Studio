@@ -171,7 +171,9 @@ class SuperLibrary:
 
     def _load_extraction_pointers(self):
         import csv
-        csv_path = get_data_path("Punteros de extraccion.csv")
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Punteros de extraccion.csv")
         
         if os.path.exists(csv_path):
             with open(csv_path, 'r', encoding='utf-8') as f:
@@ -200,7 +202,9 @@ class SuperLibrary:
 
     def _load_portraits(self):
         import csv
-        csv_path = get_data_path("portraits.csv")
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Portraits.csv")
         if os.path.exists(csv_path):
             with open(csv_path, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
@@ -214,7 +218,9 @@ class SuperLibrary:
 
     def _load_maps(self):
         import csv
-        csv_path = get_data_path("Mapas.csv")
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Mapas.csv")
         if os.path.exists(csv_path):
             with open(csv_path, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f, skipinitialspace=True)
@@ -229,7 +235,9 @@ class SuperLibrary:
 
     def _load_animations(self):
         import csv
-        csv_path = get_data_path("Animations.csv")
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Animations.csv")
         if os.path.exists(csv_path):
             with open(csv_path, 'r', encoding='utf-8') as f:
                 # El formato es Nombre,ID (ej: Player_Stop_Down,0x000)
@@ -243,13 +251,15 @@ class SuperLibrary:
                         except: pass
 
     def _load_custom_names(self):
-        mapas_path = get_data_path("mapas.json")
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        mapas_path = get_data_path(mode, f"{prefix}Mapas.json")
         if os.path.exists(mapas_path):
             with open(mapas_path, 'r', encoding='utf-8') as f:
                 try: self.custom_map_names = json.load(f)
                 except: pass
                 
-        eventos_path = get_data_path("eventos.json")
+        eventos_path = get_data_path(mode, f"{prefix}Eventos.json")
         if os.path.exists(eventos_path):
             with open(eventos_path, 'r', encoding='utf-8') as f:
                 try: self.custom_event_names = json.load(f)
@@ -258,7 +268,8 @@ class SuperLibrary:
     def load_event_names_from_csv(self, filename):
         """Carga nombres de eventos desde un archivo CSV (Formato: Event_Name,ID)."""
         import csv
-        path = get_data_path(filename)
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        path = get_data_path(mode, filename)
         if not os.path.exists(path):
             print(f"Alerta: No se encontró el archivo {filename} en {path}.")
             return False
@@ -285,10 +296,11 @@ class SuperLibrary:
 
     def _parse_mary_bible(self):
         import csv
-        filename = "lib_mfomt.csv" if self.is_mfomt else "lib_fomt.csv"
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        filename = "MFomt_Lib.csv" if self.is_mfomt else "Fomt_Lib.csv"
         
         # Intentar en data y en docs
-        lib_path = get_data_path(filename)
+        lib_path = get_data_path(mode, filename)
         if not os.path.exists(lib_path):
             lib_path = get_resource_path(os.path.join("docs", filename))
             

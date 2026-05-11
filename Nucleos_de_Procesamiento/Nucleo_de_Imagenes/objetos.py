@@ -20,31 +20,50 @@ class BaseItem:
     def save_name_in_place(self, new_name):
         if not hasattr(self, 'name_ptr') or self.name_ptr == 0:
             return
+        
         encoded = new_name.encode('windows-1252', errors='replace') + b'\x00'
-        new_offset = self.parser.project.allocate_free_space(len(encoded))
-        self.parser.project.write_patch(new_offset, encoded)
-        gba_ptr = struct.pack("<I", new_offset | 0x08000000)
-        # El puntero al nombre está en el offset 0 de la estructura
-        self.parser.project.write_patch(self.base_offset, gba_ptr)
+        old_off = self.name_ptr & 0x01FFFFFF
+        old_size = self.parser.get_string_size(self.name_ptr)
+        
+        # Usar el Gestor de Memoria inteligente para reubicar y repuntear
+        new_offset = self.parser.project.memory._re_point_generic_script(
+            encoded,
+            old_off,
+            old_size,
+            lambda off: self.parser.project.write_patch(self.base_offset, struct.pack("<I", off | 0x08000000))
+        )
+        
         self.name_str = new_name
         self.name_ptr = new_offset | 0x08000000
+        print(f"DEBUG: Item {self.index} NAME Repoint -> 0x{new_offset:08X}")
 
     def save_desc_in_place(self, new_desc):
         if not hasattr(self, 'desc_ptr') or self.desc_ptr == 0:
             return
-        # Codificar descripción (FoMT usa \n para saltos de línea en descripciones)
-        encoded = new_desc.encode('windows-1252', errors='replace') + b'\x00'
-        new_offset = self.parser.project.allocate_free_space(len(encoded))
-        self.parser.project.write_patch(new_offset, encoded)
-        gba_ptr = struct.pack("<I", new_offset | 0x08000000)
+            
+        # Usar el motor de escritura del parser para soportar comandos [0D], [n]
+        encoded = self.parser.write_string(new_desc)
+        old_off = self.desc_ptr & 0x01FFFFFF
+        old_size = self.parser.get_string_size(self.desc_ptr)
         
-        # El puntero a la descripción está al final de la estructura (byte 8 en 12-byte, byte 12 en 16-byte)
-        stride = 12 if self.category != "Consumible/Comida" else 16
-        desc_ptr_offset = self.base_offset + (stride - 4)
-        self.parser.project.write_patch(desc_ptr_offset, gba_ptr)
+        # Calcular el offset exacto según la categoría (Basado en la inspección de la ROM)
+        if self.category == "Herramienta":
+            desc_ptr_offset = self.base_offset + 8
+        elif self.category == "Consumible/Comida":
+            desc_ptr_offset = self.base_offset + 12
+        else: # Artículo / Variado (Confirmado 12 bytes en esta ROM)
+            desc_ptr_offset = self.base_offset + 8
+        
+        new_offset = self.parser.project.memory._re_point_generic_script(
+            encoded,
+            old_off,
+            old_size,
+            lambda off: self.parser.project.write_patch(desc_ptr_offset, struct.pack("<I", off | 0x08000000))
+        )
         
         self.desc_str = new_desc
         self.desc_ptr = new_offset | 0x08000000
+        print(f"DEBUG: Item {self.index} DESC Repoint -> 0x{new_offset:08X}")
         
     def save_sell_price(self, new_price):
         if not self.product_offset: return
@@ -69,12 +88,18 @@ class GenericItem(BaseItem):
     # Estructura: NombrePtr (4), Datos (4), DescripcionPtr (4)
     def read_stats(self, category):
         self.category = category
-        data = self.parser.project.read_rom(self.base_offset, 12)
-        if not data or len(data) < 12: return
+        stride = 16 if self.category == "Consumible/Comida" else 12
+        data = self.parser.project.read_rom(self.base_offset, stride)
+        if not data or len(data) < stride: return
         
-        # Estructura de 12 bytes: 4 PunteroNombre, 4 DatosInfo, 4 PunteroDesc
-        self.name_ptr, info, self.desc_ptr = struct.unpack('<III', data)
-        self.real_id = info & 0xFFFF
+        # Herramientas: 12 bytes (PtrName, Info, PtrDesc)
+        # Artículos: 8 bytes (PtrName, PtrDesc)
+        if len(data) == 12:
+            self.name_ptr, info, self.desc_ptr = struct.unpack('<III', data)
+            self.real_id = info & 0xFFFF
+        else:
+            self.name_ptr, self.desc_ptr = struct.unpack('<II', data[:8])
+            self.real_id = self.index
         
         self.name_str = self.parser.read_string(self.name_ptr)
         self.desc_str = self.parser.read_string(self.desc_ptr)
@@ -138,6 +163,7 @@ class ItemParser:
         self.items = []
         
         # Punteros por defecto (USA) como respaldo
+        # Punteros por defecto (USA) como respaldo si el CSV falla
         self.tools_off = 0x10E9C4
         self.foods_off = 0x111B90
         self.articles_off = 0x113D8C
@@ -145,15 +171,23 @@ class ItemParser:
         self.misc_off = 0
         
         self._anchor_hunt_item_tables()
+        self.scan_foods() # Escanear todo al inicio para tener la lista maestra lista
         
     def _anchor_hunt_item_tables(self):
-        """Escanea o toma del CSV los punteros."""
+        """Sincroniza los punteros usando la Tabla Maestra si está disponible."""
         cfg = self.project.super_lib.cfg
-        if cfg["TOOLS_TABLE"][0] > 0: self.tools_off = cfg["TOOLS_TABLE"][0]
-        if cfg["FOODS_TABLE"][0] > 0: self.foods_off = cfg["FOODS_TABLE"][0]
-        if cfg["MISC_TABLE"][0] > 0: self.misc_off = cfg["MISC_TABLE"][0]
+        master_off = cfg.get("MASTER_TABLE_OFFSET", 0x0F89D4)
         
-        # Intentar localizar tabla de productos (Precios de Venta) si no hay CSV
+        # Ejemplo: Si sabemos que el puntero a Tools está en Master + 0x20
+        # self.tools_off = self.project.read_pointer(master_off + 0x20)
+        
+        if "TOOLS_TABLE" in cfg and cfg["TOOLS_TABLE"][0] > 0: 
+            self.tools_off = cfg["TOOLS_TABLE"][0]
+        if "FOODS_TABLE" in cfg and cfg["FOODS_TABLE"][0] > 0: 
+            self.foods_off = cfg["FOODS_TABLE"][0]
+        if "MISC_TABLE" in cfg and cfg["MISC_TABLE"][0] > 0: 
+            self.articles_off = cfg["MISC_TABLE"][0]
+        
         if self.project.is_mfomt:
              self.products_off = 0x114200 + 0x2BD58
 
@@ -180,13 +214,14 @@ class ItemParser:
                 it.read_stats("Consumible/Comida")
                 self.items.append(it)
 
-        # 3. Variados (12 bytes stride)
+        # 3. Variados/Artículos (12 bytes stride - CONFIRMADO POR INSPECCIÓN)
         start, end = cfg.get("MISC_TABLE", (0, 0))
         if start > 0:
+            # En esta ROM, los artículos son de 12 bytes con Desc @ +8
             count = (end - start + 1) // 12
             for i in range(count):
                 it = GenericItem(self, i, start + (i * 12))
-                it.read_stats("Artículo") # Renombrado de Variados/Artículo/Semilla a solo Artículo
+                it.read_stats("Artículo")
                 self.items.append(it)
             
         # 4. Cruzar Tabla de Precios (ProductInfo - 103 items aprox)
@@ -225,20 +260,80 @@ class ItemParser:
                 
         return self.items
         
-    def read_string(self, ptr):
-        if ptr < 0x08000000 or ptr >= 0x09000000:
-            return f"0x{ptr:08X}"
-        offset = ptr & 0x01FFFFFF
-        s_bytes = bytearray()
+    def inject_from_csv_row(self, ptr_name, text_name, ptr_desc, text_desc):
+        """Inyecta una fila de CSV aplicando la lógica de repunteo atómico SlipSpace."""
+        from Nucleos_de_Procesamiento.Nucleo_de_Datos.gestor_memoria import MemoryManager
+        manager = MemoryManager(self.project)
         
-        while True:
-            b = self.project.read_rom(offset, 1)
-            if not b or b[0] == 0:
-                break
-            s_bytes.append(b[0])
+        results = []
+        # 1. Inyectar Nombre
+        if ptr_name and text_name:
+            data_name = self.write_string(text_name)
+            # Para nombres, solemos tener poco espacio, el repunteo es vital
+            success, new_gba = manager.repoint_and_write(ptr_name, data_name, cleaning_limit=0)
+            results.append(success)
+            
+        # 2. Inyectar Descripción
+        if ptr_desc and text_desc:
+            data_desc = self.write_string(text_desc)
+            # En descripciones, intentamos limpiar hasta el siguiente puntero si es posible
+            # (El manager ya maneja esto si le pasamos 0)
+            success, new_gba = manager.repoint_and_write(ptr_desc, data_desc, cleaning_limit=0)
+            results.append(success)
+            
+        return all(results)
+
+    def read_string(self, gba_addr):
+        """Lectura Robusta SlipSpace con soporte de Ñ mapeada (B1/B2)."""
+        offset = gba_addr & 0x1FFFFFF
+        s = ""
+        while offset < len(self.project.virtual_rom):
+            b = self.project.virtual_rom[offset]
+            if b == 0: break
+            
+            # Mapeo de Ñ (Glifos B1/B2)
+            if b == 0xB1: s += "ñ"
+            elif b == 0xB2: s += "Ñ"
+            elif 32 <= b <= 126:
+                s += chr(b)
+            elif b == 10:
+                s += "[n]"
+            else:
+                s += f"[{b:02x}]"
             offset += 1
-                
-        try:
-            return s_bytes.decode('windows-1252', errors='ignore').replace('\n', ' ').strip()
-        except:
-            return "DataErr"
+        return s
+
+    def write_string(self, text):
+        """Convierte texto de la UI a bytes de ROM con soporte de Ñ (B1/B2)."""
+        import re
+        
+        # Pre-procesar Ñ para el mapeo de glifos
+        text = text.replace("ñ", "[b1]").replace("Ñ", "[b2]")
+        
+        output = bytearray()
+        tokens = re.split(r'(\[[0-9A-Fa-f]{2}\]|\[n\])', text)
+        
+        for token in tokens:
+            if not token: continue
+            
+            if token == "[n]":
+                output.append(0x0A)
+            elif re.match(r'\[[0-9A-Fa-f]{2}\]', token):
+                hex_val = int(token[1:3], 16)
+                output.append(hex_val)
+            else:
+                output.extend(token.encode('windows-1252', errors='replace'))
+        
+        output.append(0x00)
+        return bytes(output)
+
+    def get_string_size(self, ptr):
+        """Calcula el tamaño de una string (incluyendo \0) en ROM."""
+        if ptr < 0x08000000 or ptr >= 0x09000000: return 0
+        offset = ptr & 0x01FFFFFF
+        size = 0
+        while True:
+            b = self.project.read_rom(offset + size, 1)
+            size += 1
+            if not b or b[0] == 0: break
+        return size

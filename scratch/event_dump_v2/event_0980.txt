@@ -1,6 +1,0 @@
-#include "lib_fomt.csv"
-
-script 980 Unknown_Event_0980 {
-Execute_Script(0x3D6);
-exit;
-}

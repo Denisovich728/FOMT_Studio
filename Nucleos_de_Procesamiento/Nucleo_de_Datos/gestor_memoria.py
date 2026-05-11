@@ -132,31 +132,48 @@ class MemoryManager:
 
         return self._re_point_generic_script(new_data, old_offset, old_size, update_header)
 
-    def _re_point_generic_script(self, new_data: bytes, old_offset: int, old_size: int, repoint_callback) -> int:
-        """Lógica común de repunteo con limpieza y reciclaje de espacio libre (0xFF)."""
+    def _re_point_generic_script(self, new_data: bytes, old_offset: int, old_size: int, repoint_callback, cleaning_limit: int = 0) -> int:
+        """Lógica de repunteo quirúrgica: solo limpia hasta el cleaning_limit si se provee."""
+        
+        # FORZAR ALINEACIÓN A 4 BYTES (Padding)
+        remainder = len(new_data) % 4
+        if remainder > 0:
+            new_data += b'\x00' * (4 - remainder)
+            
         new_size = len(new_data)
         
-        # 0. Verificación de escritura In-Place (Inspirado en la petición del usuario)
-        # Si el tamaño es igual o menor, y tenemos un offset válido, escribimos ahí mismo.
-        if old_offset and new_size <= old_size:
-            print(f"🎯 [In-Place] Sobrescribiendo espacio original en 0x{old_offset:06X} ({new_size} <= {old_size})")
-            if new_size < old_size:
-                # Rellenar el espacio sobrante con FF para limpieza total
-                padding_size = old_size - new_size
-                print(f"🧹 [Limpieza In-Place] Rellenando {padding_size} bytes con 0xFF en 0x{old_offset + new_size:06X}")
-                self.proyecto.write_patch(old_offset, new_data + (b'\xFF' * padding_size))
+        # 0. Verificación de escritura In-Place (SÓLO SI ESTÁ ALINEADO)
+        # Si la dirección original es IMPAR, forzamos el repunteo a un bloque nuevo 0,4,8,C
+        is_aligned = (old_offset % 4 == 0) if old_offset else False
+        
+        if old_offset and is_aligned and new_size <= old_size:
+            print(f"🎯 [In-Place-Aligned] Sobrescribiendo en 0x{old_offset:06X}")
+            # Si hay un límite definido (siguiente puntero), limpiamos hasta allí
+            if cleaning_limit > old_offset:
+                total_space = cleaning_limit - old_offset
+                padding_needed = total_space - new_size
+                if padding_needed > 0:
+                    self.proyecto.write_patch(old_offset, new_data + (b'\xFF' * padding_needed))
+                else:
+                    self.proyecto.write_patch(old_offset, new_data)
             else:
                 self.proyecto.write_patch(old_offset, new_data)
             
-            # Llamamos al callback por si necesita actualizar cabeceras (aunque el offset no cambie)
             repoint_callback(old_offset)
             return old_offset
+            
+        if old_offset and not is_aligned:
+            print(f"🚀 [Forcing-Repoint] Dirección original 0x{old_offset:06X} no alineada. Buscando bloque 0,4,8,C...")
 
-        # 1. Limpieza: Llenar el espacio anterior con 0xFF en la capa virtual
-        if old_offset and old_size > 0:
-            limit = min(old_size, len(self.proyecto.virtual_rom) - old_offset)
-            self.proyecto.write_patch(old_offset, b'\xFF' * limit)
-            print(f"🧹 [FF-Virtual-Clean] 0x{old_offset:06X} ({old_size} bytes)")
+        # 1. Limpieza Quirúrgica (Hasta el siguiente puntero si existe)
+        if old_offset:
+            limit = old_size
+            if cleaning_limit > old_offset:
+                limit = cleaning_limit - old_offset
+            
+            max_limit = min(limit, len(self.proyecto.virtual_rom) - old_offset)
+            self.proyecto.write_patch(old_offset, b'\xFF' * max_limit)
+            print(f"🧹 [Surgical-Clean] 0x{old_offset:06X} -> 0x{old_offset + max_limit:06X}")
 
         # 2. Búsqueda de hueco de 0xFF en el buffer virtual
         new_offset = self._find_free_space(new_size)
@@ -180,8 +197,8 @@ class MemoryManager:
         if not rom_data: return 0
         
         target = b'\xFF' * size
-        # Empezar búsqueda tras las tablas de datos principales (aprox 0x110000)
-        start_search = 0x110000
+        # Empezar búsqueda después de la firma N_MODE para evitar tocar tablas vitales
+        start_search = 0x13AA30 
         
         idx = rom_data.find(target, start_search)
         while idx != -1:

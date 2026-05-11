@@ -1,7 +1,0 @@
-#include "lib_fomt.csv"
-
-script 274 Unknown_Event_0274 {
-PlaySong(0, 0x9C);
-Proc0C7(5);
-exit;
-}
