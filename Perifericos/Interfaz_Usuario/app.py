@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -21,7 +21,7 @@ from Herramientas.tile_editor_extreme import TileEditorWidget
 from Nucleos_de_Procesamiento.Nucleo_de_Datos.proyecto import FoMTProject
 from Perifericos.Interfaz_Usuario.widgets.item_editor import ItemEditorWidget
 from Perifericos.Interfaz_Usuario.widgets.script_ide import ScriptIDEWidget
-from Perifericos.Interfaz_Usuario.widgets.event_visual import VisualEventMaker
+from Perifericos.Interfaz_Usuario.widgets.block_puzzle import BlockPuzzleEditor
 from Perifericos.Interfaz_Usuario.widgets.pointer_editor import MasterPointerEditor
 from Perifericos.Interfaz_Usuario.widgets.npc_editor import NpcEditorWidget
 from Perifericos.Interfaz_Usuario.widgets.menu_editor import MenuEditorWidget
@@ -110,7 +110,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v3.3.4 - Soberanía de la Ñ")
+        self.setWindowTitle("FoMT Studio v3.4.4 - Soberanía de la Ñ")
         self.setMinimumSize(800, 600)
         self.showMaximized()
         
@@ -119,7 +119,7 @@ class FoMTStudioApp(QMainWindow):
         self.npc_editor = None
         self.pointer_editor = None
         self.script_ide = None
-        self.visual_maker = None
+        self.block_editor = None
         self.map_editor = None
         self.tile_viewer = None
         self.audio_viewer = None
@@ -130,6 +130,7 @@ class FoMTStudioApp(QMainWindow):
         self.current_lang = self.settings.value("language", "es")
         self.current_theme = self.settings.value("theme", "forerunner")
         self.last_rom_dir = self.settings.value("last_rom_dir", "")
+        self.ai_copilot_active = self.settings.value("ai_copilot_active", False, type=bool)
         
         self._setup_ui()
         self._setup_menu()
@@ -140,6 +141,7 @@ class FoMTStudioApp(QMainWindow):
         QShortcut(QKeySequence("Ctrl+S"), self, self.action_save_project)
         QShortcut(QKeySequence("Ctrl+P"), self, self._on_shortcut_event_up)
         QShortcut(QKeySequence("Ctrl+L"), self, self._on_shortcut_event_down)
+        QShortcut(QKeySequence("Ctrl+Shift+L"), self, self.open_decoration_control)
         
         self.konami_code = [
             Qt.Key.Key_Up, Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Down,
@@ -148,6 +150,28 @@ class FoMTStudioApp(QMainWindow):
         ]
         self.konami_index = 0
         self._setup_ai_dock() # Inicializar terminal lateral
+        
+    def keyPressEvent(self, event):
+        # Konami Code logic
+        if event.key() == self.konami_code[self.konami_index]:
+            self.konami_index += 1
+            if self.konami_index == len(self.konami_code):
+                self.toggle_ai_copilot()
+                self.konami_index = 0
+        else:
+            self.konami_index = 0
+        super().keyPressEvent(event)
+
+    def toggle_ai_copilot(self):
+        self.ai_copilot_active = not self.ai_copilot_active
+        self.settings.setValue("ai_copilot_active", self.ai_copilot_active)
+        
+        status = "Activado" if self.ai_copilot_active else "Desactivado"
+        QMessageBox.information(self, "AI Copilot", f"Copiloto de IA {status}.\nEsta preferencia se ha guardado para futuras sesiones.")
+        
+        # Notificar a los widgets abiertos (si es necesario)
+        if self.script_ide:
+            self.script_ide.update_ai_status(self.ai_copilot_active)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self._check_for_crash_report()
         
@@ -536,6 +560,14 @@ class FoMTStudioApp(QMainWindow):
         root.appendRow(self.cat_bulk_items)
         root.appendRow(self.cat_events_item)
         root.appendRow(self.cat_maps)
+        
+        # Aplicar configuraciones de decoración al cargar el proyecto
+        if self.project and self.project.event_parser:
+            dec_cfg = self.settings.value("decoration_settings", {
+                "strings": True, "items": True, "characters": True, "flags": True, "coords": True
+            })
+            self.project.event_parser.decoration_settings = dec_cfg
+            
         self._populate_ui_step(2)
         item_bulk = QStandardItem("Items (Bulk Edit Mode)")
         item_bulk.setData("BULK_ITEMS", Qt.ItemDataRole.UserRole + 1)
@@ -549,7 +581,7 @@ class FoMTStudioApp(QMainWindow):
         self.tabs.addTab(QWidget(), tr("tab_npcs", self.current_lang))
         self.tabs.addTab(QWidget(), tr("tab_pointers", self.current_lang))
         self.tabs.addTab(QWidget(), tr("tab_menu_editor", self.current_lang))
-        self.tabs.addTab(QWidget(), tr("tab_visual", self.current_lang))
+        self.tabs.addTab(QWidget(), "Bloques 🧩")
         
         # Conectar el cambio de pestaña para cargar el editor bajo demanda
         try: self.tabs.currentChanged.disconnect()
@@ -762,6 +794,31 @@ class FoMTStudioApp(QMainWindow):
             subprocess.Popen([sys.executable, script_path])
         except Exception as e:
             QMessageBox.warning(self, "Error", f"No se pudo lanzar el Tile Editor Extreme:\n{e}")
+
+    def open_decoration_control(self):
+        from Perifericos.Interfaz_Usuario.widgets.decoration_control import DecorationControlDialog
+        
+        # Obtener configuraciones actuales
+        current_cfg = self.settings.value("decoration_settings", {
+            "strings": True, "items": True, "characters": True, "flags": True, "coords": True
+        })
+        
+        dialog = DecorationControlDialog(self, current_cfg)
+        if dialog.exec():
+            new_cfg = dialog.get_settings()
+            self.settings.setValue("decoration_settings", new_cfg)
+            
+            # Aplicar al parser si existe el proyecto
+            if self.project and self.project.event_parser:
+                self.project.event_parser.decoration_settings = new_cfg
+                
+            # Recargar la pestaña actual si es un editor de scripts
+            current_widget = self.tabs.currentWidget()
+            if isinstance(current_widget, ScriptIDEWidget):
+                if current_widget.current_event_id is not None:
+                    current_widget.load_event(current_widget.current_event_id)
+                elif hasattr(current_widget, 'last_offset') and current_widget.last_offset:
+                    current_widget.load_rom_script(current_widget.last_offset)
 
     def open_script_by_ref(self, ref):
         """Busca un script por nombre o ID y lo abre."""
@@ -1013,11 +1070,18 @@ class FoMTStudioApp(QMainWindow):
                     self.tabs.removeTab(index)
                     self.tabs.insertTab(index, self.menu_editor, tr("tab_menu_editor", lang))
                     self.tabs.setCurrentIndex(index)
-                elif tab_text == tr("tab_visual", lang):
-                    self.visual_maker = VisualEventMaker(self.project, self)
+                elif tab_text == "Bloques 🧩":
+                    self.block_editor = BlockPuzzleEditor(self.project, self)
                     self.tabs.removeTab(index)
-                    self.tabs.insertTab(index, self.visual_maker, tr("tab_visual", lang))
+                    self.tabs.insertTab(index, self.block_editor, "Bloques 🧩")
                     self.tabs.setCurrentIndex(index)
+                    
+                    # Cargar evento actual si hay uno seleccionado en el árbol
+                    current_index = self.tree_view.currentIndex()
+                    if current_index.isValid():
+                        item = self.tree_model.itemFromIndex(current_index)
+                        if item and item.data(Qt.ItemDataRole.UserRole + 1) == "EVENT":
+                            self.block_editor.load_event(item.data(Qt.ItemDataRole.UserRole))
                 
                 self.apply_theme(self.current_theme)
             finally:

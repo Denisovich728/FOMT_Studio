@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -136,7 +136,9 @@ def encode_instructions(vec: EncoderHelper, instructions: List[Ins]) -> JumpTabl
         if target in label_map:
             vec.write_u32_at(off, label_map[target])
             
-    vec.push_u8(OPCODE_END)
+    # Solo añadir OPCODE_END si la última instrucción no es ya un Exit o Jmp (dead code)
+    if not instructions or not isinstance(instructions[-1], Exit):
+        vec.push_u8(OPCODE_END)
     
     len_aligned = (len(vec.data) - begin + 3) & ~3
     while len(vec.data) - begin < len_aligned:

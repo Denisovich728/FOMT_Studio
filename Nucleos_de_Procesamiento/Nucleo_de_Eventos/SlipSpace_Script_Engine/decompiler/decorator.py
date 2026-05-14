@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -25,6 +25,16 @@ def _find_call_in_expr(expr, func_names):
         if found: return found
     return None
 
+class DecorateExprVisitor:
+    def visit_expr(self, expr: Expr):
+        if isinstance(expr, ExprInt):
+            expr.force_decimal = True
+        elif isinstance(expr, (ExprOpAdd, ExprOpSub, ExprOpMul, ExprOpDiv, ExprOpMod, ExprOpOr, ExprOpAnd, ExprCmpEq, ExprCmpNe, ExprCmpLt, ExprCmpLe, ExprCmpGt, ExprCmpGe)):
+            self.visit_expr(expr.lhs)
+            self.visit_expr(expr.rhs)
+        elif isinstance(expr, (ExprOpNeg, ExprOpNot)):
+            self.visit_expr(expr.inner)
+
 class StringDecorateVisitor:
     def __init__(self, num_strings: int, known_callables: Dict):
         self.num_strings = num_strings
@@ -46,15 +56,37 @@ class StringDecorateVisitor:
 
         shape = self.callables_by_name.get(invoke.func)
         if not shape:
+            # Decoraciones de propósito general incluso si no hay shape (Fallback)
+            if invoke.func in ("SetEntityFacing", "SetEntityPosition"):
+                facing_map = {0: b"Down", 1: b"Up", 2: b"Left", 3: b"Right"}
+                idx = 1 if invoke.func == "SetEntityFacing" else 3
+                if len(invoke.args) > idx:
+                    arg = invoke.args[idx]
+                    if isinstance(arg, ExprInt) and arg.value in facing_map:
+                        invoke.args[idx] = ExprStr(facing_map[arg.value])
             return
 
         if len(shape.parameter_types) != len(invoke.args):
             return
             
+        # Decoración específica basada en la firma de la función
         for i, param_type in enumerate(shape.parameter_types):
             if param_type.type_enum == ValueTypeEnum.STRING:
                 self.stringify_expr(invoke.args, i)
             else:
+                arg = invoke.args[i]
+                if isinstance(arg, ExprInt):
+                    # 1. Direcciones (Facing)
+                    if invoke.func in ("SetEntityFacing", "SetEntityPosition"):
+                        facing_map = {0: b"Down", 1: b"Up", 2: b"Left", 3: b"Right"}
+                        target_idx = 1 if invoke.func == "SetEntityFacing" else 3
+                        if i == target_idx and arg.value in facing_map:
+                            invoke.args[i] = ExprStr(facing_map[arg.value])
+                    
+                    # 2. Forzar Decimal en IDs de Eventos/Scripts para facilitar lectura
+                    if invoke.func in ("Execute_Script", "Jump", "Call"):
+                        arg.force_decimal = True
+                            
                 self.visit_expr(invoke.args[i])
 
     def visit_expr(self, expr: Expr):
@@ -243,7 +275,7 @@ def decorate_stmts_with_items(stmts: List[Stmt], item_names: Dict[int, str], foo
     visitor.visit_stmts(stmts)
 
 class CharacterDecorateVisitor(StringDecorateVisitor):
-    def __init__(self, char_names: Dict[int, str], candidate_names: Dict[int, str], portrait_names: Dict[int, str], map_names: Dict[int, str], emote_names: Dict[int, str], anim_names: Dict[int, str], known_callables: Dict):
+    def __init__(self, char_names: Dict[int, str], candidate_names: Dict[int, str], portrait_names: Dict[int, str], map_names: Dict[int, str], emote_names: Dict[int, str], anim_names: Dict[int, str], known_callables: Dict, decorate_coords: bool = True):
         super().__init__([], known_callables)
         self.char_names = char_names
         self.candidate_names = candidate_names
@@ -251,6 +283,7 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
         self.map_names = map_names
         self.emote_names = emote_names
         self.anim_names = anim_names
+        self.decorate_coords_enabled = decorate_coords
 
     def visit_invoke(self, invoke: Invoke):
         # Funciones que usan IDs de personajes/entidades en su primer argumento
@@ -267,7 +300,7 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
             "Reset_NPC_Schedule", "Kill_NPC", "Has_Met_NPC", "Player_Hold_Entity",
             "Initialize_Animal_Stats", "Set_Vector_X", "Set_Vector_Y", "Set_Vector_Z"
         )
-        candidate_funcs = ("Set_Hearth_Anim", "Give_Love_Points", "Chek_Love_Points")
+        candidate_funcs = ("Set_Hearth_Anim", "Give_Love_Points", "Chek_Love_Points", "Check_If_Single")
 
         # Priorizar funciones con múltiples argumentos que decorar
         if invoke.func == "Show_Emote" and len(invoke.args) >= 2:
@@ -285,9 +318,38 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
                     self.stringify_expr(invoke.args, 1, self.map_names)
         elif invoke.func in char_funcs and len(invoke.args) >= 1:
             self.stringify_expr(invoke.args, 0, self.char_names)
+            # Decorar el segundo argumento de Routine_State_Override como "Nombre_Routine"
+            # Routine_State_Override(NPC_Target, Routine_Source)
+            # arg0 = NPC al que se le cambia la rutina
+            # arg1 = NPC cuya rutina se copia (se decora con _Routine si mapea a un NPC conocido)
+            if invoke.func == "Routine_State_Override" and len(invoke.args) >= 2:
+                arg = invoke.args[1]
+                if isinstance(arg, ExprInt) and arg.value in self.char_names:
+                    name = self.char_names[arg.value]
+                    val_str = f"{name}_Routine".encode('windows-1252', errors='replace')
+                    invoke.args[1] = ExprStr(val_str)
+
+            
+            # Forzar decimal en puntos de amistad
+            if invoke.func == "Give_Friendship_Points" and len(invoke.args) >= 2:
+                if isinstance(invoke.args[1], ExprInt):
+                    invoke.args[1].force_decimal = True
+        elif invoke.func in candidate_funcs and len(invoke.args) >= 1:
+            # Los candidatos suelen mapearse a los nombres de personajes
+            self.stringify_expr(invoke.args, 0, self.candidate_names or self.char_names)
+            # El segundo argumento de Give_Love_Points/Give_Friendship_Points es la cantidad (forzar decimal con signo)
+            if invoke.func in ("Give_Love_Points", "Give_Friendship_Points") and len(invoke.args) >= 2:
+                if isinstance(invoke.args[1], ExprInt):
+                    invoke.args[1].force_decimal = True
         elif invoke.func == "Set_Portrait" and len(invoke.args) >= 1:
             self.stringify_expr(invoke.args, 0, self.portrait_names)
         elif invoke.func == "Make_Delay" and len(invoke.args) >= 1:
+            # Forzar decimal en toda la expresión (ej: 0x3C * 2 -> 60 * 2)
+            v = DecorateExprVisitor()
+            for arg in invoke.args:
+                v.visit_expr(arg)
+            
+            # Si es un entero simple, le añadimos el comentario decorativo
             arg = invoke.args[0]
             if isinstance(arg, ExprInt):
                 val_str = f"{arg.value} Frames".encode('windows-1252', errors='replace')
@@ -297,7 +359,8 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
                 invoke.args[0].force_decimal = True
         
         # --- NUEVO: DECORACIÓN DE COORDENADAS ---
-        self._decorate_coords(invoke)
+        if self.decorate_coords_enabled:
+            self._decorate_coords(invoke)
         
         super().visit_invoke(invoke)
 
@@ -314,6 +377,8 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
             "Set_Vector_Y": (None, 1), # El arg 1 de Vector_Y es Y
             "EntityMoveTo": (1, 2),
             "EntityMoveTo_Immediate": (1, 2),
+            "Pan_Camera_To": (0, 1),
+            "Set_Camera_Position": (0, 1),
         }
         
         if invoke.func in coord_map:
@@ -322,13 +387,13 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
             if idx_x is not None and len(invoke.args) > idx_x:
                 arg = invoke.args[idx_x]
                 if isinstance(arg, ExprInt):
-                    val_str = f"pos_x{arg.value}".encode('windows-1252', errors='replace')
+                    val_str = f"Pos_X:{arg.value}".encode('windows-1252', errors='replace')
                     invoke.args[idx_x] = ExprStr(val_str)
                     
             if idx_y is not None and len(invoke.args) > idx_y:
                 arg = invoke.args[idx_y]
                 if isinstance(arg, ExprInt):
-                    val_str = f"pos_y{arg.value}".encode('windows-1252', errors='replace')
+                    val_str = f"Pos_Y:{arg.value}".encode('windows-1252', errors='replace')
                     invoke.args[idx_y] = ExprStr(val_str)
 
     def visit_stmt(self, stmt: Stmt):
@@ -385,10 +450,10 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
             if hasattr(expr, 'comment'):
                 expr.comment = None
 
-def decorate_stmts_with_characters(stmts: List[Stmt], char_names: Dict[int, str], candidate_names: Dict[int, str], portrait_names: Dict[int, str], map_names: Dict[int, str], emote_names: Dict[int, str], anim_names: Dict[int, str], known_callables: Dict):
+def decorate_stmts_with_characters(stmts: List[Stmt], char_names: Dict[int, str], candidate_names: Dict[int, str], portrait_names: Dict[int, str], map_names: Dict[int, str], emote_names: Dict[int, str], anim_names: Dict[int, str], known_callables: Dict, decorate_coords: bool = True):
     if not char_names and not candidate_names and not portrait_names and not map_names and not emote_names and not anim_names:
         return
-    visitor = CharacterDecorateVisitor(char_names, candidate_names, portrait_names, map_names, emote_names, anim_names, known_callables)
+    visitor = CharacterDecorateVisitor(char_names, candidate_names, portrait_names, map_names, emote_names, anim_names, known_callables, decorate_coords)
     visitor.visit_stmts(stmts)
 
 class FlagDecorateVisitor(StringDecorateVisitor):

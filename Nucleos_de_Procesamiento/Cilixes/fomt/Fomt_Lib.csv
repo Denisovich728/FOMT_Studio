@@ -66,7 +66,7 @@ proc,0x046,70,Remove_Held_Item,
 proc,0x047,71,Give_Food,arg_1
 proc,0x048,72,Give_Item,arg_1
 proc,0x049,73,Give_Item_Silent,arg_1
-proc,0x04A,74,Give_Item,item_id
+proc,0x04A,74,Give_Item_Shelf,item_id
 func,0x04B,75,Func04B,
 func,0x04C,76,Func04C,
 proc,0x04D,77,Trigger_Machine_Processing,
@@ -118,7 +118,7 @@ func,0x07F,127,Func07F,arg_1
 proc,0x080,128,Free_Event_Entity,arg_1
 func,0x081,129,Has_Spoken_To_NPC_Today,NPC_ID
 func,0x082,130,Has_NPC_Talked_Today,arg_1
-func,0x083,131,Func083,arg_1
+func,0x083,131,Check_If_Single,arg_1
 proc,0x084,132,Warp_Entity_To_Map,arg_1
 func,0x085,133,Has_NPC_Talked_Today_2,arg_1
 func,0x086,134,Chek_Love_Points,arg_1

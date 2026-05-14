@@ -6,7 +6,7 @@ import multiprocessing
 def get_safe_worker_count():
     """
     Calcula el número óptimo de hilos de trabajo basado en la arquitectura del CPU.
-    Sigue las reglas de la v3.3.4:
+    Sigue las reglas de la v3.4.4:
     - Máximo 50% de la capacidad lógica total.
     - AMD: 50% de los hilos (para no saturar SMT).
     - Intel Hybrid (P-cores/E-cores): 50% de los hilos para priorizar P-cores.

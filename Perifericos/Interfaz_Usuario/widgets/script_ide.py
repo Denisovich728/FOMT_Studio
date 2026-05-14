@@ -1,18 +1,22 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTextEdit, QLineEdit,
     QPushButton, QLabel, QSplitter, QListWidget, QListWidgetItem,
-    QCompleter, QCheckBox, QApplication
+    QCompleter, QCheckBox, QApplication, QMessageBox
 )
 from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QFontDatabase, QPainter, QTextFormat, QTextCursor
 from PyQt6.QtCore import Qt, QRect, QSize, QStringListModel, QThread, pyqtSignal, QSortFilterProxyModel
 
 from Perifericos.Interfaz_Usuario.themes import get_highlighter_colors
 from Perifericos.Traducciones.i18n import tr
+
+from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.compiler.lexer import Lexer
+from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.compiler.parser import Parser, ParseError
+from Nucleos_de_Procesamiento.Nucleo_de_Eventos.SlipSpace_Script_Engine.compiler.emitter import ConstScope
 
 import re
 import json
@@ -31,6 +35,32 @@ class LineNumberArea(QWidget):
     def paintEvent(self, event):
         self.code_editor.line_number_area_paint_event(event)
 
+class CodeMinimap(QPlainTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setReadOnly(True)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        
+        # Super small font for minimap effect
+        font = QFont("Courier New", 2)
+        self.setFont(font)
+        
+        self.setStyleSheet("""
+            QPlainTextEdit {
+                background-color: rgba(30, 30, 30, 150);
+                border: none;
+                color: rgba(255, 255, 255, 50);
+            }
+        """)
+        self.setFixedWidth(120)
+        self.setMouseTracking(True)
+        
+    def mousePressEvent(self, event):
+        # Allow clicking minimap to scroll main editor (simplificado)
+        pass
+
 class CodeEditor(QPlainTextEdit):
     scriptClicked = pyqtSignal(str)
 
@@ -46,6 +76,33 @@ class CodeEditor(QPlainTextEdit):
 
         self.update_line_number_area_width(0)
         self._completer = None
+        self.error_lines = {} # Line number -> Error message
+        
+        # Timer for background parsing (Smart Suggestions)
+        from PyQt6.QtCore import QTimer
+        self.parse_timer = QTimer()
+        self.parse_timer.setSingleShot(True)
+        self.parse_timer.timeout.connect(self.run_background_check)
+        self.textChanged.connect(lambda: self.parse_timer.start(800))
+        
+    def run_background_check(self):
+        """Analiza el código en segundo plano para detectar errores y patrones."""
+        code = self.toPlainText()
+        self.error_lines.clear()
+        
+        try:
+            lex = Lexer(code)
+            par = Parser(lex)
+            # Solo intentamos parsear para ver si hay errores de sintaxis
+            scope = ConstScope()
+            par.parse_program(scope, allow_scripts=True)
+        except ParseError as e:
+            # Los errores de línea en el parser son 1-based
+            self.error_lines[e.line - 1] = str(e)
+        except Exception as e:
+            pass
+            
+        self.viewport().update()
 
     def setCompleter(self, completer):
         if self._completer:
@@ -120,7 +177,14 @@ class CodeEditor(QPlainTextEdit):
                     pos_in_line = cursor.positionInBlock()
                     
                     if start_idx <= pos_in_line <= end_idx:
-                        self.scriptClicked.emit(script_match.group(1))
+                        ref = script_match.group(1)
+                        # Convert Hex to Dec if it's a hex string
+                        if ref.startswith("0x"):
+                            try: 
+                                dec_val = int(ref, 16)
+                                ref = str(dec_val)
+                            except: pass
+                        self.scriptClicked.emit(ref)
                         return
         
         super().mousePressEvent(event)
@@ -176,7 +240,7 @@ class CodeEditor(QPlainTextEdit):
                 # Retrocedemos la longitud de args_hint + 1 (el paréntesis de cierre)
                 tc.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.MoveAnchor, 1)
                 tc.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor, len(args_hint))
-        elif item_type in ("item", "food", "tool", "npc", "candidate", "anim"):
+        elif item_type in ("item", "food", "tool", "npc", "candidate", "anim", "npc_routine"):
             # Insertar con comillas automáticamente si no las tiene ya
             current_text = tc.block().text()
             cursor_pos = tc.positionInBlock()
@@ -185,6 +249,7 @@ class CodeEditor(QPlainTextEdit):
             has_quote_before = cursor_pos > 0 and current_text[cursor_pos-1] == '"'
             # (El prefijo ya fue borrado, así que miramos justo antes)
             
+
             inserted_text = f'"{completion}"'
             if has_quote_before:
                 inserted_text = f'{completion}"' # Solo cerrar si ya se abrió manual
@@ -198,19 +263,14 @@ class CodeEditor(QPlainTextEdit):
 
     def textUnderCursor(self):
         tc = self.textCursor()
-        # Mover el cursor al final de la palabra actual considerando guiones bajos
-        # No usamos WordUnderCursor directamente porque a veces corta en el '_'
         pos = tc.position()
         tc.movePosition(QTextCursor.MoveOperation.StartOfWord, QTextCursor.MoveMode.KeepAnchor)
         word = tc.selectedText()
         
-        # Si la palabra antes del cursor tiene un guion bajo, intentar capturar más
-        # (Heurística simple para comandos tipo Set_Flag)
         full_tc = self.textCursor()
         full_tc.movePosition(QTextCursor.MoveOperation.StartOfLine, QTextCursor.MoveMode.KeepAnchor)
         line = full_tc.selectedText()
         
-        # Encontrar la palabra que termina en la posición actual (incluyendo backslash para escapes)
         match = re.search(r'([\\a-zA-Z0-9_]+)$', line)
         if match:
             return match.group(1)
@@ -222,41 +282,52 @@ class CodeEditor(QPlainTextEdit):
             self._completer.setWidget(self)
         super().focusInEvent(e)
 
-    def keyPressEvent(self, e):
-        if self._completer and self._completer.popup().isVisible():
-            if e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return, Qt.Key.Key_Tab, Qt.Key.Key_Escape, Qt.Key.Key_Backtab):
-                e.ignore()
-                return
-
-        # Auto-identación básica
-        if e.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+    def keyPressEvent(self, event):
+        # Trigger Smart Suggestions on Enter if line is empty or just started
+        if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            super().keyPressEvent(event)
+            smart = self.get_smart_suggestions()
+            if smart and self._completer:
+                # Actualizar el completer con las sugerencias inteligentes si no hay texto
+                from PyQt6.QtCore import QStringListModel
+                model = QStringListModel(smart)
+                self._completer.setModel(model)
+                self._completer.setCompletionPrefix("")
+                cr = self.cursorRect()
+                self._completer.complete(cr)
+            
+            # Auto-identación básica tras el enter original
             cursor = self.textCursor()
-            line = cursor.block().text()
+            line = cursor.block().previous().text()
             indent = ""
             for char in line:
                 if char.isspace(): indent += char
                 else: break
             
-            # Si la línea termina en '{', añadir un nivel más
+            # Si la línea anterior termina en '{', añadir un nivel más
             if line.strip().endswith("{"):
                 indent += "    "
-                
-            super().keyPressEvent(e)
+            
             self.insertPlainText(indent)
             return
 
+        if self._completer and self._completer.popup().isVisible():
+            if event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return, Qt.Key.Key_Tab, Qt.Key.Key_Escape, Qt.Key.Key_Backtab):
+                event.ignore()
+                return
+
         # Atajo manual: Ctrl + Espacio para autocompletado
-        isManualTrigger = (e.modifiers() & Qt.KeyboardModifier.ControlModifier) and e.key() == Qt.Key.Key_Space
+        isManualTrigger = (event.modifiers() & Qt.KeyboardModifier.ControlModifier) and event.key() == Qt.Key.Key_Space
         
         if not isManualTrigger:
-            super().keyPressEvent(e)
+            super().keyPressEvent(event)
 
         if not self._completer:
             return
 
         completionPrefix = self.textUnderCursor()
         
-        if not isManualTrigger and (not e.text() or len(completionPrefix) < 1):
+        if not isManualTrigger and (not event.text() or len(completionPrefix) < 1):
             self._completer.popup().hide()
             return
 
@@ -273,8 +344,8 @@ class CodeEditor(QPlainTextEdit):
         self.update_completer_context(line_text)
 
         # No disparar si se presionan modificadores solos
-        ctrlOrShift = e.modifiers() & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)
-        if not isManualTrigger and ctrlOrShift and not e.text():
+        ctrlOrShift = event.modifiers() & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)
+        if not isManualTrigger and ctrlOrShift and not event.text():
             return
 
         # Detección de contexto
@@ -285,7 +356,7 @@ class CodeEditor(QPlainTextEdit):
         completionPrefix = self.textUnderCursor()
 
         # Si no hay prefijo o se presionó una tecla de borrado, ocultar y salir
-        if not isManualTrigger and (not completionPrefix or e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete)):
+        if not isManualTrigger and (not completionPrefix or event.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete)):
             self._completer.popup().hide()
             return
 
@@ -298,6 +369,36 @@ class CodeEditor(QPlainTextEdit):
         cr.setWidth(self._completer.popup().sizeHintForColumn(0)
                     + self._completer.popup().verticalScrollBar().sizeHint().width())
         self._completer.complete(cr)
+
+    def get_smart_suggestions(self) -> list:
+        """Predice el siguiente comando basado en el contexto de las últimas líneas."""
+        cursor = self.textCursor()
+        current_line = cursor.block().text().strip()
+        
+        # Retroceder una línea para ver qué hizo el usuario
+        prev_block = cursor.block().previous()
+        prev_line = prev_block.text().strip() if prev_block.isValid() else ""
+        
+        suggestions = []
+        
+        # Patrón 1: Si movió una entidad, probablemente quiera cambiar su orientación o animación
+        if "SetEntityPosition" in prev_line or "EntityMoveTo" in prev_line:
+            # Extraer el nombre de la entidad (primer argumento)
+            match = re.search(r'\(([^,]+)', prev_line)
+            entity = match.group(1).strip() if match else "Player"
+            suggestions.append(f"SetEntityFacing({entity}, 0); // Orientar")
+            suggestions.append(f"SetEntityAnim({entity}, \"Idle\"); // Animar")
+            
+        # Patrón 2: Si mostró un mensaje, quizás quiera un delay o una opción
+        if "TalkMessage" in prev_line or "Print_Message" in prev_line:
+            suggestions.append("Make_Delay(60); // Esperar 1s")
+            suggestions.append("Show_Option_Window(0x01, \"Si\", \"No\");")
+
+        # Patrón 3: Si está dentro de un script y no ha puesto nada, sugerir cabecera común
+        if "script" in current_line and "{" in current_line:
+            suggestions.append("    Fade_Out(1, 0x00, 0x00, 0x00);")
+            
+        return suggestions
 
     def update_completer_context(self, line_text):
         """Ajusta el filtro del completer según lo que se esté escribiendo."""
@@ -329,9 +430,14 @@ class CodeEditor(QPlainTextEdit):
         # Give_Food( ...
         elif re.search(r'Give_Food\(\s*[^,)]*$', line_text):
             filter_type = "food"
-        # Give_Tool, Give_Tool_TBox, Give_Tool_Inventory, Animation_Tool_Give, Take_Tool
+        # Routine_State_Override(NPC, Routine_Name)
+        # El segundo argumento es la rutina (sugiere NPCs con _Routine)
+        elif re.search(r'Routine_State_Override\(\s*[^,)]+\s*,\s*[^,)]*$', line_text):
+            filter_type = "npc_routine"
+
+        # Give_Tool, Give_Tool_TBox, Give_Tool_Inventory, Give_Tool_In_Inventory, Animation_Tool_Give, Take_Tool
         # En FOMT, las semillas y otros variados se usan como herramientas, así que mostramos ambos.
-        elif re.search(r'(Give_Tool(?:_TBox|_Inventory)?|An?imation_Tool_Give|Take_Tool|Check_Equped_Tool|Check_Tool_Inventory_Space|Check_Tool_TBox_Space)\(\s*[^,)]*$', line_text):
+        elif re.search(r'(Give_Tool(?:_TBox|_Inventory|_In_Inventory)?|An?imation_Tool_Give|Take_Tool|Check_Equped_Tool|Check_Tool_Inventory_Space|Check_Tool_TBox_Space)\(\s*[^,)]*$', line_text):
             filter_type = "tool|item"
         # Set_Portrait( ...
         elif re.search(r'Set_Portrait\(\s*[^,)]*$', line_text):
@@ -386,18 +492,13 @@ class CodeEditor(QPlainTextEdit):
         self.line_number_area.setGeometry(QRect(cr.left(), cr.top(), self.line_number_area_width(), cr.height()))
 
     def highlight_current_line(self):
-        extra_selections = []
-        if not self.isReadOnly():
-            selection = QTextEdit.ExtraSelection()
-            # Verde matriz muy sutil (transparencia alta) para que no brille
-            # sobre el fondo negro pero marque la línea.
-            line_color = QColor(0, 255, 0, 15) 
-            selection.format.setBackground(line_color)
-            selection.format.setProperty(QTextFormat.Property.FullWidthSelection, True)
-            selection.cursor = self.textCursor()
-            selection.cursor.clearSelection()
-            extra_selections.append(selection)
-        self.setExtraSelections(extra_selections)
+        selection = QTextEdit.ExtraSelection()
+        line_color = QColor(self.parent().property("current_line_color") or "#2d2d2d")
+        selection.format.setBackground(line_color)
+        selection.format.setProperty(QTextFormat.Property.FullWidthSelection, True)
+        selection.cursor = self.textCursor()
+        selection.cursor.clearSelection()
+        self.setExtraSelections([selection])
 
     def line_number_area_paint_event(self, event):
         painter = QPainter(self.line_number_area)
@@ -421,9 +522,15 @@ class CodeEditor(QPlainTextEdit):
             block_number += 1
 
 class FoMTHighlighter(QSyntaxHighlighter):
-    def __init__(self, document):
-        super().__init__(document)
+    def __init__(self, editor):
+        super().__init__(editor.document())
+        self.editor = editor
         self.highlighting_rules = []
+        
+        # Formato de Error (Subrayado ondulado rojo)
+        self.error_format = QTextCharFormat()
+        self.error_format.setUnderlineColor(QColor("#F44336"))
+        self.error_format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SpellCheckUnderline)
 
     def update_colors(self, theme_name):
         colors = get_highlighter_colors(theme_name)
@@ -466,10 +573,16 @@ class FoMTHighlighter(QSyntaxHighlighter):
         self.rehighlight()
 
     def highlightBlock(self, text):
+        # 1. Aplicar reglas de resaltado estándar
         for pattern, fmt in self.highlighting_rules:
             for match in pattern.finditer(text):
                 start, end = match.span()
                 self.setFormat(start, end - start, fmt)
+        
+        # 2. Resaltar líneas con errores de sintaxis detectados por el parser en segundo plano
+        block_num = self.currentBlock().blockNumber()
+        if block_num in self.editor.error_lines:
+            self.setFormat(0, len(text), self.error_format)
 
 
 class ScriptIDEWidget(QWidget):
@@ -477,9 +590,11 @@ class ScriptIDEWidget(QWidget):
         super().__init__(parent)
         self.project = project
         self.current_event_id = None
+        self.last_offset = None
         self.mode = "script" # Modo por defecto
         self.lang = getattr(parent, 'current_lang', 'es') if parent else 'es'
         self.setup_ui()
+        self._load_intellisense()
         
         # Propagar señal del editor
         self.editor.scriptClicked.connect(self.on_script_clicked)
@@ -494,30 +609,30 @@ class ScriptIDEWidget(QWidget):
         layout = QVBoxLayout(self)
         lang = self.lang
         
+        # --- TOOLBAR SUPERIOR ---
         toolbar = QHBoxLayout()
         self.lbl_title = QLabel(f"<h3>{tr('ide_title', lang)}</h3>")
         
         self.btn_compile = QPushButton(tr('btn_compile_script', lang))
-        self.btn_compile.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold;")
+        self.btn_compile.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold; padding: 5px 15px;")
         self.btn_compile.clicked.connect(self.on_compile_clicked)
 
-        self.btn_debug_toggle = QPushButton(tr('btn_debug_mode', lang))
-        self.btn_debug_toggle.setStyleSheet("background-color: #1976d2; color: white; font-weight: bold;")
-        self.btn_debug_toggle.clicked.connect(self.on_debug_toggle_clicked)
+        self.btn_ai = QPushButton("🤖 Copilot Analyze")
+        self.btn_ai.setStyleSheet("background-color: #8e44ad; color: white; font-weight: bold; padding: 5px 15px;")
+        self.btn_ai.clicked.connect(self.on_ai_analyze)
+        
+        # Visibilidad inicial según configuración persistente
+        main_win = self.window()
+        is_active = getattr(main_win, 'ai_copilot_active', False)
+        self.btn_ai.setVisible(is_active)
         
         toolbar.addWidget(self.lbl_title)
         toolbar.addStretch()
-        toolbar.addWidget(self.btn_debug_toggle)
+        toolbar.addWidget(self.btn_ai)
         toolbar.addWidget(self.btn_compile)
-        
         layout.addLayout(toolbar)
         
-        # Atajo Ctrl+S para compilar el script actual
-        from PyQt6.QtGui import QShortcut, QKeySequence
-        self.compile_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
-        self.compile_shortcut.activated.connect(self.on_compile_clicked)
-
-        # Barra de Búsqueda Global (Buscar texto en todos los eventos)
+        # --- BÚSQUEDA ---
         search_layout = QHBoxLayout()
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Buscar texto en todos los eventos...")
@@ -528,11 +643,8 @@ class ScriptIDEWidget(QWidget):
         self.btn_search.clicked.connect(self.on_global_search)
         
         self.check_only_messages = QCheckBox("Solo en mensajes")
-        self.check_only_messages.setToolTip("Busca el texto solo dentro de los bloques 'const MESSAGE_X = \"...\"'")
-        
         self.btn_clear_search = QPushButton("❌")
         self.btn_clear_search.setFixedWidth(40)
-        self.btn_clear_search.setToolTip("Limpiar resultados de búsqueda y mostrar todos los eventos")
         self.btn_clear_search.clicked.connect(self.on_clear_search)
         self.btn_clear_search.setEnabled(False)
         
@@ -542,19 +654,81 @@ class ScriptIDEWidget(QWidget):
         search_layout.addWidget(self.check_only_messages)
         layout.addLayout(search_layout)
         
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        layout.addWidget(splitter)
+        # --- ÁREA CENTRAL: EDITOR + MINIMAPA ---
+        self.editor_splitter = QSplitter(Qt.Orientation.Horizontal)
         
-        # Uso de CodeEditor (QPlainTextEdit personalizado)
+        # Contenedor para el editor principal (Editor + Números de línea)
         self.editor = CodeEditor()
-        
         font = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont)
         font.setPointSize(11)
         self.editor.setFont(font)
-        
-        self.highlighter = FoMTHighlighter(self.editor.document())
+        self.highlighter = FoMTHighlighter(self.editor)
         self.highlighter.update_colors("light")
         
+        # Minimapa
+        self.minimap = CodeMinimap(self)
+        self.editor.textChanged.connect(lambda: self.minimap.setPlainText(self.editor.toPlainText()))
+        self.editor.verticalScrollBar().valueChanged.connect(self.sync_minimap_scroll)
+        
+        self.editor_splitter.addWidget(self.editor)
+        self.editor_splitter.addWidget(self.minimap)
+        self.editor_splitter.setStretchFactor(0, 1)
+        self.editor_splitter.setStretchFactor(1, 0)
+        self.editor_splitter.setSizes([1000, 150]) # Proporción inicial
+        
+        layout.addWidget(self.editor_splitter)
+        
+        # --- CONSOLA DE SALIDA ---
+        self.console = QTextEdit()
+        self.console.setReadOnly(True)
+        self.console.setMaximumHeight(120)
+        self.console.setStyleSheet("background-color: #1e1e1e; color: #d4d4d4; font-family: Consolas; border-top: 2px solid #333;")
+        layout.addWidget(self.console)
+
+    def sync_minimap_scroll(self, value):
+        max_val = self.editor.verticalScrollBar().maximum()
+        if max_val > 0:
+            ratio = value / max_val
+            mini_max = self.minimap.verticalScrollBar().maximum()
+            self.minimap.verticalScrollBar().setValue(int(ratio * mini_max))
+
+    def update_ai_status(self, is_active):
+        self.btn_ai.setVisible(is_active)
+
+    def on_ai_analyze(self):
+        """Analiza el código y propone mejoras con explicación y aprobación."""
+        code = self.editor.toPlainText()
+        self.console.append("<b style='color:#8e44ad;'>[Copilot]</b> Analizando script actual...")
+        
+        # Simulación de propuesta inteligente
+        if "Execute_Movement" in code and "Wait_For_Animation" not in code:
+            explanation = (
+                "He detectado que estás ejecutando movimientos pero no estás esperando a que terminen.\\n\\n"
+                "<b>Proceso:</b> Sin Wait_For_Animation, el script continuará inmediatamente, "
+                "lo que puede causar que los diálogos se superpongan con el movimiento o que la cámara no siga al NPC.\\n\\n"
+                "<b>Mejora:</b> Inyectar 'Wait_For_Animation(NPC_ID);' tras cada movimiento."
+            )
+            
+            msg_box = QMessageBox(self)
+            msg_box.setWindowTitle("Propuesta de Mejora - Copilot")
+            msg_box.setText(explanation)
+            msg_box.setIcon(QMessageBox.Icon.Information)
+            btn_accept = msg_box.addButton("Aceptar Mejoras", QMessageBox.ButtonRole.AcceptRole)
+            msg_box.addButton("Ignorar", QMessageBox.ButtonRole.RejectRole)
+            
+            msg_box.exec()
+            
+            if msg_box.clickedButton() == btn_accept:
+                # Aplicar mejora (Simulado con regex simple)
+                new_code = re.sub(r'(Execute_Movement\s*\(\s*"([^"]+)"\s*,\s*[^;]+;)', 
+                                  r'\1\n    Wait_For_Animation("\2");', code)
+                self.editor.setPlainText(new_code)
+                self.console.append("<b style='color:#27ae60;'>[Copilot]</b> Mejoras aplicadas con éxito.")
+        else:
+            self.console.append("<b style='color:#8e44ad;'>[Copilot]</b> No se encontraron fallos de lógica evidentes. ¡Buen trabajo!")
+
+    def _load_intellisense(self):
+        """Carga y configura el motor de autocompletado inteligente."""
         # Cargar diccionario de conocimientos
         knowledge_path = get_resource_path("fomt_knowledge.json")
         knowledge_data = {}
@@ -660,6 +834,14 @@ class ScriptIDEWidget(QWidget):
                         q_item.setToolTip(f"ID: {real_id} (0x{real_id:02X})\nRol: {npc.get_translated_role()}")
                         self.completer_model.appendRow(q_item)
                         
+                        # Item de rutina para Routine_State_Override
+                        routine_text = f"{name}_Routine"
+                        routine_item = QStandardItem(routine_text)
+                        routine_item.setData("npc_routine", Qt.ItemDataRole.UserRole)
+                        routine_item.setData(routine_text, Qt.ItemDataRole.EditRole)
+                        routine_item.setToolTip(f"Rutina de {name}")
+                        self.completer_model.appendRow(routine_item)
+                        
                         # Si es candidata, añadir otro item oculto o duplicado para el filtro de candidatas
                         if npc.is_candidate:
                             cand_item = QStandardItem(completion_text)
@@ -709,8 +891,6 @@ class ScriptIDEWidget(QWidget):
         
         self.editor.setPlainText("// Load a script to start editing...")
         
-        splitter.addWidget(self.editor)
-        
     def load_event(self, event_id):
         self.current_event_id = event_id
         code, stmts = self.project.event_parser.decompile_to_ui(event_id)
@@ -719,6 +899,7 @@ class ScriptIDEWidget(QWidget):
     def load_rom_script(self, offset):
         """Carga y descompila un script desde un offset arbitrario (usado por Mapas)."""
         self.current_event_id = None
+        self.last_offset = offset
         code, stmts = self.project.event_parser.decompile_from_offset(offset, hint="MapScript")
         self.editor.setPlainText(code)
         

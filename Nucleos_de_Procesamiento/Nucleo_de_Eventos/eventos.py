@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -86,10 +86,11 @@ class FoMTEventParser:
                 b = self.project.read_rom(script_off + raw_len, 1)
                 raw_len += 1
                 if b == b'\x0B': 
-                    # Escaneo de relleno posterior (00 o FF) para maximizar el espacio recuperable
+                    # Escaneo de relleno posterior (FF) para maximizar el espacio recuperable
+                    # FIX: NO consumir 0x00 porque 0x00 es un byte común en cabeceras de mapas y colisiones.
                     while raw_len < 10000:
                         next_b = self.project.read_rom(script_off + raw_len, 1)
-                        if next_b not in (b'\x00', b'\xFF'):
+                        if next_b != b'\xFF':
                             break
                         raw_len += 1
                     break
@@ -113,61 +114,70 @@ class FoMTEventParser:
             known_callables = self.super_lib.known_callables
             stmts = decompile_instructions(instructions, known_callables)
             
-            if strings:
+            # Aplicar decoraciones según configuración
+            dec_cfg = getattr(self, 'decoration_settings', {
+                "strings": True, "items": True, "characters": True, "flags": True, "coords": True
+            })
+
+            if strings and dec_cfg.get("strings", True):
                 decorate_stmts_with_strings(stmts, strings, known_callables)
             
             # Decorar ítems (Give_Item, Give_Food) - No dependen del bloque STR
-            if self._cached_items is None and self.project.item_parser:
-                self._cached_items = self.project.item_parser.scan_foods()
-            
-            if self._cached_items:
-                item_map = {}
-                food_map = {}
-                tool_map = {}
-                for itm in self._cached_items:
-                    # Limpiar nombre igual que en el compilador para consistencia
-                    name = itm.name_str.replace('\n', ' ').strip('\x00').strip()
-                    if not name: name = f"Unknown_{itm.index}"
-                    rom_addr = itm.base_offset + 0x08000000
-                    if itm.category == "Artículo":
-                        item_map[itm.index] = name
-                    elif itm.category == "Consumible/Comida":
-                        food_map[itm.index] = name
-                    elif itm.category == "Herramienta":
-                        tool_map[itm.index] = name
-                decorate_stmts_with_items(stmts, item_map, food_map, tool_map, known_callables)
+            if dec_cfg.get("items", True):
+                if self._cached_items is None and self.project.item_parser:
+                    self._cached_items = self.project.item_parser.scan_foods()
+                
+                if self._cached_items:
+                    item_map = {}
+                    food_map = {}
+                    tool_map = {}
+                    for itm in self._cached_items:
+                        # Limpiar nombre igual que en el compilador para consistencia
+                        name = itm.name_str.replace('\n', ' ').strip('\x00').strip()
+                        if not name: name = f"Unknown_{itm.index}"
+                        if itm.category == "Artículo":
+                            item_map[itm.index] = name
+                        elif itm.category == "Consumible/Comida":
+                            food_map[itm.index] = name
+                        elif itm.category == "Herramienta":
+                            tool_map[itm.index] = name
+                    decorate_stmts_with_items(stmts, item_map, food_map, tool_map, known_callables)
                 
             # Decorar comandos de personajes con nombres reales (ID 1-based)
-            if self.project.npc_parser:
-                if self._cached_npcs is None:
-                    self._cached_npcs = self.project.npc_parser.scan_npcs()
-                
-                if self._cached_npcs:
-                    char_map = {npc.index + 1: npc.name_str.strip('\x00') for npc in self._cached_npcs}
-                    candidate_map = {npc.index + 1: npc.name_str.strip('\x00') for npc in self._cached_npcs if npc.is_candidate}
+            if dec_cfg.get("characters", True):
+                if self.project.npc_parser:
+                    if self._cached_npcs is None:
+                        self._cached_npcs = self.project.npc_parser.scan_npcs()
                     
-                    # Inversos de los mapas para el descompilador
-                    portrait_map_inv = {v: k for k, v in self.super_lib.portrait_map.items()}
-                    map_map_inv = {v: k for k, v in self.super_lib.map_map.items()}
+                    if self._cached_npcs:
+                        char_map = {npc.index + 1: npc.name_str.strip('\x00') for npc in self._cached_npcs}
+                        candidate_map = {npc.index + 1: npc.name_str.strip('\x00') for npc in self._cached_npcs if npc.is_candidate}
+                        
+                        # Inversos de los mapas para el descompilador
+                        portrait_map_inv = {v: k for k, v in self.super_lib.portrait_map.items()}
+                        map_map_inv = {v: k for k, v in self.super_lib.map_map.items()}
 
-                    # Cargar emotes y animaciones
-                    mode = "mfomt" if self.project.is_mfomt else "fomt"
-                    prefix = "MFomt_" if self.project.is_mfomt else "Fomt_"
-                    emote_map = {}
-                    emote_path = get_data_path(mode, f"{prefix}Emotes.csv")
-                    if os.path.exists(emote_path):
-                        with open(emote_path, 'r', encoding='utf-8') as f:
-                            import csv
-                            f.seek(0)
-                            reader = csv.DictReader(f)
-                            for row in reader:
-                                emote_map[int(row['Emote_ID'], 16)] = row['Emote_Name']
+                        # Cargar emotes y animaciones
+                        mode = "mfomt" if self.project.is_mfomt else "fomt"
+                        prefix = "MFomt_" if self.project.is_mfomt else "Fomt_"
+                        emote_map = {}
+                        emote_path = get_data_path(mode, f"{prefix}Emotes.csv")
+                        if os.path.exists(emote_path):
+                            with open(emote_path, 'r', encoding='utf-8') as f:
+                                import csv
+                                f.seek(0)
+                                reader = csv.DictReader(f)
+                                for row in reader:
+                                    emote_map[int(row['Emote_ID'], 16)] = row['Emote_Name']
 
-                    anim_map = {v: k for k, v in self.super_lib.anim_map.items()}
+                        anim_map = {v: k for k, v in self.super_lib.anim_map.items()}
 
-                    decorate_stmts_with_characters(stmts, char_map, candidate_map, portrait_map_inv, map_map_inv, emote_map, anim_map, known_callables)
+                        decorate_stmts_with_characters(stmts, char_map, candidate_map, portrait_map_inv, map_map_inv, emote_map, anim_map, known_callables, decorate_coords=dec_cfg.get("coords", True))
 
-                # Decorar flags desde flags.csv
+            # Decorar flags desde flags.csv
+            if dec_cfg.get("flags", True):
+                mode = "mfomt" if self.project.is_mfomt else "fomt"
+                prefix = "MFomt_" if self.project.is_mfomt else "Fomt_"
                 flag_path = get_data_path(mode, f"{prefix}Flags.csv")
                 if os.path.exists(flag_path):
                     with open(flag_path, 'r', encoding='utf-8') as f:
@@ -281,18 +291,17 @@ class FoMTEventParser:
                     item_map[itm.name_ptr] = name
                     item_map[addr] = name
                     # Inverso para compilación
-                    item_map[name] = itm.real_id
+                    item_map[name] = itm.index
                 elif itm.category == "Consumible/Comida":
                     food_map[itm.index] = name
                     food_map[itm.name_ptr] = name
                     food_map[addr] = name
-                    food_map[name] = itm.real_id
+                    food_map[name] = itm.index
                 elif itm.category == "Herramienta":
                     tool_map[itm.index] = name
                     tool_map[itm.name_ptr] = name
                     tool_map[addr] = name
-                    tool_map[itm.real_id] = name
-                    tool_map[name] = itm.real_id
+                    tool_map[name] = itm.index
             
         char_map = {}
         candidate_map = {}

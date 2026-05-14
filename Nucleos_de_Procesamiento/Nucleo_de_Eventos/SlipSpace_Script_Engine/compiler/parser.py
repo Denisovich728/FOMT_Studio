@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -19,6 +19,7 @@ class Parser:
         self.lexer = lexer
         self.tokens: List[Token] = []
         self.pos = 0
+        self.switch_id_counter = 0
         self._pump()
         
     def _pump(self):
@@ -284,7 +285,9 @@ class Parser:
                     # Si no es un case o default, lanzamos error
                     raise ParseError(f"Expected case or default in switch, got {t_err.type}", t_err.line, t_err.column)
                     
-            return StmtSwitch(cond, cases, SwitchId(0))
+            sid = self.switch_id_counter
+            self.switch_id_counter += 1
+            return StmtSwitch(cond, cases, SwitchId(sid))
             
         elif t.type == TokenType.KW_EXIT:
             self.next_token()

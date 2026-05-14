@@ -21,7 +21,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='FoMT_Studio_v3.3.4_Folder',
+    name='FoMT_Studio_v3.4.4_Folder',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -42,5 +42,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='FoMT_Studio_v3.3.4_Folder',
+    name='FoMT_Studio_v3.3.5_Folder',
 )

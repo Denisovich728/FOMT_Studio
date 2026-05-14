@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.3.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -72,15 +72,6 @@ class Emitter:
         self.strings: List[bytes] = []
         self.location_counter = 0
         self.errors = []
-        self.item_resolver = item_resolver or {}
-        self.food_resolver = food_resolver or {}
-        self.tool_resolver = tool_resolver or {}
-        self.char_resolver = char_resolver or {}
-        self.candidate_resolver = candidate_resolver or {}
-        self.portrait_resolver = portrait_resolver or {}
-        self.map_resolver = map_resolver or {}
-        self.emote_resolver = emote_resolver or {}
-        self.anim_resolver = anim_resolver or {}
         self.break_targets: List[JumpId] = []
         
     def new_label(self) -> JumpId:
@@ -91,9 +82,6 @@ class Emitter:
         self.instructions.append(ins)
         
     def emit_str_id(self, string: bytes) -> IntValue:
-        # IMPORTANTE: No podemos de-duplicar strings. 
-        # En la traducción de ROMs, cada caja de texto necesita su propia entrada
-        # independiente, incluso si el texto es idéntico, para permitir traducciones contextuales.
         self.strings.append(string)
         return len(self.strings) - 1
 
@@ -106,7 +94,6 @@ class Emitter:
 
     def expr(self, scope: BlockScope, expr: Expr):
         if isinstance(expr, ExprName):
-            # SOPORTE DIRECTO PARA MESSAGE_X
             if expr.name.startswith("MESSAGE_"):
                 try:
                     idx_str = expr.name.replace("MESSAGE_", "")
@@ -122,7 +109,6 @@ class Emitter:
         elif isinstance(expr, ExprInt):
             self.emit(PushInt(expr.value))
         elif isinstance(expr, ExprStr):
-            # Usar eval_expr para resolver decoraciones (Player, pos_x, etc.)
             resolved = eval_expr(expr, scope, self)
             if isinstance(resolved, ConstValInt):
                 self.emit(PushInt(resolved.value))
@@ -169,12 +155,14 @@ class Emitter:
                 self.errors.append(f"Not callable: {expr.invoke.func}")
                 
     def _emit_invoke_args(self, scope: BlockScope, invoke: Invoke):
-        """Helper para emitir argumentos, manejando resolución de nombres de ítems y personajes."""
-        is_give_item = (invoke.func == "Give_Item")
+        is_give_item = invoke.func in ("Give_Item", "Get_Item_Sprite_ID", "Add_Item_To_Rucksack_Raw")
         is_give_food = (invoke.func == "Give_Food")
-        is_give_tool = invoke.func in ("Give_Tool", "Give_Tool_TBox", "Give_Tool_Inventory")
+        is_give_tool = invoke.func in (
+            "Give_Tool", "Give_Tool_TBox", "Give_Tool_In_ToolBox", 
+            "Give_Tool_In_Inventory", "Animation_Tool_Give", 
+            "Anmation_Tool_Give", "Take_Tool"
+        )
         
-        # SINCRONIZADO con decorator.py CharacterDecorateVisitor.char_funcs
         char_funcs = (
             "Set_Name_Window", "Give_Friendship_Points", "Free_Event_Entity",
             "Set_Entity_Position", "Get_Entity_X", "Get_Entity_Y",
@@ -183,15 +171,14 @@ class Emitter:
             "Is_NPC_Birthday", "Chek_Friendship_Points", "Has_NPC_Talked_Today",
             "Has_NPC_Talked_Today_2", "Kill_NPC", "Execute_Movement", "SetEntityAnim",
             "Hide_Entity", "GetEntityLocation", "Wait_For_Animation",
-            "Set_Vector_X", "Set_Vector_Y", "Has_Met_NPC", "Has_Spoken_To_NPC_Today",
-            "Routine_State_Override"
+            "Set_Vector_X", "Set_Vector_Y", "Has_Met_NPC", "Has_Spoken_To_NPC_Today"
         )
         is_char_func = invoke.func in char_funcs
+        is_routine_override = (invoke.func == "Routine_State_Override")
         
         is_candidate_func = invoke.func in ("Set_Hearth_Anim", "Give_Love_Points", "Chek_Love_Points")
         is_portrait_func = (invoke.func == "Set_Portrait")
         is_map_func = invoke.func in ("Warp_Player", "Warp_Entity_To_Map")
-        is_routine_override = (invoke.func == "Routine_State_Override")
         
         for i, arg in enumerate(invoke.args):
             if isinstance(arg, ExprStr):
@@ -202,44 +189,37 @@ class Emitter:
                     if is_give_item:
                         if name in self.item_resolver:
                             self.emit(PushInt(self.item_resolver[name])); resolved = True
-                    
                     elif is_give_food:
                         if name in self.food_resolver:
                             self.emit(PushInt(self.food_resolver[name])); resolved = True
-                    
                     elif is_give_tool:
                         if name in self.tool_resolver:
                             self.emit(PushInt(self.tool_resolver[name])); resolved = True
                         elif name in self.item_resolver:
                             self.emit(PushInt(self.item_resolver[name])); resolved = True
-                    
                     elif is_candidate_func:
                         if name in self.candidate_resolver:
                             self.emit(PushInt(self.candidate_resolver[name])); resolved = True
-                    
+                        elif name in self.char_resolver:
+                            self.emit(PushInt(self.char_resolver[name])); resolved = True
                     elif is_portrait_func:
                         if name in self.portrait_resolver:
                             self.emit(PushInt(self.portrait_resolver[name])); resolved = True
-                    
                     elif is_char_func:
-                        # Player → 0 (hardcoded en decorator.py)
                         if name == "Player":
                             self.emit(PushInt(0)); resolved = True
                         elif name in self.char_resolver:
                             self.emit(PushInt(self.char_resolver[name])); resolved = True
-                    
                     elif is_map_func:
-                        # Warp_Player(MAP, X, Y) -> i=0 es MAPA
-                        # Warp_Entity_To_Map(ENTITY, MAP, X, Y) -> i=0 es ENTIDAD
                         if invoke.func == "Warp_Player":
                             if name in self.map_resolver:
                                 self.emit(PushInt(self.map_resolver[name])); resolved = True
-                        else: # Warp_Entity_To_Map
+                        else: # Warp_Entity_To_Map (Arg 0 is entity)
                             if name == "Player":
                                 self.emit(PushInt(0)); resolved = True
                             elif name in self.char_resolver:
                                 self.emit(PushInt(self.char_resolver[name])); resolved = True
-                
+
                 elif i == 1:
                     if invoke.func == "Show_Emote":
                         if name in self.emote_resolver:
@@ -251,34 +231,43 @@ class Emitter:
                         if name in self.map_resolver:
                             self.emit(PushInt(self.map_resolver[name])); resolved = True
                 
-                # Segundo argumento de Routine_State_Override: "Script_XXXX" → int
-                if not resolved and i == 1 and is_routine_override:
-                    if name.startswith("Script_"):
-                        try:
-                            self.emit(PushInt(int(name.replace("Script_", "")))); resolved = True
-                        except: pass
+                # --- RESOLUCIÓN DE RUTINAS (Nombre_Routine -> ID) ---
+                # Routine_State_Override(NPC_Target, Routine_Source)
+                # arg1 puede ser "Nombre_Routine" → resolver al ID del NPC
+                if not resolved and name.endswith("_Routine") and invoke.func == "Routine_State_Override" and i == 1:
+                    raw_name = name.replace("_Routine", "")
+                    if raw_name in self.char_resolver:
+                        self.emit(PushInt(self.char_resolver[raw_name])); resolved = True
+
                 
-                if resolved:
-                    continue
+                facing_names = {"Down": 0, "Up": 1, "Left": 2, "Right": 3}
+                if not resolved and name in facing_names:
+                    target_idx = -1
+                    if invoke.func in ("SetEntityFacing", "Set_Entity_Facing", "Set_Entit_y_Facing"):
+                        target_idx = 1
+                    elif invoke.func in ("SetEntityPosition", "Set_Entity_Position"):
+                        target_idx = 3
+                    if i == target_idx:
+                        self.emit(PushInt(facing_names[name])); resolved = True
+                
+                if not resolved and (name.startswith("Pos_X:") or name.startswith("Pos_Y:")):
+                    try:
+                        num_str = name.split(":", 1)[1].strip()
+                        self.emit(PushInt(int(num_str, 16 if "0x" in num_str else 10))); resolved = True
+                    except: pass
+                
+                if resolved: continue
             
             self.expr(scope, arg)
                 
     def expr_cmp(self, scope, lhs, rhs, branch_cls):
         lbl_true = self.new_label()
         lbl_next = self.new_label()
-        self.expr(scope, lhs)
-        self.expr(scope, rhs)
-        self.emit(Cmp())
-        self.emit(branch_cls(lbl_true))
-        self.emit(PushInt(0))
-        self.emit(Jmp(lbl_next))
-        self.emit(Label(lbl_true))
-        self.emit(PushInt(1))
-        self.emit(Label(lbl_next))
+        self.expr(scope, lhs); self.expr(scope, rhs); self.emit(Cmp()); self.emit(branch_cls(lbl_true))
+        self.emit(PushInt(0)); self.emit(Jmp(lbl_next)); self.emit(Label(lbl_true)); self.emit(PushInt(1)); self.emit(Label(lbl_next))
         
     def assign(self, scope, var_id, expr, op):
-        self.emit(PushInt(var_id.id))
-        self.expr(scope, expr)
+        self.emit(PushInt(var_id.id)); self.expr(scope, expr)
         if op == AssignOperation.NONE: self.emit(Assign())
         elif op == AssignOperation.ADD: self.emit(AssignAdd())
         elif op == AssignOperation.SUB: self.emit(AssignSub())
@@ -293,166 +282,69 @@ class Emitter:
             if isinstance(s, StmtVars):
                 for name, exp in s.vars:
                     vid = scope.define_var(name)
-                    if exp:
-                        self.assign(scope, vid, exp, AssignOperation.NONE)
-            
+                    if exp: self.assign(scope, vid, exp, AssignOperation.NONE)
             elif isinstance(s, StmtMessage):
-                # Asegurar espacio en el pool para el índice específico
-                while len(self.strings) <= s.index:
-                    self.strings.append(b"")
+                while len(self.strings) <= s.index: self.strings.append(b"")
                 self.strings[s.index] = s.text
-                        
             elif isinstance(s, StmtConsts):
                 for name, exp in s.consts:
                     val = eval_expr(exp, scope)
                     if val is not None:
                         scope.define_const(name, val)
                         if isinstance(val, ConstValStr):
-                            # Si el nombre es MESSAGE_X, usamos el índice X
                             if name.startswith("MESSAGE_"):
-                                idx_str = name.replace("MESSAGE_", "")
                                 try:
-                                    idx = int(idx_str, 16 if idx_str.startswith("0x") else 10)
-                                    while len(self.strings) <= idx:
-                                        self.strings.append(b"")
+                                    idx = int(name.replace("MESSAGE_", ""), 16 if "0x" in name else 10)
+                                    while len(self.strings) <= idx: self.strings.append(b"")
                                     self.strings[idx] = val.value
-                                except:
-                                    self.emit_str_id(val.value)
-                            else:
-                                self.emit_str_id(val.value)
-                        
+                                except: self.emit_str_id(val.value)
+                            else: self.emit_str_id(val.value)
             elif isinstance(s, StmtAssign):
                 ref = scope.lookup_name(s.name)
                 self.assign(scope, ref.var_id, s.expr, s.op)
-                
             elif isinstance(s, StmtExpr):
-                self.expr(scope, s.expr)
-                self.emit(Discard())
-                
+                self.expr(scope, s.expr); self.emit(Discard())
             elif isinstance(s, StmtCall):
                 ref = scope.lookup_name(s.invoke.func)
                 if ref:
                     self._emit_invoke_args(scope, s.invoke)
-                    if isinstance(ref, NameRefFunc):
-                        self.emit(Call(ref.call_id))
-                        self.emit(Discard()) # Functions leave a value on stack, Procs do not
-                    elif isinstance(ref, NameRefProc):
-                        self.emit(Call(ref.call_id))
-                    else:
-                        self.errors.append(f"Symbol '{s.invoke.func}' is not a callable function or procedure.")
-                else:
-                    self.errors.append(f"Undefined function/procedure: {s.invoke.func}")
-                    
+                    self.emit(Call(ref.call_id))
+                    if isinstance(ref, NameRefFunc): self.emit(Discard())
+                else: self.errors.append(f"Undefined function/procedure: {s.invoke.func}")
             elif isinstance(s, StmtIf):
-                nxt = self.new_label()
-                self.expr(scope, s.condition)
-                self.emit(Beq(nxt))
-                self.stmts(scope, s.stmts)
-                self.emit(Label(nxt))
-                
+                nxt = self.new_label(); self.expr(scope, s.condition); self.emit(Beq(nxt)); self.stmts(scope, s.stmts); self.emit(Label(nxt))
             elif isinstance(s, StmtIfElse):
-                else_lbl = self.new_label()
-                nxt_lbl = self.new_label()
-                self.expr(scope, s.condition)
-                self.emit(Beq(else_lbl))
-                self.stmts(scope, s.true_stmts)
-                self.emit(Jmp(nxt_lbl))
-                self.emit(Label(else_lbl))
-                self.stmts(scope, s.false_stmts)
-                self.emit(Label(nxt_lbl))
-                
+                else_lbl, nxt_lbl = self.new_label(), self.new_label()
+                self.expr(scope, s.condition); self.emit(Beq(else_lbl)); self.stmts(scope, s.true_stmts); self.emit(Jmp(nxt_lbl)); self.emit(Label(else_lbl)); self.stmts(scope, s.false_stmts); self.emit(Label(nxt_lbl))
             elif isinstance(s, StmtFor):
                 for_scope = BlockScope(parent=scope, var_frame=scope.next_id())
                 loop_lbl, tail_lbl, body_lbl, nxt_lbl = [self.new_label() for _ in range(4)]
-                
-                self.stmts(for_scope, [s.head])
-                self.emit(Label(loop_lbl))
-                self.expr(for_scope, s.condition)
-                self.emit(Bne(body_lbl))
-                self.emit(Jmp(nxt_lbl))
-                self.emit(Label(tail_lbl))
-                self.stmts(for_scope, [s.tail])
-                self.emit(Jmp(loop_lbl))
-                self.emit(Label(body_lbl))
-                self.break_targets.append(nxt_lbl)
-                self.stmts(for_scope, s.body)
-                self.break_targets.pop()
-                self.emit(Jmp(tail_lbl))
-                self.emit(Label(nxt_lbl))
-                
+                self.stmts(for_scope, [s.head]); self.emit(Label(loop_lbl)); self.expr(for_scope, s.condition); self.emit(Bne(body_lbl)); self.emit(Jmp(nxt_lbl)); self.emit(Label(tail_lbl)); self.stmts(for_scope, [s.tail]); self.emit(Jmp(loop_lbl)); self.emit(Label(body_lbl)); self.break_targets.append(nxt_lbl); self.stmts(for_scope, s.body); self.break_targets.pop(); self.emit(Jmp(tail_lbl)); self.emit(Label(nxt_lbl))
             elif isinstance(s, StmtDoWhile):
-                loop_lbl = self.new_label()
-                nxt_lbl = self.new_label()
-                self.emit(Label(loop_lbl))
-                self.break_targets.append(nxt_lbl)
-                self.stmts(scope, s.body)
-                self.break_targets.pop()
-                self.expr(scope, s.condition)
-                self.emit(Bne(loop_lbl))
-                self.emit(Label(nxt_lbl))
-                
+                loop_lbl, nxt_lbl = self.new_label(), self.new_label(); self.emit(Label(loop_lbl)); self.break_targets.append(nxt_lbl); self.stmts(scope, s.body); self.break_targets.pop(); self.expr(scope, s.condition); self.emit(Bne(loop_lbl)); self.emit(Label(nxt_lbl))
             elif isinstance(s, StmtSwitch):
-                switch_lbl = self.new_label()
-                nxt_lbl = self.new_label()
-                self.break_targets.append(nxt_lbl)
-                self.expr(scope, s.condition)
-                self.emit(Jmp(switch_lbl))
-                
+                switch_logic_lbl, nxt_lbl = self.new_label(), self.new_label()
+                self.break_targets.append(nxt_lbl); self.expr(scope, s.condition); self.emit(Jmp(switch_logic_lbl))
                 for switch_case in s.cases:
+                    case_body_lbl = self.new_label(); self.emit(Label(case_body_lbl))
                     if isinstance(switch_case, SwitchCaseCase):
                         for c_exp in switch_case.exprs:
                             val = eval_expr(c_exp, scope, self)
-                            if isinstance(val, ConstValInt):
-                                self.emit(Case(s.switch_id, CaseVal(val.value)))
-                            else:
-                                self.errors.append(f"Switch case value must be a constant integer or a resolvable name (Char/Item). Got: {val}")
-                                
+                            if isinstance(val, ConstValInt): self.emit(Case(s.switch_id, CaseVal(val.value)))
                         self.stmts(scope, switch_case.stmts)
-                        # omit jump if exit was issued
-                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], StmtExit) and not isinstance(switch_case.stmts[-1], StmtBreak):
-                            self.emit(Jmp(nxt_lbl))
+                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], (StmtExit, StmtBreak)): self.emit(Jmp(nxt_lbl))
                     elif isinstance(switch_case, SwitchCaseDefault):
-                        self.emit(Case(s.switch_id, CaseDefault()))
-                        self.stmts(scope, switch_case.stmts)
-                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], StmtExit) and not isinstance(switch_case.stmts[-1], StmtBreak):
-                            self.emit(Jmp(nxt_lbl))
-                            
-                self.break_targets.pop()
-                            
-                self.emit(Jmp(nxt_lbl)) # dead code pad
-                self.emit(Label(switch_lbl))
-                self.emit(Switch(s.switch_id))
-                self.emit(Label(nxt_lbl))
-                
-            elif isinstance(s, StmtExit):
-                self.emit(Exit())
-                
-            elif isinstance(s, StmtBreak):
-                if not self.break_targets:
-                    self.errors.append("Break statement outside of loop/switch")
-                else:
-                    self.emit(Jmp(self.break_targets[-1]))
-                
-            elif isinstance(s, StmtEmpty):
-                pass
+                        self.emit(Case(s.switch_id, CaseDefault())); self.stmts(scope, switch_case.stmts)
+                        if not switch_case.stmts or not isinstance(switch_case.stmts[-1], (StmtExit, StmtBreak)): self.emit(Jmp(nxt_lbl))
+                self.emit(Label(switch_logic_lbl)); self.emit(Switch(s.switch_id)); self.emit(Label(nxt_lbl)); self.break_targets.pop()
+            elif isinstance(s, StmtExit): self.emit(Exit())
+            elif isinstance(s, StmtBreak): self.emit(Jmp(self.break_targets[-1]))
                 
     def end(self) -> Script:
-        if self.errors:
-            raise CompileError("\n".join(self.errors))
+        if self.errors: raise CompileError("\n".join(self.errors))
         return Script(self.instructions, self.strings)
 
-def compile_script(stmts: List[Stmt], const_scope: ConstScope, 
-                   item_resolver: Dict[str, int] = None, 
-                   food_resolver: Dict[str, int] = None,
-                   tool_resolver: Dict[str, int] = None,
-                   char_resolver: Dict[str, int] = None, 
-                   candidate_resolver: Dict[str, int] = None,
-                   portrait_resolver: Dict[str, int] = None,
-                   map_resolver: Dict[str, int] = None,
-                   emote_resolver: Dict[str, int] = None,
-                   anim_resolver: Dict[str, int] = None,
-                   flag_resolver: Dict[str, int] = None) -> Script:
-    # We allocate switch ids
+def compile_script(stmts: List[Stmt], const_scope: ConstScope, **resolvers) -> Script:
     sid_alloc = 0
     def alloc_switches(stmt_list):
         nonlocal sid_alloc
@@ -462,82 +354,29 @@ def compile_script(stmts: List[Stmt], const_scope: ConstScope,
             elif isinstance(s, StmtFor): alloc_switches(s.body)
             elif isinstance(s, StmtDoWhile): alloc_switches(s.body)
             elif isinstance(s, StmtSwitch):
-                s.switch_id = SwitchId(sid_alloc)
-                sid_alloc += 1
-                for sc in s.cases:
-                    alloc_switches(sc.stmts)
-                    
+                s.switch_id = SwitchId(sid_alloc); sid_alloc += 1
+                for sc in s.cases: alloc_switches(sc.stmts)
     alloc_switches(stmts)
-    emitter = Emitter(item_resolver, food_resolver, tool_resolver, char_resolver, candidate_resolver, portrait_resolver, map_resolver, emote_resolver, anim_resolver, flag_resolver)
+    emitter = Emitter(**resolvers)
     emitter.stmts(const_scope, stmts)
     return emitter.end()
 
 def eval_expr(expr: Expr, scope: ConstScope, emitter: Emitter = None) -> Optional[ConstVal]:
-    if isinstance(expr, ExprInt):
-        return ConstValInt(expr.value)
+    if isinstance(expr, ExprInt): return ConstValInt(expr.value)
     if isinstance(expr, ExprStr):
         name = expr.value.decode('windows-1252', errors='ignore').strip()
-        
-        # Resolución PRIORITARIA de nombres especiales para evitar inflado de STR chunk
         if name == "Player": return ConstValInt(0)
-        
         if emitter:
-            if name in emitter.char_resolver: return ConstValInt(emitter.char_resolver[name])
-            if name in emitter.item_resolver: return ConstValInt(emitter.item_resolver[name])
-            if name in emitter.food_resolver: return ConstValInt(emitter.food_resolver[name])
-            if name in emitter.tool_resolver: return ConstValInt(emitter.tool_resolver[name])
-            if name in emitter.candidate_resolver: return ConstValInt(emitter.candidate_resolver[name])
-            if name in emitter.portrait_resolver: return ConstValInt(emitter.portrait_resolver[name])
-            if name in emitter.map_resolver: return ConstValInt(emitter.map_resolver[name])
-            if name in emitter.emote_resolver: return ConstValInt(emitter.emote_resolver[name])
-            if name in emitter.anim_resolver: return ConstValInt(emitter.anim_resolver[name])
-            if name in emitter.flag_resolver: return ConstValInt(emitter.flag_resolver[name])
-            
+            for r in [emitter.char_resolver, emitter.item_resolver, emitter.food_resolver, emitter.tool_resolver, emitter.candidate_resolver, emitter.portrait_resolver, emitter.map_resolver, emitter.emote_resolver, emitter.anim_resolver, emitter.flag_resolver]:
+                if name in r: return ConstValInt(r[name])
         if name.startswith("Script_"):
             try: return ConstValInt(int(name.replace("Script_", "")))
             except: pass
-            
-        if name.startswith("Delay_Sec_"):
-            try: return ConstValInt(int(name.replace("Delay_Sec_", "")))
-            except: pass
-            
-        if name.startswith("Delay_Frames_"):
-            try: return ConstValInt(int(name.replace("Delay_Frames_", "")))
-            except: pass
-            
-        if name.endswith(" Frames"):
-            try: return ConstValInt(int(name.replace(" Frames", "")))
-            except: pass
-            
-        if "(" in name and name.endswith(")"):
+        if name.startswith("Pos_X:") or name.startswith("Pos_Y:"):
             try:
-                num_str = name.split("(")[-1].replace(")", "").strip()
-                if num_str.startswith("0x") or num_str.startswith("-0x"):
-                    return ConstValInt(int(num_str, 16))
-                return ConstValInt(int(num_str))
+                num_str = name.split(":", 1)[1].strip()
+                return ConstValInt(int(num_str, 16 if "0x" in num_str else 10))
             except: pass
-            
-        # Fallback de decoradores del de-compilador para entidades no mapeadas
-        prefixes = ["Char_", "Item_", "Food_", "Tool_", "Candidate_", "Portrait_", "Map_", "Emote_", "Anim_", "Flag_"]
-        for p in prefixes:
-            if name.startswith(p):
-                try:
-                    num_str = name.replace(p, "")
-                    if num_str.startswith("0x") or num_str.startswith("-0x"):
-                        return ConstValInt(int(num_str, 16))
-                    return ConstValInt(int(num_str))
-                except: pass
-        
-        # Resolución de coordenadas decoradas (pos_x305 -> 305)
-        if name.startswith("pos_x") or name.startswith("pos_y"):
-            try:
-                num_str = name.replace("pos_x", "").replace("pos_y", "")
-                if num_str.startswith("0x") or num_str.startswith("-0x"):
-                    return ConstValInt(int(num_str, 16))
-                return ConstValInt(int(num_str))
-            except: pass
-            
         return ConstValStr(expr.value)
-    if isinstance(expr, ExprName):
-        return scope.lookup_const(expr.name)
+    if isinstance(expr, ExprName): return scope.lookup_const(expr.name)
     return None

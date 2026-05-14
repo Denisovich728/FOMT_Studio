@@ -1,10 +1,37 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Versión 3.3.4 "Estabilización y Paridad de Bytecode"
+## Versión 3.4.4 "Soberanía del Scripting"
+**Fecha:** 2026-05-14
+**Estado:** Lanzamiento Crítico / Estabilidad Total
+
+### Mejoras en el Motor SlipSpace (v3.4.4)
+- **Optimización de Autocompletado:** Refinamiento del motor Intellisense con soporte contextual para nuevos opcodes y una lógica de filtrado más precisa.
+- **Soporte de Decorado Extendido:** Inclusión de más opcodes en el sistema de decoración, permitiendo una lectura más humana de los scripts complejos.
+- **Corrección de Control de Flujo:** Se solucionó un error importante en la re-estructuración de bucles `switch-case` que causaba saltos infinitos en scripts de eventos condicionales.
+- **Estabilización de Reinyección In-Place:** Se corrigió un error crítico en el `MemoryManager` que podía corromper el final del script al sobrescribir datos en el espacio original.
+- **Corrección de Alineación de Ítems:** Solucionado el bug de desalineamiento en la lista de ítems del autocompletado que desplazaba los IDs reales.
+
+### Interfaz y Depuración
+- **Nuevo Panel de Debugger:** Se añadió un sistema de control de depuración accesible mediante `Control + Shift + L`.
+    - Permite activar/desactivar decorados dinámicamente (Coordenadas, IDs, Flags, etc.) para facilitar la ingeniería inversa.
+    - Menú flotante con persistencia de estado entre sesiones.
+
+
+## Versión 3.4.4 "Sincronización de Datos Cilixes"
+**Fecha:** 2026-05-12
+**Estado:** Lanzamiento Estable
+
+### Mejoras de Distribución y CSV
+- **Sincronización Global de CSV:** Se forzó la actualización de todos los recursos de la suite Cilixes en la compilación, asegurando que los cambios en flags, animaciones y punteros se reflejen correctamente en la versión final.
+- **Corrección de Dependencias (EXE):** Optimización del proceso de empaquetado para resolver conflictos de carga de DLLs (`LoadLibrary`) en entornos Windows. Se recomienda una limpieza total de carpetas temporales antes de cada compilación.
+- **Estabilidad de Punteros:** Refinamiento en la carga de `Fomt_Lib.csv` y `MFomt_Lib.csv` para evitar colisiones de identificadores durante el autocompletado.
+
+
+## Versión 3.4.4 "Estabilización y Paridad de Bytecode"
 **Fecha:** 2026-05-11
 **Estado:** Lanzamiento Estable
 
-### Estabilización del Motor SlipSpace (v3.3.4)
+### Estabilización del Motor SlipSpace (v3.4.4)
 - **Corrección de Inflación de Bytecode:** Se optimizó la codificación de instrucciones `PUSH` para números negativos. Ahora los valores pequeños se emiten como `PUSH8` o `PUSH16` en lugar de forzar siempre `PUSH32`, restaurando la paridad 1:1 en ediciones In-Place.
 - **Inyección Inteligente 1:1:** Se eliminó el padding forzado de 4 bytes en el MemoryManager que causaba repunteos innecesarios al final de la ROM cuando el script conservaba su tamaño original.
 - **Sincronización de Tabla de Punteros:** Se corrigió un error de desfase (off-by-one) en el cálculo de la Master Table de eventos, asegurando que los repunteos actualicen la ranura de ID correcta.
