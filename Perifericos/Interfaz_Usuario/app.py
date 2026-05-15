@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.6.5)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -26,6 +26,7 @@ from Perifericos.Interfaz_Usuario.widgets.pointer_editor import MasterPointerEdi
 from Perifericos.Interfaz_Usuario.widgets.npc_editor import NpcEditorWidget
 from Perifericos.Interfaz_Usuario.widgets.menu_editor import MenuEditorWidget
 from Perifericos.Interfaz_Usuario.widgets.map_editor import MapEditorWidget
+from Perifericos.Interfaz_Usuario.widgets.native_proc_viewer import NativeProcViewerWidget
 from Perifericos.Interfaz_Usuario.widgets.item_bulk_editor import ItemBulkEditorWidget
 from Perifericos.Interfaz_Usuario.widgets.tile_viewer import TileViewerWidget
 from Perifericos.Interfaz_Usuario.widgets.intro_text_editor import IntroTextEditorWidget
@@ -110,7 +111,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v3.4.4 - Soberanía de la Ñ")
+        self.setWindowTitle("FoMT Studio v3.6.5 - Soberanía de la Ñ")
         self.setMinimumSize(800, 600)
         self.showMaximized()
         
@@ -554,11 +555,13 @@ class FoMTStudioApp(QMainWindow):
         self.cat_items = QStandardItem(tr("cat_items", self.current_lang))
         self.cat_bulk_items = QStandardItem("Lista Maestra (Nombres/Desc)")
         self.cat_events_item = QStandardItem(tr("cat_events", self.current_lang))
+        # self.cat_native_procs = QStandardItem("Rutinas Nativas (THUMB)")
         self.cat_maps = QStandardItem(tr("cat_maps", self.current_lang))
         root.appendRow(self.cat_npcs)
         root.appendRow(self.cat_items)
         root.appendRow(self.cat_bulk_items)
         root.appendRow(self.cat_events_item)
+        # root.appendRow(self.cat_native_procs)
         root.appendRow(self.cat_maps)
         
         # Aplicar configuraciones de decoración al cargar el proyecto
@@ -661,6 +664,36 @@ class FoMTStudioApp(QMainWindow):
                 self.cat_maps.appendRow(map_item)
                 if i % 20 == 0: QApplication.processEvents()
             self.tree_view.expand(self.cat_events_item.index())
+            
+            # Native Procs (Oculto temporalmente por petición del usuario)
+            # self.cat_native_procs.removeRows(0, self.cat_native_procs.rowCount())
+            # try:
+            #     from Perifericos.Interfaz_Usuario.widgets.native_proc_viewer import NativeProcDecompiler
+            #     import struct
+            #     rom_path = self.project.base_rom_path
+            #     with open(rom_path, 'rb') as f:
+            #         rom_data = f.read()
+            #     cilixes_dir = os.path.join(
+            #         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            #         "Nucleos_de_Procesamiento", "Cilixes", "fomt"
+            #     )
+            #     decomp = NativeProcDecompiler(rom_data, cilixes_dir, self.project)
+            #     proc_list = decomp.get_proc_list()
+            #     native_count = 0
+            #     for cid, name, etype, rom_off, args in proc_list:
+            #         label = "[0x%03X] %s" % (cid, name)
+            #         if args:
+            #             label += "(%s)" % args
+            #         proc_item = QStandardItem(label)
+            #         proc_item.setData("NATIVE_PROC", Qt.ItemDataRole.UserRole + 1)
+            #         proc_item.setData(cid, Qt.ItemDataRole.UserRole)
+            #         self.cat_native_procs.appendRow(proc_item)
+            #         native_count += 1
+            #         if native_count % 50 == 0: QApplication.processEvents()
+            #     self.cat_native_procs.setText("Rutinas Nativas (%d)" % native_count)
+            # except Exception as e:
+            #     pass
+            #     self.cat_native_procs.appendRow(err_item)
 
         elif step == 3:
             # Abrir el Tile Editor Extreme por defecto al cargar gráficos
@@ -728,6 +761,8 @@ class FoMTStudioApp(QMainWindow):
                 self.tabs.setCurrentWidget(editor)
         elif type == "BULK_ITEMS":
             self.open_bulk_items("Herramientas", "Herramienta")
+        elif type == "NATIVE_PROC":
+            self.open_native_proc(val)
 
     def open_bulk_items(self, label, category_filter):
         tab_name = f"Bulk {label}"
@@ -785,6 +820,39 @@ class FoMTStudioApp(QMainWindow):
         ide.editor.setPlainText(code)
         self.tabs.addTab(ide, tab_name)
         self.tabs.setCurrentWidget(ide)
+
+    def open_native_proc(self, call_id):
+        """Abre un pseudo-decompilador de rutina nativa en una pestaña nueva."""
+        name_info = None
+        # Try to get name from existing viewer or lib
+        try:
+            from Perifericos.Interfaz_Usuario.widgets.native_proc_viewer import NativeProcDecompiler
+            cilixes_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                "Nucleos_de_Procesamiento", "Cilixes", "fomt"
+            )
+            import csv as csv_mod
+            lib_path = os.path.join(cilixes_dir, "Fomt_Lib.csv")
+            with open(lib_path, 'r') as f:
+                reader = csv_mod.reader(f)
+                next(reader)
+                for row in reader:
+                    if len(row) >= 4 and int(row[2].strip()) == call_id:
+                        name_info = row[3].strip()
+                        break
+        except:
+            pass
+        
+        tab_name = "Native: %s" % (name_info or "Proc%03X" % call_id)
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tab_name:
+                self.tabs.setCurrentIndex(i)
+                return
+        
+        viewer = NativeProcViewerWidget(self.project, self)
+        viewer.load_proc(call_id)
+        self.tabs.addTab(viewer, tab_name)
+        self.tabs.setCurrentWidget(viewer)
 
     def _open_tile_editor_extreme(self):
         """Lanza el editor de tiles avanzado como un proceso independiente o ventana flotante."""

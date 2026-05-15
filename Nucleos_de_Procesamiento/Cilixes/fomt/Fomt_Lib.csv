@@ -130,7 +130,7 @@ proc,0x08C,140,Open_Shop_Quantity_UI,Shop_Item_ID
 proc,0x08D,141,Reset_NPC_Schedule,npc_id
 proc,0x08E,142,Proc08E,
 proc,0x08F,143,Proc08F,
-proc,0x090,144,Proc090,
+proc,0x090,144,Open_Chicken_Shop_Ui,
 proc,0x091,145,Proc091,
 proc,0x092,146,Proc092,
 proc,0x093,147,Proc093,

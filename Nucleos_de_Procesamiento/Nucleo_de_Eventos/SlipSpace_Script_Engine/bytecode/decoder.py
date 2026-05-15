@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.6.5)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -203,6 +203,9 @@ def disassemble(code_data: bytes, jump_targets: List[JumpInfo], case_map: List[T
         elif opcode == OPCODE_END: result.append(Exit())
         elif opcode == OPCODE_CALL: result.append(Call(CallId(operand)))
         elif opcode == OPCODE_SWITCH: result.append(Switch(SwitchId(operand)))
+        elif opcode == 0xFF:
+            # Padding o final de script en ROM. Detenemos el desensamblado.
+            break
         else:
             raise DecodeError(f"Bad opcode: {opcode:02X}")
             

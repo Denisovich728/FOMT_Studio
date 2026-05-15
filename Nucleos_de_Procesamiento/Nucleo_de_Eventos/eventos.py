@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.6.5)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -352,7 +352,20 @@ class FoMTEventParser:
                 for row in reader:
                     flag_map_inv[row['Flag_name']] = int(row['flag_id'], 16)
 
-        compiled_script = compile_script(script_obj, self._lib_scope, item_map, food_map, tool_map, char_map, candidate_map, self.super_lib.portrait_map, self.super_lib.map_map, emote_map_inv, anim_map_inv, flag_map_inv)
+        compiled_script = compile_script(
+            script_obj, 
+            self._lib_scope, 
+            item_resolver=item_map, 
+            food_resolver=food_map, 
+            tool_resolver=tool_map, 
+            char_resolver=char_map, 
+            candidate_resolver=candidate_map, 
+            portrait_resolver=self.super_lib.portrait_map, 
+            map_resolver=self.super_lib.map_map, 
+            emote_resolver=emote_map_inv, 
+            anim_resolver=anim_map_inv, 
+            flag_resolver=flag_map_inv
+        )
         
         # FIX: target_size debe ser la suma de riff_len + 8 para representar el archivo RIFF completo
         # scanned_sizes ya contiene el valor total si es RIFF, o raw_len si no lo es.

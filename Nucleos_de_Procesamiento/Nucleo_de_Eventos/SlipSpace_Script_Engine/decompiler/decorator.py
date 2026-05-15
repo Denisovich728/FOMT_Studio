@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.4.4)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.6.5)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -324,9 +324,8 @@ class CharacterDecorateVisitor(StringDecorateVisitor):
             # arg1 = NPC cuya rutina se copia (se decora con _Routine si mapea a un NPC conocido)
             if invoke.func == "Routine_State_Override" and len(invoke.args) >= 2:
                 arg = invoke.args[1]
-                if isinstance(arg, ExprInt) and arg.value in self.char_names:
-                    name = self.char_names[arg.value]
-                    val_str = f"{name}_Routine".encode('windows-1252', errors='replace')
+                if isinstance(arg, ExprInt):
+                    val_str = f"Script_{arg.value}".encode('windows-1252', errors='replace')
                     invoke.args[1] = ExprStr(val_str)
 
             

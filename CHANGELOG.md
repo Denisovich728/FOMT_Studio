@@ -1,15 +1,22 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Versión 3.4.4 "Soberanía del Scripting"
-**Fecha:** 2026-05-14
-**Estado:** Lanzamiento Crítico / Estabilidad Total
+## Versión 3.6.5 "Ingeniería de Rutinas Nativas"
+**Fecha:** 2026-05-15
+**Estado:** Lanzamiento Estable / Ingeniería Inversa Avanzada
 
-### Mejoras en el Motor SlipSpace (v3.4.4)
-- **Optimización de Autocompletado:** Refinamiento del motor Intellisense con soporte contextual para nuevos opcodes y una lógica de filtrado más precisa.
-- **Soporte de Decorado Extendido:** Inclusión de más opcodes en el sistema de decoración, permitiendo una lectura más humana de los scripts complejos.
-- **Corrección de Control de Flujo:** Se solucionó un error importante en la re-estructuración de bucles `switch-case` que causaba saltos infinitos en scripts de eventos condicionales.
-- **Estabilización de Reinyección In-Place:** Se corrigió un error crítico en el `MemoryManager` que podía corromper el final del script al sobrescribir datos en el espacio original.
-- **Corrección de Alineación de Ítems:** Solucionado el bug de desalineamiento en la lista de ítems del autocompletado que desplazaba los IDs reales.
+### Decompilador de Patrones Nativos (v3.6.5)
+- **Motor de Análisis THUMB:** Implementación de un nuevo visor de rutinas nativas con detección semántica de patrones.
+- **Detección de Diálogos y Objetos:**
+    - Integración con el charset de FoMT (soporte de `0x05 \BRK` y tildes).
+    - Detección automática de ítems, herramientas y consumibles desde la base de datos del proyecto.
+    - Resolución de retratos (`Lilia_Happy`, `Rick_Afraid`, etc.) en comparaciones lógicas.
+- **Mapeo de Funciones del Engine:** Identificación de llamadas internas como `Register_Shipment`, `Init_Shop_UI`, `Play_SE` y transacciones de dinero.
+- **Corrección en `Routine_State_Override`:** Se ajustó la decoración del segundo argumento para usar el formato `Script_ID`, permitiendo una referencia clara a los eventos de diálogo.
+
+### Mejoras en SlipSpace Engine (v3.6.5)
+- **Robustez del Desensamblador:** Se corrigió el error `Bad opcode: FF` permitiendo que el motor ignore el padding de la ROM al final de los scripts.
+- **Resolución de Compilación:** Corrección crítica en la llamada a `compile_script` que impedía la resolución de nombres decorados (Items/NPCs) a IDs binarios.
+
 
 ### Interfaz y Depuración
 - **Nuevo Panel de Debugger:** Se añadió un sistema de control de depuración accesible mediante `Control + Shift + L`.

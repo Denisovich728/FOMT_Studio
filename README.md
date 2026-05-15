@@ -7,9 +7,15 @@
 FOMT Studio es un entorno de desarrollo de bajo nivel diseñado para la investigación, desensamblado y modificación (ROM Hacking) del ecosistema "Harvest Moon: Friends of Mineral Town" (GBA).
 
 ------------------------------------------------------------
-ESTADO ACTUAL DEL PROYECTO (v3.4.4 - Actualización La Imposibilidad)
+ESTADO ACTUAL DEL PROYECTO (v3.6.5 - Ingeniería de Rutinas Nativas)
 ------------------------------------------------------------
-La herramienta ha sido sometida a una refactorización integral de su base de código, profesionalizando la documentación y eliminando redundancias:
+La herramienta ha evolucionado hacia la ingeniería inversa de bajo nivel, permitiendo auditar el código nativo del motor:
+
+1. DECOMPILADOR NATIVO (NUEVO v3.6.5):
+   - Análisis semántico de rutinas THUMB (GBA ARM).
+   - Detección de portraits, flags e ítems en código no-bytecode.
+   - Resolución de funciones del kernel y del kernel gráfico del juego.
+
 
 1. ARQUITECTURA CILIXES (NUEVA):
    - Migración total a un sistema de datos modular y escalable.
