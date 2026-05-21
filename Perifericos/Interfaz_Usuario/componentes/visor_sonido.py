@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.6.5)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.7.0)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -323,11 +323,32 @@ class SappyAudioViewer(QWidget):
 
     def load_sound_names(self):
         import json
+        import csv
+        import os
+        names = {}
+        # Cargar nombres desde el nuevo CSV (prioridad)
+        csv_path = "Nucleos_de_Procesamiento/Listas_de_Nombres/canciones_offsets.csv"
+        if os.path.exists(csv_path):
+            try:
+                with open(csv_path, 'r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        names[str(row['ID'])] = row['Name']
+            except Exception as e:
+                print(f"Error leyendo CSV de canciones: {e}")
+                
+        # Cargar fallback (json viejo)
         path = "Nucleos_de_Procesamiento/Listas_de_Nombres/sonidos.json"
         if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {}
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    json_names = json.load(f)
+                    for k, v in json_names.items():
+                        if k not in names:
+                            names[k] = v
+            except:
+                pass
+        return names
 
     def init_ui(self):
         layout = QVBoxLayout(self)
@@ -423,6 +444,7 @@ class SappyAudioViewer(QWidget):
         self.btn_play = QPushButton("▶ PLAY")
         self.btn_stop = QPushButton("■ STOP")
         self.btn_export = QPushButton("💾 EXPORT MIDI/SF2")
+        self.btn_import = QPushButton("📤 IMPORT MIDI")
         self.btn_play.setStyleSheet("""
             QPushButton {
                 background: #00FF96; color: black; font-weight: bold;
@@ -445,9 +467,17 @@ class SappyAudioViewer(QWidget):
             }
             QPushButton:hover { background: #33CCFF; }
         """)
+        self.btn_import.setStyleSheet("""
+            QPushButton {
+                background: #FFD700; color: black; font-weight: bold;
+                padding: 10px 20px; border-radius: 4px; font-size: 12px;
+            }
+            QPushButton:hover { background: #FFE033; }
+        """)
         ctrl_layout.addWidget(self.btn_play)
         ctrl_layout.addWidget(self.btn_stop)
         ctrl_layout.addWidget(self.btn_export)
+        ctrl_layout.addWidget(self.btn_import)
 
         # Speed control
         speed_layout = QHBoxLayout()
@@ -502,6 +532,7 @@ class SappyAudioViewer(QWidget):
         self.btn_play.clicked.connect(self.on_play)
         self.btn_stop.clicked.connect(self.on_stop)
         self.btn_export.clicked.connect(self.on_export_data)
+        self.btn_import.clicked.connect(self.on_import_data)
         self.song_list.currentRowChanged.connect(self.on_song_selected)
         self.speed_combo.currentIndexChanged.connect(self._update_timer_speed)
 
@@ -703,21 +734,82 @@ class SappyAudioViewer(QWidget):
         
     def on_export_data(self):
         from PyQt6.QtWidgets import QFileDialog, QMessageBox
+        import subprocess
+        
+        song = self._get_selected_song()
+        if not song:
+            QMessageBox.warning(self, "Export", "Please select a song to export.")
+            return
+
         out_dir = QFileDialog.getExistingDirectory(self, "Select Export Directory")
         if not out_dir: return
         
         try:
             self.btn_export.setText("EXPORTING (PLEASE WAIT)...")
             self.btn_export.setEnabled(False)
+            
             import threading
             def bg_task():
-                count = self.project.sappy_engine.export_all_via_ripper(out_dir)
-                print(f"Exported successfully to {out_dir}")
-                # Reset button
-                self.btn_export.setText("💾 EXPORT MIDI/SF2")
-                self.btn_export.setEnabled(True)
+                try:
+                    ripper_dir = self.project.sappy_engine.get_resource_path("gba-mus-ripper")
+                    song_ripper = os.path.join(ripper_dir, "song_ripper.exe")
+                    sf2_ripper = os.path.join(ripper_dir, "sound_font_ripper.exe")
+                    rom_path = self.project.base_rom_path
+                    
+                    s_addr = hex(song['offset'])
+                    vg_addr = hex(song['voicegroup_ptr'])
+                    
+                    s_id = song['id']
+                    mid_file = os.path.join(out_dir, f"song_{s_id:03d}.mid")
+                    sf2_file = os.path.join(out_dir, f"song_{s_id:03d}.sf2")
+                    
+                    subprocess.run([song_ripper, rom_path, mid_file, s_addr], cwd=ripper_dir, capture_output=True)
+                    subprocess.run([sf2_ripper, rom_path, sf2_file, vg_addr], cwd=ripper_dir, capture_output=True)
+                    
+                    print(f"Exported song {s_id} successfully to {out_dir}")
+                except Exception as e:
+                    print(f"Export task error: {e}")
+                finally:
+                    # Reset button
+                    self.btn_export.setText("💾 EXPORT MIDI/SF2")
+                    self.btn_export.setEnabled(True)
+                    
             threading.Thread(target=bg_task).start()
         except Exception as e:
             print(f"Export Error: {e}")
             self.btn_export.setText("💾 EXPORT MIDI/SF2")
             self.btn_export.setEnabled(True)
+
+    def on_import_data(self):
+        from PyQt6.QtWidgets import QFileDialog, QMessageBox
+        from Nucleos_de_Procesamiento.Nucleo_de_Sonido.midi_compiler import MidiToSappyCompiler
+        
+        song = self._get_selected_song()
+        if not song:
+            QMessageBox.warning(self, "Import", "Please select a song slot to overwrite.")
+            return
+
+        midi_path, _ = QFileDialog.getOpenFileName(self, "Select MIDI to Import", "", "MIDI Files (*.mid)")
+        if not midi_path: return
+        
+        try:
+            self.btn_import.setText("IMPORTING...")
+            self.btn_import.setEnabled(False)
+            
+            compiler = MidiToSappyCompiler(self.project)
+            success, msg = compiler.inject_midi(midi_path, song['id'])
+            
+            if success:
+                QMessageBox.information(self, "Success", f"MIDI Injected successfully!\n{msg}")
+                # Refresh ROM data and songs
+                self.project.sappy_engine.scan_songs()
+                self.populate_songs()
+            else:
+                QMessageBox.warning(self, "Failed", f"Failed to inject MIDI:\n{msg}")
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Error during import:\n{e}")
+        finally:
+            self.btn_import.setText("📤 IMPORT MIDI")
+            self.btn_import.setEnabled(True)
+

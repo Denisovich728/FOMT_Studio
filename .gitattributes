@@ -1,0 +1,5 @@
+* text=auto
+*.exe binary
+*.dll binary
+*.sf2 binary
+*.mid binary

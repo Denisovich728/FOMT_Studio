@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='FoMT_Studio_v3.6.5',
+    name='FoMT_Studio_v3.7.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

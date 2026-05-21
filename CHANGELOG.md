@@ -1,10 +1,16 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Versión 3.6.5 "Ingeniería de Rutinas Nativas"
+## Versión 3.7.0 "Ingeniería de Rutinas Nativas"
 **Fecha:** 2026-05-15
 **Estado:** Lanzamiento Estable / Ingeniería Inversa Avanzada
 
-### Decompilador de Patrones Nativos (v3.6.5)
+### Restauración del Motor de Audio Sappy (v3.7.0)
+- **Pipeline de Audio Nativo:** Restauración de las dependencias limpias de `gba-mus-ripper` y `fluidsynth` para renderizado fiel al hardware original (solucionando problemas graves de interferencia).
+- **Importador y Exportador MIDI:** Implementación completa del flujo bidireccional. Permite exportar partituras a MIDI estándar junto a sus bancos de sonido (SF2).
+- **Compilador Python a Sappy:** Se construyó un compilador nativo en Python (`midi_compiler.py`) que lee archivos MIDI subidos por el usuario, los traduce a bytecodes de Sappy e inyecta la pista en espacio libre repunteando automáticamente en la ROM.
+- **Categorización Inteligente:** Organización de la tabla de sonidos, separando dinámicamente "Músicas" (IDs 1-37) de los Efectos de Sonido "SFX" (IDs 101+).
+
+### Decompilador de Patrones Nativos (v3.7.0)
 - **Motor de Análisis THUMB:** Implementación de un nuevo visor de rutinas nativas con detección semántica de patrones.
 - **Detección de Diálogos y Objetos:**
     - Integración con el charset de FoMT (soporte de `0x05 \BRK` y tildes).
@@ -13,7 +19,7 @@
 - **Mapeo de Funciones del Engine:** Identificación de llamadas internas como `Register_Shipment`, `Init_Shop_UI`, `Play_SE` y transacciones de dinero.
 - **Corrección en `Routine_State_Override`:** Se ajustó la decoración del segundo argumento para usar el formato `Script_ID`, permitiendo una referencia clara a los eventos de diálogo.
 
-### Mejoras en SlipSpace Engine (v3.6.5)
+### Mejoras en SlipSpace Engine (v3.7.0)
 - **Robustez del Desensamblador:** Se corrigió el error `Bad opcode: FF` permitiendo que el motor ignore el padding de la ROM al final de los scripts.
 - **Resolución de Compilación:** Corrección crítica en la llamada a `compile_script` que impedía la resolución de nombres decorados (Items/NPCs) a IDs binarios.
 
@@ -24,7 +30,7 @@
     - Menú flotante con persistencia de estado entre sesiones.
 
 
-## Versión 3.4.4 "Sincronización de Datos Cilixes"
+## Versión 3.7.0 "Sincronización de Datos Cilixes"
 **Fecha:** 2026-05-12
 **Estado:** Lanzamiento Estable
 
@@ -34,11 +40,11 @@
 - **Estabilidad de Punteros:** Refinamiento en la carga de `Fomt_Lib.csv` y `MFomt_Lib.csv` para evitar colisiones de identificadores durante el autocompletado.
 
 
-## Versión 3.4.4 "Estabilización y Paridad de Bytecode"
+## Versión 3.7.0 "Estabilización y Paridad de Bytecode"
 **Fecha:** 2026-05-11
 **Estado:** Lanzamiento Estable
 
-### Estabilización del Motor SlipSpace (v3.4.4)
+### Estabilización del Motor SlipSpace (v3.7.0)
 - **Corrección de Inflación de Bytecode:** Se optimizó la codificación de instrucciones `PUSH` para números negativos. Ahora los valores pequeños se emiten como `PUSH8` o `PUSH16` en lugar de forzar siempre `PUSH32`, restaurando la paridad 1:1 en ediciones In-Place.
 - **Inyección Inteligente 1:1:** Se eliminó el padding forzado de 4 bytes en el MemoryManager que causaba repunteos innecesarios al final de la ROM cuando el script conservaba su tamaño original.
 - **Sincronización de Tabla de Punteros:** Se corrigió un error de desfase (off-by-one) en el cálculo de la Master Table de eventos, asegurando que los repunteos actualicen la ranura de ID correcta.

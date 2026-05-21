@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.6.5)
+# FOMT Studio - Suite de Ingeniería Inversa (v3.7.0)
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
@@ -87,6 +87,28 @@ class SappyParser:
 
     @property
     def song_table_offset(self):
+        """Lee el offset de la tabla de canciones dinámicamente desde la literal pool."""
+        import csv
+        import os
+        maestro_path = "punteros_maestros.csv"
+        if os.path.exists(maestro_path):
+            try:
+                with open(maestro_path, 'r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if row.get('ID') == 'SONG_LITERAL_POOL_PTR':
+                            rom_offset = int(row['Offset_ROM'], 16)
+                            dinamico = self.read_rom_ptr(rom_offset)
+                            if dinamico > 0:
+                                return dinamico
+            except:
+                pass
+                
+        if hasattr(self, 'SONG_TABLE_POINTERS') and len(self.SONG_TABLE_POINTERS) > 0:
+            for ptr in self.SONG_TABLE_POINTERS:
+                dinamico = self.read_rom_ptr(ptr)
+                if dinamico > 0:
+                    return dinamico
         return 0x13ABF0 if not self.is_mfomt else 0x144FF4
 
     # ═══════════════════════════════════════════════════════════════════
@@ -98,7 +120,10 @@ class SappyParser:
         self.songs = []
         offset = self.song_table_offset
 
-        for i in range(256):
+        # La tabla maestra de canciones va desde 13ABF0 hasta 13B280 (211 entradas)
+        # Cada entrada es de 8 bytes (4 bytes de puntero + 4 bytes de espacio/prioridad)
+        max_songs = 211 
+        for i in range(max_songs):
             entry_ptr = self.read_rom_ptr(offset + (i * 8))
             if entry_ptr == 0 or entry_ptr > len(self.proyecto.base_rom_data):
                 break
@@ -229,12 +254,14 @@ class SappyParser:
             sid = song["id"]
 
             # Categoría
-            if sid in self.SPECIAL_IDS:
+            if 1 <= sid <= 37:
+                song["category"] = "BGM"
+            elif sid >= 101:
+                song["category"] = "SFX"
+            elif sid in self.SPECIAL_IDS:
                 song["category"] = self.SPECIAL_IDS[sid]
             elif sid in self.FOMT_US_SONG_CATEGORIES:
                 song["category"] = self.FOMT_US_SONG_CATEGORIES[sid]
-            elif sid > 0x1A:
-                song["category"] = "SFX"
             else:
                 song["category"] = "UNKNOWN"
 
@@ -272,7 +299,7 @@ class SappyParser:
     def get_category_label(self, category):
         """Retorna un label legible para la categoría."""
         labels = {
-            "BGM":     "🎵 BGM",
+            "BGM":     "🎵 Músicas",
             "AMBIENT": "🌧 Ambient",
             "UNUSED":  "⚠ Unused / Rare",
             "SFX":     "🔊 SFX",
@@ -329,7 +356,7 @@ class SappyParser:
     # ═══════════════════════════════════════════════════════════════════
     
     def preview_song_natively(self, song, out_wav_path):
-        """Usa song_ripper + sound_font_ripper + fluidsynth para generar un test_play.wav"""
+        """Usa song_ripper + sound_font_ripper + fluidsynth para generar un test_play.wav de alta calidad."""
         import subprocess
         
         # Paths
@@ -359,16 +386,11 @@ class SappyParser:
         s_addr = hex(song['offset'])
         res1 = subprocess.run([song_ripper, rom_path, mid_file, s_addr], cwd=ripper_dir, capture_output=True, text=True)
         print(f"[song_ripper OUT] {res1.stdout}")
-        print(f"[song_ripper ERR] {res1.stderr}")
         
         # 2. Extraer SF2 aisladamente
         vg_addr = hex(song['voicegroup_ptr'])
         res2 = subprocess.run([sf2_ripper, rom_path, sf2_file, vg_addr], cwd=ripper_dir, capture_output=True, text=True)
         print(f"[sf2_ripper OUT] {res2.stdout}")
-        print(f"[sf2_ripper ERR] {res2.stderr}")
-        
-        print(f"Mid file exists? {os.path.exists(mid_file)}")
-        print(f"SF2 file exists? {os.path.exists(sf2_file)}")
         
         # 3. Renderizar WAV usando Fluidsynth
         if os.path.exists(mid_file) and os.path.exists(sf2_file):
@@ -378,7 +400,7 @@ class SappyParser:
                 print(f"[fluidsynth ERROR] {res3.stderr}\n{res3.stdout}")
                            
         return os.path.exists(out_wav_path)
-            
+
 
 class TrackDecoder:
     """Decodifica el flujo de bytes de una pista Sappy a eventos de tiempo."""
