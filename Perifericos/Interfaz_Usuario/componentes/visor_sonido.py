@@ -325,9 +325,11 @@ class SappyAudioViewer(QWidget):
         import json
         import csv
         import os
+        from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.rutas import get_resource_path
+        
         names = {}
         # Cargar nombres desde el nuevo CSV (prioridad)
-        csv_path = "Nucleos_de_Procesamiento/Listas_de_Nombres/canciones_offsets.csv"
+        csv_path = get_resource_path("Nucleos_de_Procesamiento/Listas_de_Nombres/canciones_offsets.csv")
         if os.path.exists(csv_path):
             try:
                 with open(csv_path, 'r', encoding='utf-8') as f:
@@ -338,7 +340,7 @@ class SappyAudioViewer(QWidget):
                 print(f"Error leyendo CSV de canciones: {e}")
                 
         # Cargar fallback (json viejo)
-        path = "Nucleos_de_Procesamiento/Listas_de_Nombres/sonidos.json"
+        path = get_resource_path("Nucleos_de_Procesamiento/Listas_de_Nombres/sonidos.json")
         if os.path.exists(path):
             try:
                 with open(path, 'r', encoding='utf-8') as f:
@@ -671,11 +673,23 @@ class SappyAudioViewer(QWidget):
             
         self.is_playing = True
         
+        # Cargar datos WAV a memoria para sincronizar el visualizador
+        import wave, time, os
+        try:
+            with wave.open(wav_path, 'rb') as w:
+                self.wav_framerate = w.getframerate()
+                self.wav_channels = w.getnchannels()
+                self.wav_sampwidth = w.getsampwidth()
+                self.wav_data = w.readframes(w.getnframes())
+            self.playback_start_time = time.time()
+        except Exception as e:
+            print(f"Error cargando WAV a memoria: {e}")
+            self.wav_data = None
+        
         # Reproducción nativa exclusiva con winsound (Garantiza que no haya locks ni problemas de codecs)
         import sys
         if sys.platform == 'win32':
             import winsound
-            import os
             try:
                 norm_path = os.path.normpath(wav_path)
                 winsound.PlaySound(norm_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
@@ -686,16 +700,61 @@ class SappyAudioViewer(QWidget):
         self.track_info_label.setText(current_text)
         self.track_info_label.setStyleSheet("color: #00FF96; font-weight: bold; font-family: 'Consolas'; font-size: 11px;")
         
-        # Fake retro visuals since we are piping to QMediaPlayer natively
         self.play_timer = QTimer(self)
-        self.play_timer.timeout.connect(self._fake_visuals)
+        self.play_timer.timeout.connect(self._sync_visuals)
         self.play_timer.start(50)
 
-    def _fake_visuals(self):
+    def _sync_visuals(self):
         if not self.is_playing: return
-        # Random visuals synced loosely to music existence
-        import random
-        v_data = bytes([random.randint(0, 255) for _ in range(32)])
+        
+        if not hasattr(self, 'wav_data') or not self.wav_data:
+            # Fallback a visuales aleatorios si falló la carga
+            import random
+            v_data = bytes([random.randint(0, 255) for _ in range(32)])
+            self.retro_vis.update_from_data(v_data)
+            return
+
+        import time
+        import numpy as np
+        
+        elapsed = time.time() - self.playback_start_time
+        frame_idx = int(elapsed * self.wav_framerate)
+        byte_idx = frame_idx * self.wav_channels * self.wav_sampwidth
+        
+        # Leer ~50ms
+        chunk_frames = int(0.05 * self.wav_framerate)
+        chunk_bytes = chunk_frames * self.wav_channels * self.wav_sampwidth
+        
+        if byte_idx + chunk_bytes > len(self.wav_data):
+            # Final de pista (detener reproducción visual)
+            self.on_stop()
+            return
+            
+        chunk = self.wav_data[byte_idx : byte_idx + chunk_bytes]
+        if not chunk: return
+        
+        if self.wav_sampwidth == 2:
+            arr = np.frombuffer(chunk, dtype=np.int16)
+        else:
+            arr = np.frombuffer(chunk, dtype=np.int8)
+            
+        if self.wav_channels == 2:
+            arr = arr[::2]
+            
+        arr = np.abs(arr)
+        bars = 32
+        if len(arr) < bars: return
+        
+        bin_size = len(arr) // bars
+        v_data = bytearray(32)
+        for i in range(bars):
+            val = np.mean(arr[i*bin_size : (i+1)*bin_size])
+            if self.wav_sampwidth == 2:
+                norm = int((val / 32768.0) * 255)
+            else:
+                norm = int((val / 128.0) * 255)
+            v_data[i] = max(0, min(255, norm))
+            
         self.retro_vis.update_from_data(v_data)
 
     def on_position_changed(self, pos):

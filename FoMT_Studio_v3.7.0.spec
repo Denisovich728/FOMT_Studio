@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['j:/Repositorios/fomt_studio/main.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('Nucleos_de_Procesamiento/Cilixes', 'Nucleos_de_Procesamiento/Cilixes'), ('Perifericos/Traducciones', 'Perifericos/Traducciones')],
+    datas=[('Nucleos_de_Procesamiento/Cilixes', 'Nucleos_de_Procesamiento/Cilixes'), ('Nucleos_de_Procesamiento/Listas_de_Nombres', 'Nucleos_de_Procesamiento/Listas_de_Nombres'), ('Perifericos/Traducciones', 'Perifericos/Traducciones'), ('gba-mus-ripper', 'gba-mus-ripper'), ('fluidsynth_bin', 'fluidsynth_bin')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -19,21 +19,27 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='FoMT_Studio_v3.7.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['j:\\Repositorios\\fomt_studio\\icon.ico'],
+    icon=['Icono_Fomt_Studio.ico'],
+)
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='FoMT_Studio_v3.7.0',
 )

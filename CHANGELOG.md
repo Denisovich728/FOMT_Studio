@@ -1,6 +1,6 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Versión 3.7.0 "Listen The World"
+## Versión 3.7.1 "Listen The World"
 **Fecha:** 2026-05-15
 **Estado:** Lanzamiento Estable / Ingeniería Inversa Avanzada
 
