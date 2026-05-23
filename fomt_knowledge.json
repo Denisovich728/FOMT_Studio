@@ -87,6 +87,6 @@
     "empty_space_start": "0x75C244",
     "npc_names_start": "0x104128",
     "dialogue_scripts_start": "0x1004E0",
-    "map_pointer_table": "0x8105EDC"
+    "map_header_table": "0x105EDC"
   }
 }

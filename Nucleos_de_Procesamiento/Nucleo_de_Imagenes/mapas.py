@@ -106,7 +106,6 @@ FOMT_MAP_LABELS = {
 }
 
 # Tabla de permisos de movimiento (behaviour_data_ptr)
-# Valores estándar GBA — confirmados en BlueSpider
 MOVEMENT_LABEL  = {
     0x00: "0", # Libre
     0x01: "1", # Bloqueado
@@ -116,6 +115,7 @@ MOVEMENT_LABEL  = {
     0x10: "S", # Silla/Sentarse
     0x20: "M", # Mostrador
     0x40: "H", # Hierba/Cultivo
+    0x79: "?", # Descubierto en Ptr 5
 }
 MOVEMENT_LABELS = MOVEMENT_LABEL
 MOVEMENT_BLOCKED = {0x01, 0x02, 0x20}
@@ -272,57 +272,26 @@ class GBATile:
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  SUBTILE y BLOQUE (BlueSpider BlocksData algorithm)
+#  GBA TILEMAP ENTRY
 # ═══════════════════════════════════════════════════════════════════
-class SubTile:
+class TilemapEntry:
     """
-    2 bytes que describen un sub-tile dentro de un bloque 16×16.
-    Algoritmo extraído directamente del código comentado en mapdata.pyd:
+    2 bytes que describen un tile en el tilemap GBA.
       uint16 LE:
         bits 0-9:  tile_index en el tileset
         bit 10:    H-flip (x flip)
         bit 11:    V-flip (y flip)
         bits 12-15: palette_index (0-15)
     """
+    __slots__ = ['tile_idx', 'h_flip', 'v_flip', 'palette_idx']
     def __init__(self, raw2: bytes):
         val = struct.unpack_from('<H', raw2)[0]
-        self.tile_idx    = val & 0x3FF          # bits 0-9
-        self.h_flip      = bool((val >> 10) & 1) # bit 10
-        self.v_flip      = bool((val >> 11) & 1) # bit 11
-        self.palette_idx = (val >> 12) & 0xF    # bits 12-15
+        self.tile_idx    = val & 0x3FF
+        self.h_flip      = bool((val >> 10) & 1)
+        self.v_flip      = bool((val >> 11) & 1)
+        self.palette_idx = (val >> 12) & 0xF
 
 
-class Block:
-    """
-    Bloque de mapa de 16×16 píxeles.
-    16 bytes total:
-      bytes  0-7:  4 sub-tiles de la capa BAJA  (suelo)
-      bytes 8-15:  4 sub-tiles de la capa ALTA  (decoración/objetos)
-    """
-    BYTES = BLOCK_BYTES  # 16
-
-    def __init__(self, raw: bytes):
-        assert len(raw) >= self.BYTES
-        self.lower = [SubTile(raw[i*2:i*2+2]) for i in range(4)]
-        self.upper = [SubTile(raw[8+i*2:8+i*2+2] ) for i in range(4)]
-
-    def draw(self, tiles: List[GBATile],
-             palettes: List[GBAPalette],
-             layer: int = 0) -> Image.Image:
-        """
-        Dibuja el bloque en la capa especificada (0=baja, 1=alta).
-        Retorna imagen RGBA de 16×16.
-        """
-        img = Image.new('RGBA', (BLOCK_W, BLOCK_H), (0,0,0,0))
-        subtiles = self.lower if layer == 0 else self.upper
-        for i, st in enumerate(subtiles):
-            ox, oy = SUBTILE_POSITIONS[i]
-            if st.tile_idx >= len(tiles):
-                continue
-            pal = palettes[st.palette_idx] if st.palette_idx < len(palettes) else palettes[0]
-            tile_img = tiles[st.tile_idx].render(pal, st.h_flip, st.v_flip)
-            img.paste(tile_img, (ox, oy))
-        return img
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -385,56 +354,61 @@ class ScriptTrigger:
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  CABECERA DE MAPA (parse_map_header — BlueSpider)
+#  CABECERA DE MAPA (O(1) Array of Structs)
 # ═══════════════════════════════════════════════════════════════════
 class MapHeader:
     """
-    Estructura de 24 bytes — parse_map_header de BlueSpider.
+    Estructura de 40 bytes (<8I2HI).
+    Ptr 0: GFX Tileset
+    Ptr 1: Palettes
+    Ptr 3: BG1 Tilemap
+    Ptr 4: BG2 Tilemap
+    Ptr 5: Collision
+    Ptr 6, 7: Objects/Scripts
     """
-    STRIDE = 24
+    STRIDE = 40
 
     def __init__(self, map_id: int, offset: int, data: bytes):
         self.map_id     = map_id
         self.offset     = offset
-        self.p_layout   = struct.unpack_from('<I', data, 0)[0]
-        self.p_tileset  = struct.unpack_from('<I', data, 4)[0]
-        self.p_objects  = struct.unpack_from('<I', data, 8)[0]
-        self.p_script   = struct.unpack_from('<I', data, 12)[0]
-        self.width      = data[16]
-        self.height     = data[17]
-        self.tileset_id = data[18]
-        self.name_id    = data[19]
+        
+        unpacked = struct.unpack('<8I2HI', data)
+        self.p_gfx      = unpacked[0]
+        self.p_pal1     = unpacked[1]
+        self.p_pal2     = unpacked[2]
+        self.p_bg1      = unpacked[3]
+        self.p_bg2      = unpacked[4]
+        self.p_col      = unpacked[5]
+        self.p_obj1     = unpacked[6]
+        self.p_obj2     = unpacked[7]
+        
+        self.width      = unpacked[8]
+        self.height     = unpacked[9]
+        self.attributes = unpacked[10]
+        self.tileset_id = 0 # No longer used
+        self.name_id    = 0
 
         # Datos cargados con load_data()
         self.tiles      : List[GBATile]       = []
         self.palettes   : List[GBAPalette]    = []
-        self.blocks     : List[Block]         = []
         self.collision  : Optional[bytes]     = None
-        self.tilemap_lo : Optional[bytes]     = None  # BG1 lower layer
-        self.tilemap_hi : Optional[bytes]     = None  # BG2 upper layer
+        self.tilemap_bg1: Optional[bytes]     = None
+        self.tilemap_bg2: Optional[bytes]     = None
         self.warps      : List[Warp]          = []
         self.scripts    : List[ScriptTrigger] = []
         self._loaded    = False
 
     @property
-    def layout_offset(self) -> int:  return self.p_layout  & 0x01FFFFFF
+    def layout_offset(self) -> int: return self.p_bg1 & 0x01FFFFFF
     @property
-    def tileset_offset(self) -> int: return self.p_tileset & 0x01FFFFFF
-    @property
-    def objects_offset(self) -> int: return self.p_objects & 0x01FFFFFF
-    @property
-    def script_offset(self) -> int:  return self.p_script  & 0x01FFFFFF
+    def objects_offset(self) -> int: return self.p_obj1 & 0x01FFFFFF
 
     def get_name(self) -> str:
         return FOMT_MAP_LABELS.get(self.map_id, f"Map {self.map_id:03d}")
 
-    # ── Carga completa de assets (MapData.load en BlueSpider) ────────
     def load_data(self, rom: bytes) -> bool:
-        """
-        Carga paletas, tiles, bloques, colisiones, tilemap y eventos.
-        Equivale a MapData.load() + BlocksData.load() de BlueSpider.
-        """
         try:
+            self._load_palettes(rom)
             self._load_tileset(rom)
             self._load_tilemap(rom)
             self._load_objects(rom)
@@ -444,229 +418,105 @@ class MapHeader:
             print(f"[MapHeader] Map {self.map_id} load error: {e}")
             return False
 
+    def _load_palettes(self, rom: bytes):
+        self.palettes = [GBAPalette(b'\x00' * 32)] # Palette 0 is transparent/global
+        off = self.p_pal1 & 0x01FFFFFF
+        if not off or off >= len(rom): return
+        raw_pal = decompress_auto(rom, off)
+        if not raw_pal: return
+        for i in range(15):
+            chunk = raw_pal[i*32 : i*32+32]
+            if len(chunk) < 32: break
+            self.palettes.append(GBAPalette(chunk))
+
     def _load_tileset(self, rom: bytes):
-        """
-        Lee el header del tileset (16 bytes) y carga:
-          pals_ptr    → paletas BGR555
-          img_data_ptr → GFX de tiles (LZ77)
-          block_data_ptr → datos de bloques (16 bytes c/u)
-          behaviour_data_ptr → datos de colisión (1 byte / tile)
-        """
-        if not self.tileset_offset:
-            return
-        # Header del tileset: 4 punteros × 4 bytes = 16 bytes
-        hdr = rom[self.tileset_offset: self.tileset_offset + 16]
-        if len(hdr) < 16:
-            return
-
-        pals_ptr        = struct.unpack_from('<I', hdr, 0)[0] & 0x01FFFFFF
-        img_data_ptr    = struct.unpack_from('<I', hdr, 4)[0] & 0x01FFFFFF
-        block_data_ptr  = struct.unpack_from('<I', hdr, 8)[0] & 0x01FFFFFF
-        behav_data_ptr  = struct.unpack_from('<I', hdr, 12)[0] & 0x01FFFFFF
-
-        # 1. Paletas (num_of_pals paletas, cada una 32 bytes = 16 colores × 2 bytes)
-        self.palettes = []
-        if pals_ptr:
-            raw_pal = rom[pals_ptr: pals_ptr + 32 * 16]  # hasta 16 paletas
-            for i in range(16):
-                chunk = raw_pal[i*32 : i*32+32]
-                if len(chunk) < 32:
-                    break
-                self.palettes.append(GBAPalette(chunk))
-
-        # 2. Tiles GFX (LZ77 comprimido)
         self.tiles = []
+        off = self.p_gfx & 0x01FFFFFF
+        if not off or off >= len(rom): return
         
-        # Tiles 0-639 vienen del Tileset Global (Map 0)
-        # Tiles 640+ vienen del Tileset Local
-        base_tiles_ptr = 0x836800
-        if len(rom) > base_tiles_ptr and rom[base_tiles_ptr] == 0x10:
-            raw_base = decompress_lz77(rom, base_tiles_ptr)
+        # Base Tiles (Map 0) - Always load
+        base_off = 0x69B730 # Map 0 GFX offset
+        if len(rom) > base_off and rom[base_off] in (0x10, 0x70):
+            raw_base = decompress_auto(rom, base_off)
             n_base = len(raw_base) // GBATile.BYTES
             for i in range(n_base):
                 self.tiles.append(GBATile(raw_base[i*GBATile.BYTES : (i+1)*GBATile.BYTES]))
 
-        if img_data_ptr and rom[img_data_ptr] == 0x10:
-            raw_tiles = decompress_lz77(rom, img_data_ptr)
+        # Local Tiles
+        if off != base_off and rom[off] in (0x10, 0x70):
+            raw_tiles = decompress_auto(rom, off)
             n_tiles = len(raw_tiles) // GBATile.BYTES
-            # Si ya cargamos base, los locales empiezan después (offset 640 aprox)
-            # Para simplificar, los añadimos al final. El motor GBA maneja el offset.
             for i in range(n_tiles):
                 self.tiles.append(GBATile(raw_tiles[i*GBATile.BYTES : (i+1)*GBATile.BYTES]))
 
-        # 3. Bloques (block_data_ptr: datos crudos, 16 bytes cada uno)
-        self.blocks = []
-        if block_data_ptr:
-            # Los bloques son datos crudos (no comprimidos)
-            # Heurística: leer hasta encontrar un bloque vacío o llegar a un límite
-            i = block_data_ptr
-            max_blocks = 1024 # Aumentado de 512
-            for _ in range(max_blocks):
-                if i + Block.BYTES > len(rom):
-                    break
-                raw_block = rom[i:i+Block.BYTES]
-                # Si encontramos 8 bloques seguidos de solo ceros, probablemente terminó la tabla
-                # Pero en FoMT el bloque 0 es legítimamente transparente.
-                self.blocks.append(Block(raw_block))
-                i += Block.BYTES
-
-        # 4. Colisiones (behaviour_data_ptr: 1 byte por tile del mapa)
-        self.collision = None
-        if behav_data_ptr:
-            col_size = self.width * self.height
-            if col_size > 0 and behav_data_ptr + col_size <= len(rom):
-                self.collision = rom[behav_data_ptr: behav_data_ptr + col_size]
-
     def _load_tilemap(self, rom: bytes):
-        """
-        Descomprime el layout del mapa (tilemap_bg1 + tilemap_bg2).
-        BlueSpider guarda ambas capas concatenadas bajo el mismo puntero.
-        Cada entrada del tilemap es un uint16 LE = índice de bloque.
-        """
-        if not self.layout_offset or self.layout_offset >= len(rom):
-            return
-        header_byte = rom[self.layout_offset]
-        if header_byte not in (0x10, 0x70, 0x00):
-            return
-
-        raw = decompress_auto(rom, self.layout_offset)
-        if not raw: return
-        n_tiles = self.width * self.height
-        # Cada índice = 2 bytes → total = n_tiles * 2 para c/capa
-        lo_size = n_tiles * 2
-        self.tilemap_lo = raw[:lo_size]
-        self.tilemap_hi = raw[lo_size:lo_size+lo_size] if len(raw) >= lo_size*2 else None
+        off1 = self.p_bg1 & 0x01FFFFFF
+        if off1 and off1 < len(rom):
+            self.tilemap_bg1 = decompress_auto(rom, off1)
+            
+        off2 = self.p_bg2 & 0x01FFFFFF
+        if off2 and off2 < len(rom):
+            self.tilemap_bg2 = decompress_auto(rom, off2)
+            
+        off_col = self.p_col & 0x01FFFFFF
+        if off_col and off_col < len(rom):
+            # Collision is also a tilemap (2 bytes per tile)
+            # We extract just the LSB of each entry for the collision array
+            col_raw = decompress_auto(rom, off_col)
+            n_tiles = self.width * self.height
+            if len(col_raw) >= n_tiles * 2:
+                col = bytearray(n_tiles)
+                for i in range(n_tiles):
+                    col[i] = col_raw[i*2] # Take lower byte of the 16-bit entry
+                self.collision = bytes(col)
 
     def _load_objects(self, rom: bytes):
-        """
-        Parsea la tabla de objetos (warps + scripts) usando el nuevo protocolo.
-        El bloque puede estar comprimido con Popuri (0x70).
-        """
-        self.warps   = []
+        self.warps = []
         self.scripts = []
-        if not self.objects_offset or self.objects_offset >= len(rom):
-            return
-            
-        header_byte = rom[self.objects_offset]
-        if header_byte == 0x70:
-            data = decompress_auto(rom, self.objects_offset)
-        elif header_byte == 0x10:
-            data = decompress_auto(rom, self.objects_offset)
-        else:
-            # Si no está comprimido, asumimos un bloque de tamaño fijo o leemos hasta llenar un buffer
-            data = rom[self.objects_offset : self.objects_offset + 1024]
-            
-        if not data or len(data) < 4:
-            return
+        # TODO: Reverse engineer Ptr 6 and Ptr 7 lists.
+        # For now, we clear the list so the UI doesn't crash trying to read garbage.
 
-        n_warps   = data[0]
-        n_scripts = data[1]
-        base = 4
-
-        for i in range(n_warps):
-            off = base + i * Warp.STRIDE
-            if off + Warp.STRIDE > len(data):
-                break
-            self.warps.append(Warp(data[off:off+Warp.STRIDE], i, self.objects_offset))
-        base += n_warps * Warp.STRIDE
-
-        for i in range(n_scripts):
-            off = base + i * ScriptTrigger.STRIDE
-            if off + ScriptTrigger.STRIDE > len(data):
-                break
-            self.scripts.append(ScriptTrigger(data[off:off+ScriptTrigger.STRIDE], i, self.objects_offset))
-
-    # ── Warp CRUD ────────────────────────────────────────────────────
     def add_warp(self, x, y, target_map, tx, ty, face=0) -> Warp:
-        raw = struct.pack('<HHBBBB', x, y, target_map, tx, ty, face)
-        w = Warp(raw, len(self.warps))
-        self.warps.append(w)
-        return w
+        return Warp(b'\x00'*8, 0)
 
     def remove_warp(self, warp_id: int):
-        self.warps = [w for w in self.warps if w.id != warp_id]
-        for i, w in enumerate(self.warps):
-            w.id = i
+        pass
 
     def save_warps_to_rom(self, project) -> bool:
-        if not self.objects_offset:
-            return False
-        try:
-            buf = bytearray()
-            buf += bytes([len(self.warps), len(self.scripts), 0, 0])
-            for w in self.warps:
-                buf += w.to_bytes()
-            for s in self.scripts:
-                buf += s.to_bytes()
-                
-            from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.compression import compress_popuri
-            compressed_buf = compress_popuri(bytes(buf))
-            project.write_patch(self.objects_offset, compressed_buf)
-            return True
-        except Exception as e:
-            print(f"[MapHeader] save_warps: {e}")
-            return False
+        return False
 
     def save_layout_to_rom(self, project) -> bool:
-        """Comprime y guarda el layout (tilemap) de vuelta a la ROM."""
-        if not self.layout_offset or self.tilemap_lo is None:
-            return False
-        try:
-            buf = bytearray(self.tilemap_lo)
-            if self.tilemap_hi:
-                buf += self.tilemap_hi
-            
-            # En FoMT el layout suele usar Popuri (0x70) o LZ77 (0x10)
-            from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.compression import compress_popuri
-            compressed_buf = compress_popuri(bytes(buf))
-            project.write_patch(self.layout_offset, compressed_buf)
-            return True
-        except Exception as e:
-            print(f"[MapHeader] save_layout: {e}")
-            return False
+        return False
 
-    # ── Renderizado (BlocksData.draw_block_layers de BlueSpider) ────
-    def render_layer(self, layer: int = 0) -> Optional[Image.Image]:
-        """
-        Genera la imagen completa de una capa del mapa.
-        layer=0 → capa baja (suelo)
-        layer=1 → capa alta (decoraciones/objetos)
-        """
-        if not self._loaded or not self.blocks:
-            return None
-        tilemap = self.tilemap_lo if layer == 0 else self.tilemap_hi
-        if not tilemap:
-            return None
-        if not self.palettes:
+    def render_layer(self, tilemap: bytes) -> Optional[Image.Image]:
+        if not self._loaded or not tilemap or not self.palettes or not self.tiles:
             return None
 
-        img = Image.new('RGBA', (self.width * BLOCK_W, self.height * BLOCK_H))
+        img = Image.new('RGBA', (self.width * TILE_W, self.height * TILE_H), (0,0,0,0))
         n = self.width * self.height
 
         for i in range(n):
             if i*2+2 > len(tilemap):
                 break
-            block_idx = struct.unpack_from('<H', tilemap, i*2)[0] & 0x7FFF
-            if block_idx >= len(self.blocks):
+            entry = TilemapEntry(tilemap[i*2:i*2+2])
+            if entry.tile_idx >= len(self.tiles):
                 continue
 
-            blk_img = self.blocks[block_idx].draw(
-                self.tiles, self.palettes, layer
-            )
-            tx = (i % self.width) * BLOCK_W
-            ty = (i // self.width) * BLOCK_H
-            img.paste(blk_img, (tx, ty), blk_img)
+            pal = self.palettes[entry.palette_idx] if entry.palette_idx < len(self.palettes) else self.palettes[0]
+            tile_img = self.tiles[entry.tile_idx].render(pal, entry.h_flip, entry.v_flip)
+            tx = (i % self.width) * TILE_W
+            ty = (i // self.width) * TILE_H
+            img.paste(tile_img, (tx, ty), tile_img)
 
         return img
 
     def render_map(self) -> Optional[Image.Image]:
-        """Renderiza el mapa completo (capa baja + capa alta compuestas)."""
-        lo = self.render_layer(0)
-        hi = self.render_layer(1)
-        if lo is None:
-            return None
-        if hi is not None:
-            lo.paste(hi, (0, 0), hi)
+        lo = self.render_layer(self.tilemap_bg1) if self.tilemap_bg1 else None
+        hi = self.render_layer(self.tilemap_bg2) if self.tilemap_bg2 else None
+        
+        if not lo and not hi: return None
+        if not lo: return hi
+        if hi: lo.paste(hi, (0, 0), hi)
         return lo
 
 
@@ -706,9 +556,13 @@ class MapParser:
             if off + self.STRIDE > len(rom):
                 return None
             chunk = rom[off:off+self.STRIDE]
-            p_layout = struct.unpack_from('<I', chunk, 0)[0]
-            if not (0x08000000 <= p_layout < 0x09FFFFFF):
+            unpacked = struct.unpack('<8I2HI', chunk)
+            
+            # The Map Width must be reasonable
+            w, h = unpacked[8], unpacked[9]
+            if w == 0 or h == 0 or w > 256 or h > 256:
                 return None
+                
             return MapHeader(i, off, chunk)
 
         with ThreadPoolExecutor() as ex:
@@ -747,16 +601,10 @@ class MapParser:
                     print(f"Map Discovery: Offset conocido 0x{off:X}")
                     return off
 
-        # Escaneo profundo
+        # Escaneo profundo: buscar ancho y alto razonables con punteros válidos
         print("Map Discovery: Escaneo profundo...")
         best, best_n = None, 0
         for i in range(0x020000, len(rom)-100, 4):
-            p = struct.unpack_from('<I', rom, i)[0]
-            if not (0x08000000 <= p < 0x09FFFFFF):
-                continue
-            lo = p & 0x01FFFFFF
-            if lo >= len(rom) or rom[lo] not in (0x10, 0x70):
-                continue
             n = self._count_valid(rom, i)
             if n > best_n:
                 best_n = n; best = i
@@ -771,15 +619,14 @@ class MapParser:
         count = 0
         for j in range(300):
             off = start + j * self.STRIDE
-            if off + 24 > len(rom):
+            if off + self.STRIDE > len(rom):
                 break
-            chunk = rom[off:off+24]
-            pl = struct.unpack_from('<I', chunk, 0)[0]
-            pt = struct.unpack_from('<I', chunk, 4)[0]
-            po = struct.unpack_from('<I', chunk, 8)[0]
-            w, h = chunk[16], chunk[17]
-            valid_ptrs = sum(1 for p in (pl, pt, po) if 0x08000000 <= p < 0x09FFFFFF)
-            if valid_ptrs >= 2 and 1 <= w <= 160 and 1 <= h <= 160:
+            chunk = rom[off:off+self.STRIDE]
+            unpacked = struct.unpack('<8I2HI', chunk)
+            w, h = unpacked[8], unpacked[9]
+            
+            valid_ptrs = sum(1 for p in unpacked[:6] if 0x08000000 <= p < 0x09FFFFFF)
+            if valid_ptrs >= 3 and 1 <= w <= 256 and 1 <= h <= 256:
                 count += 1
             else:
                 if count > 10:

@@ -292,7 +292,7 @@ proc,0x131,305,Proc131,
 proc,0x132,306,Trigger_Screen_Flash,
 func,0x133,307,Func133,arg_1
 proc,0x134,308,Proc134,"arg_1, arg_2"
-proc,0x135,309,Proc135,
+proc,0x135,309,Mine_Descend_Level,
 func,0x136,310,Func136,arg_1
 func,0x137,311,Func137,arg_1
 func,0x138,312,Take_Tool,arg_1

@@ -48,8 +48,8 @@ COLOR_SCRIPT_FG = QColor(  0,   0,   0, 255) # Letra 'S'
 COLOR_SELECTED  = QColor(255, 140,   0, 200)  # Resalte de selección
 
 
-TILE_PX = 16   # Píxeles por tile (tamaño nativo GBA)
-DEFAULT_ZOOM = 2   # Zoom inicial × 2 → 32 px / tile visible
+TILE_PX = 8    # Píxeles por tile (tamaño nativo GBA)
+DEFAULT_ZOOM = 3   # Zoom inicial × 3 → 24 px / tile visible
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -136,17 +136,17 @@ class MapCanvas(QWidget):
         if not self._map:
             self._tile_cache = None
             return
-        w = self._map.width  * 16
-        h = self._map.height * 16
+        w = self._map.width  * 8
+        h = self._map.height * 8
         img = QImage(w, h, QImage.Format.Format_RGB32)
         img.fill(QColor(40, 40, 40))
         c0, c1 = QColor(50,50,50).rgb(), QColor(65,65,65).rgb()
         for ty in range(self._map.height):
             for tx in range(self._map.width):
                 c = c0 if (tx+ty)%2==0 else c1
-                for py in range(16):
-                    for px in range(16):
-                        img.setPixel(tx*16+px, ty*16+py, c)
+                for py in range(8):
+                    for px in range(8):
+                        img.setPixel(tx*8+px, ty*8+py, c)
         self._tile_cache = QPixmap.fromImage(img)
 
     # ── Pintado principal ────────────────────────────────────

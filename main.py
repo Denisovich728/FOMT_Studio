@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.7.0)
-# "Actualización La Imposibilidad"
+# FOMT Studio - Suite de Ingeniería Inversa (v3.8.1)
+# "Actualización Listen The World"
 # Desarrollado por: Denisovich728
 # ============================================================
 import sys

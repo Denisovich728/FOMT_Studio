@@ -89,6 +89,10 @@ class FoMTProject:
         for offset, data in self.patches.items():
             self.virtual_rom[offset : offset + len(data)] = data
             
+        # Validación e Inyección Obligatoria del Splash (Control de Integridad)
+        from Nucleos_de_Procesamiento.Nucleo_de_Datos.parche_splash import validar_e_inyectar_splash
+        validar_e_inyectar_splash(self)
+            
         # Inicialización dinámica post-parches
         self.super_lib.dynamic_init(self.virtual_rom)
             
