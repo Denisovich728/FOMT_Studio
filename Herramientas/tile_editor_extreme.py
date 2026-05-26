@@ -10,7 +10,8 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QFrame, QGridLayout,
     QFileDialog, QMessageBox, QSpinBox, QComboBox, QCheckBox,
-    QPlainTextEdit, QLineEdit, QButtonGroup, QToolButton
+    QPlainTextEdit, QLineEdit, QButtonGroup, QToolButton, QTabWidget,
+    QScrollBar, QSplitter
 )
 from PyQt6.QtGui import QColor, QPainter, QPen, QAction, QIcon
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
@@ -152,13 +153,22 @@ class TileCanvas(QWidget):
 
 class TileGridItem(QFrame):
     clicked = pyqtSignal(int)
-    def __init__(self, index, data, offset=0, interleave_rows=False, bpp=4, h=16, palette=None):
+    def __init__(self, index, data, offset=0, interleave_rows=False, bpp=4, h=16, palette=None, show_details=True):
         super().__init__()
         self.index, self.data, self.interleave_rows = index, data, interleave_rows
         self.bpp, self.tile_h, self.palette = bpp, h, palette
         self.offset, self.selected = offset, False
-        self.setFixedSize(65, h * 6 + 25)
-        self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Plain)
+        self.show_details = show_details
+        if self.show_details:
+            self.setFixedSize(65, h * 6 + 25)
+            self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Plain)
+            self.pad_x = 6
+            self.pad_y = 6
+        else:
+            self.setFixedSize(48, h * 6)
+            self.setFrameStyle(QFrame.Shape.NoFrame)
+            self.pad_x = 0
+            self.pad_y = 0
 
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -166,8 +176,10 @@ class TileGridItem(QFrame):
         if self.selected:
             qp.setPen(QPen(QColor(255,255,0), 2))
             qp.drawRect(1, 1, self.width()-2, self.height()-2)
-        qp.setPen(QPen(QColor(180, 180, 180), 1))
-        qp.drawText(5, self.height() - 5, f"{self.offset:06X}")
+        if self.show_details:
+            qp.setPen(QPen(QColor(180, 180, 180), 1))
+            qp.drawText(5, self.height() - 5, f"{self.offset:06X}")
+            
         ps, bpr, half = 6, self.bpp, self.tile_h // 2
         for row in range(self.tile_h):
             if self.interleave_rows and self.tile_h >= 16:
@@ -177,19 +189,19 @@ class TileGridItem(QFrame):
             if self.bpp == 1:
                 b = self.data[off]
                 for x in range(8):
-                    if (b >> x) & 1: qp.fillRect(x*ps+6, row*ps+6, ps, ps, self.palette[1])
+                    if (b >> x) & 1: qp.fillRect(x*ps+self.pad_x, row*ps+self.pad_y, ps, ps, self.palette[1])
             elif self.bpp == 4:
                 for cp in range(4):
                     if off+cp >= len(self.data): break
                     b = self.data[off+cp]
                     p0, p1 = b & 0xF, (b >> 4) & 0xF
-                    if p0: qp.fillRect((cp*2)*ps+6, row*ps+6, ps, ps, self.palette[p0])
-                    if p1: qp.fillRect((cp*2+1)*ps+6, row*ps+6, ps, ps, self.palette[p1])
+                    if p0: qp.fillRect((cp*2)*ps+self.pad_x, row*ps+self.pad_y, ps, ps, self.palette[p0])
+                    if p1: qp.fillRect((cp*2+1)*ps+self.pad_x, row*ps+self.pad_y, ps, ps, self.palette[p1])
             elif self.bpp == 8:
                 for x in range(8):
                     if off+x >= len(self.data): break
                     p = self.data[off+x]
-                    if p: qp.fillRect(x*ps+6, row*ps+6, ps, ps, self.palette[p])
+                    if p: qp.fillRect(x*ps+self.pad_x, row*ps+self.pad_y, ps, ps, self.palette[p])
     def mousePressEvent(self, event): self.clicked.emit(self.index)
 
 class TileEditorWidget(QWidget):
@@ -203,8 +215,13 @@ class TileEditorWidget(QWidget):
             self.rom_data = standalone_data
             
         self.selected_idx = -1
-        self._init_ui()
-        if self.rom_data is not None: self._refresh()
+        try:
+            self._init_ui()
+            if self.rom_data is not None: self._refresh()
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            QMessageBox.critical(self, "Error Interno", f"Ocurrió un error al cargar el Tile Editor:\n{e}")
 
     def set_rom_data(self, data):
         self.rom_data = data
@@ -217,10 +234,19 @@ class TileEditorWidget(QWidget):
             self._refresh()
 
     def _init_ui(self):
-        layout = QHBoxLayout(self)
+        main_layout = QVBoxLayout(self)
+        self.splitter = QSplitter(Qt.Orientation.Horizontal)
+        main_layout.addWidget(self.splitter)
+        
         left = QWidget(); l_lay = QVBoxLayout(left)
+        self.splitter.addWidget(left)
         
         top = QHBoxLayout()
+        btn_toggle_panel = QPushButton("🎨 Menú Lateral")
+        btn_toggle_panel.setCheckable(True); btn_toggle_panel.setChecked(True)
+        btn_toggle_panel.toggled.connect(self._toggle_right_panel)
+        top.addWidget(btn_toggle_panel)
+        
         if not self.project:
             btn_open = QPushButton("📂 Abrir ROM")
             btn_open.clicked.connect(self._open_file_standalone)
@@ -230,38 +256,48 @@ class TileEditorWidget(QWidget):
         self.edit_off = QLineEdit("75A440"); top.addWidget(self.edit_off)
         top.addWidget(QLabel("Fino:"))
         self.spin_fine = QSpinBox(); self.spin_fine.setRange(-1000, 1000); top.addWidget(self.spin_fine)
-        btn_go = QPushButton("<"); btn_go.setFixedWidth(30); btn_go.clicked.connect(lambda: self._page(-1)); top.addWidget(btn_go)
-        btn_go2 = QPushButton(">"); btn_go2.setFixedWidth(30); btn_go2.clicked.connect(lambda: self._page(1)); top.addWidget(btn_go2)
         btn_refresh = QPushButton("Ir"); btn_refresh.clicked.connect(self._refresh); top.addWidget(btn_refresh)
         l_lay.addLayout(top)
 
         cfg = QHBoxLayout()
         cfg.addWidget(QLabel("Alto:"))
-        self.spin_h = QSpinBox(); self.spin_h.setRange(8, 32); self.spin_h.setValue(8); self.spin_h.setSingleStep(8); cfg.addWidget(self.spin_h)
+        self.spin_h = QSpinBox(); self.spin_h.setRange(1, 128); self.spin_h.setValue(8); self.spin_h.setSingleStep(1); cfg.addWidget(self.spin_h)
         cfg.addWidget(QLabel("Grid:"))
-        self.spin_w_grid = QSpinBox(); self.spin_w_grid.setRange(1, 40); self.spin_w_grid.setValue(15); cfg.addWidget(self.spin_w_grid)
+        self.spin_w_grid = QSpinBox(); self.spin_w_grid.setRange(1, 40); self.spin_w_grid.setValue(15); self.spin_w_grid.setSingleStep(1); cfg.addWidget(self.spin_w_grid)
         cfg.addWidget(QLabel("Stride:"))
-        self.spin_stride = QSpinBox(); self.spin_stride.setRange(1, 255); self.spin_stride.setValue(30); cfg.addWidget(self.spin_stride)
+        self.spin_stride = QSpinBox(); self.spin_stride.setRange(1, 255); self.spin_stride.setValue(30); self.spin_stride.setSingleStep(1); cfg.addWidget(self.spin_stride)
         cfg.addWidget(QLabel("BPP:"))
         self.combo_bpp = QComboBox(); self.combo_bpp.addItems(["1 bpp", "2 bpp", "4 bpp", "8 bpp"]); self.combo_bpp.setCurrentIndex(2); cfg.addWidget(self.combo_bpp)
         l_lay.addLayout(cfg)
 
         self.chk_inter_rows = QCheckBox("Intercalar Filas"); self.chk_stride = QCheckBox("Usar Stride")
+        self.chk_details = QCheckBox("Detalles"); self.chk_details.setChecked(True)
         self.chk_inter_rows.toggled.connect(self._refresh); self.chk_stride.toggled.connect(self._refresh)
+        self.chk_details.toggled.connect(self._refresh)
         self.spin_h.valueChanged.connect(self._refresh); self.spin_w_grid.valueChanged.connect(self._refresh)
         self.spin_stride.valueChanged.connect(self._refresh); self.combo_bpp.currentIndexChanged.connect(self._refresh)
-        chk_lay = QHBoxLayout(); chk_lay.addWidget(self.chk_inter_rows); chk_lay.addWidget(self.chk_stride); l_lay.addLayout(chk_lay)
+        chk_lay = QHBoxLayout(); chk_lay.addWidget(self.chk_inter_rows); chk_lay.addWidget(self.chk_stride); chk_lay.addWidget(self.chk_details); l_lay.addLayout(chk_lay)
 
         self.scroll = QScrollArea(); self.scroll.setWidgetResizable(True)
         self.grid_w = QWidget(); self.grid_lay = QGridLayout(self.grid_w); self.grid_lay.setSpacing(2)
-        self.scroll.setWidget(self.grid_w); l_lay.addWidget(self.scroll)
-        layout.addWidget(left, 7)
+        self.grid_lay.setContentsMargins(0, 0, 0, 0)
+        self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        self.scroll.setWidget(self.grid_w)
+        
+        center_lay = QHBoxLayout()
+        center_lay.addWidget(self.scroll)
+        
+        self.rom_scrollbar = QScrollBar(Qt.Orientation.Vertical)
+        self.rom_scrollbar.setMinimum(0)
+        self.rom_scrollbar.valueChanged.connect(self._on_scrollbar_changed)
+        center_lay.addWidget(self.rom_scrollbar)
+        
+        l_lay.addLayout(center_lay)
 
-        right_scroll = QScrollArea()
-        right_scroll.setWidgetResizable(True)
-        right_scroll.setFixedWidth(400)
-        right_container = QWidget()
-        r_lay = QVBoxLayout(right_container)
+        self.right_container = QWidget()
+        r_lay = QVBoxLayout(self.right_container)
+        self.splitter.addWidget(self.right_container)
+        self.splitter.setSizes([800, 400])
         
         tools_lay = QHBoxLayout()
         self.btn_brush = QPushButton("🖌️ Pincel"); self.btn_brush.setCheckable(True); self.btn_brush.setChecked(True)
@@ -308,11 +344,25 @@ class TileEditorWidget(QWidget):
             b.clicked.connect(lambda _, x=i: self._set_color(x)); c_grid.addWidget(b, i//8, i%8); self.pal_btns.append(b)
         r_lay.addLayout(c_grid)
         
-        r_lay.addWidget(QLabel("Raw Hex Data:"))
-        self.edit_hex = QPlainTextEdit(); self.edit_hex.setFixedHeight(120)
+        self.tabs = QTabWidget()
+        
+        self.tab_hex_tile = QWidget()
+        hex_tile_lay = QVBoxLayout(self.tab_hex_tile)
+        self.edit_hex = QPlainTextEdit(); self.edit_hex.setFixedHeight(150)
         self.edit_hex.setStyleSheet("font-family: 'Consolas'; background: #1a1a1a; color: #00ff00;")
-        r_lay.addWidget(self.edit_hex)
-        r_lay.addWidget(QPushButton("🔗 Sincronizar Hex -> Canvas", clicked=self._apply_hex))
+        hex_tile_lay.addWidget(self.edit_hex)
+        hex_tile_lay.addWidget(QPushButton("🔗 Sincronizar Hex -> Canvas", clicked=self._apply_hex))
+        self.tabs.addTab(self.tab_hex_tile, "Hex Tile")
+
+        self.tab_hex_block = QWidget()
+        hex_block_lay = QVBoxLayout(self.tab_hex_block)
+        self.edit_hex_block = QPlainTextEdit(); self.edit_hex_block.setFixedHeight(150)
+        self.edit_hex_block.setStyleSheet("font-family: 'Consolas'; background: #1a1a1a; color: #00ffff;")
+        self.edit_hex_block.setReadOnly(True)
+        hex_block_lay.addWidget(self.edit_hex_block)
+        self.tabs.addTab(self.tab_hex_block, "Hex Bloque")
+
+        r_lay.addWidget(self.tabs)
         
         if self.project:
             r_lay.addWidget(QPushButton("💾 PERSISTIR CAMBIOS", clicked=self._persist_project))
@@ -324,8 +374,17 @@ class TileEditorWidget(QWidget):
         p1 = QHBoxLayout(); p1.addWidget(QPushButton("🅰️ Font Main", clicked=self._preset_main)); p1.addWidget(QPushButton("⌨️ Keyboard", clicked=self._preset_kb)); r_lay.addLayout(p1)
         p2 = QHBoxLayout(); p2.addWidget(QPushButton("📝 UI Naming", clicked=self._preset_naming)); p2.addWidget(QPushButton("⚧️ Symbols", clicked=self._preset_symbols)); r_lay.addLayout(p2)
         
-        right_scroll.setWidget(right_container)
-        layout.addWidget(right_scroll, 3)
+    def _toggle_right_panel(self, checked):
+        self.right_container.setVisible(checked)
+
+    def _on_scrollbar_changed(self, value):
+        bpp = [1,2,4,8][self.combo_bpp.currentIndex()]
+        h = self.spin_h.value()
+        step = (self.spin_w_grid.value() * 10) * (h * bpp if not self.chk_stride.isChecked() else (h//2) * bpp)
+        if step <= 0: step = 1
+        real_offset = value * step
+        self.edit_off.setText(f"{real_offset:X}")
+        self._refresh(from_scrollbar=True)
 
     def _open_file_standalone(self):
         path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM GBA", "", "GBA ROM (*.gba);;All Files (*)")
@@ -409,37 +468,62 @@ class TileEditorWidget(QWidget):
         item = self.grid_lay.itemAt(self.selected_idx).widget()
         if item: item.data = data; item.update()
 
-    def _page(self, dir):
-        try:
-            off = int(self.edit_off.text(), 16); bpp = [1,2,4,8][self.combo_bpp.currentIndex()]; h = self.spin_h.value()
-            step = (self.spin_w_grid.value() * 10) * (h * bpp if not self.chk_stride.isChecked() else (h//2) * bpp)
-            self.edit_off.setText(f"0x{max(0, off + dir * step):x}"); self._refresh()
-        except: pass
-
-    def _refresh(self):
+    def _refresh(self, *args, from_scrollbar=False):
         if self.rom_data is None: return
-        for i in reversed(range(self.grid_lay.count())):
-            w = self.grid_lay.itemAt(i).widget()
-            if w: w.deleteLater()
-        try: off_base = int(self.edit_off.text(), 16) + self.spin_fine.value()
-        except: return
-        inter, use_stride, bpp, h = self.chk_inter_rows.isChecked(), self.chk_stride.isChecked(), [1,2,4,8][self.combo_bpp.currentIndex()], self.spin_h.value()
-        stride, grid_w = self.spin_stride.value(), self.spin_w_grid.value()
-        t_size, c_size = h * bpp, (h // 2) * bpp
-        for i in range(grid_w * 10):
-            if not use_stride:
-                off = off_base + i * t_size
-                if off + t_size > len(self.rom_data): break
-                data = self.rom_data[off : off + t_size]
-            else:
-                off_t, off_b = off_base + i * c_size, off_base + (i + stride) * c_size
-                if off_b + c_size > len(self.rom_data): break
-                data = self.rom_data[off_t : off_t + c_size] + self.rom_data[off_b : off_b + c_size]
-                off = off_t
-            item = TileGridItem(i, data, off, inter, bpp, h, self.canvas.palette)
-            item.clicked.connect(self._select_tile)
-            if self.selected_idx == i: item.selected = True
-            self.grid_lay.addWidget(item, i // grid_w, i % grid_w)
+        
+        try:
+            bpp = [1,2,4,8][self.combo_bpp.currentIndex()]
+            h = self.spin_h.value()
+            step = (self.spin_w_grid.value() * 10) * (h * bpp if not self.chk_stride.isChecked() else (h//2) * bpp)
+            
+            if step > 0:
+                max_steps = len(self.rom_data) // step
+                if self.rom_scrollbar.maximum() != max_steps:
+                    self.rom_scrollbar.blockSignals(True)
+                    self.rom_scrollbar.setRange(0, max_steps)
+                    self.rom_scrollbar.blockSignals(False)
+
+            for i in reversed(range(self.grid_lay.count())):
+                w = self.grid_lay.itemAt(i).widget()
+                if w: w.deleteLater()
+            try: off_base = int(self.edit_off.text(), 16) + self.spin_fine.value()
+            except: return
+            
+            if not from_scrollbar and step > 0:
+                sb_val = off_base // step
+                self.rom_scrollbar.blockSignals(True)
+                self.rom_scrollbar.setValue(sb_val)
+                self.rom_scrollbar.blockSignals(False)
+            inter, use_stride, bpp, h = self.chk_inter_rows.isChecked(), self.chk_stride.isChecked(), [1,2,4,8][self.combo_bpp.currentIndex()], self.spin_h.value()
+            stride, grid_w = self.spin_stride.value(), self.spin_w_grid.value()
+            t_size, c_size = h * bpp, (h // 2) * bpp
+            
+            block_data = bytearray()
+            self.grid_lay.setSpacing(2 if self.chk_details.isChecked() else 0)
+            
+            for i in range(grid_w * 10):
+                if not use_stride:
+                    off = off_base + i * t_size
+                    if off + t_size > len(self.rom_data): break
+                    data = self.rom_data[off : off + t_size]
+                else:
+                    off_t, off_b = off_base + i * c_size, off_base + (i + stride) * c_size
+                    if off_b + c_size > len(self.rom_data): break
+                    data = self.rom_data[off_t : off_t + c_size] + self.rom_data[off_b : off_b + c_size]
+                    off = off_t
+                    
+                block_data.extend(data)
+                
+                item = TileGridItem(i, data, off, inter, bpp, h, self.canvas.palette, self.chk_details.isChecked())
+                item.clicked.connect(self._select_tile)
+                if self.selected_idx == i: item.selected = True
+                self.grid_lay.addWidget(item, i // grid_w, i % grid_w)
+                
+            self._update_hex_block_view(block_data)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            QMessageBox.critical(self, "Error de Refresh", f"Falló la renderización del Tile Editor:\n{e}")
 
     def _update_hex_view(self, data):
         hex_text = ""
@@ -447,6 +531,13 @@ class TileEditorWidget(QWidget):
             chunk = data[i:i+8]
             hex_text += f"{i:02X}: " + " ".join(f"{b:02X}" for b in chunk) + "\n"
         self.edit_hex.setPlainText(hex_text)
+
+    def _update_hex_block_view(self, data):
+        hex_text = ""
+        for i in range(0, len(data), 16):
+            chunk = data[i:i+16]
+            hex_text += f"{i:04X}: " + " ".join(f"{b:02X}" for b in chunk) + "\n"
+        self.edit_hex_block.setPlainText(hex_text)
 
     def _select_tile(self, idx):
         self.selected_idx = idx

@@ -33,6 +33,7 @@ from Perifericos.Interfaz_Usuario.widgets.intro_text_editor import IntroTextEdit
 from Perifericos.Interfaz_Usuario.widgets.help_widget import HelpWidget
 from Perifericos.Interfaz_Usuario.componentes.visor_sonido import SappyAudioViewer
 from Perifericos.Interfaz_Usuario.componentes.visor_sprites import VisorSprites
+from Perifericos.Interfaz_Usuario.componentes.visor_metasprites import VisorMetasprites
 from PyQt6.QtGui import QAction, QShortcut, QKeySequence, QCursor
 from PyQt6.QtWidgets import QDialog
 
@@ -125,6 +126,7 @@ class FoMTStudioApp(QMainWindow):
         self.tile_viewer = None
         self.audio_viewer = None
         self.sprite_viewer = None
+        self.metasprite_viewer = None
         self.cat_events_item = None
         
         self.settings = QSettings("FoMTStudio", "ModdingSuite")
@@ -239,10 +241,14 @@ class FoMTStudioApp(QMainWindow):
         self.toolbar.addWidget(self.btn_bulk_menu)
         
         self.toolbar.addSeparator()
+        self.toolbar.addAction("Editor de Metasprites / Portraits", self._open_visor_metasprites)
+        self.toolbar.addAction("Editor de NPCs", self._open_visor_npc)
+        
+        self.toolbar.addSeparator()
         self.toolbar.addAction(tr('menu_ui_texts', lang), self.open_menu_editor)
         self.toolbar.addAction(tr('menu_intro_texts', lang), self.open_intro_editor)
         self.toolbar.addSeparator()
-        
+
         # Botón para colapsar/expandir explorador
         self.action_toggle_explorer = QAction("📂", self)
         self.action_toggle_explorer.setCheckable(True)
@@ -376,13 +382,16 @@ class FoMTStudioApp(QMainWindow):
         act_sprites = QAction("Visor de Sprites/Portraits", self)
         act_sprites.triggered.connect(lambda: self._populate_ui_step(3))
         
+        act_metasprites = QAction("Visor de Metasprites", self)
+        act_metasprites.triggered.connect(self._open_visor_metasprites)
+        
         act_audio = QAction(tr("tab_audio", lang), self)
         act_audio.triggered.connect(lambda: self._populate_ui_step(4))
         
         act_tile_ext = QAction("Tile Editor Extreme", self)
         act_tile_ext.triggered.connect(self._open_tile_editor_extreme)
         
-        tools_menu.addActions([act_maps, act_sprites, act_audio, act_tile_ext])
+        tools_menu.addActions([act_maps, act_sprites, act_metasprites, act_audio, act_tile_ext])
 
     def apply_theme(self, theme_name):
         self.current_theme = theme_name
@@ -786,6 +795,24 @@ class FoMTStudioApp(QMainWindow):
         editor = MenuEditorWidget(self.project, self)
         self.tabs.addTab(editor, "Textos Interfaz")
         self.tabs.setCurrentWidget(editor)
+
+    def _open_visor_metasprites(self):
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == "🖼 Metasprites":
+                self.tabs.setCurrentIndex(i)
+                return
+        if not self.metasprite_viewer:
+            self.metasprite_viewer = VisorMetasprites(self)
+            self.metasprite_viewer.set_project(self.project)
+        self.tabs.addTab(self.metasprite_viewer, "🖼 Metasprites")
+        self.tabs.setCurrentWidget(self.metasprite_viewer)
+
+    def _open_visor_npc(self):
+        lang = self.current_lang
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tr("tab_npcs", lang):
+                self.tabs.setCurrentIndex(i)
+                return
 
     def open_intro_editor(self):
         """Abre el editor global de textos de la introducción."""

@@ -10,17 +10,14 @@ def validar_e_inyectar_splash(project):
     # el project_dir podría estar vacío o apuntar a la sesión. El asset debe estar en la carpeta fuente.
     # Como la estructura es fija, intentamos localizar el asset usando rutas relativas robustas.
     
-    # Trataremos de localizar el binario usando la ruta absoluta basada en el path actual (la carpeta raíz del repo)
-    # asumiendo que FoMT Studio se ejecuta en la raíz.
-    base_dir = getattr(project, 'studio_root_dir', os.getcwd())
+    from Nucleos_de_Procesamiento.Nucleo_de_Datos.Utilidades.rutas import get_resource_path
     
-    asset_path = os.path.join(
-        base_dir,
-        "Nucleos_de_Procesamiento", 
-        "Nucleo_de_Datos", 
-        "assets", 
+    asset_path = get_resource_path(os.path.join(
+        "Nucleos_de_Procesamiento",
+        "Nucleo_de_Datos",
+        "assets",
         "splash_logo.bin"
-    )
+    ))
     
     if not os.path.exists(asset_path):
         raise RuntimeError(
@@ -56,7 +53,7 @@ def validar_e_inyectar_splash(project):
     project.write_patch(0x77990, ptr_bytes)
     
     # 4. Inyectar la paleta (splash.pal)
-    pal_path = os.path.join(base_dir, "Nucleos_de_Procesamiento", "Nucleo_de_Datos", "assets", "splash.pal")
+    pal_path = get_resource_path(os.path.join("Nucleos_de_Procesamiento", "Nucleo_de_Datos", "assets", "splash.pal"))
     if os.path.exists(pal_path):
         with open(pal_path, "rb") as f:
             pal_data = f.read()

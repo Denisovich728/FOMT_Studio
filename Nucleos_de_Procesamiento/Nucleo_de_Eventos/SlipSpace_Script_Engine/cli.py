@@ -236,6 +236,10 @@ def main():
     t_scan = subparsers.add_parser("scan-tables", help="Scan ROM for pointer tables like Characters and Items")
     t_scan.add_argument("rom_file", help="Path to FoMT ROM .gba file")
     
+    # Aggressive Script Scanner
+    a_scan = subparsers.add_parser("aggressive-scan", help="Agresivamente escanea la ROM por scripts RIFF/SCR y reconstruye tablas de eventos.")
+    a_scan.add_argument("rom_file", help="Path to FoMT ROM .gba file")
+    
     args = parser.parse_args()
     
     if args.command == "compile":
@@ -246,6 +250,9 @@ def main():
         with open(args.rom_file, 'rb') as f:
             from .utility.scan_tables import scan_fomt_tables
             scan_fomt_tables(f.read())
+    elif args.command == "aggressive-scan":
+        from .utility.scan_aggressive_scripts import run_aggressive_scan
+        run_aggressive_scan(args.rom_file)
     else:
         # Launch GUI if no command is specified
         from .ui import launch_gui
