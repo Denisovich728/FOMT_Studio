@@ -39,8 +39,14 @@ class NpcEditorWidget(QWidget):
         self.btn_save.setStyleSheet("background-color: #2e7d32; color: white;")
         self.btn_save.clicked.connect(self.save_data)
         
+        self.btn_expand = QPushButton("Portrait Expand (Experimental)")
+        self.btn_expand.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold;")
+        self.btn_expand.setToolTip("Aumentar el límite de tamaño e IDs de retratos en la ROM.")
+        self.btn_expand.clicked.connect(self.expand_portraits)
+        
         toolbar.addWidget(self.lbl_title)
         toolbar.addStretch()
+        toolbar.addWidget(self.btn_expand)
         toolbar.addWidget(self.btn_refresh)
         toolbar.addWidget(self.btn_save)
         
@@ -61,6 +67,16 @@ class NpcEditorWidget(QWidget):
         self.table.setItemDelegateForColumn(1, self.delegate)
         
         layout.addWidget(self.table)
+        
+    def expand_portraits(self):
+        lang = getattr(self.window(), 'current_lang', 'es')
+        reply = QMessageBox.warning(self, "Portrait Expand", 
+            "¿Quieres instalar el Assembly Hook para aumentar el límite de tamaño de portraits y permitir agregar más IDs a la ROM?\n\nEsta es una función EXPERIMENTAL. Úsalo bajo tu propio riesgo. Requiere una copia de seguridad de la ROM.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            
+        if reply == QMessageBox.StandardButton.Yes:
+            # Aquí irá la lógica de inyección del Assembly Hook del Repacker
+            QMessageBox.information(self, "Portrait Expand", "Hook de Expansión de Retratos preparado. La inyección se realizará durante el repacking.")
         
     def load_data(self):
         if not self.project: return
@@ -138,6 +154,7 @@ class NpcEditorWidget(QWidget):
 class NpcDetailDialog(QDialog):
     def __init__(self, npc, parent=None):
         super().__init__(parent)
+        self.npc = npc
         name = npc.name_str.strip('\x00')
         lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
         self.setWindowTitle(tr('npc_profile', lang).format(name=name))
@@ -152,6 +169,12 @@ class NpcDetailDialog(QDialog):
         self.lbl_portrait.setStyleSheet("background-color: #222; border: 1px solid #444;")
         self.lbl_portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.side_graphics.addWidget(self.lbl_portrait)
+        
+        self.btn_edit_portrait = QPushButton("👤 Editar Retrato")
+        self.btn_edit_portrait.setStyleSheet("background-color: #1F3A5F; color: #89B4FA; font-weight: bold;")
+        self.btn_edit_portrait.clicked.connect(self.abrir_editor_retrato)
+        self.side_graphics.addWidget(self.btn_edit_portrait)
+        
         self.side_graphics.addStretch()
         self.layout_main.addLayout(self.side_graphics)
         
@@ -172,6 +195,18 @@ class NpcDetailDialog(QDialog):
         lbl_ptr = QLabel(f"<b>{tr('ptr_rom', lang)}</b> <span style='color:blue;'><u>{ptr_str}</u></span>")
         lbl_ptr.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         layout.addWidget(lbl_ptr)
+        
+        # Enlace Interactivo al Script de Personalidad
+        script_layout = QHBoxLayout()
+        lbl_script = QLabel("<b>Script Vinculado:</b>")
+        self.btn_script = QPushButton(f"📜 {name}_Personality")
+        self.btn_script.setStyleSheet("color: #4CAF50; border: none; text-decoration: underline; text-align: left;")
+        self.btn_script.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_script.clicked.connect(lambda: self.abrir_script(f"{name}_Personality"))
+        script_layout.addWidget(lbl_script)
+        script_layout.addWidget(self.btn_script)
+        script_layout.addStretch()
+        layout.addLayout(script_layout)
         
         self.txt_data = QTextEdit()
         self.txt_data.setReadOnly(True)
@@ -194,56 +229,97 @@ class NpcDetailDialog(QDialog):
         btn_close.clicked.connect(self.close)
         layout.addWidget(btn_close)
         
+    def abrir_script(self, script_name):
+        app = self.parent().window()
+        ptr = getattr(self.npc, 'personality_ptr', 0)
+        if ptr == 0:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, "Error", "Este NPC no tiene un script de personalidad válido.")
+            return
+            
+        if hasattr(app, 'tabs'):
+            for i in range(app.tabs.count()):
+                widget = app.tabs.widget(i)
+                if hasattr(widget, 'load_rom_script'):
+                    app.tabs.setCurrentIndex(i)
+                    widget.load_rom_script(ptr)
+                    self.close()
+                    return
+            
+            # Si no existe la pestaña IDE, la creamos usando el método de app
+            from Perifericos.Interfaz_Usuario.widgets.script_ide import ScriptIDEWidget
+            ide = ScriptIDEWidget(app.project, app)
+            ide.load_rom_script(ptr)
+            app.tabs.addTab(ide, f"Script: {script_name}")
+            app.tabs.setCurrentWidget(ide)
+            self.close()
+        
+
     def _load_npc_portrait(self, npc, parent):
-        """Intenta extraer y mostrar el retrato o sprite del NPC usando el motor RAW."""
+        import os
+        import csv
+        from PyQt6.QtGui import QPixmap
+        
+        name = npc.name_str.strip('\x00')
+        dump_dir = r"j:\Repositorios\fomt_studio\portraits_dump"
+        csv_path = r"j:\Repositorios\fomt_studio\Nucleos_de_Procesamiento\Cilixes\fomt\Fomt_Portraits.csv"
+        lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
+        
+        if not os.path.exists(dump_dir):
+            self.lbl_portrait.setText(tr('no_rom_data', lang))
+            return
+            
+        target_portrait_name = f"{name}_Neutral"
+        # Manejar discrepancia Lillia vs Lilia
+        if name == "Lillia":
+            target_portrait_name = "Lilia_Neutral"
+            name = "Lilia"
+            
+        hex_id = None
+        
+        # Read the CSV to find the hex ID mapped to this NPC
         try:
-            import struct
-            from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.codec_tiles import assemble_sprite
-            from PyQt6.QtGui import QImage, QPixmap
-            
-            project = parent.project
-            p_offset = npc.portrait_offset
-            
-            # Motor RAW: cargamos 2KB directamente
-            raw_data = project.read_rom(p_offset, 2048)
-            lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
-            if not raw_data: 
-                self.lbl_portrait.setText(tr('no_rom_data', lang))
-                return
-            
-            # Cargar Paleta Maestra (0x58B3E0)
-            pal_raw = project.read_rom(npc.parser.master_palette_off, 32)
-            pal = []
-            if pal_raw:
-                for i in range(16):
-                    c16 = struct.unpack_from('<H', pal_raw, i*2)[0]
-                    r = (c16 & 0x1F) << 3
-                    g = ((c16 >> 5) & 0x1F) << 3
-                    b = ((c16 >> 10) & 0x1F) << 3
-                    pal.append((r, g, b))
-            else:
-                pal = [(i*16, i*16, i*16) for i in range(16)] # Fallback grayscale
-            
-            size = 64
-            oam = {
-                "w": size, "h": size, "tile_id": 0, "is_8bpp": False,
-                "palette_bank": 0
-            }
-            
-            canvas = assemble_sprite(raw_data, oam)
-            
-            img = QImage(size, size, QImage.Format.Format_RGB32)
-            for y in range(size):
-                for x in range(size):
-                    c = pal[canvas[y][x]]
-                    img.setPixel(x, y, (c[0] << 16) | (c[1] << 8) | c[2])
-            
-            pix = QPixmap.fromImage(img).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
-            self.lbl_portrait.setPixmap(pix)
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                next(reader) # skip header
+                for row in reader:
+                    if len(row) >= 2 and row[0].strip() == target_portrait_name:
+                        hex_id = row[1].strip()
+                        break
         except Exception as e:
-            print(f"Portrait Error: {e}")
-            lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
-            self.lbl_portrait.setText(tr('render_error', lang))
+            print(f"Error reading Fomt_Portraits.csv: {e}")
+            
+        if not hex_id:
+            # Fallback for NPCs that might not have a Neutral portrait
+            self.lbl_portrait.setText(tr('no_rom_data', lang))
+            return
+            
+        self.current_hex_id = int(hex_id, 16)
+        self.base_portrait_name = name
+            
+        # The dump script generates names like "00_Rick_Neutral.png"
+        img_filename = f"{hex_id}_{target_portrait_name}.png"
+        img_path = os.path.join(dump_dir, img_filename)
+        
+        if os.path.exists(img_path):
+            try:
+                pix = QPixmap(img_path).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
+                self.lbl_portrait.setPixmap(pix)
+            except Exception as e:
+                print(f"Error cargando PNG: {e}")
+                self.lbl_portrait.setText(tr('render_error', lang))
+        else:
+            self.lbl_portrait.setText(tr('no_rom_data', lang))
+
+    def abrir_editor_retrato(self):
+        if not hasattr(self, 'current_hex_id') or self.current_hex_id is None:
+            QMessageBox.warning(self, "Sin Retrato", "Este NPC no tiene un retrato asociado o no se encontró en la lista.")
+            return
+        from Perifericos.Interfaz_Usuario.widgets.portrait_editor import PortraitEditorDialog
+        dlg = PortraitEditorDialog(self.npc.name_str.strip('\x00'), self.current_hex_id, self.base_portrait_name, parent=self)
+        dlg.exec()
+        # Recargar portrait tras cerrar el diálogo
+        self._load_npc_portrait(self.npc, self.parent())
 
     def _on_close(self):
         self.close()

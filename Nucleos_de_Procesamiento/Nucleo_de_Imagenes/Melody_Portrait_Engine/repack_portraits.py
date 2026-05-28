@@ -93,12 +93,37 @@ def _load_tables(rom):
 def _flush_tables(rom, tables, counts, save_path=None):
     """
     Escribe las tablas en el espacio libre 0x007D0000 y parchea los 3 punteros ASM.
+
+    El payload incluye T4 completa (tiles vanilla ~362KB + nuevos), por lo que
+    la ROM se extiende mas alla de los 8MB originales cuando hay portraits expandidos.
+    Esto es normal — el bytearray crece segun sea necesario.
+
+    Emite advertencia solo si metadata+tiles_nuevos supera el 80%% de los 192KB
+    del espacio 0x7D0000-0x800000 (como referencia para el usuario).
     """
-    NEW_BASE = 0x007D0000
+    NEW_BASE    = 0x007D0000
+    REF_SPACE   = 0x800000 - NEW_BASE   # 196,608 bytes de referencia
+    WARN_THRESH = int(REF_SPACE * 0.80)
+
     payload = bytearray()
     for i, t_data in enumerate(tables):
         payload += struct.pack('<I', counts[i])
         payload += t_data
+
+    # Advertencia basada solo en metadata + tiles nuevos (excluye T4 vanilla)
+    vanilla_t4_count = _get_vanilla_t4_count(rom)
+    t4_new_bytes     = max(0, len(tables[3]) - vanilla_t4_count * 32)
+    meta_sz = sum(4 + len(t) for i, t in enumerate(tables) if i != 3) + 4 + t4_new_bytes
+    if meta_sz > WARN_THRESH:
+        pct = meta_sz / REF_SPACE * 100
+        print(f"[WARNING] Metadata+tiles_nuevos: {meta_sz:,}B ({pct:.0f}%% de {REF_SPACE:,}B). "
+              f"Considera resetear la ROM base pronto.")
+
+    # Extender el bytearray si el payload supera el tamano actual de la ROM
+    needed = NEW_BASE + len(payload)
+    if needed > len(rom):
+        rom += bytearray(needed - len(rom))
+
     rom[NEW_BASE:NEW_BASE + len(payload)] = payload
 
     ptr_bytes = struct.pack('<I', NEW_BASE + 0x08000000)
@@ -109,7 +134,76 @@ def _flush_tables(rom, tables, counts, save_path=None):
     if save_path:
         with open(save_path, 'wb') as f:
             f.write(rom)
-        print(f"ROM guardada en {save_path}")
+        print(f"ROM guardada en {save_path} ({len(rom):,} bytes)")
+
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# _get_vanilla_t4_count — detecta dinámicamente el count de T4 en la ROM vanilla
+# ─────────────────────────────────────────────────────────────────────────────────
+
+def _get_vanilla_t4_count(rom):
+    """
+    Lee el count de T4 (GFX tiles) desde la posicion VANILLA fija 0x0852D984,
+    que siempre esta presente en la ROM independientemente de si ya fue expandida.
+    Esto permite detectar si f6 de un portrait esta en la zona expandida (> vanilla count).
+    """
+    VANILLA_HEADER = 0x0852D984 - 0x08000000
+    r1 = VANILLA_HEADER
+    for shift in [2, 4, 3]:   # T1, T2, T3
+        cnt = struct.unpack('<I', rom[r1:r1+4])[0]
+        r1 += 4 + cnt * (1 << shift)
+    # Ahora r1 apunta al count de T4
+    return struct.unpack('<I', rom[r1:r1+4])[0]
+
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# _validate_tables — Table Integrity Guard
+# Verifica que ningún índice de T2 apunte fuera de rango en T3/T4/T5
+# y que el payload no desborde el espacio en 0x007D0000.
+# ─────────────────────────────────────────────────────────────────────────────────
+
+def _validate_tables(tables, counts):
+    """
+    Table Integrity Guard: verifica la coherencia de todas las tablas antes
+    de hacer el flush a la ROM. Lanza AssertionError si detecta algun problema.
+
+    No valida el tamaño absoluto del payload (T4 es grande y se acepta que
+    la ROM pueda crecer). Solo valida coherencia de indices entre tablas.
+    """
+    t1, t2, t3, t4, t5, t6, t7 = tables
+
+    # 1. Coherencia de longitudes de tablas vs counts
+    assert len(t3) == counts[2] * 8,  f"[INTEGRITY] T3 size mismatch: {len(t3)} != {counts[2]*8}"
+    assert len(t4) == counts[3] * 32, f"[INTEGRITY] T4 size mismatch: {len(t4)} != {counts[3]*32}"
+    assert len(t5) == counts[4] * 32, f"[INTEGRITY] T5 size mismatch: {len(t5)} != {counts[4]*32}"
+
+    # 2. T2: todos los indices apuntan a rangos validos en T3, T4, T5
+    for iidx in range(counts[1]):
+        base = iidx * 16
+        if base + 16 > len(t2):
+            break
+        f0_v = read_hword(t2, base)
+        f2_v = read_hword(t2, base + 2)
+        f4_v = read_hword(t2, base + 4)
+        f6_v = read_hword(t2, base + 6)
+        fA_v = read_hword(t2, base + 10)
+
+        assert f2_v + f0_v <= counts[2], (
+            f"[INTEGRITY] T2[{iidx}] OAM fuera de T3: "
+            f"f2={f2_v}+f0={f0_v}={f2_v+f0_v} > count={counts[2]}"
+        )
+        assert f6_v + f4_v <= counts[3], (
+            f"[INTEGRITY] T2[{iidx}] GFX fuera de T4: "
+            f"f6={f6_v}+f4={f4_v}={f6_v+f4_v} > count={counts[3]}"
+        )
+        assert fA_v < counts[4], (
+            f"[INTEGRITY] T2[{iidx}] Paleta fuera de T5: "
+            f"fA={fA_v} >= count={counts[4]}"
+        )
+
+    payload_sz = sum(4 + len(t) for t in tables)
+    print(f"[Integrity] OK — {counts[2]} OAMs / {counts[3]} tiles / {counts[4]} paletas. "
+          f"Payload total: {payload_sz:,}B")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -270,10 +364,17 @@ def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_pa
 def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_palette=None):
     """
     Reinyecta un portrait completamente nuevo en la ROM.
-    Recalcula OAMs, GFX y metadata. SIEMPRE actualiza f0.
-    Funciona para cualquier tamaño de PNG, incluidos los más grandes que el original.
+    Recalcula OAMs (Natsume-style smart slicer), GFX y metadata.
+
+    Modos de escritura:
+      - PRIMERA INYECCION: fork-and-append al final de T3/T4/T5.
+      - OVERWRITE IN-PLACE: si el portrait ya fue expandido antes y los nuevos
+        tiles caben en el slot anterior (new_tiles <= old_f4), sobreescribe
+        en-place sin crecer T4. Esto evita la acumulacion de datos huerfanos.
+      - ORPHAN + APPEND: si el portrait crece demasiado para su slot anterior,
+        se appendea al final y el slot viejo queda sin referencias (huerfano).
     """
-    rom = bytearray(rom_data) if rom_data else bytearray(open(ROM_PATH, 'rb').read())
+    rom    = bytearray(rom_data) if rom_data else bytearray(open(ROM_PATH, 'rb').read())
     engine = MelodyPortraitEngine(None)
     img    = Image.open(input_png_path).convert("RGBA")
 
@@ -282,77 +383,123 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
 
     internal_idx = struct.unpack('<H', t1[target_portrait_hex*4+2 : target_portrait_hex*4+4])[0]
     if internal_idx >= counts[1]:
-        raise ValueError(f"Índice interno inválido: {internal_idx}")
+        raise ValueError(f"Indice interno invalido: {internal_idx}")
 
     meta = internal_idx * 16
     f0   = struct.unpack('<H', t2[meta:meta+2])[0]
     f2   = struct.unpack('<H', t2[meta+2:meta+4])[0]
+    f4   = struct.unpack('<H', t2[meta+4:meta+6])[0]   # tiles actuales del portrait
+    f6   = struct.unpack('<H', t2[meta+6:meta+8])[0]   # inicio GFX actual en T4
 
-    # Leer OAMs originales solo para obtener el anchor (min_x, min_y)
-    # El anchor determina la posición en pantalla del portrait.
+    # Leer OAMs originales para obtener el anchor (min_x, min_y)
     oams = _parse_oams(t3, t2, engine, f0, f2)
     if not oams:
         raise ValueError("No se encontraron OAMs para este portrait.")
 
     min_x, min_y, _, _ = _bounding_box(oams)
     print(f"[Expansion] Portrait {target_portrait_hex:02X}: anchor=({min_x},{min_y}), "
-          f"PNG={img.width}×{img.height}px")
+          f"PNG={img.width}x{img.height}px")
 
-    # --- Calcular nuevos slices OAM en coordenadas GBA correctas ---
-    # anchor_x = min_x del portrait original (posición horizontal en pantalla)
-    # anchor_y = 0     (baseline = borde INFERIOR del PNG = el suelo)
-    # El tope del PNG en coords GBA = anchor_y - img.height = -img.height
-    # Todos los OAMs tendrán y <= 0 → siempre visibles (sobre el suelo)
-    slices = engine.calculate_slices(img.width, img.height,
-                                     anchor_x=min_x,
-                                     anchor_y=0)
-    print(f"[Expansion] {len(slices)} OAM slices generados con anchor=({min_x},0).")
-    print(f"[Expansion] Rango Y GBA: [{-img.height}, 0]  (todos negativos = sobre el suelo)")
+    # ── Smart Slicer (Natsume-style): omite OAMs 100%% transparentes ──
+    slices = engine.calculate_slices_smart(img, img.width, img.height,
+                                           anchor_x=min_x,
+                                           anchor_y=0)
+    print(f"[Expansion] Smart slicer: {len(slices)} OAMs generados "
+          f"(vs {len(oams)} originales). anchor=({min_x},0)")
 
-    # --- GFX y Paleta ---
+    # ── GFX y Paleta ──
     if custom_palette and len(custom_palette) == 16:
         new_gfx, _ = engine.encode_4bpp(img, slices)
         new_pal    = _encode_custom_palette(custom_palette)
     else:
         new_gfx, new_pal = engine.encode_4bpp(img, slices)
 
-    # Las coordenadas GBA ya están correctas desde calculate_slices()
-    # NO se necesita ningún ajuste post-hoc (eso era el bug anterior)
-    new_oam_data   = engine.generate_oam_data(slices)
+    new_oam_data    = engine.generate_oam_data(slices)
     new_tiles_count = len(new_gfx) // 32
-    new_oam_count  = len(new_oam_data) // 8
+    new_oam_count   = len(new_oam_data) // 8
 
     print(f"[Expansion] new_oam_count={new_oam_count}, new_tiles_count={new_tiles_count}")
 
-    # --- Fork & Append: añadir al final de cada tabla (100% seguro, no toca otros portraits) ---
-    new_oam_start = counts[2]
-    t3 += new_oam_data
+    # ── Portrait Slot Manager: overwrite in-place vs fork-and-append ──
+    vanilla_t4_count = _get_vanilla_t4_count(rom)
+    is_already_expanded = (f6 >= vanilla_t4_count)
 
-    new_gfx_start = counts[3]
-    t4 += new_gfx
+    if is_already_expanded and new_tiles_count <= f4:
+        # OVERWRITE IN-PLACE: los tiles caben en el slot anterior
+        # T4 no crece, se sobreescribe en la posicion existente.
+        old_gfx_off = f6 * 32
+        t4[old_gfx_off : old_gfx_off + new_tiles_count * 32] = new_gfx
+        # Rellenar con ceros los tiles sobrantes del slot anterior (si new < old)
+        if new_tiles_count < f4:
+            zero_start = old_gfx_off + new_tiles_count * 32
+            zero_end   = old_gfx_off + f4 * 32
+            t4[zero_start:zero_end] = bytes(zero_end - zero_start)
+        new_gfx_start = f6
+        print(f"[Expansion] OVERWRITE IN-PLACE: slot f6={f6}, "
+              f"{new_tiles_count}/{f4} tiles usados.")
 
-    new_pal_idx   = counts[4]
-    t5 += new_pal
+        # OAMs: sobreescribir en-place en T3 si caben
+        old_oam_off = f2 * 8
+        if new_oam_count <= f0:
+            t3[old_oam_off : old_oam_off + new_oam_count * 8] = new_oam_data
+            new_oam_start = f2
+            print(f"[Expansion] OAMs overwrite in-place: slot f2={f2}, "
+                  f"{new_oam_count}/{f0} OAMs usados.")
+        else:
+            # Mas OAMs que antes: appendear
+            new_oam_start = counts[2]
+            t3 += new_oam_data
+            print(f"[Expansion] OAMs append: {new_oam_count} OAMs (antes {f0}).")
 
-    # --- Actualizar metadata (Table 2) para este portrait ---
-    # CRÍTICO: f0 = new_oam_count → el juego sabrá que hay más piezas
+        # Paleta: sobreescribir en-place (misma fA, misma posicion en T5)
+        old_fA = struct.unpack('<H', t2[meta+10:meta+12])[0]
+        pal_off = old_fA * 32
+        t5[pal_off:pal_off+32] = new_pal
+        new_pal_idx = old_fA
+        print(f"[Expansion] Paleta overwrite in-place: fA={old_fA}.")
+
+        new_counts = list(counts)
+        if new_oam_count > f0:
+            new_counts[2] += new_oam_count
+        # T4 y T5 no cambian de count (in-place)
+
+    else:
+        # FORK-AND-APPEND: primera inyeccion, o portrait que crece mas alla del slot
+        if is_already_expanded:
+            print(f"[Expansion] ORPHAN+APPEND: portrait ya expandido pero crece "
+                  f"({new_tiles_count} > slot={f4}). Slot anterior f6={f6} queda huerfano.")
+        else:
+            print(f"[Expansion] FORK-AND-APPEND: primera inyeccion del portrait.")
+
+        new_oam_start = counts[2]
+        t3 += new_oam_data
+
+        new_gfx_start = counts[3]
+        t4 += new_gfx
+
+        new_pal_idx = counts[4]
+        t5 += new_pal
+
+        new_counts = list(counts)
+        new_counts[2] += new_oam_count
+        new_counts[3] += new_tiles_count
+        new_counts[4] += 1
+
+    # ── Actualizar metadata T2 ──
     m_off = internal_idx * 16
-    struct.pack_into('<H', t2, m_off,    new_oam_count)   # f0: OAM count  ← LA CLAVE
-    struct.pack_into('<H', t2, m_off+2,  new_oam_start)   # f2: OAM start
+    struct.pack_into('<H', t2, m_off,    new_oam_count)    # f0: OAM count
+    struct.pack_into('<H', t2, m_off+2,  new_oam_start)    # f2: OAM start
     struct.pack_into('<H', t2, m_off+4,  new_tiles_count)  # f4: Tiles count
-    struct.pack_into('<H', t2, m_off+6,  new_gfx_start)   # f6: GFX start
-    struct.pack_into('<H', t2, m_off+10, new_pal_idx)      # fA: Palette index
+    struct.pack_into('<H', t2, m_off+6,  new_gfx_start)    # f6: GFX start
+    struct.pack_into('<H', t2, m_off+10, new_pal_idx)       # fA: Palette index
 
-    print(f"[Expansion] Metadata actualizada: f0={new_oam_count}, f2={new_oam_start}, "
+    print(f"[Expansion] Metadata: f0={new_oam_count}, f2={new_oam_start}, "
           f"f4={new_tiles_count}, f6={new_gfx_start}, fA={new_pal_idx}")
 
-    # --- Actualizar contadores globales de cada tabla ---
-    new_counts = list(counts)
-    new_counts[2] += new_oam_count
-    new_counts[3] += new_tiles_count
-    new_counts[4] += 1
-
+    # ── Table Integrity Guard ──
     tables = [t1, t2, t3, t4, t5, t6, t7]
+    _validate_tables(tables, new_counts)
+
     _flush_tables(rom, tables, new_counts, OUT_ROM_PATH if rom_data is None else None)
     print(f"[Expansion] Repack completo para portrait {target_portrait_hex:02X}.")
     return rom

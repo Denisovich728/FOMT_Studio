@@ -1,6 +1,6 @@
 # ============================================================
 # FOMT Studio - Portrait Engine
-# Melody Portrait Engine - v2.1 (Sistema de Coordenadas Corregido)
+# Melody Portrait Engine - v3.0 (Smart Slicer + Slot Manager)
 # Desarrollado por: Denisovich728
 #
 # DESCUBRIMIENTO CRÍTICO (Reverse Engineering):
@@ -56,74 +56,164 @@ class MelodyPortraitEngine:
 
     def calculate_slices(self, width, height, anchor_x=None, anchor_y=None):
         """
-        Auto-Slicing Greedy Algorithm adaptado al sistema de coordenadas GBA.
-
-        El sistema de coordenadas del juego tiene el anchor en la baseline
-        inferior del portrait (el suelo). Los OAMs usan coordenadas negativas
-        en Y para representar píxeles SOBRE el suelo.
-
-        Parámetros:
-            width, height: Dimensiones del PNG de entrada.
-            anchor_x:      Posición X del anchor en el sistema de coordenadas GBA.
-                           Por defecto: -width // 2 (centrado horizontalmente).
-            anchor_y:      Posición Y del anchor en el sistema de coordenadas GBA.
-                           Por defecto: 0 (baseline = borde inferior del PNG).
-                           SIEMPRE debe ser 0 o negativo.
-
-        El mapeo es:
-            PNG (0, 0)        → GBA (anchor_x, anchor_y - height)   [esquina sup-izq]
-            PNG (0, height)   → GBA (anchor_x, anchor_y)             [baseline/suelo]
-
-        Todos los slices generados tienen y <= 0 para que sean visibles.
+        Slicer algorithm (Greedy + recursive gap fill).
         """
         if anchor_x is None:
             anchor_x = -(width // 2)
         if anchor_y is None:
-            anchor_y = 0  # baseline = borde inferior del PNG
+            anchor_y = 0
 
-        slices = []
-        # Iterar de ARRIBA (y más negativo) hacia ABAJO (y=0)
-        # El tope del PNG en coordenadas GBA es anchor_y - height
         gba_top = anchor_y - height
 
-        y_png = 0  # posición en el PNG (de arriba hacia abajo)
-        while y_png < height:
-            rem_h = height - y_png
-            gba_y = gba_top + y_png  # coordenada Y en sistema GBA
+        def slice_rect(start_x, start_y, rw, rh):
+            sl = []
+            y = 0
+            while y < rh:
+                rem_h = rh - y
+                valid_h = [oh for _, _, _, oh in self.sorted_dims if oh <= rem_h]
+                best_h = max(valid_h) if valid_h else 8
+                x = 0
+                while x < rw:
+                    rem_w = rw - x
+                    best_sprite = None
+                    for shape, size, ow, oh in self.sorted_dims:
+                        if ow <= rem_w and oh <= best_h:
+                            best_sprite = (shape, size, ow, oh)
+                            break
+                    if not best_sprite:
+                        best_sprite = (0, 0, 8, 8)
+                    shape, size, ow, oh = best_sprite
+                    
+                    sl.append({
+                        'x':     anchor_x + start_x + x,
+                        'y':     gba_top + start_y + y,
+                        'w':     ow,
+                        'h':     oh,
+                        'shape': shape,
+                        'size':  size,
+                        'png_x': start_x + x,
+                        'png_y': start_y + y,
+                    })
+                    
+                    if oh < best_h:
+                        sl.extend(slice_rect(start_x + x, start_y + y + oh, ow, best_h - oh))
+                    x += ow
+                y += best_h
+            return sl
 
-            valid_heights = [oh for _, _, _, oh in self.sorted_dims if oh <= rem_h]
-            best_h = max(valid_heights) if valid_heights else 8
+        return slice_rect(0, 0, width, height)
 
-            x_png = 0
-            while x_png < width:
-                rem_w = width - x_png
-                gba_x = anchor_x + x_png
+    def _region_has_pixels(self, pixels, img_w, img_h, src_x, src_y, w, h):
+        """
+        Devuelve True si hay al menos 1 píxel no transparente en el rectángulo.
+        """
+        for y in range(h):
+            for x in range(w):
+                cx, cy = src_x + x, src_y + y
+                if 0 <= cx < img_w and 0 <= cy < img_h:
+                    if pixels[cx, cy][3] >= 128:
+                        return True
+        return False
 
-                best_sprite = None
-                for shape, size, ow, oh in self.sorted_dims:
-                    if ow <= rem_w and oh <= best_h:
-                        best_sprite = (shape, size, ow, oh)
-                        break
+    def _wasted_tiles_ratio(self, pixels, img_w, img_h, src_x, src_y, w, h):
+        """
+        Calcula qué porcentaje de los tiles 8x8 en este OAM son 100%% transparentes.
+        Ayuda a decidir si vale la pena romper un OAM grande en más pequeños.
+        """
+        total_tiles = (w // 8) * (h // 8)
+        empty_tiles = 0
+        for ty in range(h // 8):
+            for tx in range(w // 8):
+                has_px = False
+                for py in range(8):
+                    for px in range(8):
+                        cx, cy = src_x + tx*8 + px, src_y + ty*8 + py
+                        if 0 <= cx < img_w and 0 <= cy < img_h:
+                            if pixels[cx, cy][3] >= 128:
+                                has_px = True
+                                break
+                    if has_px: break
+                if not has_px:
+                    empty_tiles += 1
+        return empty_tiles / total_tiles
 
-                if not best_sprite:
-                    best_sprite = (0, 0, 8, 8)
+    def calculate_slices_smart(self, img, width, height, anchor_x=None, anchor_y=None):
+        """
+        Natsume-Style Smart Slicer (con gap fill recursivo y optimización agresiva).
+        Omite rectángulos 100%% transparentes. Además, si un OAM desperdicia muchos
+        tiles en zonas transparentes, lo rechaza para forzar OAMs más pequeños
+        y ahorrar VRAM.
+        """
+        img = img.convert("RGBA")
+        pixels = img.load()
+        img_w, img_h = img.width, img.height
 
-                shape, size, ow, oh = best_sprite
-                slices.append({
-                    'x': gba_x,          # Coordenada GBA (incluye anchor_x)
-                    'y': gba_y,          # Coordenada GBA negativa (sobre el suelo)
-                    'w': ow,
-                    'h': oh,
-                    'shape': shape,
-                    'size': size,
-                    # Posición en el PNG para el encodificador
-                    'png_x': x_png,
-                    'png_y': y_png,
-                })
-                x_png += ow
-            y_png += best_h
+        if anchor_x is None:
+            anchor_x = -(width // 2)
+        if anchor_y is None:
+            anchor_y = 0
 
-        return slices
+        gba_top = anchor_y - height
+
+        def slice_rect(start_x, start_y, rw, rh):
+            sl = []
+            y = 0
+            while y < rh:
+                rem_h = rh - y
+                valid_h = [oh for _, _, _, oh in self.sorted_dims if oh <= rem_h]
+                best_h = max(valid_h) if valid_h else 8
+                x = 0
+                while x < rw:
+                    rem_w = rw - x
+                    best_sprite = None
+                    
+                    # Buscar el sprite más grande, pero penalizar si desperdicia mucha memoria
+                    for shape, size, ow, oh in self.sorted_dims:
+                        if ow <= rem_w and oh <= best_h:
+                            if not self._region_has_pixels(pixels, img_w, img_h, start_x + x, start_y + y, ow, oh):
+                                # 100% transparente, es un candidato perfecto (costo 0 tiles)
+                                best_sprite = (shape, size, ow, oh)
+                                break
+                            
+                            # Si no es transparente, ver cuánto desperdicia
+                            wasted = self._wasted_tiles_ratio(pixels, img_w, img_h, start_x + x, start_y + y, ow, oh)
+                            # Si desperdicia más del 30% de sus tiles, intentamos usar un OAM más pequeño
+                            if wasted > 0.30 and (ow > 16 or oh > 16):
+                                continue
+                                
+                            best_sprite = (shape, size, ow, oh)
+                            break
+                            
+                    if not best_sprite:
+                        # Fallback al sprite más pequeño posible que quepa (o 8x8)
+                        for shape, size, ow, oh in reversed(self.sorted_dims):
+                            if ow <= rem_w and oh <= best_h:
+                                best_sprite = (shape, size, ow, oh)
+                                break
+                        if not best_sprite:
+                            best_sprite = (0, 0, 8, 8)
+                            
+                    shape, size, ow, oh = best_sprite
+
+                    if self._region_has_pixels(pixels, img_w, img_h, start_x + x, start_y + y, ow, oh):
+                        sl.append({
+                            'x':     anchor_x + start_x + x,
+                            'y':     gba_top + start_y + y,
+                            'w':     ow,
+                            'h':     oh,
+                            'shape': shape,
+                            'size':  size,
+                            'png_x': start_x + x,
+                            'png_y': start_y + y,
+                        })
+                    
+                    if oh < best_h:
+                        sl.extend(slice_rect(start_x + x, start_y + y + oh, ow, best_h - oh))
+                    x += ow
+                y += best_h
+            return sl
+
+        return slice_rect(0, 0, width, height)
 
     def encode_4bpp(self, img, oam_slices):
         """

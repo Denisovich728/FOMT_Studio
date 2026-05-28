@@ -45,3 +45,9 @@ temp_*.py
 *.fsp
 config.json
 .env
+
+# Extracted portraits & temp files
+portraits_dump/
+portraits_dump.zip
+temp.bin
+warn-*.txt
