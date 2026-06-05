@@ -16,7 +16,6 @@ from PyQt6.QtGui import (
 )
 from PyQt6.QtCore import Qt, QRect, QPoint, QSize, pyqtSignal
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # GBA Color Helpers
 # ─────────────────────────────────────────────────────────────────────────────
@@ -347,6 +346,7 @@ class PaletteEditorDialog(QDialog):
     - Opción de crear paleta nueva (todo negro excepto transparente)
     """
     palette_accepted = pyqtSignal(list)  # lista de (r,g,b) × 16
+    palette_changed_live = pyqtSignal(list)  # se emite en tiempo real
 
     DARK_BG  = "#1E1E2E"
     MID_BG   = "#2A2A3E"
@@ -609,6 +609,28 @@ class PaletteEditorDialog(QDialog):
         btn_reset.clicked.connect(self._reset_palette)
         right.addWidget(btn_reset)
 
+        # ── Herramientas de Paleta ─────────────────────────────────────────
+        tools_grid = QGridLayout()
+        tools_grid.setSpacing(4)
+        
+        btn_copy = QPushButton("📋 Copiar Hex")
+        btn_copy.clicked.connect(self._copy_hex)
+        tools_grid.addWidget(btn_copy, 0, 0)
+        
+        btn_paste = QPushButton("📝 Pegar Hex")
+        btn_paste.clicked.connect(self._paste_hex)
+        tools_grid.addWidget(btn_paste, 0, 1)
+        
+        btn_import = QPushButton("📂 Importar .pal")
+        btn_import.clicked.connect(self._import_pal)
+        tools_grid.addWidget(btn_import, 1, 0)
+        
+        btn_export = QPushButton("💾 Exportar .pal")
+        btn_export.clicked.connect(self._export_pal)
+        tools_grid.addWidget(btn_export, 1, 1)
+        
+        right.addLayout(tools_grid)
+
         right.addStretch()
 
         # ── Accept / Cancel ────────────────────────────────────────────────
@@ -769,6 +791,12 @@ class PaletteEditorDialog(QDialog):
         self.preview_new.setStyleSheet(
             f"background-color: rgb({rq},{gq},{bq}); border: 1px solid #555; border-radius: 3px;"
         )
+        
+        # Auto-aplicar en tiempo real al slot seleccionado
+        if self._selected_slot != 0:
+            self._palette[self._selected_slot] = (rq, gq, bq)
+            self.swatch_grid.set_color_at(self._selected_slot, rq, gq, bq)
+            self.palette_changed_live.emit(self._palette)
 
     def _on_hex_edited(self):
         txt = self.inp_hex.text().strip().lstrip("#")
@@ -788,6 +816,7 @@ class PaletteEditorDialog(QDialog):
         self._palette[self._selected_slot] = (rq, gq, bq)
         self.swatch_grid.set_color_at(self._selected_slot, rq, gq, bq)
         self._update_old_preview(rq, gq, bq)
+        self.palette_changed_live.emit(self._palette)
 
     def _new_palette(self):
         reply = QMessageBox.question(
@@ -805,6 +834,7 @@ class PaletteEditorDialog(QDialog):
         self._palette = list(self._orig_palette)
         self.swatch_grid.set_palette(self._palette)
         self._select_slot(self._selected_slot)
+        self.palette_changed_live.emit(list(self._palette))
 
     def _accept(self):
         self.palette_accepted.emit(list(self._palette))
@@ -821,3 +851,110 @@ class PaletteEditorDialog(QDialog):
             c16 = rgb888_to_gba(r, g, b)
             struct.pack_into('<H', data, i * 2, c16)
         return data
+
+    # ── Exportar/Importar/Copiar/Pegar ─────────────────────────────────────
+
+    def _copy_hex(self):
+        from PyQt6.QtWidgets import QApplication
+        hex_list = []
+        for (r, g, b) in self._palette:
+            rq, gq, bq = quantize_to_gba(r, g, b)
+            hex_list.append(f"#{rq:02X}{gq:02X}{bq:02X}")
+        text = ", ".join(hex_list)
+        QApplication.clipboard().setText(text)
+        QMessageBox.information(self, "Copiado", "Paleta copiada al portapapeles en formato Hexadecimal.")
+
+    def _paste_hex(self):
+        from PyQt6.QtWidgets import QApplication
+        text = QApplication.clipboard().text()
+        import re
+        # Extraer cualquier secuencia de 6 caracteres hex (con o sin #)
+        matches = re.findall(r'#?([0-9a-fA-F]{6})', text)
+        if not matches:
+            QMessageBox.warning(self, "Error", "No se encontraron colores hexadecimales válidos en el portapapeles.")
+            return
+            
+        if len(matches) < 16:
+            QMessageBox.warning(self, "Advertencia", f"Solo se encontraron {len(matches)} colores. Se rellenará el resto con negro.")
+            
+        new_pal = []
+        for i in range(16):
+            if i < len(matches):
+                hx = matches[i]
+                r, g, b = int(hx[0:2], 16), int(hx[2:4], 16), int(hx[4:6], 16)
+                new_pal.append(quantize_to_gba(r, g, b))
+            else:
+                new_pal.append((0, 0, 0))
+                
+        # Mantener el primer color como transparente según GBA
+        new_pal[0] = self._palette[0]
+        
+        self._palette = new_pal
+        self.swatch_grid.set_palette(self._palette)
+        self._select_slot(1)
+        self.palette_changed_live.emit(list(self._palette))
+        QMessageBox.information(self, "Pegado", "Paleta pegada correctamente.")
+
+    def _import_pal(self):
+        from PyQt6.QtWidgets import QFileDialog
+        import os
+        path, _ = QFileDialog.getOpenFileName(self, "Importar Paleta", "", "JASC-PAL (*.pal);;All Files (*)")
+        if not path: return
+        
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                lines = [l.strip() for l in f.readlines() if l.strip()]
+                
+            if len(lines) >= 3 and lines[0] == "JASC-PAL":
+                # Es JASC-PAL
+                count = int(lines[2])
+                color_lines = lines[3:3+count]
+                new_pal = []
+                for cl in color_lines:
+                    parts = cl.split()
+                    if len(parts) >= 3:
+                        r, g, b = int(parts[0]), int(parts[1]), int(parts[2])
+                        new_pal.append(quantize_to_gba(r, g, b))
+            else:
+                # Intento leer lineas de "R G B" plano
+                new_pal = []
+                for cl in lines:
+                    parts = cl.replace(",", " ").split()
+                    if len(parts) >= 3:
+                        try:
+                            r, g, b = int(parts[0]), int(parts[1]), int(parts[2])
+                            new_pal.append(quantize_to_gba(r, g, b))
+                        except: pass
+                        
+            if not new_pal:
+                raise ValueError("No se encontraron colores validos.")
+                
+            while len(new_pal) < 16:
+                new_pal.append((0,0,0))
+                
+            # Mantener transparente original
+            new_pal[0] = self._palette[0]
+            
+            self._palette = new_pal[:16]
+            self.swatch_grid.set_palette(self._palette)
+            self._select_slot(1)
+            self.palette_changed_live.emit(list(self._palette))
+            QMessageBox.information(self, "Importado", "Paleta importada correctamente.")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Fallo al importar paleta:\n{e}")
+
+    def _export_pal(self):
+        from PyQt6.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getSaveFileName(self, "Exportar Paleta", "paleta.pal", "JASC-PAL (*.pal)")
+        if not path: return
+        
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("JASC-PAL\n0100\n16\n")
+                for r, g, b in self._palette:
+                    rq, gq, bq = quantize_to_gba(r, g, b)
+                    f.write(f"{rq} {gq} {bq}\n")
+            QMessageBox.information(self, "Exportado", f"Paleta guardada en {path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Fallo al exportar paleta:\n{e}")

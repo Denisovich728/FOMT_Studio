@@ -218,6 +218,12 @@ class FoMTStudioApp(QMainWindow):
         if self.main_splitter.count() > 0:
             self.main_splitter.widget(0).setVisible(visible)
         
+    def _switch_to_tab_by_name(self, name_to_match):
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == name_to_match:
+                self.tabs.setCurrentIndex(i)
+                return
+
     def _setup_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -229,32 +235,22 @@ class FoMTStudioApp(QMainWindow):
         self.toolbar.setMovable(False)
         self.addToolBar(self.toolbar)
         
-        # Menú Desplegable "HERRAMIENTAS DE VOLCADO"
-        lang = self.current_lang
-        self.btn_bulk_menu = QPushButton(tr('menu_bulk_items', lang))
-        self.btn_bulk_menu.setStyleSheet("padding: 5px; font-weight: bold; background: #34495E; color: white;")
-        bulk_menu = QMenu(self)
-        bulk_menu.addAction(tr('bulk_tools', lang), lambda: self.open_bulk_items(tr('bulk_tools', lang), "Herramienta"))
-        bulk_menu.addAction(tr('bulk_foods', lang), lambda: self.open_bulk_items(tr('bulk_foods', lang), "Consumible/Comida"))
-        bulk_menu.addAction(tr('bulk_misc', lang), lambda: self.open_bulk_items(tr('bulk_misc', lang), "Artículo"))
-        self.btn_bulk_menu.setMenu(bulk_menu)
-        self.toolbar.addWidget(self.btn_bulk_menu)
-        
-        self.toolbar.addSeparator()
-        self.toolbar.addAction("Editor de Metasprites / Portraits", self._open_visor_metasprites)
-        self.toolbar.addAction("Editor de NPCs", self._open_visor_npc)
-        
-        self.toolbar.addSeparator()
-        self.toolbar.addAction(tr('menu_ui_texts', lang), self.open_menu_editor)
-        self.toolbar.addAction(tr('menu_intro_texts', lang), self.open_intro_editor)
-        self.toolbar.addSeparator()
-
         # Botón para colapsar/expandir explorador
-        self.action_toggle_explorer = QAction("📂", self)
+        self.action_toggle_explorer = QAction("📂 Explorador", self)
         self.action_toggle_explorer.setCheckable(True)
         self.action_toggle_explorer.setChecked(True)
         self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
         self.toolbar.addAction(self.action_toggle_explorer)
+        
+        # Botón para Extractor de Animaciones
+        self.action_anim_extractor = QAction("🏃 Extractor de Animaciones", self)
+        self.action_anim_extractor.triggered.connect(self._open_anim_extractor)
+        self.toolbar.addAction(self.action_anim_extractor)
+        
+        # Botón para Visor de Mapas
+        self.action_map_viewer = QAction("🗺️ Visor de Mapas (Titán)", self)
+        self.action_map_viewer.triggered.connect(self._open_map_viewer)
+        self.toolbar.addAction(self.action_map_viewer)
         
         self.main_splitter = QSplitter(Qt.Orientation.Horizontal)
         self.main_splitter.setHandleWidth(4)
@@ -263,7 +259,7 @@ class FoMTStudioApp(QMainWindow):
         
         left_panel = QVBoxLayout()
         
-        self.btn_n = QPushButton(tr('btn_install_n', lang))
+        self.btn_n = QPushButton(tr('btn_install_n', self.current_lang))
         self.btn_n.setStyleSheet("""
             QPushButton {
                 background-color: #E74C3C;
@@ -368,30 +364,50 @@ class FoMTStudioApp(QMainWindow):
             act.triggered.connect(lambda checked, lc=l_code: self.apply_language(lc))
             lang_menu.addAction(act)
         
+        # Menú Herramientas / Utilidades
+        tools_menu = menubar.addMenu(tr("menu_tools", lang))
+        
+        # --- Editores de Interfaz ---
+        m_ui = tools_menu.addMenu("📝 " + tr("cat_editors_ui", lang))
+        m_ui.addAction(tr("menu_ui_texts", lang), self.open_menu_editor)
+        m_ui.addAction(tr("menu_intro_texts", lang), self.open_intro_editor)
+        
+        # --- Gráficos & Audio ---
+        m_ga = tools_menu.addMenu("🎨 " + tr("cat_graphics_audio", lang))
+        m_ga.addAction(tr("tab_metasprites", lang), self._open_visor_metasprites)
+        m_ga.addAction(tr("tab_sprites", lang), lambda: self._populate_ui_step(3))
+        m_ga.addAction("🎬 Visor de Animaciones", self._open_visor_animaciones)
+        m_ga.addAction(tr("tab_tile_editor", lang), self._open_tile_editor_extreme)
+        m_ga.addAction(tr("tab_audio_sappy", lang), lambda: self._populate_ui_step(4))
+        
+        # --- Editores de Datos y Mapas ---
+        m_dm = tools_menu.addMenu("🗺️ " + tr("cat_data_maps", lang))
+        m_dm.addAction(tr("tab_map_editor", lang), lambda: self._populate_ui_step(5))
+        m_dm.addAction(tr("tab_npc_visual", lang), self._open_visor_npc)
+        
+        # --- Base de Datos Interna (Pestañas por defecto) ---
+        m_db = tools_menu.addMenu("🗄️ " + tr("cat_internal_db", lang))
+        m_db.addAction(tr("tab_npc_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_npcs", lang)))
+        m_db.addAction(tr("tab_item_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_items", lang)))
+        m_db.addAction(tr("tab_menu_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_menu_editor", lang)))
+        
+        # Submenú Volcado Masivo
+        m_bulk = tools_menu.addMenu("📦 " + tr("menu_bulk_items", lang))
+        m_bulk.addAction(tr("bulk_tools", lang), lambda: self.open_bulk_items(tr("bulk_tools", lang), "Herramienta"))
+        m_bulk.addAction(tr("bulk_foods", lang), lambda: self.open_bulk_items(tr("bulk_foods", lang), "Consumible/Comida"))
+        m_bulk.addAction(tr("bulk_misc", lang), lambda: self.open_bulk_items(tr("bulk_misc", lang), "Artículo"))
+        
+        tools_menu.addSeparator()
+        
+        # --- Avanzado ---
+        m_adv = tools_menu.addMenu("⚙️ " + tr("cat_advanced", lang))
+        m_adv.addAction(tr("tab_pointer_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_pointers", lang)))
+        m_adv.addAction(tr("tab_block_puzzle", lang), lambda: self._switch_to_tab_by_name("Bloques 🧩"))
+        
         help_menu = menubar.addMenu(tr("menu_help", lang))
         shortcuts_action = QAction(tr("tab_help", lang), self)
         shortcuts_action.triggered.connect(self._on_action_help)
         help_menu.addAction(shortcuts_action)
-
-        # Menú Herramientas / Utilidades
-        tools_menu = menubar.addMenu(tr("menu_tools", lang))
-        
-        act_maps = QAction(tr("tab_maps", lang), self)
-        act_maps.triggered.connect(lambda: self._populate_ui_step(5)) # Forzar apertura de mapa base o lista
-        
-        act_sprites = QAction("Visor de Sprites/Portraits", self)
-        act_sprites.triggered.connect(lambda: self._populate_ui_step(3))
-        
-        act_metasprites = QAction("Visor de Metasprites", self)
-        act_metasprites.triggered.connect(self._open_visor_metasprites)
-        
-        act_audio = QAction(tr("tab_audio", lang), self)
-        act_audio.triggered.connect(lambda: self._populate_ui_step(4))
-        
-        act_tile_ext = QAction("Tile Editor Extreme", self)
-        act_tile_ext.triggered.connect(self._open_tile_editor_extreme)
-        
-        tools_menu.addActions([act_maps, act_sprites, act_metasprites, act_audio, act_tile_ext])
 
     def apply_theme(self, theme_name):
         self.current_theme = theme_name
@@ -535,6 +551,172 @@ class FoMTStudioApp(QMainWindow):
             except Exception as e:
                 QMessageBox.critical(self, "Error de Compilación", f"Ocurrió un fallo durante la exportación:\n{e}")
 
+    def _open_anim_extractor(self):
+        from Perifericos.Interfaz_Usuario.componentes.anim_extractor import FomtAnimExtractor
+        self._add_tab(FomtAnimExtractor(self.project), "Extractor Animaciones")
+
+    def _add_tab(self, widget, title: str):
+        """Añade una nueva pestaña al área de trabajo y la enfoca."""
+        # Si ya hay una pestaña con ese título, solo la enfocamos
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == title:
+                self.tabs.setCurrentIndex(i)
+                return
+        idx = self.tabs.addTab(widget, title)
+        self.tabs.setCurrentIndex(idx)
+        self.apply_theme(self.current_theme)
+
+    def _open_map_viewer(self):
+        if not self.project:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, "Visor de Mapas", "Debes cargar una ROM o Proyecto primero.")
+            return
+        from Perifericos.Interfaz_Usuario.componentes.visor_mapas import VisorMapas
+        viewer = VisorMapas(self.project)
+        win = FloatingWindow(viewer, "🗺️ Visor de Mapas", self)
+        self.floating_windows.append(win)
+        win.show()
+        self.apply_theme(self.current_theme)
+
+    def _open_visor_animaciones(self):
+        from Perifericos.Interfaz_Usuario.componentes.visor_animaciones import VisorAnimaciones
+        if not hasattr(self, 'visor_animaciones') or not self.visor_animaciones:
+            self.visor_animaciones = VisorAnimaciones(self)
+            self.visor_animaciones.set_project(self.project)
+            self.visor_animaciones.openEditorRequested.connect(self._open_anim_editor)
+            self.tabs.addTab(self.visor_animaciones, "🎬 Animaciones")
+        
+        # Focus tab
+        for i in range(self.tabs.count()):
+            if self.tabs.widget(i) == self.visor_animaciones:
+                self.tabs.setCurrentIndex(i)
+                break
+
+    def _open_anim_editor(self, anim_name):
+        import os, csv
+        from Herramientas.negrozma_engine import NegrozmaEngine
+        csv_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            "Nucleos_de_Procesamiento", "Cilixes", "fomt", "Fomt_Animations.csv"
+        )
+        anim_id = None
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row.get("Animation_Name") == anim_name:
+                    id_str = row.get("Animation_ID")
+                    anim_id = int(id_str, 16) if id_str.startswith('0x') else int(id_str)
+                    break
+        if anim_id is None:
+            return
+            
+        engine = NegrozmaEngine(self.project.base_rom_path)
+        script = engine.parse_animation_script(anim_id)
+        if not script: return
+        
+        frame_idx = script[0]["frame_index"]
+        FRAME_ARRAY_PTR = 0x0858E20C
+        GFX_BASE = 0x085A33FC
+        PAL_BASE = 0x08661DC0
+        
+        frame = engine.parse_frame_struct(FRAME_ARRAY_PTR, frame_idx)
+        final_gfx, final_pal = engine.resolve_graphics_pointers(GFX_BASE, PAL_BASE, frame)
+        
+        # Open TileEditorExtreme
+        exists = False
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tr("tab_tile_editor", self.current_lang):
+                self.tabs.setCurrentIndex(i)
+                tile_editor = self.tabs.widget(i)
+                exists = True
+                break
+        
+        if not exists:
+            from Herramientas.tile_editor_extreme import TileEditorWidget
+            tile_editor = TileEditorWidget(project=self.project)
+            tile_editor.dataPersisted.connect(self._on_tile_editor_persisted)
+            self.tabs.addTab(tile_editor, tr("tab_tile_editor", self.current_lang))
+            self.tabs.setCurrentWidget(tile_editor)
+            
+        if tile_editor:
+            self.current_editing_anim = anim_name
+            self.current_editing_anim_id = anim_id
+            
+            tile_editor.edit_off.setText(f"{engine.get_rom_address(final_gfx):X}")
+            tile_editor.palette_input.setText(f"{engine.get_rom_address(final_pal):X}")
+            tile_editor.combo_bpp.setCurrentIndex(2) # 4 bpp
+            tile_editor._load_palette_from_rom()
+            tile_editor._refresh()
+
+    def _on_tile_editor_persisted(self):
+        if not hasattr(self, 'current_editing_anim') or not hasattr(self, 'current_editing_anim_id'): return
+        if not hasattr(self, 'visor_animaciones') or not self.visor_animaciones.current_folder: return
+        
+        from Herramientas.negrozma_engine import NegrozmaEngine
+        # Instanciar el motor directo a la RAM (virtual_rom)
+        engine = NegrozmaEngine(rom_data=self.project.virtual_rom)
+        
+        FRAME_ARRAY_PTR = 0x0858E20C
+        GFX_BASE = 0x085A33FC
+        PAL_BASE = 0x08661DC0
+        out_dir = self.visor_animaciones.current_folder
+        
+        try:
+            # Reexportar el GIF con los nuevos tiles de la RAM
+            engine.export_animation(
+                self.current_editing_anim_id, 
+                FRAME_ARRAY_PTR, GFX_BASE, PAL_BASE, 
+                out_dir, self.current_editing_anim
+            )
+            # Refrescar la celda en el visor
+            self.visor_animaciones.reload_cell(self.current_editing_anim)
+        except Exception as e:
+            print(f"Error en Live Reload: {e}")
+
+    def _on_action_help(self):
+        if not self.help_dialog:
+            self.help_dialog = HelpWidget(self)
+        self.help_dialog.show()
+
+    def _open_anim_extractor(self):
+        if not self.project or not self.project.base_rom_path:
+            QMessageBox.warning(self, "Extractor de Animaciones", "Debes cargar una ROM o Proyecto primero.")
+            return
+            
+        out_dir = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta para exportar animaciones")
+        if not out_dir:
+            return
+            
+        try:
+            import sys
+            import os
+            
+            # Ensure Herramientas is in sys.path
+            herramientas_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Herramientas")
+            if herramientas_path not in sys.path:
+                sys.path.append(herramientas_path)
+                
+            from Herramientas.negrozma_engine import NegrozmaEngine
+            from PyQt6.QtWidgets import QApplication
+            
+            self.status.showMessage("Extrayendo animaciones masivamente... (Puede tardar varios segundos)")
+            QApplication.processEvents() # Forzar actualización de la UI
+            
+            engine = NegrozmaEngine(self.project.base_rom_path)
+            csv_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                "Nucleos_de_Procesamiento", "Cilixes", "fomt", "Fomt_Animations.csv"
+            )
+            
+            engine.batch_export_all_animations(csv_path, out_dir)
+            
+            self.status.showMessage("Extracción masiva completada.")
+            QMessageBox.information(self, "Extractor de Animaciones", f"¡Las animaciones se han exportado correctamente a:\n{out_dir}")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error en Extractor", f"Fallo en la extracción:\n{e}")
+            self.status.showMessage("Error durante la extracción.")
+
     def _on_project_loaded(self):
         self.tabs.clear()
         self.tree_model.clear()
@@ -542,6 +724,23 @@ class FoMTStudioApp(QMainWindow):
         self.audio_viewer = None
         self.sprite_viewer = None
         
+        # Limpiar caché de imágenes (PNGs) para forzar extracción de la ROM actual
+        import glob
+        import os
+        dirs_to_clean = [os.path.join(os.getcwd(), "portraits_dump"), os.path.join(os.getcwd(), "sprites_dump")]
+        if self.project and getattr(self.project, 'project_dir', None):
+            dirs_to_clean.extend([
+                os.path.join(self.project.project_dir, "portraits_dump"),
+                os.path.join(self.project.project_dir, "sprites_dump")
+            ])
+        for p_dir in dirs_to_clean:
+            if os.path.exists(p_dir):
+                for f in glob.glob(os.path.join(p_dir, "*.png")):
+                    try:
+                        os.remove(f)
+                    except:
+                        pass
+                        
         if self.project:
             self.ai_terminal.project = self.project # Actualizar nexo de IA
             self.btn_n.setEnabled(True)
@@ -940,6 +1139,18 @@ class FoMTStudioApp(QMainWindow):
     def _close_tab(self, index):
         widget = self.tabs.widget(index)
         if widget:
+            # Limpiar referencias cacheadas para evitar RuntimeError: deleted object
+            if getattr(self, 'metasprite_viewer', None) == widget:
+                self.metasprite_viewer = None
+            if getattr(self, 'sprite_viewer', None) == widget:
+                self.sprite_viewer = None
+            if getattr(self, 'sappy_viewer', None) == widget:
+                self.sappy_viewer = None
+            if getattr(self, 'tile_viewer', None) == widget:
+                self.tile_viewer = None
+            if getattr(self, 'intro_editor', None) == widget:
+                self.intro_editor = None
+                
             widget.deleteLater()
         self.tabs.removeTab(index)
 

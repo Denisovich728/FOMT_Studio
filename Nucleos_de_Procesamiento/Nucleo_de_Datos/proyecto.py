@@ -65,11 +65,11 @@ class FoMTProject:
         if header_16 == b"HARVESTMOGBAA4NE":
             self.game_version = "Harvest Moon FoMT"
             self.is_mfomt = False
-            print(f"🎯 Detectada ROM: {self.game_version} (A0-AF: {header_16.hex().upper()})")
+            print(f"[*] Detectada ROM: {self.game_version} (A0-AF: {header_16.hex().upper()})")
         elif header_16 == b"HM MFOM USA\0BFGE":
             self.game_version = "Harvest Moon MFoMT"
             self.is_mfomt = True
-            print(f"🎯 Detectada ROM: {self.game_version} (A0-AF: {header_16.hex().upper()})")
+            print(f"[*] Detectada ROM: {self.game_version} (A0-AF: {header_16.hex().upper()})")
         else:
             # Fallback por si hay ligeras variaciones (ej: versiones EU)
             game_name = header_16[:12]

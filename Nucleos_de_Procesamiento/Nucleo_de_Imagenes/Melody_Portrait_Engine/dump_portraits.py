@@ -40,15 +40,51 @@ OAM_DIMS = {
 }
 
 def get_bundle_headers(rom):
-    r1 = 0x0852D984
+    # Firma de la función que lee el bundle de portraits
+    # 70 B5 46 46 40 B4 8E B0 80 46 0D 1C 20 20 52 F7 C9 FC 06 1C 0D 49 68 46
+    signature = bytes.fromhex('70B5464640B48EB080460D1C202052F7C9FC061C0D496846')
+    idx = rom.find(signature)
+    
+    header_addr = 0x0052D984 # Default to vanilla if not found
+    
+    if idx != -1:
+        # La instrucción ldr r1, [pc, #0x34] está en idx + 0x14
+        pc_val = (idx + 0x14 + 4) & ~3
+        pool_addr = pc_val + 0x34
+        
+        if pool_addr + 4 <= len(rom):
+            p = struct.unpack_from('<I', rom, pool_addr)[0]
+            if 0x08000000 <= p < 0x09FFFFFF:
+                header_addr = p & 0x01FFFFFF
+
     counts = []
     ptrs = []
-    for shift in [2, 4, 3, 5, 5, 3]:
-        cnt = read_hword(rom, r1)
-        counts.append(cnt)
-        r1 += 4
-        ptrs.append(r1)
-        r1 += cnt * (1 << shift)
+    r1 = header_addr
+
+    # --- Auto-Recovery de payload corrupto anterior ---
+    is_buggy_payload = False
+    if header_addr == 0x007D0000:
+        first_val = struct.unpack_from('<I', rom, header_addr)[0]
+        if first_val == 0x00000001 or first_val == 0x00010001:
+            is_buggy_payload = True
+            buggy_counts_addr = 0x0852D984 - 0x08000000
+            for _ in range(5):
+                counts.append(struct.unpack_from('<H', rom, buggy_counts_addr)[0])
+                buggy_counts_addr += 8
+            counts.append(0)  # Table 6 count dummy
+            curr_data_ptr = header_addr
+            for i, shift in enumerate([2, 4, 3, 5, 5, 3]):
+                ptrs.append(curr_data_ptr + 0x08000000)
+                curr_data_ptr += counts[i] * (1 << shift)
+
+    if not is_buggy_payload:
+        for shift in [2, 4, 3, 5, 5, 3]:
+            cnt = struct.unpack_from('<I', rom, r1)[0]
+            counts.append(cnt)
+            r1 += 4
+            ptrs.append(r1 + 0x08000000)
+            r1 += cnt * (1 << shift)
+
     return counts, ptrs
 
 def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
@@ -113,7 +149,15 @@ def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
     if img_w <= 0 or img_h <= 0 or img_w > 512 or img_h > 512:
         return False
 
-    img = Image.new('RGBA', (img_w, img_h), (0, 0, 0, 0))
+    img = Image.new('P', (img_w, img_h), 0)
+    
+    # Flatten palette for PIL: [r,g,b, r,g,b, ...]
+    flat_palette = []
+    for c in palette:
+        flat_palette.extend([c[0], c[1], c[2]])
+    # Pad to 256 colors
+    flat_palette.extend([0] * (768 - len(flat_palette)))
+    img.putpalette(flat_palette)
 
     # Draw OAMs
     for oam in oam_entries:
@@ -132,13 +176,13 @@ def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
                     for px in range(8):
                         color_idx = pixels[py*8 + px]
                         if color_idx != 0: # not transparent
-                            img.putpixel((dest_x + tx*8 + px, dest_y + ty*8 + py), palette[color_idx])
+                            img.putpixel((dest_x + tx*8 + px, dest_y + ty*8 + py), color_idx)
 
     safe_name = "".join([c for c in name if c.isalpha() or c.isdigit() or c=='_']).strip()
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     out_path = os.path.join(output_dir, f"{portrait_id:02X}_{safe_name}.png")
-    img.save(out_path)
+    img.save(out_path, transparency=0)
     return out_path
 
 def dump_all(rom_path, csv_path, output_dir):

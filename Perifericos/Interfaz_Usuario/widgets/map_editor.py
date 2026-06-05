@@ -426,7 +426,7 @@ class PropertiesPanel(QWidget):
         self._target = s
         self.lbl_type.setText(f"Script #{s.id}")
         self.lbl_pos.setText(f"({s.x}, {s.y})")
-        self.lbl_dest.setText(f"Script: 0x{s.script_id:04X}")
+        self.lbl_dest.setText(f"Script ID: {s.script_id // 2} (Raw: 0x{s.script_id:04X})")
         self.btn_edit_warp.setEnabled(True)
         self.btn_del_warp.setEnabled(True)
         self.btn_go_script.setEnabled(True)

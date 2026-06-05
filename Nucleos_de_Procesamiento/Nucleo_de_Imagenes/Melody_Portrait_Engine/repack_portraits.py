@@ -260,7 +260,7 @@ def _encode_custom_palette(custom_palette):
 #      Ideal para retoques rápidos en el mismo portrait.
 # ─────────────────────────────────────────────────────────────────────────────
 
-def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_palette=None):
+def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_palette=None, fork_palette=False):
     """
     Reinyecta píxeles en los tiles existentes SIN tocar la metadata OAM.
     El PNG debe caber dentro del bounding box OAM original.
@@ -302,7 +302,14 @@ def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_pa
     pal_offset = fA * 32
     if custom_palette and len(custom_palette) == 16:
         pal_data = _encode_custom_palette(custom_palette)
-        t5[pal_offset:pal_offset+32] = pal_data
+        if fork_palette:
+            new_pal_idx = counts[4]
+            t5 += pal_data
+            counts[4] += 1
+            fA = new_pal_idx
+            struct.pack_into('<H', t2, meta+10, fA)
+        else:
+            t5[pal_offset:pal_offset+32] = pal_data
         colors = list(custom_palette)
     else:
         pal_data = t5[pal_offset:pal_offset+32]
@@ -361,7 +368,7 @@ def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_pa
 #      Siempre actualiza f0 (OAM count) en la metadata → SIN recorte.
 # ─────────────────────────────────────────────────────────────────────────────
 
-def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_palette=None):
+def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_palette=None, fork_palette=False):
     """
     Reinyecta un portrait completamente nuevo en la ROM.
     Recalcula OAMs (Natsume-style smart slicer), GFX y metadata.
@@ -409,10 +416,10 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
 
     # ── GFX y Paleta ──
     if custom_palette and len(custom_palette) == 16:
-        new_gfx, _ = engine.encode_4bpp(img, slices)
+        new_gfx, _ = engine.encode_4bpp(img, slices, custom_palette=custom_palette, respect_indices=True)
         new_pal    = _encode_custom_palette(custom_palette)
     else:
-        new_gfx, new_pal = engine.encode_4bpp(img, slices)
+        new_gfx, new_pal = engine.encode_4bpp(img, slices, respect_indices=True)
 
     new_oam_data    = engine.generate_oam_data(slices)
     new_tiles_count = len(new_gfx) // 32
@@ -451,14 +458,21 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
             t3 += new_oam_data
             print(f"[Expansion] OAMs append: {new_oam_count} OAMs (antes {f0}).")
 
-        # Paleta: sobreescribir en-place (misma fA, misma posicion en T5)
+        # Paleta: sobreescribir en-place o fork
         old_fA = struct.unpack('<H', t2[meta+10:meta+12])[0]
-        pal_off = old_fA * 32
-        t5[pal_off:pal_off+32] = new_pal
-        new_pal_idx = old_fA
-        print(f"[Expansion] Paleta overwrite in-place: fA={old_fA}.")
-
         new_counts = list(counts)
+        if custom_palette and fork_palette:
+            new_pal_idx = new_counts[4]
+            t5 += new_pal
+            new_counts[4] += 1
+            print(f"[Expansion] Paleta FORK: nueva paleta agregada en índice {new_pal_idx}.")
+        else:
+            pal_off = old_fA * 32
+            if custom_palette:
+                t5[pal_off:pal_off+32] = new_pal
+            new_pal_idx = old_fA
+            print(f"[Expansion] Paleta overwrite in-place: fA={old_fA}.")
+
         if new_oam_count > f0:
             new_counts[2] += new_oam_count
         # T4 y T5 no cambian de count (in-place)
@@ -477,13 +491,20 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
         new_gfx_start = counts[3]
         t4 += new_gfx
 
-        new_pal_idx = counts[4]
-        t5 += new_pal
-
         new_counts = list(counts)
+        
+        old_fA = struct.unpack('<H', t2[meta+10:meta+12])[0]
+        if not fork_palette and custom_palette:
+            pal_off = old_fA * 32
+            t5[pal_off:pal_off+32] = new_pal
+            new_pal_idx = old_fA
+        else:
+            new_pal_idx = new_counts[4]
+            t5 += new_pal
+            new_counts[4] += 1
+
         new_counts[2] += new_oam_count
         new_counts[3] += new_tiles_count
-        new_counts[4] += 1
 
     # ── Actualizar metadata T2 ──
     m_off = internal_idx * 16
@@ -521,7 +542,7 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
 # ─────────────────────────────────────────────────────────────────────────────
 
 def repack(target_portrait_hex, input_png_path, rom_data=None,
-           force_expansion=True, custom_palette=None):
+           force_expansion=True, custom_palette=None, fork_palette=False):
     """
     Punto de entrada unificado para la UI.
 
@@ -532,9 +553,10 @@ def repack(target_portrait_hex, input_png_path, rom_data=None,
         force_expansion:      True  → Expansión siempre (default, seguro para nuevos portraits).
                               False → Auto-detect (Vanilla si cabe, Expansión si no).
         custom_palette:       Lista de 16 tuplas (r,g,b) o None.
+        fork_palette:         True  → Crea una nueva entrada en la paleta.
     """
     if force_expansion:
-        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette)
+        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
 
     # Auto-detect: necesitamos leer el bounding box
     rom = bytearray(rom_data) if rom_data else bytearray(open(ROM_PATH, 'rb').read())
@@ -546,7 +568,7 @@ def repack(target_portrait_hex, input_png_path, rom_data=None,
 
     internal_idx = struct.unpack('<H', t1[target_portrait_hex*4+2 : target_portrait_hex*4+4])[0]
     if internal_idx >= counts[1]:
-        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette)
+        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
 
     meta = internal_idx * 16
     f0   = struct.unpack('<H', t2[meta:meta+2])[0]
@@ -554,7 +576,7 @@ def repack(target_portrait_hex, input_png_path, rom_data=None,
     oams = _parse_oams(t3, t2, engine, f0, f2)
 
     if not oams:
-        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette)
+        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
 
     min_x, min_y, max_x, max_y = _bounding_box(oams)
     orig_w = max_x - min_x
@@ -562,10 +584,10 @@ def repack(target_portrait_hex, input_png_path, rom_data=None,
 
     if img.width <= orig_w and img.height <= orig_h:
         print(f"[Auto] PNG ({img.width}×{img.height}) cabe en bbox original ({orig_w}×{orig_h}) → Vanilla")
-        return repack_vanilla(target_portrait_hex, input_png_path, rom_data, custom_palette)
+        return repack_vanilla(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
     else:
         print(f"[Auto] PNG ({img.width}×{img.height}) > bbox original ({orig_w}×{orig_h}) → Expansion")
-        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette)
+        return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
 
 
 if __name__ == '__main__':

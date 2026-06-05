@@ -322,8 +322,8 @@ class SpriteRenderer:
         # Convertir RGBA a P (palettized) para GIF
         gif_frames = []
         for frame in frames:
-            # Crear fondo blanco para transparencia
-            bg = Image.new('RGBA', frame.size, (255, 255, 255, 255))
+            # Crear fondo magenta puro para reemplazar la transparencia (fácil de editar/keying)
+            bg = Image.new('RGBA', frame.size, (255, 0, 255, 255))
             bg.paste(frame, mask=frame.split()[3] if frame.mode == 'RGBA' else None)
             gif_frames.append(bg.convert('P', palette=Image.ADAPTIVE, colors=256))
 

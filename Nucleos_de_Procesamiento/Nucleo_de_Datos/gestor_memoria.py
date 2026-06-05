@@ -165,7 +165,7 @@ class MemoryManager:
         is_aligned = (old_offset % 4 == 0) if old_offset else False
         
         if old_offset and is_aligned and new_size <= old_size:
-            print(f"🎯 [In-Place-Aligned] Sobrescribiendo en 0x{old_offset:06X}")
+            print(f"[*] [In-Place-Aligned] Sobrescribiendo en 0x{old_offset:06X}")
             # Si hay un límite definido (siguiente puntero), limpiamos hasta allí
             if cleaning_limit > old_offset:
                 total_space = cleaning_limit - old_offset

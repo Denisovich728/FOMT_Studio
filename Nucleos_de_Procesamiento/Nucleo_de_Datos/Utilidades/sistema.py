@@ -18,7 +18,7 @@ def get_safe_worker_count():
     try:
         if platform.system() == "Windows":
             # Usar wmic para una detección precisa en Windows
-            proc_info = subprocess.check_output("wmic cpu get Name", shell=True).decode().lower()
+            proc_info = subprocess.check_output("wmic cpu get Name", shell=True, stderr=subprocess.DEVNULL).decode().lower()
             if "amd" in proc_info:
                 is_amd = True
         else:

@@ -205,6 +205,8 @@ class TileGridItem(QFrame):
     def mousePressEvent(self, event): self.clicked.emit(self.index)
 
 class TileEditorWidget(QWidget):
+    dataPersisted = pyqtSignal()
+
     def __init__(self, parent=None, project=None, standalone_data=None):
         super().__init__(parent)
         self.project = project
@@ -419,6 +421,7 @@ class TileEditorWidget(QWidget):
         if self.project:
             QMessageBox.information(self, "Proyecto", "Los cambios han sido integrados en la memoria virtual del proyecto.")
             self._refresh()
+            self.dataPersisted.emit()
 
     def _load_palette_from_rom(self):
         if self.rom_data is None: return

@@ -210,7 +210,7 @@ class PortraitEditorDialog(QDialog):
         self.lbl_image = QLabel()
         self.lbl_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_image.setMinimumSize(256, 220)
-        self._refresh_preview(self.current_img_path)
+        self._refresh_preview()
         vis_lay.addWidget(self.lbl_image)
 
         # Palette preview strip (16 swatches)
@@ -284,31 +284,147 @@ class PortraitEditorDialog(QDialog):
 
     # ── Helpers ───────────────────────────────────────────────────────────────
 
-    def _refresh_preview(self, path: str):
-        if path and os.path.exists(path):
-            pix = QPixmap(path)
+    def _refresh_preview(self):
+        pix = self._render_hex_portrait()
+        if pix:
             self.lbl_image.setPixmap(
                 pix.scaled(256, 256,
                            Qt.AspectRatioMode.KeepAspectRatio,
                            Qt.TransformationMode.FastTransformation)
             )
         else:
-            self.lbl_image.setText(
-                "<span style='color:#F38BA8;'>No hay retrato disponible en el volcado.<br>"
-                "Usa <b>Extraer a PNG</b> primero.</span>"
-            )
+            # Fallback a la imagen extraida (por si falla el engine ROM)
+            path = self.current_img_path
+            if path and os.path.exists(path):
+                pix = QPixmap(path)
+                self.lbl_image.setPixmap(
+                    pix.scaled(256, 256,
+                               Qt.AspectRatioMode.KeepAspectRatio,
+                               Qt.TransformationMode.FastTransformation)
+                )
+            else:
+                self.lbl_image.setText(
+                    "<span style='color:#F38BA8;'>No hay retrato disponible en el volcado.<br>"
+                    "Usa <b>Extraer a PNG</b> primero.</span>"
+                )
+
+    def _render_hex_portrait(self):
+        """Genera el QPixmap directamente desde los tiles 4bpp y OAMs en la ROM."""
+        try:
+            sys.path.insert(0, r'j:\Repositorios\fomt_studio')
+            from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.Melody_Portrait_Engine.repack_portraits import _load_tables, _parse_oams
+            from Nucleos_de_Procesamiento.Nucleo_de_Imagenes.Melody_Portrait_Engine.engine import MelodyPortraitEngine
+            
+            if self.project and hasattr(self.project, 'base_rom_data') and self.project.base_rom_data:
+                rom = bytearray(self.project.base_rom_data)
+            else:
+                with open(self.rom_path, 'rb') as f:
+                    rom = bytearray(f.read())
+                
+            counts, ptrs, tables, _, _ = _load_tables(rom)
+            t1, t2, t3, t4, t5, t6, t7 = tables
+            
+            internal_idx = struct.unpack('<H', t1[self.hex_id*4+2 : self.hex_id*4+4])[0]
+            if internal_idx >= counts[1]: return None
+            
+            meta = internal_idx * 16
+            f0  = struct.unpack('<H', t2[meta:meta+2])[0]
+            f2  = struct.unpack('<H', t2[meta+2:meta+4])[0]
+            f4  = struct.unpack('<H', t2[meta+4:meta+6])[0]
+            f6  = struct.unpack('<H', t2[meta+6:meta+8])[0]
+            
+            engine = MelodyPortraitEngine(None)
+            oams = _parse_oams(t3, t2, engine, f0, f2)
+            
+            if not oams: return None
+            
+            min_x = min(o['x'] for o in oams)
+            min_y = min(o['y'] for o in oams)
+            max_x = max(o['x'] + o['w'] for o in oams)
+            max_y = max(o['y'] + o['h'] for o in oams)
+            
+            w = max_x - min_x
+            h = max_y - min_y
+            if w <= 0 or h <= 0: return None
+            
+            gfx_data = t4[f6 * 32 : (f6 + f4) * 32]
+            palette = self._edited_palette if self._edited_palette else self._palette
+            
+            from PIL import Image
+            from PyQt6.QtGui import QImage, QPixmap
+            
+            img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+            pixels = img.load()
+            
+            for oam in oams:
+                ox = oam['x'] - min_x
+                oy = oam['y'] - min_y
+                ow, oh = oam['w'], oam['h']
+                t_start = oam['tile']
+                for ty in range(oh // 8):
+                    for tx in range(ow // 8):
+                        t_idx = t_start + (ty * (ow // 8)) + tx
+                        if t_idx >= f4: continue
+                        boff = t_idx * 32
+                        for py in range(8):
+                            for px in range(0, 8, 2):
+                                cx = ox + tx*8 + px
+                                cy = oy + ty*8 + py
+                                if cx < 0 or cx >= w or cy < 0 or cy >= h: continue
+                                if boff + py*4 + px//2 >= len(gfx_data): continue
+                                byte = gfx_data[boff + py*4 + px//2]
+                                idx1 = byte & 0xF
+                                idx2 = (byte >> 4) & 0xF
+                                
+                                if idx1 != 0 and idx1 < len(palette) and cx < w:
+                                    pixels[cx, cy] = palette[idx1] + (255,)
+                                if idx2 != 0 and idx2 < len(palette) and cx+1 < w:
+                                    pixels[cx+1, cy] = palette[idx2] + (255,)
+            
+            img_data = img.tobytes("raw", "RGBA")
+            qim = QImage(img_data, img.width, img.height, QImage.Format.Format_RGBA8888)
+            return QPixmap.fromImage(qim)
+            
+        except Exception as e:
+            print(f"Error hex visualization: {e}")
+            return None
 
     # ── Palette Editor ────────────────────────────────────────────────────────
 
     def _open_palette_editor(self):
-        current_pal = self._edited_palette if self._edited_palette else self._palette
-        dlg = PaletteEditorDialog(current_pal, parent=self)
-        dlg.palette_accepted.connect(self._on_palette_accepted)
-        dlg.exec()
+        if not hasattr(self, '_pal_dlg') or not self._pal_dlg.isVisible():
+            current_pal = self._edited_palette if self._edited_palette else self._palette
+            self._pal_dlg = PaletteEditorDialog(current_pal, parent=self)
+            self._pal_dlg.palette_accepted.connect(self._on_palette_accepted)
+            self._pal_dlg.palette_changed_live.connect(self._on_palette_changed_live)
+            self._pal_dlg.rejected.connect(self._on_palette_rejected)
+            self._pal_dlg.show()
+        else:
+            self._pal_dlg.raise_()
+            self._pal_dlg.activateWindow()
+
+    def _on_palette_rejected(self):
+        # Revertir a la paleta guardada previamente si se cancela
+        self.pal_strip.set_palette(self._edited_palette if self._edited_palette else self._palette)
+        self._refresh_preview()
+        self.lbl_pal_status.setText(
+            "Paleta: <b style='color:#FAB387;'>EDICIÓN CANCELADA</b> — se restauró la paleta previa."
+        )
+        self.lbl_pal_status.setTextFormat(Qt.TextFormat.RichText)
+
+    def _on_palette_changed_live(self, palette: list):
+        self._edited_palette = palette
+        self.pal_strip.set_palette(palette)
+        self._refresh_preview()
+        self.lbl_pal_status.setText(
+            "Paleta: <b style='color:#A6E3A1;'>EDICIÓN EN TIEMPO REAL</b> — click en Guardar para conservar."
+        )
+        self.lbl_pal_status.setTextFormat(Qt.TextFormat.RichText)
 
     def _on_palette_accepted(self, palette: list):
         self._edited_palette = palette
         self.pal_strip.set_palette(palette)
+        self._refresh_preview()
         self.lbl_pal_status.setText(
             "Paleta: <b style='color:#A6E3A1;'>MODIFICADA</b> — se aplicará en la próxima inyección."
         )
@@ -400,7 +516,7 @@ class PortraitEditorDialog(QDialog):
                     f.write(new_rom)
                 self.project.unsaved_changes = True
 
-            self._refresh_preview(file_path)
+            self._refresh_preview()
             modo_ok = "Vainilla (in-place)" if use_vanilla else "Expansión (metadata actualizada)"
             QMessageBox.information(
                 self, "Inyección Exitosa",

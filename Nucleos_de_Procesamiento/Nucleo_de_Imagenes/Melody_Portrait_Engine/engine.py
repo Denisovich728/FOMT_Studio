@@ -215,44 +215,71 @@ class MelodyPortraitEngine:
 
         return slice_rect(0, 0, width, height)
 
-    def encode_4bpp(self, img, oam_slices):
+    def encode_4bpp(self, img, oam_slices, custom_palette=None, respect_indices=False):
         """
         Convierte los slices del PNG a GBA 4bpp y extrae la paleta.
-        
-        Ahora los slices incluyen 'png_x'/'png_y' para la posición exacta
-        en el PNG fuente (independiente del sistema de coordenadas GBA).
-        Si los slices no tienen png_x/png_y (compatibilidad con código viejo),
-        usa la diferencia con el anchor implícito.
         """
-        img = img.convert("RGBA")
-
-        # 1. Extraer colores únicos
-        colors = []
-        pixels = img.load()
-        for y in range(img.height):
-            for x in range(img.width):
-                r, g, b, a = pixels[x, y]
-                if a < 128:
-                    continue
-                color = ((r >> 3), (g >> 3), (b >> 3))
-                if color not in colors:
-                    colors.append(color)
-
-        if len(colors) > 15:
-            colors = colors[:15]
-
+        is_indexed = respect_indices and img.mode == 'P'
         palette_data = bytearray(32)
-        for i, c in enumerate(colors):
-            c16 = c[0] | (c[1] << 5) | (c[2] << 10)
-            struct.pack_into('<H', palette_data, (i + 1) * 2, c16)
+        
+        if not is_indexed:
+            img = img.convert("RGBA")
+            pixels = img.load()
 
-        def get_color_idx(r, g, b, a):
-            if a < 128:
-                return 0
-            c = ((r >> 3), (g >> 3), (b >> 3))
-            if c in colors:
-                return colors.index(c) + 1
-            return 1
+            # 1. Extraer colores únicos
+            colors = []
+            if custom_palette and len(custom_palette) == 16:
+                for cr, cg, cb in custom_palette[1:]:
+                    colors.append(((cr >> 3), (cg >> 3), (cb >> 3)))
+            else:
+                for y in range(img.height):
+                    for x in range(img.width):
+                        r, g, b, a = pixels[x, y]
+                        if a < 128:
+                            continue
+                        color = ((r >> 3), (g >> 3), (b >> 3))
+                        if color not in colors:
+                            colors.append(color)
+
+                if len(colors) > 15:
+                    colors = colors[:15]
+
+            for i, c in enumerate(colors):
+                c16 = c[0] | (c[1] << 5) | (c[2] << 10)
+                struct.pack_into('<H', palette_data, (i + 1) * 2, c16)
+
+            def get_color_idx(cx, cy):
+                r, g, b, a = pixels[cx, cy]
+                if a < 128:
+                    return 0
+                c = ((r >> 3), (g >> 3), (b >> 3))
+                
+                if custom_palette:
+                    best_idx = 1
+                    best_dist = float('inf')
+                    for i, pc in enumerate(colors):
+                        dist = (c[0]-pc[0])**2 + (c[1]-pc[1])**2 + (c[2]-pc[2])**2
+                        if dist < best_dist:
+                            best_dist = dist
+                            best_idx = i + 1
+                    return best_idx
+                else:
+                    if c in colors:
+                        return colors.index(c) + 1
+                    return 1
+        else:
+            # Indexed Mode
+            pixels = img.load()
+            if custom_palette and len(custom_palette) == 16:
+                for i, (cr, cg, cb) in enumerate(custom_palette):
+                    c16 = ((cr>>3)&0x1F) | (((cg>>3)&0x1F)<<5) | (((cb>>3)&0x1F)<<10)
+                    struct.pack_into('<H', palette_data, i*2, c16)
+                    
+            def get_color_idx(cx, cy):
+                idx = pixels[cx, cy]
+                if idx >= 16:
+                    return 0
+                return idx
 
         # 2. Generar Tiles usando png_x/png_y del slice
         tile_data = bytearray()
@@ -279,11 +306,9 @@ class MelodyPortraitEngine:
                             idx1 = 0
                             idx2 = 0
                             if cx < img.width and cy < img.height:
-                                r, g, b, a = pixels[cx, cy]
-                                idx1 = get_color_idx(r, g, b, a)
+                                idx1 = get_color_idx(cx, cy)
                             if cx + 1 < img.width and cy < img.height:
-                                r, g, b, a = pixels[cx + 1, cy]
-                                idx2 = get_color_idx(r, g, b, a)
+                                idx2 = get_color_idx(cx + 1, cy)
 
                             byte = (idx2 << 4) | idx1
                             tile_data.append(byte)
