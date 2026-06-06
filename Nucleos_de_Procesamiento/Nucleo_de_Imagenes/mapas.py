@@ -476,14 +476,9 @@ def decompress_unicorn(data, offset):
 def decompress_popuri(data: bytes, offset: int) -> bytearray:
     """
     Descomprime datos comprimidos con el algoritmo "Popuri" (0x70).
-    Aplica primero HuffLZ y luego el filtro DeltaNibble si corresponde.
+    Usamos el motor Unicorn para garantizar extracción byte-perfect.
     """
-    try:
-        dec = HuffLZDecompressor(data, offset)
-        return dec.decompress()
-    except Exception:
-        # Fallback to unicorn if native python HuffLZ fails
-        return decompress_unicorn(data, offset)
+    return decompress_unicorn(data, offset)
 
 def decompress_auto(data: bytes, offset: int) -> bytes:
     """Detecta automáticamente LZ77 o Popuri y descomprime."""

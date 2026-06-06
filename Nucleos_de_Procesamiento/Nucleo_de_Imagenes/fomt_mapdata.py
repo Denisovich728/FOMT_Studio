@@ -271,7 +271,7 @@ class FomtMapRenderer:
                 most_common, count = c.most_common(1)[0]
                 
                 # Patrones conocidos de basura de GBA o capas no inicializadas
-                if most_common in [0xaaaa, 0xffff, 0x5555, 0x1111, 0x9999, 0x3333]:
+                if most_common in [0xaaaa, 0xffff, 0x5555, 0x1111, 0x9999, 0x3333, 0x8888, 0xcccc, 0x4444]:
                     if count > n_cells * 0.05: # Si este patrón domina, es casi seguro basura
                         print(f"[FomtMapRenderer] Ignorando {attr}: Detectada capa de basura (patrón {hex(most_common)})")
                         continue
@@ -287,19 +287,6 @@ class FomtMapRenderer:
             for val in words:
                 tgt.append(val)
             print(f"[FomtMapRenderer] {attr}: {n_cells} celdas (raw bytes: {len(raw)})")
-            
-        # Generación dinámica del Frente (BG1) para mapas excepcionales (Ej. 06 y 2C)
-        # Si la extracción nativa del Frente falló (porque era basura), lo generamos usando colisión
-        if not self.tilemap_bg1 and self.tilemap_bg2 and getattr(self, 'collision_map', None):
-            print(f"[FomtMapRenderer] Generando Frente (p_bg1) dinámicamente desde p_bg2...")
-            bg1 = [1023] * len(self.tilemap_bg2)
-            for i in range(len(self.tilemap_bg2)):
-                if i < len(self.collision_map):
-                    col_val = self.collision_map[i]
-                    # Valores >= 0x06 corresponden a tiles de techo, copas de árboles, sillas altas, etc.
-                    if col_val >= 0x06:
-                        bg1[i] = self.tilemap_bg2[i]
-            self.tilemap_bg1 = bg1
 
     def render(self, show_bg1=True, show_bg2=True, show_bg3=True, show_col=False, bank=1, invert_bg=False) -> Image.Image | None:
         """
