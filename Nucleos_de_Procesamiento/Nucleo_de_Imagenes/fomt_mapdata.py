@@ -353,6 +353,27 @@ class FomtMapRenderer:
             from PIL import ImageDraw
             overlay = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
             draw = ImageDraw.Draw(overlay)
+            behavior_colors = {
+                0x00: (255, 255, 255, 90),  # Caminable (Blanco)
+                0x01: (0, 255, 0, 90),      # Trigger Caminable A (Verde)
+                0x02: (0, 128, 0, 90),      # Trigger Caminable B (Verde oscuro)
+                0x03: (0, 150, 255, 90),    # Agua (Azul)
+                0x04: (255, 0, 0, 90),      # Pared (Rojo)
+                0x05: (255, 255, 0, 90),    # Trigger Sólido A (Amarillo)
+                0x08: (128, 0, 128, 90),    # Trigger Solido D (Morado)
+                0x09: (255, 105, 180, 90),  # Trigger Solido E (Rosa fuerte)
+                0x0C: (255, 215, 0, 90),    # Trigger Solido H (Oro)
+                0x10: (255, 127, 80, 90),   # Trigger Solido L (Coral)
+                0x11: (0, 0, 128, 90),      # Trigger Solido M (Azul Marino)
+                0x18: (0, 255, 255, 90),    # Cian
+                0x20: (255, 165, 0, 90),    # Naranja
+                0x21: (139, 69, 19, 90),    # Marrón
+                0x28: (0, 128, 128, 90),    # Teal
+                0x40: (50, 205, 50, 90),    # Verde Lima
+                0x80: (192, 192, 192, 90),  # Plata
+                0xC0: (139, 0, 139, 90),    # Magenta oscuro
+            }
+
             for row in range(h):
                 for col in range(w):
                     idx = row * w + col
@@ -367,24 +388,12 @@ class FomtMapRenderer:
                         behavior = 0
                         script_id = 0
 
-                    if script_id > 0:
-                        r, g, b = 255, 0, 255 # Fucsia (Triggers)
-                        a = 150
-                    elif behavior == 0:
-                        r, g, b = 255, 255, 255 # Blanco/Gris (Caminable)
-                        a = 60
-                    elif behavior == 1:
-                        r, g, b = 255, 0, 0   # Rojo (Pared/Sólido)
-                        a = 100
-                    elif behavior == 2:
-                        r, g, b = 0, 200, 0   # Verde (Cultivable/Tierra)
-                        a = 100
-                    else:
-                        # Azul/Cyán para Agua y otros comportamientos
-                        r = (behavior * 40) % 255
-                        g = 150
-                        b = 255
-                        a = 100
+                    # Map val directly as it matches the behavior names
+                    r, g, b, a = behavior_colors.get(val, (255, 0, 255, 150)) # Fucsia por defecto si no se encuentra
+                    
+                    # Highlight if it has a script, but keep base color
+                    if script_id > 0 and val not in behavior_colors:
+                        r, g, b, a = 255, 0, 255, 150 # Fucsia (Triggers)
 
                     draw.rectangle([col*8, row*8, col*8+7, row*8+7], fill=(r, g, b, a), outline=(r, g, b, 200))
             img.paste(overlay, (0, 0), overlay)

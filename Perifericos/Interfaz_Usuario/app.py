@@ -319,6 +319,16 @@ class FoMTStudioApp(QMainWindow):
         self.status = QStatusBar()
         self.setStatusBar(self.status)
         
+        # Magic Circle
+        import importlib.util
+        mc_path = os.path.join(os.path.dirname(__file__), "Logo de Carga", "magic_circle.py")
+        spec = importlib.util.spec_from_file_location("magic_circle", mc_path)
+        mc_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mc_mod)
+        self.magic_circle = mc_mod.MagicCircleLoader()
+        self.magic_circle.hide()
+        self.status.addPermanentWidget(self.magic_circle)
+        
         from PyQt6.QtWidgets import QProgressBar
         self.progress_bar = QProgressBar()
         self.progress_bar.setMaximumWidth(150)
@@ -328,6 +338,56 @@ class FoMTStudioApp(QMainWindow):
         
         self.status.showMessage(tr("status_ready", self.current_lang))
         
+        # Large Splash Overlay for Startup
+        self.large_splash = QWidget(self)
+        self.large_splash.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
+        self.large_splash.hide()
+        splash_layout = QVBoxLayout(self.large_splash)
+        splash_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.large_magic_circle = mc_mod.MagicCircleLoader(parent=self.large_splash, size=400)
+        splash_layout.addWidget(self.large_magic_circle)
+        
+        # Show splash on startup
+        self.show_startup_splash()
+
+        # Connect the signal so the large splash hides only when the animation completes
+        self.large_magic_circle.animationFinished.connect(self.force_hide_startup_splash)
+
+    def show_startup_splash(self):
+        self.large_splash.resize(self.size())
+        self.large_splash.show()
+        self.large_magic_circle.start_animation()
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(7000, self.force_hide_startup_splash)
+
+    def force_hide_startup_splash(self):
+        if getattr(self, '_hiding_splash', False):
+            return
+        self._hiding_splash = True
+        if hasattr(self, 'large_magic_circle') and self.large_magic_circle:
+            try:
+                self.large_magic_circle.animationFinished.disconnect(self.force_hide_startup_splash)
+            except Exception:
+                pass
+            self.large_magic_circle.stop_animation()
+        if hasattr(self, 'large_splash') and self.large_splash:
+            self.large_splash.hide()
+            self.large_splash.deleteLater()
+            self.large_splash = None
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'large_splash') and self.large_splash is not None:
+            try:
+                if self.large_splash.isVisible():
+                    self.large_splash.resize(self.size())
+            except RuntimeError:
+                # El widget ya fue eliminado por force_hide_startup_splash
+                pass
+            
     def _setup_menu(self):
         menubar = self.menuBar()
         lang = self.current_lang
@@ -486,6 +546,10 @@ class FoMTStudioApp(QMainWindow):
         self.status.showMessage("Iniciando tarea de fondo...")
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
+            
+        if hasattr(self, 'magic_circle'):
+            self.magic_circle.start_animation()
+            
         self.loader_thread = ProjectLoaderThread(mode, rom_path, proj_path)
         self.loader_thread.progress.connect(self._on_load_progress)
         self.loader_thread.step_finished.connect(self._on_project_step_finished)
@@ -512,6 +576,9 @@ class FoMTStudioApp(QMainWindow):
         self.menuBar().setEnabled(True)
         self.tree_view.setEnabled(True)
         self.progress_bar.setVisible(False)
+        if hasattr(self, 'magic_circle'):
+            self.magic_circle.stop_animation()
+            
         if success:
             self.status.showMessage(tr("status_scan_complete", self.current_lang), 5000)
             if self.project:
@@ -536,9 +603,17 @@ class FoMTStudioApp(QMainWindow):
     def action_save_project(self):
         if not self.project: return
         try:
+            if hasattr(self, 'magic_circle'):
+                self.magic_circle.start_animation()
+            from PyQt6.QtWidgets import QApplication
+            QApplication.processEvents()
             self.project.save()
             self.status.showMessage("Progreso guardado en el archivo de proyecto.")
+            if hasattr(self, 'magic_circle'):
+                self.magic_circle.stop_animation()
         except Exception as e:
+            if hasattr(self, 'magic_circle'):
+                self.magic_circle.stop_animation()
             QMessageBox.critical(self, "Error", f"Error guardando: {e}")
             
     def action_compile_rom(self):
@@ -546,9 +621,17 @@ class FoMTStudioApp(QMainWindow):
         dest, _ = QFileDialog.getSaveFileName(self, "Exportar ROM Compilada", "Modded_FoMT.gba", "GBA ROM (*.gba)")
         if dest:
             try:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.start_animation()
+                from PyQt6.QtWidgets import QApplication
+                QApplication.processEvents()
                 self.project.compile_to_rom(dest)
                 self.status.showMessage(f"ROM parcheada y exportada a {dest}!")
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
             except Exception as e:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
                 QMessageBox.critical(self, "Error de Compilación", f"Ocurrió un fallo durante la exportación:\n{e}")
 
     def _open_anim_extractor(self):
@@ -825,8 +908,14 @@ class FoMTStudioApp(QMainWindow):
                 return
 
             try:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.start_animation()
+                from PyQt6.QtWidgets import QApplication
+                QApplication.processEvents()
                 aplicar_parche_n(self.project)
                 self.btn_n.setEnabled(False)
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
                 QMessageBox.information(self, "¡Éxito!", "La Soberanía de la Ñ se ha instalado correctamente.")
                 
                 # Refrescar Tile Editor si está abierto
@@ -835,6 +924,8 @@ class FoMTStudioApp(QMainWindow):
                         self.tabs.widget(i).set_project(self.project)
                         
             except Exception as e:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
                 QMessageBox.critical(self, "Error", f"No se pudo instalar la Ñ:\n{e}")
 
     def _populate_ui_step(self, step):

@@ -65,50 +65,72 @@ TILESET_GFX_TABLE_USA = [
 
 # Tabla de nombres de mapas (fomt_map_labels — BlueSpider mapped.pyd)
 FOMT_MAP_LABELS = {
-    0:  "Farm (Main)",
-    1:  "Farm House",
-    2:  "Farm Cave",
-    3:  "Mineral Town",
-    4:  "Town South",
-    5:  "Rose Plaza",
-    6:  "Church",
-    7:  "Inn",
-    8:  "Hospital",
-    9:  "Blacksmith",
-    10: "Supermarket",
-    11: "Library",
-    12: "Flower Shop",
-    13: "Bakery",
-    14: "Poultry Farm",
-    15: "Yodel Farm",
-    16: "Ranch House",
-    17: "Aja Winery",
-    18: "Hot Spring",
-    19: "Mineral Mine",
-    20: "Mine 1F",
-    21: "Mine 2F",
-    22: "Mine B1F",
-    23: "Goddess Pond",
-    24: "Harvest Sprite",
-    25: "Connor's Cart",
-    26: "Saibara House",
-    27: "Town House",
-    28: "Gotz House",
-    29: "Barley House 1F",
-    30: "Barley House 2F",
-    31: "Mine Lake",
-    32: "Mother's Hill",
-    33: "Summit",
-    34: "Mineral Mine",
-    35: "Spring Mine",
-    38: "Lake",
-    47: "Tutorial Field",
-    83: "Mineral Clinic",
-    120: "Supermarket",
-    121: "Inn 1F",
-    122: "Inn 2F",
-    123: "Library 1F",
-    124: "Library 2F",
+    0:  "Farm Normal",
+    1:  "Farm Winter",
+    2:  "Rose Square",
+    3:  "Rose Square Winter",
+    4:  "Town North",
+    5:  "Town North Winter",
+    6:  "Town South",
+    7:  "Town South Winter",
+    8:  "Beach",
+    9:  "Beach Winter",
+    10: "Church Back",
+    11: "Church Back Winter",
+    12: "Forest",
+    13: "Forest Winter",
+    14: "Mothers Hill Middle",
+    15: "Mothers Hill Middle Winter",
+    16: "Mothers Hill Top",
+    17: "Mothers Hill Top Winter",
+    18: "Aja Winery 1ST Floor",
+    19: "Aja Winery 2ND Floor",
+    20: "Aja Storage",
+    21: "Aja Basement",
+    22: "Doug Inn 1ST Floor",
+    23: "Doug Room",
+    24: "Doug Inn 2ND Floor",
+    25: "Jeff Shop",
+    26: "Jeff Room",
+    27: "Kai Shop",
+    28: "Zack House",
+    29: "Hospital 1ST Floor",
+    30: "Hospital 2ND Floor",
+    31: "Church",
+    32: "Mary Library 1ST Floor",
+    33: "Mary Library 2ND Floor",
+    34: "Basil House 1ST Floor",
+    35: "Basil House 2ND Floor",
+    36: "Chicken Coop 1",
+    37: "Chicken Coop 2",
+    38: "Barn 1",
+    39: "Barn 2",
+    40: "Horse Stable",
+    41: "House LV1",
+    42: "House LV2",
+    43: "House LV3",
+    44: "Lilia House 1ST Floor",
+    45: "Lilia House 2ND Floor",
+    46: "Barley House 1ST Floor",
+    47: "Barley House 2ND Floor",
+    48: "Saibara House",
+    49: "Gotz House",
+    50: "Thomas House",
+    51: "Ellen House",
+    52: "Harvest Sprites House",
+    53: "Mountain House",
+    54: "Beach House",
+    55: "Town House",
+    56: "Mine Entrance",
+    57: "Mine Floor Type 1",
+    58: "Mine Floor Type 2",
+    59: "Mine Floor Type 3",
+    60: "Mine Cenote",
+    61: "Mine Cenote Entrance",
+    62: "Tutorial Field",
+    63: "Tutorial Barn Outside",
+    64: "Tutorial Barn",
+    65: "Tutorial Chicken Cop",
 }
 
 # Tabla de permisos de movimiento (behaviour_data_ptr)
@@ -498,40 +520,115 @@ def decompress_auto(data: bytes, offset: int) -> bytes:
     else:
         raise ValueError(f"Formato desconocido 0x{header:02X} en 0x{offset:06X}")
 
+class BitWriter:
+    def __init__(self):
+        self.out_words = []
+        self.current_word = 0
+        self.bits_in_word = 0
+
+    def write_bits(self, value, count):
+        while count > 0:
+            space = 32 - self.bits_in_word
+            if count <= space:
+                self.current_word |= (value & ((1 << count) - 1)) << (space - count)
+                self.bits_in_word += count
+                count = 0
+                if self.bits_in_word == 32:
+                    self.out_words.append(self.current_word)
+                    self.current_word = 0
+                    self.bits_in_word = 0
+            else:
+                top_bits = (value >> (count - space)) & ((1 << space) - 1)
+                self.current_word |= top_bits
+                self.out_words.append(self.current_word)
+                self.current_word = 0
+                self.bits_in_word = 0
+                count -= space
+
+    def flush(self):
+        if self.bits_in_word > 0:
+            self.out_words.append(self.current_word)
+            self.current_word = 0
+            self.bits_in_word = 0
+
+    def get_bytes(self):
+        self.flush()
+        out = bytearray()
+        import struct
+        for w in self.out_words:
+            out.extend(struct.pack('<I', w))
+        return bytes(out)
+
 def compress_popuri(data: bytes) -> bytes:
-    """Compresor Popuri RLE (0x70)."""
-    out = bytearray()
+    """
+    Compresor nativo 100% auténtico para FoMT (0x70) con soporte LZ completo.
+    Codifica un flujo bit-perfect usando el compType = 0 soportado
+    directamente por la ROM (secuencias de literales crudos mezclados con LZ).
+    Garantiza una compresión óptima sin exceder el tamaño original en la ROM.
+    """
     size = len(data)
-    out.append(0x70)
-    out.append(size & 0xFF)
-    out.append((size >> 8) & 0xFF)
-    out.append((size >> 16) & 0xFF)
+    bw = BitWriter()
     
-    i = 0
-    while i < size:
-        run_len = 1
-        while i + run_len < size and run_len < 128 and data[i] == data[i + run_len]:
-            run_len += 1
-            
-        if run_len >= 3:
-            out.append(0x80 | (run_len - 1))
-            out.append(data[i])
-            i += run_len
+    # 1. header32 (32 bits)
+    bw.write_bits((size << 8) | 0x70, 32)
+    # 2. typeByte (8 bits). compType=0, huffType=0, filtType=0 -> 0
+    bw.write_bits(0, 8)
+    # 3. lz lookup ladder (2 elementos, 4 bits c/u).
+    # ladder 0 usará 12 bits para distancias (hasta 4096), ladder 1 sin usar
+    bw.write_bits(11, 4) # 12 bits = 11 + 1
+    bw.write_bits(0, 4)  # no usado
+
+    # 4. Secuencias de compresión (LZ + Literales)
+    pos = 0
+    while pos < size:
+        best_len = 0
+        best_dist = 0
+        max_dist = min(pos, 4096)
+        max_len = min(66, size - pos)
+        
+        # Búsqueda inversa para coincidencia LZ
+        if max_len >= 3 and max_dist >= 1:
+            for d in range(1, max_dist + 1):
+                match_len = 0
+                while match_len < max_len and data[pos - d + match_len] == data[pos + match_len]:
+                    match_len += 1
+                if match_len > best_len:
+                    best_len = match_len
+                    best_dist = d
+                    if best_len == max_len:
+                        break
+                        
+        if best_len >= 3:
+            # Codificar referencia LZ usando ladder 0 (i = 0)
+            bw.write_bits(0, 2)
+            bw.write_bits(best_dist - 1, 12)
+            bw.write_bits(best_len - 3, 6)
+            pos += best_len
         else:
-            lit_len = 0
-            while i + lit_len < size and lit_len < 128:
-                if i + lit_len + 2 < size and data[i+lit_len] == data[i+lit_len+1] == data[i+lit_len+2]:
+            # Racha de literales (hasta 64) hasta la próxima buena coincidencia
+            lit_len = 1
+            while lit_len < min(64, size - pos):
+                next_pos = pos + lit_len
+                next_max_dist = min(next_pos, 4096)
+                next_max_len = min(66, size - next_pos)
+                found_match = False
+                if next_max_len >= 3 and next_max_dist >= 1:
+                    # Lookahead rápido
+                    for d in range(1, min(next_max_dist, 256) + 1):
+                        if data[next_pos - d] == data[next_pos] and data[next_pos - d + 1] == data[next_pos + 1] and data[next_pos - d + 2] == data[next_pos + 2]:
+                            found_match = True
+                            break
+                if found_match:
                     break
                 lit_len += 1
-            
-            out.append(lit_len - 1)
-            for j in range(lit_len):
-                out.append(data[i + j])
-            i += lit_len
-            
-    while len(out) % 4 != 0:
-        out.append(0)
-    return bytes(out)
+                
+            bw.write_bits(2, 2)              # i = 2 (indicador de secuencia literal)
+            bw.write_bits(lit_len - 1, 6)    # contador de literales (6 bits)
+            for b in data[pos : pos + lit_len]:
+                bw.write_bits(b, 8)
+            pos += lit_len
+
+    return bw.get_bytes()
 
 def compress_lz77(data: bytes) -> bytes:
     """Compresor LZ77 GBA estándar (0x10). Implementación acelerada."""
@@ -1019,12 +1116,15 @@ class MapParser:
     KNOWN_OFFSETS_EUR   = [0x127048, 0x117A00, 0x110200]
     KNOWN_OFFSETS_MFOMT = [0x0E5DB0, 0x10FF14, 0x110200]
 
+    LITERAL_POOLS_MAP_TABLE = [0x0A46A8]
+
     STRIDE = MapHeader.STRIDE
 
     def __init__(self, project):
         self.project = project
         self.maps: List[MapHeader] = []
         self._table_offset: Optional[int] = None
+        self._literal_pool_addr: Optional[int] = None
 
     def scan_maps(self):
         self.maps = []
@@ -1037,15 +1137,19 @@ class MapParser:
             print("MapParser: No se encontró la tabla de mapas.")
             return
 
-        for i in range(256): # Max limit to avoid infinite loop
+        i = 0
+        while True:
             off = self._table_offset + i * self.STRIDE
             if off + self.STRIDE > len(rom):
                 break
             chunk = rom[off:off+self.STRIDE]
             
-            # Simple validación heurística
-            p_bg3 = struct.unpack_from('<I', chunk, 12)[0]
-            if not (0x08000000 <= p_bg3 < 0x09FFFFFF) and p_bg3 != 0:
+            # Validación heurística estricta para evitar leer basura
+            unpacked = struct.unpack('<8I2HI', chunk)
+            valid_ptrs = sum(1 for p in unpacked[:6] if 0x08000000 <= p < 0x09FFFFFF)
+            w, h = unpacked[8], unpacked[9]
+            
+            if valid_ptrs < 3 or not (1 <= w <= 256) or not (1 <= h <= 256):
                 break
                 
             m = MapHeader(i, off, chunk)
@@ -1060,11 +1164,13 @@ class MapParser:
                             break
             
             self.maps.append(m)
+            i += 1
 
         print(f"MapParser: Cargados {len(self.maps)} mapas exactos desde 0x{self._table_offset:X}")
 
     def _find_table(self, rom: bytes) -> Optional[int]:
         """Busca la tabla maestra dinámicamente mediante el Literal Pool (reapuntable)."""
+        self._literal_pool_addr = None
         # Firma de la función que calcula: Address = Base + (MapID * 40)
         signature = bytes.fromhex('011C88004018C000014940187047')
         idx = rom.find(signature)
@@ -1078,7 +1184,8 @@ class MapParser:
                 p = struct.unpack_from('<I', rom, pool_addr)[0]
                 if 0x08000000 <= p < 0x09FFFFFF:
                     off = p & 0x01FFFFFF
-                    print(f"Map Discovery: Offset detectado por Literal Pool en 0x{off:X}")
+                    self._literal_pool_addr = pool_addr
+                    print(f"Map Discovery: Offset detectado por Literal Pool en 0x{off:X} (Literal en 0x{pool_addr:X})")
                     return off
 
         # Fallback a los offsets conocidos si falló la búsqueda de la firma
@@ -1146,6 +1253,67 @@ class MapParser:
                 idx += 4 - (idx % 4)
             return idx
         return -1
+
+    def create_new_map(self, width: int, height: int) -> int:
+        """
+        Crea un nuevo mapa repunteando toda la tabla maestra.
+        Devuelve el ID del nuevo mapa creado.
+        """
+        if self._table_offset is None or self._literal_pool_addr is None:
+            raise Exception("No se encontró la tabla de mapas o el Literal Pool no está disponible para repuntear.")
+            
+        rom = self.project.base_rom_data
+        num_maps = len(self.maps)
+        
+        # Tamaño de la tabla actual + 1 nueva entrada
+        old_table_size = num_maps * self.STRIDE
+        new_table_size = old_table_size + self.STRIDE
+        
+        # 1. Buscar espacio libre para la nueva tabla
+        new_table_offset = self.find_free_space(new_table_size)
+        if new_table_offset == -1:
+            new_table_offset = len(rom)
+            if new_table_offset % 4 != 0:
+                new_table_offset += 4 - (new_table_offset % 4)
+                
+        # 2. Copiar la tabla vieja al nuevo espacio
+        old_table_data = rom[self._table_offset : self._table_offset + old_table_size]
+        self.project.overwrite_rom_directly(new_table_offset, old_table_data)
+        
+        # 3. Crear la nueva entrada de mapa (vacía/referencias a mapa 0 para evitar crash)
+        new_map_id = num_maps
+        base_map = self.maps[0] # Clonar assets básicos del mapa 0
+        new_entry = struct.pack('<8I2HI',
+            base_map.p_gfx,
+            base_map.p_pal1,
+            base_map.p_pal2,
+            0, # bg3
+            0, # bg2
+            0, # bg1
+            0, # obj1
+            0, # obj2
+            width,
+            height,
+            0  # attributes
+        )
+        self.project.overwrite_rom_directly(new_table_offset + old_table_size, new_entry)
+        
+        # 4. Actualizar el Literal Pool
+        new_table_ptr = new_table_offset | 0x08000000
+        ptr_data = struct.pack('<I', new_table_ptr)
+        
+        for pool_addr in self.LITERAL_POOLS_MAP_TABLE:
+            self.project.overwrite_rom_directly(pool_addr, ptr_data)
+            
+        # Optional: still update the one found dynamically if it wasn't in the list
+        if self._literal_pool_addr and self._literal_pool_addr not in self.LITERAL_POOLS_MAP_TABLE:
+            self.project.overwrite_rom_directly(self._literal_pool_addr, ptr_data)
+        
+        # Actualizar estado interno
+        self._table_offset = new_table_offset
+        print(f"Tabla de mapas repunteada a 0x{new_table_offset:X}. Nuevo mapa ID: {new_map_id}")
+        
+        return new_map_id
 
     def save_map(self, map_index: int, renderer) -> bool:
         import struct

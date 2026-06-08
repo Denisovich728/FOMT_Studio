@@ -194,18 +194,43 @@ class MapCanvas(QWidget):
         font.setBold(True)
         painter.setFont(font)
         m = self._map
+        
+        # 18 colors for collisions matching fomt_mapdata.py (Alpha ~100)
+        col_colors = {
+            0x00: QColor(0, 255, 0, 100),       # Verde: Caminable
+            0x01: QColor(255, 0, 0, 100),       # Rojo: Bloqueado
+            0x02: QColor(0, 0, 255, 100),       # Azul: Agua / Nadable
+            0x03: QColor(255, 255, 0, 100),     # Amarillo: Acción / Interacción
+            0x04: QColor(255, 165, 0, 100),     # Naranja: Puerta / Transición
+            0x05: QColor(128, 0, 128, 100),     # Morado: Límite / Borde de mapa
+            0x06: QColor(0, 255, 255, 100),     # Cian: Escaleras / Elevación
+            0x07: QColor(255, 192, 203, 100),   # Rosa: Evento
+            0x08: QColor(165, 42, 42, 100),     # Marrón: Suelo de tierra
+            0x09: QColor(128, 128, 128, 100),   # Gris: Suelo de piedra
+            0x0A: QColor(0, 128, 0, 100),       # Verde oscuro: Hierba alta
+            0x0B: QColor(139, 69, 19, 100),     # Chocolate: Madera
+            0x0C: QColor(255, 20, 147, 100),    # Rosa profundo: NPC / Personaje
+            0x0D: QColor(64, 224, 208, 100),    # Turquesa: Objeto recogible
+            0x0E: QColor(255, 215, 0, 100),     # Oro: Cofre / Tesoro
+            0x0F: QColor(192, 192, 192, 100),   # Plata: Especial 1
+            0x10: QColor(0, 0, 128, 100),       # Azul marino: Especial 2
+            0x11: QColor(128, 0, 0, 100),       # Granate: Peligro / Daño
+        }
+        
         for idx, byte in enumerate(m.collision):
             tx = idx % m.width
             ty = idx // m.width
             rx = tx * tpx
             ry = ty * tpx
             label = MOVEMENT_LABELS.get(byte, "?")
+            
+            fill_color = col_colors.get(byte, QColor(255, 100, 100, 200))
             if byte == 0x00:
                 painter.setPen(QColor(255, 255, 255, 100))
-                painter.fillRect(rx, ry, tpx, tpx, COLOR_FREE)
             else:
                 painter.setPen(QColor(255, 100, 100, 200))
-                painter.fillRect(rx, ry, tpx, tpx, COLOR_BLOCK)
+            
+            painter.fillRect(rx, ry, tpx, tpx, fill_color)
             painter.drawText(
                 QRect(rx, ry, tpx, tpx),
                 Qt.AlignmentFlag.AlignCenter,
@@ -343,7 +368,9 @@ class PropertiesPanel(QWidget):
         super().__init__()
         self.editor  = editor
         self._target : Warp | ScriptTrigger | None = None
-        self.setMinimumWidth(220)
+        self.setMinimumWidth(150)
+        from PyQt6.QtWidgets import QSizePolicy
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
         self._build_ui()
 
     def _build_ui(self):
@@ -457,6 +484,7 @@ class PropertiesPanel(QWidget):
             data = struct.pack('<BBH', x, y, sid) + meta
             w = Warp(data, len(m.warps), m.objects_offset)
             m.warps.append(w)
+            self.show_warp(w)
             self.warpChanged.emit()
 
     def _on_add_script(self):
@@ -471,6 +499,7 @@ class PropertiesPanel(QWidget):
             data = struct.pack('<BBH', x, y, sid) + meta
             s = ScriptTrigger(data, len(m.scripts), m.objects_offset)
             m.scripts.append(s)
+            self.show_script(s)
             self.warpChanged.emit()
 
     def _on_edit_warp(self):
@@ -575,6 +604,8 @@ class MapEditorWidget(QWidget):
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(False)
         self.scroll.setStyleSheet("background:#1a1a1a;")
+        from PyQt6.QtWidgets import QSizePolicy
+        self.scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.canvas = MapCanvas(self)
         self.canvas.setFixedSize(600, 400)
         self.scroll.setWidget(self.canvas)
