@@ -13,7 +13,7 @@ if root_dir not in sys.path:
     sys.path.append(root_dir)
 
 from PyQt6.QtWidgets import QApplication
-from Perifericos.Interfaz_Usuario.app import FoMTStudioApp
+from Consola_de_Comando.app import FoMTStudioApp
 
 def main():
     # Soporte para multiprocesamiento en versiones congeladas (EXE)
@@ -22,7 +22,7 @@ def main():
     # Evitar bucle infinito en versión compilada:
     # Si detectamos argumentos del monitor, ejecutamos el monitor y salimos.
     if len(sys.argv) > 1 and ("monitor.py" in sys.argv[1] or "--pid" in sys.argv):
-        from Perifericos.Gestor_Errores.monitor import main as monitor_main
+        from Consola_de_Comando.monitor import main as monitor_main
         # Ajustar sys.argv para que argparse en monitor.py funcione correctamente
         if "monitor.py" in sys.argv[1]:
             sys.argv.pop(1)
@@ -35,7 +35,7 @@ def main():
     # Iniciar Monitor de Errores Externo (Si no es una instancia de depuración directa)
     root_dir = os.path.dirname(os.path.abspath(__file__))
     log_path = os.path.join(root_dir, "fomt_studio_error.log")
-    monitor_script = os.path.join(root_dir, "Perifericos", "Gestor_Errores", "monitor.py")
+    monitor_script = os.path.join(root_dir, "Consola_de_Comando", "monitor.py")
     
     try:
         # Lanzamos el monitor pasando nuestro PID actual

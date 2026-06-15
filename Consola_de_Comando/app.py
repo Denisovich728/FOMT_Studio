@@ -1,0 +1,1490 @@
+# ============================================================
+# FOMT Studio - Suite de Ingeniería Inversa (v3.7.0)
+# "Actualización La Imposibilidad"
+# Desarrollado por: Denisovich728
+# ============================================================
+import os
+import sys
+import re
+from PyQt6.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+    QTabWidget, QSplitter, QTreeView, QMenuBar, QMenu,
+    QStatusBar, QFileDialog, QMessageBox, QLabel, QLineEdit, QPushButton
+)
+from PyQt6.QtCore import Qt, QSettings, QThread, pyqtSignal, QUrl
+from PyQt6.QtGui import QAction, QStandardItemModel, QStandardItem, QDesktopServices
+
+from Consola_de_Comando.themes import get_light_theme, get_dark_theme, get_matrix_theme, get_forerunner_theme
+from Consola_de_Comando.i18n import tr
+from Nucleos_Positronicos.Nucleo_de_Imagenes.tile_editor_extreme import TileEditorWidget
+
+from Banco_de_Datos.proyecto import FoMTProject
+from Nucleos_Positronicos.Nucleo_de_Items.item_editor import ItemEditorWidget
+from Nucleos_Positronicos.Nucleo_de_Scripts.script_ide import ScriptIDEWidget
+from Nucleos_Positronicos.Nucleo_de_Scripts.block_puzzle import BlockPuzzleEditor
+from Consola_de_Comando.pointer_editor import MasterPointerEditor
+from Nucleos_Positronicos.Nucleo_de_Aldeanos.npc_editor import NpcEditorWidget
+from Consola_de_Comando.menu_editor import MenuEditorWidget
+from Nucleos_Positronicos.Nucleo_de_Mapas.map_editor import MapEditorWidget
+from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.native_proc_viewer import NativeProcViewerWidget
+from Nucleos_Positronicos.Nucleo_de_Items.item_bulk_editor import ItemBulkEditorWidget
+from Nucleos_Positronicos.Nucleo_de_Mapas.tile_viewer import TileViewerWidget
+from Consola_de_Comando.intro_text_editor import IntroTextEditorWidget
+from Consola_de_Comando.help_widget import HelpWidget
+from Nucleos_Positronicos.Nucleo_de_Sonido.visor_sonido import SappyAudioViewer
+from Nucleos_Positronicos.Nucleo_de_Sprites.visor_sprites import VisorSprites
+from Nucleos_Positronicos.Nucleo_de_Sprites.visor_metasprites import VisorMetasprites
+from PyQt6.QtGui import QAction, QShortcut, QKeySequence, QCursor
+from PyQt6.QtWidgets import QDialog
+
+class FloatingWindow(QMainWindow):
+    def __init__(self, widget, title, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setCentralWidget(widget)
+                # lsrs r4, r4, #4 (Camera Tile Y)
+                0x24, 0x09,
+                # adds r4, #7 (Player Tile Y = Camera + 7 tiles)
+                0x07, 0x34,
+                # movs r5, #0x1F (Mask 31)
+                0x1F, 0x25,
+                # ands r4, r5 (Player_Tile_Y &= 31)
+                0x2C, 0x40,
+                
+                # Crop Tile Y from VRAM offset (r0)
+                # lsrs r6, r0, #6
+                0x46, 0x09,
+                # ands r6, r5 (Crop_Tile_Y &= 31)
+                0x2E, 0x40,
+                
+                # Compare Crop vs Player
+                # subs r6, r6, r4
+                0xE6, 0x1A,
+                # adds r6, #1 (Shift logic 1 tile down)
+                0x01, 0x36,
+                # ands r6, r5 (Diff = (Crop - Player) & 31)
+                0x2E, 0x40,
+                
+                # If Diff is between 0 and 3, hide Top Tile!
+                # cmp r6, #4
+                0x04, 0x2E,
+                # bge .draw_normal
+                0x01, 0xDA,
+    def __init__(self, mode, rom_path, proj_path):
+        super().__init__()
+        self.mode = mode
+        self.rom_path = rom_path
+        self.proj_path = proj_path
+        self.project = None
+
+    def run(self):
+        try:
+            self.project = FoMTProject()
+            if self.mode == 'session':
+                self.progress.emit(10, "status_ready")
+                proj_dir = self.project.open_rom_session(self.rom_path)
+                self.proj_path = os.path.join(proj_dir, f"{self.project.name}.fsp")
+                self.progress.emit(25, "status_scanning_events")
+                self.project.step_2_scan_events()
+                self.step_finished.emit(2)
+                self.progress.emit(50, "status_scanning_graphics")
+                self.project.step_3_scan_graphics()
+                self.step_finished.emit(3)
+                self.progress.emit(80, "status_scanning_audio")
+                self.project.step_4_scan_audio()
+                self.step_finished.emit(4)
+
+            elif self.mode == 'new':
+                self.progress.emit(10, "status_ready")
+                self.project.step_1_detect_rom(self.rom_path, self.proj_path)
+                self.progress.emit(25, "status_scanning_events")
+                self.project.step_2_scan_events()
+                self.step_finished.emit(2)
+                self.progress.emit(50, "status_scanning_graphics")
+                self.project.step_3_scan_graphics()
+                self.step_finished.emit(3)
+                self.progress.emit(80, "status_scanning_audio")
+                self.project.step_4_scan_audio()
+                self.step_finished.emit(4)
+                self.project.save()
+            else:
+                self.progress.emit(20, "menu_load")
+                self.project.load(self.proj_path)
+                self.project.step_2_scan_events()
+                self.step_finished.emit(2)
+                self.progress.emit(50, "status_scanning_graphics")
+                self.project.step_3_scan_graphics()
+                self.step_finished.emit(3)
+                self.progress.emit(80, "status_scanning_audio")
+                self.project.step_4_scan_audio()
+                self.step_finished.emit(4)
+            
+            self.progress.emit(100, "status_scan_complete")
+            self.finished.emit(True, "")
+        except Exception as e:
+            self.finished.emit(False, str(e))
+
+class FoMTStudioApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.floating_windows = []
+        self.project = None
+        self.setWindowTitle("FoMT Studio v3.7.0 - Soberanía de la Ñ")
+        self.setMinimumSize(600, 400) # Reduced to allow small laptop screens
+        self.showMaximized()
+        
+        self.project = None
+        self.item_editor = None
+        self.npc_editor = None
+        self.pointer_editor = None
+        self.script_ide = None
+        self.block_editor = None
+        self.map_editor = None
+        self.tile_viewer = None
+        self.audio_viewer = None
+        self.sprite_viewer = None
+        self.metasprite_viewer = None
+        self.cat_events_item = None
+        
+        self.settings = QSettings("FoMTStudio", "ModdingSuite")
+        self.current_lang = self.settings.value("language", "es")
+        self.current_theme = self.settings.value("theme", "forerunner")
+        self.last_rom_dir = self.settings.value("last_rom_dir", "")
+        self.ai_copilot_active = self.settings.value("ai_copilot_active", False, type=bool)
+        
+        self._setup_ui()
+        self._setup_menu()
+        self.apply_theme(self.current_theme)
+        self.apply_language(self.current_lang)
+        
+        QShortcut(QKeySequence("Ctrl+O"), self, self.action_open_rom)
+        QShortcut(QKeySequence("Ctrl+S"), self, self.action_save_project)
+        QShortcut(QKeySequence("Ctrl+P"), self, self._on_shortcut_event_up)
+        QShortcut(QKeySequence("Ctrl+L"), self, self._on_shortcut_event_down)
+        QShortcut(QKeySequence("Ctrl+Shift+L"), self, self.open_decoration_control)
+        
+        self.konami_code = [
+            Qt.Key.Key_Up, Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Down,
+            Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_Right,
+            Qt.Key.Key_B, Qt.Key.Key_A, Qt.Key.Key_Return
+        ]
+        self.konami_index = 0
+        self._setup_ai_dock() # Inicializar terminal lateral
+        
+    def keyPressEvent(self, event):
+        # Konami Code logic
+        if event.key() == self.konami_code[self.konami_index]:
+            self.konami_index += 1
+            if self.konami_index == len(self.konami_code):
+                self.konami_index = 0
+                self.unlock_gemini_ia()
+                self.toggle_ai_copilot()
+        else:
+            self.konami_index = 0
+        super().keyPressEvent(event)
+
+    def toggle_ai_copilot(self):
+        self.ai_copilot_active = not self.ai_copilot_active
+        self.settings.setValue("ai_copilot_active", self.ai_copilot_active)
+        
+        status = "Activado" if self.ai_copilot_active else "Desactivado"
+        # We can also translate this MessageBox later!
+        QMessageBox.information(self, "AI Copilot", f"Copiloto de IA {status}.\nEsta preferencia se ha guardado para futuras sesiones.")
+        
+        if self.script_ide:
+            self.script_ide.update_ai_status(self.ai_copilot_active)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self._check_for_crash_report()
+
+    def _setup_ai_dock(self):
+        """Crea el panel lateral de la terminal de IA integrado en el splitter."""
+        from Nucleos_Positronicos.Nucleo_de_Scripts.gemini_editor import GeminiEditorWidget
+        
+        self.ai_terminal = GeminiEditorWidget(self.project, self)
+        # Lo añadimos al splitter principal (será el tercer componente)
+        self.main_splitter.addWidget(self.ai_terminal)
+        self.ai_terminal.hide() # Empieza oculta hasta el código Konami
+
+    def log(self, message):
+        """Muestra un mensaje en la barra de estado."""
+        self.status.showMessage(message, 5000)
+
+    def unlock_gemini_ia(self):
+        lang = self.current_lang
+        self.log(tr('msg_konami_activated', lang))
+        self.ai_terminal.show()
+        # El splitter se ajusta dinámicamente empujando el centro
+        # Intentamos mantener el explorador pequeño y dar espacio a la IA
+        width = self.width()
+        self.main_splitter.setSizes([200, int(width*0.5), int(width*0.3)])
+        self.main_splitter.setStretchFactor(2, 2)
+        self.ai_terminal.refresh_context()
+        self.status.showMessage(tr('msg_aether_unlocked', lang))
+        
+    def _toggle_explorer(self, visible):
+        """Oculta o muestra el panel lateral dinámicamente."""
+        if self.main_splitter.count() > 0:
+            self.main_splitter.widget(0).setVisible(visible)
+        
+    def _switch_to_tab_by_name(self, name_to_match):
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == name_to_match:
+                self.tabs.setCurrentIndex(i)
+                return
+
+    def _setup_ui(self):
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget) # Cambiar a Vertical para poner la barra arriba
+        
+        # --- BARRA DE HERRAMIENTAS (TOOLBAR) ---
+        from PyQt6.QtWidgets import QToolBar, QMenu
+        self.toolbar = QToolBar("Principal")
+        self.toolbar.setMovable(False)
+        self.addToolBar(self.toolbar)
+        
+        # Botón para colapsar/expandir explorador
+        self.action_toggle_explorer = QAction("📂 Explorador", self)
+        self.action_toggle_explorer.setCheckable(True)
+        self.action_toggle_explorer.setChecked(True)
+        self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
+        self.toolbar.addAction(self.action_toggle_explorer)
+        
+        # Botón para Extractor de Animaciones
+        self.action_anim_extractor = QAction("🏃 Extractor de Animaciones", self)
+        self.action_anim_extractor.triggered.connect(self._open_anim_extractor)
+        self.toolbar.addAction(self.action_anim_extractor)
+        
+        # Botón para Visor de Mapas
+        self.action_map_viewer = QAction("🗺️ Visor de Mapas (Titán)", self)
+        self.action_map_viewer.triggered.connect(self._open_map_viewer)
+        self.toolbar.addAction(self.action_map_viewer)
+        
+        self.main_splitter = QSplitter(Qt.Orientation.Horizontal)
+        self.main_splitter.setHandleWidth(4)
+        self.main_splitter.setOpaqueResize(True)
+        main_layout.addWidget(self.main_splitter)
+        
+        left_panel = QVBoxLayout()
+        
+        self.btn_n = QPushButton(tr('btn_install_n', self.current_lang))
+        self.btn_n.setStyleSheet("""
+            QPushButton {
+                background-color: #E74C3C;
+                color: white;
+                font-size: 28px;
+                font-weight: bold;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            QPushButton:hover {
+                background-color: #C0392B;
+            }
+            QPushButton:disabled {
+                background-color: #27AE60;
+                color: white;
+            }
+        """)
+        self.btn_n.clicked.connect(self._apply_n_patch)
+        self.btn_n.setEnabled(False)
+        left_panel.addWidget(self.btn_n)
+        
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText(tr("search_placeholder", self.current_lang))
+        self.search_bar.textChanged.connect(self.on_search_text_changed)
+        
+        self.tree_view = QTreeView()
+        self.tree_model = QStandardItemModel()
+        self.tree_model.setHorizontalHeaderLabels([tr("explorer_header", self.current_lang)])
+        self.tree_view.setModel(self.tree_model)
+        
+        left_panel.addWidget(self.search_bar)
+        left_panel.addWidget(self.tree_view)
+        
+        left_widget = QWidget()
+        left_widget.setLayout(left_panel)
+        self.main_splitter.addWidget(left_widget)
+        
+        self.tabs = QTabWidget()
+        self.tabs.setTabsClosable(True)
+        self.tabs.setMovable(True)
+        self.tabs.tabCloseRequested.connect(self._close_tab)
+        self.tabs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tabs.customContextMenuRequested.connect(self._on_tab_context_menu)
+        self.main_splitter.addWidget(self.tabs)
+
+        self.help_dialog = None
+        
+        # Ajustes de estiramiento dinámico (Explorer: 1, Tabs: 5, IA: 2)
+        self.main_splitter.setStretchFactor(0, 1)
+        self.main_splitter.setStretchFactor(1, 5)
+        # El tercer widget (IA) se añadirá luego y tendrá su propio factor
+        
+        # Inicialización de tamaños proporcionales
+        self.main_splitter.setSizes([250, 950])
+        
+        self.status = QStatusBar()
+        self.setStatusBar(self.status)
+        
+        # Magic Circle
+        import importlib.util
+        mc_path = os.path.join(os.path.dirname(__file__), "Logo de Carga", "magic_circle.py")
+        spec = importlib.util.spec_from_file_location("magic_circle", mc_path)
+        mc_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mc_mod)
+        self.magic_circle = mc_mod.MagicCircleLoader()
+        self.magic_circle.hide()
+        self.status.addPermanentWidget(self.magic_circle)
+        
+        from PyQt6.QtWidgets import QProgressBar
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMaximumWidth(150)
+        self.progress_bar.setVisible(False)
+        self.progress_bar.setStyleSheet("QProgressBar { height: 12px; font-size: 10px; }")
+        self.status.addPermanentWidget(self.progress_bar)
+        
+        self.status.showMessage(tr("status_ready", self.current_lang))
+        
+        # Large Splash Overlay for Startup
+        self.large_splash = QWidget(self)
+        self.large_splash.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
+        self.large_splash.hide()
+        splash_layout = QVBoxLayout(self.large_splash)
+        splash_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.large_magic_circle = mc_mod.MagicCircleLoader(parent=self.large_splash, size=400)
+        splash_layout.addWidget(self.large_magic_circle)
+        
+        # Show splash on startup
+        self.show_startup_splash()
+
+        # Connect the signal so the large splash hides only when the animation completes
+        self.large_magic_circle.animationFinished.connect(self.force_hide_startup_splash)
+
+    def show_startup_splash(self):
+        self.large_splash.resize(self.size())
+        self.large_splash.show()
+        self.large_magic_circle.start_animation()
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(7000, self.force_hide_startup_splash)
+
+    def force_hide_startup_splash(self):
+        if getattr(self, '_hiding_splash', False):
+            return
+        self._hiding_splash = True
+        if hasattr(self, 'large_magic_circle') and self.large_magic_circle:
+            try:
+                self.large_magic_circle.animationFinished.disconnect(self.force_hide_startup_splash)
+            except Exception:
+                pass
+            self.large_magic_circle.stop_animation()
+        if hasattr(self, 'large_splash') and self.large_splash:
+            self.large_splash.hide()
+            self.large_splash.deleteLater()
+            self.large_splash = None
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'large_splash') and self.large_splash is not None:
+            try:
+                if self.large_splash.isVisible():
+                    self.large_splash.resize(self.size())
+            except RuntimeError:
+                # El widget ya fue eliminado por force_hide_startup_splash
+                pass
+            
+    def _setup_menu(self):
+        menubar = self.menuBar()
+        lang = self.current_lang
+        
+        file_menu = menubar.addMenu(tr("menu_file", lang))
+        new_proj_action = QAction(tr("menu_new", lang), self)
+        new_proj_action.triggered.connect(self.action_new_project)
+        file_menu.addAction(new_proj_action)
+        load_proj_action = QAction(tr("menu_load", lang), self)
+        load_proj_action.triggered.connect(self.action_load_project)
+        file_menu.addAction(load_proj_action)
+        file_menu.addSeparator()
+        save_action = QAction(tr("menu_save", lang), self)
+        save_action.setShortcut("Ctrl+S")
+        save_action.triggered.connect(self.action_save_project)
+        file_menu.addAction(save_action)
+        compile_action = QAction(tr("menu_compile", lang), self)
+        compile_action.triggered.connect(self.action_compile_rom)
+        file_menu.addAction(compile_action)
+        
+        config_menu = menubar.addMenu(tr("menu_config", lang))
+        theme_menu = config_menu.addMenu(tr("menu_theme", lang))
+        light_action = QAction(tr("theme_light", lang), self)
+        light_action.triggered.connect(lambda: self.apply_theme("light"))
+        dark_action = QAction(tr("theme_dark", lang), self)
+        dark_action.triggered.connect(lambda: self.apply_theme("dark"))
+        theme_menu.addAction("Matrix", lambda: self.apply_theme("matrix"))
+        theme_menu.addAction("Forerunner", lambda: self.apply_theme("forerunner"))
+        theme_menu.addActions([light_action, dark_action])
+        
+        lang_menu = config_menu.addMenu(tr("menu_lang", lang))
+        for l_code in ["es", "en", "jp", "ru", "de", "zh", "hi", "pt"]:
+            act = QAction(tr(f"lang_{l_code}", lang), self)
+            act.triggered.connect(lambda checked, lc=l_code: self.apply_language(lc))
+            lang_menu.addAction(act)
+        
+        # Menú Herramientas / Utilidades
+        tools_menu = menubar.addMenu(tr("menu_tools", lang))
+        
+        # --- Editores de Interfaz ---
+        m_ui = tools_menu.addMenu("📝 " + tr("cat_editors_ui", lang))
+        m_ui.addAction(tr("menu_ui_texts", lang), self.open_menu_editor)
+        m_ui.addAction(tr("menu_intro_texts", lang), self.open_intro_editor)
+        
+        # --- Gráficos & Audio ---
+        m_ga = tools_menu.addMenu("🎨 " + tr("cat_graphics_audio", lang))
+        m_ga.addAction(tr("tab_metasprites", lang), self._open_visor_metasprites)
+        m_ga.addAction(tr("tab_sprites", lang), lambda: self._populate_ui_step(3))
+        m_ga.addAction("🎬 Visor de Animaciones", self._open_visor_animaciones)
+        m_ga.addAction(tr("tab_tile_editor", lang), self._open_tile_editor_extreme)
+        m_ga.addAction(tr("tab_audio_sappy", lang), lambda: self._populate_ui_step(4))
+        
+        # --- Editores de Datos y Mapas ---
+        m_dm = tools_menu.addMenu("🗺️ " + tr("cat_data_maps", lang))
+        m_dm.addAction(tr("tab_map_editor", lang), lambda: self._populate_ui_step(5))
+        m_dm.addAction(tr("tab_npc_visual", lang), self._open_visor_npc)
+        
+        # --- Base de Datos Interna (Pestañas por defecto) ---
+        m_db = tools_menu.addMenu("🗄️ " + tr("cat_internal_db", lang))
+        m_db.addAction(tr("tab_npc_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_npcs", lang)))
+        m_db.addAction(tr("tab_item_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_items", lang)))
+        m_db.addAction(tr("tab_menu_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_menu_editor", lang)))
+        
+        # Submenú Volcado Masivo
+        m_bulk = tools_menu.addMenu("📦 " + tr("menu_bulk_items", lang))
+        m_bulk.addAction(tr("bulk_tools", lang), lambda: self.open_bulk_items(tr("bulk_tools", lang), "Herramienta"))
+        m_bulk.addAction(tr("bulk_foods", lang), lambda: self.open_bulk_items(tr("bulk_foods", lang), "Consumible/Comida"))
+        m_bulk.addAction(tr("bulk_misc", lang), lambda: self.open_bulk_items(tr("bulk_misc", lang), "Artículo"))
+        
+        tools_menu.addSeparator()
+        
+        # --- Avanzado ---
+        m_adv = tools_menu.addMenu("⚙️ " + tr("cat_advanced", lang))
+        m_adv.addAction(tr("tab_pointer_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_pointers", lang)))
+        m_adv.addAction(tr("tab_block_puzzle", lang), lambda: self._switch_to_tab_by_name("Bloques 🧩"))
+        
+        help_menu = menubar.addMenu(tr("menu_help", lang))
+        shortcuts_action = QAction(tr("tab_help", lang), self)
+        shortcuts_action.triggered.connect(self._on_action_help)
+        help_menu.addAction(shortcuts_action)
+
+    def apply_theme(self, theme_name):
+        self.current_theme = theme_name
+        self.settings.setValue("theme", theme_name)
+        if theme_name == "light":
+            self.setStyleSheet(get_light_theme())
+        elif theme_name == "dark":
+            self.setStyleSheet(get_dark_theme())
+        elif theme_name == "matrix":
+            self.setStyleSheet(get_matrix_theme())
+        elif theme_name == "forerunner":
+            self.setStyleSheet(get_forerunner_theme())
+        else:
+            self.setStyleSheet(get_light_theme())
+        
+        for i in range(self.tabs.count()):
+            widget = self.tabs.widget(i)
+            if hasattr(widget, "highlighter") and widget.highlighter:
+                widget.highlighter.update_colors(theme_name)
+        
+        for win in self.floating_windows:
+            w = win.centralWidget()
+            if hasattr(w, "highlighter") and w.highlighter:
+                w.highlighter.update_colors(theme_name)
+
+    def apply_language(self, lang_code):
+        self.current_lang = lang_code
+        self.settings.setValue("language", lang_code)
+        self.menuBar().clear()
+        self._setup_menu()
+        title_hint = tr('explorer_title', lang_code)
+        self.setWindowTitle(f"FoMT Studio - {title_hint}")
+        self.status.showMessage(tr("status_ready", lang_code))
+        if self.project:
+            self._on_project_loaded()
+        else:
+            header_text = tr("explorer_header", lang_code)
+            self.tree_model.setHorizontalHeaderLabels([header_text])
+
+    def _check_close_project(self) -> bool:
+        if self.project:
+            ret = QMessageBox.warning(
+                self, 
+                tr("title_close_project", self.current_lang),
+                tr("msg_close_project", self.current_lang),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            return ret == QMessageBox.StandardButton.Yes
+        return True
+            
+    def action_open_rom(self):
+        if not self._check_close_project(): return
+        path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM (Crear Sesión FSP)", self.last_rom_dir, "GBA ROM (*.gba)")
+        if not path: return
+        self.last_rom_dir = os.path.dirname(path)
+        self.settings.setValue("last_rom_dir", self.last_rom_dir)
+        self._start_async_load('session', path, None)
+
+    def action_new_project(self):
+        if not self._check_close_project(): return
+        path, _ = QFileDialog.getOpenFileName(self, tr("menu_new", self.current_lang), self.last_rom_dir, "GBA ROM (*.gba)")
+        if not path: return
+        self.last_rom_dir = os.path.dirname(path)
+        self.settings.setValue("last_rom_dir", self.last_rom_dir)
+        proj_dir = QFileDialog.getExistingDirectory(self, "Selecciona Carpeta para tu Nuevo Proyecto FoMT Studio")
+        if not proj_dir: return
+        self._start_async_load('new', path, proj_dir)
+            
+    def action_load_project(self):
+        if not self._check_close_project(): return
+        path, _ = QFileDialog.getOpenFileName(self, tr("menu_load", self.current_lang), "", "FoMT Studio Project (*.fsp *.json)")
+        if not path: return
+        self._start_async_load('load', None, path)
+
+    def _start_async_load(self, mode, rom_path, proj_path):
+        self.status.showMessage("Iniciando tarea de fondo...")
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setValue(0)
+            
+        if hasattr(self, 'magic_circle'):
+            self.magic_circle.start_animation()
+            
+        self.loader_thread = ProjectLoaderThread(mode, rom_path, proj_path)
+        self.loader_thread.progress.connect(self._on_load_progress)
+        self.loader_thread.step_finished.connect(self._on_project_step_finished)
+        self.loader_thread.finished.connect(self._on_async_load_finished)
+        self.loader_thread.start()
+        self.menuBar().setEnabled(False)
+        self.tree_view.setEnabled(False)
+
+    def _on_load_progress(self, value, status_key):
+        self.progress_bar.setValue(value)
+        self.status.showMessage(tr(status_key, self.current_lang))
+
+    def _on_project_step_finished(self, step):
+        if self.loader_thread:
+            self.project = self.loader_thread.project
+        if step == 2:
+            self._on_project_loaded()
+            self.menuBar().setEnabled(True)
+            self.tree_view.setEnabled(True)
+        else:
+            self._populate_ui_step(step)
+
+    def _on_async_load_finished(self, success, error_msg):
+        self.menuBar().setEnabled(True)
+        self.tree_view.setEnabled(True)
+        self.progress_bar.setVisible(False)
+        if hasattr(self, 'magic_circle'):
+            self.magic_circle.stop_animation()
+            
+        if success:
+            self.status.showMessage(tr("status_scan_complete", self.current_lang), 5000)
+            if self.project:
+                game_label = "FOMT" if not self.project.is_mfomt else "MFOMT"
+                csv_name = "Fomt_Events_Listname.csv" if not self.project.is_mfomt else "MFomt_Events_Listname.csv"
+                reply = QMessageBox.question(
+                    self, 
+                    tr("title_detection", self.current_lang),
+                    tr("msg_fomt_detected", self.current_lang).format(game=game_label),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                if reply == QMessageBox.StandardButton.Yes:
+                    if self.project.super_lib.load_event_names_from_csv(csv_name):
+                        if self.cat_events_item:
+                            self.cat_events_item.removeRows(0, self.cat_events_item.rowCount())
+                            self._populate_ui_step(2)
+                        self.status.showMessage(f"Lista de nombres {game_label} cargada correctamente.")
+        else:
+            QMessageBox.critical(self, tr("err_fatal", self.current_lang), error_msg)
+            self.status.showMessage("Error en carga.")
+
+    def action_save_project(self):
+        if not self.project: return
+        try:
+            if hasattr(self, 'magic_circle'):
+                self.magic_circle.start_animation()
+            from PyQt6.QtWidgets import QApplication
+            QApplication.processEvents()
+            self.project.save()
+            self.status.showMessage("Progreso guardado en el archivo de proyecto.")
+            if hasattr(self, 'magic_circle'):
+                self.magic_circle.stop_animation()
+        except Exception as e:
+            if hasattr(self, 'magic_circle'):
+                self.magic_circle.stop_animation()
+            QMessageBox.critical(self, "Error", f"Error guardando: {e}")
+            
+    def action_compile_rom(self):
+        if not self.project: return
+        dest, _ = QFileDialog.getSaveFileName(self, "Exportar ROM Compilada", "Modded_FoMT.gba", "GBA ROM (*.gba)")
+        if dest:
+            try:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.start_animation()
+                from PyQt6.QtWidgets import QApplication
+                QApplication.processEvents()
+                self.project.compile_to_rom(dest)
+                self.status.showMessage(f"ROM parcheada y exportada a {dest}!")
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
+            except Exception as e:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
+                QMessageBox.critical(self, "Error de Compilación", f"Ocurrió un fallo durante la exportación:\n{e}")
+
+    def _add_tab(self, widget, title: str):
+        """Añade una nueva pestaña al área de trabajo y la enfoca."""
+        # Si ya hay una pestaña con ese título, solo la enfocamos
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == title:
+                self.tabs.setCurrentIndex(i)
+                return
+        idx = self.tabs.addTab(widget, title)
+        self.tabs.setCurrentIndex(idx)
+        self.apply_theme(self.current_theme)
+
+    def _open_map_viewer(self):
+        if not self.project:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, "Visor de Mapas", "Debes cargar una ROM o Proyecto primero.")
+            return
+        from Nucleos_Positronicos.Nucleo_de_Mapas.visor_mapas import VisorMapas
+        viewer = VisorMapas(self.project)
+        win = FloatingWindow(viewer, "🗺️ Visor de Mapas", self)
+        self.floating_windows.append(win)
+        win.show()
+        self.apply_theme(self.current_theme)
+
+    def _open_visor_animaciones(self):
+        from Nucleos_Positronicos.Nucleo_de_Sprites.visor_animaciones import VisorAnimaciones
+        if not hasattr(self, 'visor_animaciones') or not self.visor_animaciones:
+            self.visor_animaciones = VisorAnimaciones(self)
+            self.visor_animaciones.set_project(self.project)
+            self.visor_animaciones.openEditorRequested.connect(self._open_anim_editor)
+            self.tabs.addTab(self.visor_animaciones, "🎬 Animaciones")
+        
+        # Focus tab
+        for i in range(self.tabs.count()):
+            if self.tabs.widget(i) == self.visor_animaciones:
+                self.tabs.setCurrentIndex(i)
+                break
+
+    def _open_anim_editor(self, anim_name):
+        import os, csv
+        from Nucleos_Positronicos.Nucleo_de_Sprites.negrozma_engine import NegrozmaEngine
+        csv_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "Banco_de_Datos", "Cilixes", "fomt", "Fomt_Animations.csv"
+        )
+        anim_id = None
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row.get("Animation_Name") == anim_name:
+                    id_str = row.get("Animation_ID")
+                    anim_id = int(id_str, 16) if id_str.startswith('0x') else int(id_str)
+                    break
+        if anim_id is None:
+            return
+            
+        engine = NegrozmaEngine(self.project.base_rom_path)
+        script = engine.parse_animation_script(anim_id)
+        if not script: return
+        
+        frame_idx = script[0]["frame_index"]
+        FRAME_ARRAY_PTR = 0x0858E20C
+        GFX_BASE = 0x085A33FC
+        PAL_BASE = 0x08661DC0
+        
+        frame = engine.parse_frame_struct(FRAME_ARRAY_PTR, frame_idx)
+        final_gfx, final_pal = engine.resolve_graphics_pointers(GFX_BASE, PAL_BASE, frame)
+        
+        # Open TileEditorExtreme
+        exists = False
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tr("tab_tile_editor", self.current_lang):
+                self.tabs.setCurrentIndex(i)
+                tile_editor = self.tabs.widget(i)
+                exists = True
+                break
+        
+        if not exists:
+            from Nucleos_Positronicos.Nucleo_de_Imagenes.tile_editor_extreme import TileEditorWidget
+            tile_editor = TileEditorWidget(project=self.project)
+            tile_editor.dataPersisted.connect(self._on_tile_editor_persisted)
+            self.tabs.addTab(tile_editor, tr("tab_tile_editor", self.current_lang))
+            self.tabs.setCurrentWidget(tile_editor)
+            
+        if tile_editor:
+            self.current_editing_anim = anim_name
+            self.current_editing_anim_id = anim_id
+            
+            tile_editor.edit_off.setText(f"{engine.get_rom_address(final_gfx):X}")
+            tile_editor.palette_input.setText(f"{engine.get_rom_address(final_pal):X}")
+            tile_editor.combo_bpp.setCurrentIndex(2) # 4 bpp
+            tile_editor._load_palette_from_rom()
+            tile_editor._refresh()
+
+    def _on_tile_editor_persisted(self):
+        if not hasattr(self, 'current_editing_anim') or not hasattr(self, 'current_editing_anim_id'): return
+        if not hasattr(self, 'visor_animaciones') or not self.visor_animaciones.current_folder: return
+        
+        from Nucleos_Positronicos.Nucleo_de_Sprites.negrozma_engine import NegrozmaEngine
+        # Instanciar el motor directo a la RAM (virtual_rom)
+        engine = NegrozmaEngine(rom_data=self.project.virtual_rom)
+        
+        FRAME_ARRAY_PTR = 0x0858E20C
+        GFX_BASE = 0x085A33FC
+        PAL_BASE = 0x08661DC0
+        out_dir = self.visor_animaciones.current_folder
+        
+        try:
+            # Reexportar el GIF con los nuevos tiles de la RAM
+            engine.export_animation(
+                self.current_editing_anim_id, 
+                FRAME_ARRAY_PTR, GFX_BASE, PAL_BASE, 
+                out_dir, self.current_editing_anim
+            )
+            # Refrescar la celda en el visor
+            self.visor_animaciones.reload_cell(self.current_editing_anim)
+        except Exception as e:
+            print(f"Error en Live Reload: {e}")
+
+    def _on_action_help(self):
+        if not self.help_dialog:
+            self.help_dialog = HelpWidget(self)
+        self.help_dialog.show()
+
+    def _open_anim_extractor(self):
+        if not self.project or not self.project.base_rom_path:
+            QMessageBox.warning(self, "Extractor de Animaciones", "Debes cargar una ROM o Proyecto primero.")
+            return
+            
+        out_dir = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta para exportar animaciones")
+        if not out_dir:
+            return
+            
+        try:
+            import sys
+            import os
+            
+            # Ensure Herramientas is in sys.path
+            herramientas_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Herramientas")
+            if herramientas_path not in sys.path:
+                sys.path.append(herramientas_path)
+                
+            from Nucleos_Positronicos.Nucleo_de_Sprites.negrozma_engine import NegrozmaEngine
+            from PyQt6.QtWidgets import QApplication
+            
+            self.status.showMessage("Extrayendo animaciones masivamente... (Puede tardar varios segundos)")
+            QApplication.processEvents() # Forzar actualización de la UI
+            
+            engine = NegrozmaEngine(self.project.base_rom_path)
+            csv_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "Banco_de_Datos", "Cilixes", "fomt", "Fomt_Animations.csv"
+            )
+            
+            engine.batch_export_all_animations(csv_path, out_dir)
+            
+            self.status.showMessage("Extracción masiva completada.")
+            QMessageBox.information(self, "Extractor de Animaciones", f"¡Las animaciones se han exportado correctamente a:\n{out_dir}")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error en Extractor", f"Fallo en la extracción:\n{e}")
+            self.status.showMessage("Error durante la extracción.")
+
+    def _on_project_loaded(self):
+        self.tabs.clear()
+        self.tree_model.clear()
+        self.tile_viewer = None
+        self.audio_viewer = None
+        self.sprite_viewer = None
+        
+        # Limpiar caché de imágenes (PNGs) para forzar extracción de la ROM actual
+        import glob
+        import os
+        dirs_to_clean = [os.path.join(os.getcwd(), "portraits_dump"), os.path.join(os.getcwd(), "sprites_dump")]
+        if self.project and getattr(self.project, 'project_dir', None):
+            dirs_to_clean.extend([
+                os.path.join(self.project.project_dir, "portraits_dump"),
+                os.path.join(self.project.project_dir, "sprites_dump")
+            ])
+        for p_dir in dirs_to_clean:
+            if os.path.exists(p_dir):
+                for f in glob.glob(os.path.join(p_dir, "*.png")):
+                    try:
+                        os.remove(f)
+                    except:
+                        pass
+                        
+        if self.project:
+            self.ai_terminal.project = self.project # Actualizar nexo de IA
+            self.btn_n.setEnabled(True)
+            try:
+                # La firma N_MODE se encuentra en el espacio libre del sistema (0x13AA24)
+                flag = self.project.read_rom(0x0013AA24, 6)
+                if flag == b'N_MODE':
+                    self.btn_n.setText("Ñ Activada")
+                    self.btn_n.setEnabled(False)
+                else:
+                    self.btn_n.setText("¡Instalar Ñ!")
+                    self.btn_n.setEnabled(True)
+            except:
+                pass
+                
+        proj_label = tr("explorer_proj", self.current_lang).format(name=self.project.name)
+        self.tree_model.setHorizontalHeaderLabels([proj_label])
+        root = self.tree_model.invisibleRootItem()
+        self.cat_npcs = QStandardItem(tr("cat_npcs", self.current_lang))
+        self.cat_items = QStandardItem(tr("cat_items", self.current_lang))
+        self.cat_bulk_items = QStandardItem("Lista Maestra (Nombres/Desc)")
+        self.cat_events_item = QStandardItem(tr("cat_events", self.current_lang))
+        # self.cat_native_procs = QStandardItem("Rutinas Nativas (THUMB)")
+        self.cat_maps = QStandardItem(tr("cat_maps", self.current_lang))
+        root.appendRow(self.cat_npcs)
+        root.appendRow(self.cat_items)
+        root.appendRow(self.cat_bulk_items)
+        root.appendRow(self.cat_events_item)
+        # root.appendRow(self.cat_native_procs)
+        root.appendRow(self.cat_maps)
+        
+        # Aplicar configuraciones de decoración al cargar el proyecto
+        if self.project and self.project.event_parser:
+            dec_cfg = self.settings.value("decoration_settings", {
+                "strings": True, "items": True, "characters": True, "flags": True, "coords": True
+            })
+            self.project.event_parser.decoration_settings = dec_cfg
+            
+        self._populate_ui_step(2)
+        item_bulk = QStandardItem("Items (Bulk Edit Mode)")
+        item_bulk.setData("BULK_ITEMS", Qt.ItemDataRole.UserRole + 1)
+        self.cat_bulk_items.appendRow(item_bulk)
+        try: self.tree_view.doubleClicked.disconnect()
+        except: pass
+        self.tree_view.doubleClicked.connect(self._on_tree_double_click)
+        
+        # ── Preparación de Pestañas (Lazy Loading) ───────────────────
+        self.tabs.addTab(QWidget(), tr("tab_items", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_npcs", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_pointers", self.current_lang))
+        self.tabs.addTab(QWidget(), tr("tab_menu_editor", self.current_lang))
+        self.tabs.addTab(QWidget(), "Bloques 🧩")
+        
+        # Conectar el cambio de pestaña para cargar el editor bajo demanda
+        try: self.tabs.currentChanged.disconnect()
+        except: pass
+        self.tabs.currentChanged.connect(self._on_tab_changed)
+        
+        self.apply_theme(self.current_theme)
+
+    def _apply_n_patch(self):
+        if not self.project or not self.project.base_rom_path:
+            return
+        reply = QMessageBox.question(
+            self,
+            "Soberanía de la Ñ",
+            "¿Deseas inyectar el soporte nativo para la 'Ñ' en la ROM?\nEsto modificará el archivo base y habilitará los caracteres en el juego.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            from Banco_de_Datos.parche_n import aplicar_parche_n
+            # Advertencia de seguridad solicitada por el usuario
+            reply = QMessageBox.warning(
+                self, 
+                "Soberanía de la Ñ", 
+                "¡ATENCIÓN! No debe haber ningún evento editado antes de activar la Ñ.\n\n"
+                "La inyección de glifos y el repunteo de scripts pueden entrar en conflicto con cambios previos.\n"
+                "¿Deseas continuar con la instalación?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.No:
+                return
+
+            try:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.start_animation()
+                from PyQt6.QtWidgets import QApplication
+                QApplication.processEvents()
+                aplicar_parche_n(self.project)
+                self.btn_n.setEnabled(False)
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
+                QMessageBox.information(self, "¡Éxito!", "La Soberanía de la Ñ se ha instalado correctamente.")
+                
+                # Refrescar Tile Editor si está abierto
+                for i in range(self.tabs.count()):
+                    if isinstance(self.tabs.widget(i), TileEditorWidget):
+                        self.tabs.widget(i).set_project(self.project)
+                        
+            except Exception as e:
+                if hasattr(self, 'magic_circle'):
+                    self.magic_circle.stop_animation()
+                QMessageBox.critical(self, "Error", f"No se pudo instalar la Ñ:\n{e}")
+
+    def _populate_ui_step(self, step):
+        if not self.project: return
+        
+        if step == 2:
+            from PyQt6.QtWidgets import QApplication
+            # NPCs
+            self.cat_npcs.removeRows(0, self.cat_npcs.rowCount())
+            for i, npc in enumerate(self.project.npc_parser.npcs):
+                item = QStandardItem(f"[{i:02d}] {npc.name_str.strip('\x00')}")
+                item.setData("NPC", Qt.ItemDataRole.UserRole + 1)
+                item.setData(i, Qt.ItemDataRole.UserRole)
+                self.cat_npcs.appendRow(item)
+                if i % 20 == 0: QApplication.processEvents()
+            
+            # Events
+            self.cat_events_item.removeRows(0, self.cat_events_item.rowCount())
+            self.cat_events_item.setText(f"{tr('cat_events', self.current_lang)} ({self.project.event_parser.get_event_count()})")
+            for i in range(1, self.project.event_parser.get_event_count() + 1):
+                ev_item = QStandardItem(self.project.super_lib.get_baptized_name(i, ""))
+                ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
+                ev_item.setData(i, Qt.ItemDataRole.UserRole)
+                self.cat_events_item.appendRow(ev_item)
+                if i % 50 == 0: QApplication.processEvents()
+            
+            # Maps
+            self.cat_maps.removeRows(0, self.cat_maps.rowCount())
+            for i, m in enumerate(self.project.map_parser.maps):
+                m_name = self.project.super_lib.get_map_name_hint(m.map_id)
+                map_label = "MAPA" if self.current_lang == "es" else "MAP"
+                map_item = QStandardItem(f"{map_label} {m.map_id:03d}: {m_name}")
+                map_item.setData("MAP", Qt.ItemDataRole.UserRole + 1)
+                map_item.setData(m.map_id, Qt.ItemDataRole.UserRole)
+                self.cat_maps.appendRow(map_item)
+                if i % 20 == 0: QApplication.processEvents()
+            self.tree_view.expand(self.cat_events_item.index())
+            
+            # Native Procs (Oculto temporalmente por petición del usuario)
+            # self.cat_native_procs.removeRows(0, self.cat_native_procs.rowCount())
+            # try:
+            #     from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.native_proc_viewer import NativeProcDecompiler
+            #     import struct
+            #     rom_path = self.project.base_rom_path
+            #     with open(rom_path, 'rb') as f:
+            #         rom_data = f.read()
+            #     cilixes_dir = os.path.join(
+            #         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            #         "Banco_de_Datos", "Cilixes", "fomt"
+            #     )
+            #     decomp = NativeProcDecompiler(rom_data, cilixes_dir, self.project)
+            #     proc_list = decomp.get_proc_list()
+            #     native_count = 0
+            #     for cid, name, etype, rom_off, args in proc_list:
+            #         label = "[0x%03X] %s" % (cid, name)
+            #         if args:
+            #             label += "(%s)" % args
+            #         proc_item = QStandardItem(label)
+            #         proc_item.setData("NATIVE_PROC", Qt.ItemDataRole.UserRole + 1)
+            #         proc_item.setData(cid, Qt.ItemDataRole.UserRole)
+            #         self.cat_native_procs.appendRow(proc_item)
+            #         native_count += 1
+            #         if native_count % 50 == 0: QApplication.processEvents()
+            #     self.cat_native_procs.setText("Rutinas Nativas (%d)" % native_count)
+            # except Exception as e:
+            #     pass
+            #     self.cat_native_procs.appendRow(err_item)
+
+        elif step == 3:
+            # Abrir el Tile Editor Extreme por defecto al cargar gráficos
+            exists = False
+            for i in range(self.tabs.count()):
+                if self.tabs.tabText(i) == tr("tab_tile_editor", self.current_lang):
+                    exists = True
+                    break
+            
+            if not exists:
+                tile_editor = TileEditorWidget(project=self.project)
+                self.tabs.addTab(tile_editor, tr("tab_tile_editor", self.current_lang))
+
+            if not self.sprite_viewer:
+                self.sprite_viewer = VisorSprites(self)
+                self.sprite_viewer.set_project(self.project)
+                self.tabs.addTab(self.sprite_viewer, "🎨 Sprites & Portraits")
+        elif step == 4:
+            if not self.audio_viewer:
+                self.audio_viewer = SappyAudioViewer(self.project, self)
+                self.tabs.addTab(self.audio_viewer, tr("tab_audio", self.current_lang))
+        elif step == 5:
+            # Abrir el primer mapa por defecto o mostrar aviso
+            if self.project.map_parser.maps:
+                self.open_map_editor(self.project.map_parser.maps[0].map_id)
+            else:
+                self.status.showMessage("No se detectaron mapas para abrir.")
+
+    def open_map_editor(self, map_id):
+        map_header = self.project.map_parser.get_map_by_id(map_id)
+        if map_header:
+            for i in range(self.tabs.count()):
+                if self.tabs.tabText(i).startswith(f"Map {map_id}"):
+                    self.tabs.setCurrentIndex(i)
+                    return
+            editor = MapEditorWidget(self)
+            editor.project = self.project
+            editor.load_map(map_header)
+            editor.openScriptRequested.connect(self.open_event)
+            self.tabs.addTab(editor, f"Map {map_id:03d}")
+            self.tabs.setCurrentWidget(editor)
+        
+    def _on_tree_double_click(self, index):
+        item = self.tree_model.itemFromIndex(index)
+        if not item: return
+        type = item.data(Qt.ItemDataRole.UserRole + 1)
+        val = item.data(Qt.ItemDataRole.UserRole)
+        if type == "EVENT":
+            self.open_event(val)
+        elif type == "NPC":
+            self.open_npc_routine(val)
+        elif type == "MAP":
+            map_id = val
+            map_header = self.project.map_parser.get_map_by_id(map_id)
+            if map_header:
+                for i in range(self.tabs.count()):
+                    if self.tabs.tabText(i).startswith(f"Map {map_id}"):
+                        self.tabs.setCurrentIndex(i)
+                        return
+                editor = MapEditorWidget(self)
+                editor.project = self.project
+                editor.load_map(map_header)
+                editor.openScriptRequested.connect(self.open_event)
+                self.tabs.addTab(editor, f"Map {map_id:03d}")
+                self.tabs.setCurrentWidget(editor)
+        elif type == "BULK_ITEMS":
+            self.open_bulk_items("Herramientas", "Herramienta")
+        elif type == "NATIVE_PROC":
+            self.open_native_proc(val)
+
+    def open_bulk_items(self, label, category_filter):
+        tab_name = f"Bulk {label}"
+        # 1. Verificar si la pestaña ya está abierta
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tab_name:
+                self.tabs.setCurrentIndex(i)
+                return
+                
+        # 2. Crear el nuevo editor DEDICADO de ítems
+        editor = ItemBulkEditorWidget(self.project, label, category_filter, self)
+        self.tabs.addTab(editor, tab_name)
+        self.tabs.setCurrentWidget(editor)
+
+    def open_menu_editor(self):
+        """Abre el editor de textos de sistema / interfaz."""
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == "Textos Interfaz":
+                self.tabs.setCurrentIndex(i)
+                return
+        editor = MenuEditorWidget(self.project, self)
+        self.tabs.addTab(editor, "Textos Interfaz")
+        self.tabs.setCurrentWidget(editor)
+
+    def _open_visor_metasprites(self):
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == "🖼 Metasprites":
+                self.tabs.setCurrentIndex(i)
+                return
+        if not self.metasprite_viewer:
+            self.metasprite_viewer = VisorMetasprites(self)
+            self.metasprite_viewer.set_project(self.project)
+        self.tabs.addTab(self.metasprite_viewer, "🖼 Metasprites")
+        self.tabs.setCurrentWidget(self.metasprite_viewer)
+
+    def _open_visor_npc(self):
+        lang = self.current_lang
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tr("tab_npcs", lang):
+                self.tabs.setCurrentIndex(i)
+                return
+
+    def open_intro_editor(self):
+        """Abre el editor global de textos de la introducción."""
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == "Textos Intro":
+                self.tabs.setCurrentIndex(i)
+                return
+        editor = IntroTextEditorWidget(self.project, self)
+        self.tabs.addTab(editor, "Textos Intro")
+        self.tabs.setCurrentWidget(editor)
+
+    def open_event(self, event_id):
+        tab_name = self.project.super_lib.get_baptized_name(event_id, "")
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tab_name:
+                self.tabs.setCurrentIndex(i)
+                return
+        ide = ScriptIDEWidget(self.project, self)
+        ide.load_event(event_id)
+        self.tabs.addTab(ide, tab_name)
+        self.tabs.setCurrentWidget(ide)
+
+    def open_npc_routine(self, npc_id):
+        npc_data = self.project.npc_parser.npcs[npc_id]
+        tab_name = f"Routine: {npc_data.name_str.strip()}"
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tab_name:
+                self.tabs.setCurrentIndex(i)
+                return
+        ide = ScriptIDEWidget(self.project, self)
+        code, _ = self.project.schedule_parser.decode_npc_schedule(npc_data)
+        ide.editor.setPlainText(code)
+        self.tabs.addTab(ide, tab_name)
+        self.tabs.setCurrentWidget(ide)
+
+    def open_native_proc(self, call_id):
+        """Abre un pseudo-decompilador de rutina nativa en una pestaña nueva."""
+        name_info = None
+        # Try to get name from existing viewer or lib
+        try:
+            from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.native_proc_viewer import NativeProcDecompiler
+            cilixes_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "Banco_de_Datos", "Cilixes", "fomt"
+            )
+            import csv as csv_mod
+            lib_path = os.path.join(cilixes_dir, "Fomt_Lib.csv")
+            with open(lib_path, 'r') as f:
+                reader = csv_mod.reader(f)
+                next(reader)
+                for row in reader:
+                    if len(row) >= 4 and int(row[2].strip()) == call_id:
+                        name_info = row[3].strip()
+                        break
+        except:
+            pass
+        
+        tab_name = "Native: %s" % (name_info or "Proc%03X" % call_id)
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tab_name:
+                self.tabs.setCurrentIndex(i)
+                return
+        
+        viewer = NativeProcViewerWidget(self.project, self)
+        viewer.load_proc(call_id)
+        self.tabs.addTab(viewer, tab_name)
+        self.tabs.setCurrentWidget(viewer)
+
+    def _open_tile_editor_extreme(self):
+        """Lanza el editor de tiles avanzado como un proceso independiente o ventana flotante."""
+        import subprocess
+        from Banco_de_Datos.Utilidades.rutas import get_resource_path
+        script_path = get_resource_path(os.path.join("Nucleos_Positronicos", "Nucleo_de_Imagenes", "tile_editor_extreme.py"))
+        try:
+            subprocess.Popen([sys.executable, script_path])
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"No se pudo lanzar el Tile Editor Extreme:\n{e}")
+
+    def open_decoration_control(self):
+        from Nucleos_Positronicos.Nucleo_de_Scripts.decoration_control import DecorationControlDialog
+        
+        # Obtener configuraciones actuales
+        current_cfg = self.settings.value("decoration_settings", {
+            "strings": True, "items": True, "characters": True, "flags": True, "coords": True
+        })
+        
+        dialog = DecorationControlDialog(self, current_cfg)
+        if dialog.exec():
+            new_cfg = dialog.get_settings()
+            self.settings.setValue("decoration_settings", new_cfg)
+            
+            # Aplicar al parser si existe el proyecto
+            if self.project and self.project.event_parser:
+                self.project.event_parser.decoration_settings = new_cfg
+                
+            # Recargar la pestaña actual si es un editor de scripts
+            current_widget = self.tabs.currentWidget()
+            if isinstance(current_widget, ScriptIDEWidget):
+                if current_widget.current_event_id is not None:
+                    current_widget.load_event(current_widget.current_event_id)
+                elif hasattr(current_widget, 'last_offset') and current_widget.last_offset:
+                    current_widget.load_rom_script(current_widget.last_offset)
+
+    def open_script_by_ref(self, ref):
+        """Busca un script por nombre o ID y lo abre."""
+        event_id = None
+        if ref.startswith("0x"):
+            try: event_id = int(ref, 16)
+            except: pass
+        elif ref.isdigit():
+            event_id = int(ref)
+        else:
+            for eid, name in self.project.super_lib.event_names.items():
+                if name == ref:
+                    event_id = eid
+                    break
+            if event_id is None and ref.startswith("Script_"):
+                try: event_id = int(ref.replace("Script_", ""), 16)
+                except: pass
+        
+        if event_id is not None:
+            self.open_event(event_id)
+        else:
+            self.status.showMessage(f"No se pudo encontrar el script: {ref}", 3000)
+
+    def _close_tab(self, index):
+        widget = self.tabs.widget(index)
+        if widget:
+            # Limpiar referencias cacheadas para evitar RuntimeError: deleted object
+            if getattr(self, 'metasprite_viewer', None) == widget:
+                self.metasprite_viewer = None
+            if getattr(self, 'sprite_viewer', None) == widget:
+                self.sprite_viewer = None
+            if getattr(self, 'sappy_viewer', None) == widget:
+                self.sappy_viewer = None
+            if getattr(self, 'tile_viewer', None) == widget:
+                self.tile_viewer = None
+            if getattr(self, 'intro_editor', None) == widget:
+                self.intro_editor = None
+                
+            widget.deleteLater()
+        self.tabs.removeTab(index)
+
+    def _on_tab_context_menu(self, position):
+        index = self.tabs.tabBar().tabAt(position)
+        if index == -1: return
+        
+        menu = QMenu()
+        float_action = QAction("Hacer Flotante", self)
+        float_action.triggered.connect(lambda: self._float_tab(index))
+        menu.addAction(float_action)
+        
+        close_action = QAction("Cerrar", self)
+        close_action.triggered.connect(lambda: self._close_tab(index))
+        menu.addAction(close_action)
+        
+        menu.exec(self.tabs.tabBar().mapToGlobal(position))
+
+    def _float_tab(self, index):
+        widget = self.tabs.widget(index)
+        title = self.tabs.tabText(index)
+        
+        # Remover del tab widget sin destruir
+        self.tabs.removeTab(index)
+        
+        # Crear ventana flotante
+        float_win = FloatingWindow(widget, title, self)
+        float_win.show()
+        self.floating_windows.append(float_win)
+
+    def _on_shortcut_event_up(self):
+        self._navigate_event(-1)
+
+    def _on_shortcut_event_down(self):
+        self._navigate_event(1)
+
+    def _navigate_event(self, direction):
+        if not self.cat_events_item: return
+        
+        # Obtener índice seleccionado actual en el árbol
+        current_index = self.tree_view.currentIndex()
+        if not current_index.isValid():
+            # Si no hay nada seleccionado, empezamos por el primero de eventos
+            new_idx = self.cat_events_item.child(0).index()
+        else:
+            # Seleccionar el siguiente/anterior relativo al actual
+            row = current_index.row()
+            parent = current_index.parent()
+            
+            # Si el padre es la categoría de eventos
+            if parent == self.cat_events_item.index():
+                new_row = (row + direction) % self.cat_events_item.rowCount()
+                new_idx = self.cat_events_item.child(new_row).index()
+            else:
+                # Si no estamos en eventos, forzamos ir al primero de eventos
+                new_idx = self.cat_events_item.child(0).index()
+        
+        self.tree_view.setCurrentIndex(new_idx)
+        self._on_tree_double_click(new_idx)
+
+    def _on_action_help(self):
+        """Abre el Centro de Ayuda como un Pop-up independiente."""
+        from PyQt6.QtWidgets import QDialog
+        
+        # Crear diálogo si no existe
+        dialog = QDialog(self)
+        dialog.setWindowTitle(tr("help_title", self.current_lang))
+        dialog.setMinimumWidth(600)
+        dialog.setMinimumHeight(500)
+        
+        lay = QVBoxLayout(dialog)
+        help_content = HelpWidget(self)
+        lay.addWidget(help_content)
+        
+        dialog.exec()
+
+    def _check_for_crash_report(self):
+        """Busca el archivo de log y pregunta al usuario si desea enviarlo (si está PENDING)."""
+        root_dir = os.path.dirname(os.path.abspath(sys.argv[0])) # Usar sys.argv[0] para main.py
+        log_path = os.path.join(root_dir, "fomt_studio_error.log")
+        
+        if not os.path.exists(log_path):
+            return
+
+        try:
+            with open(log_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            
+            if "[STATUS: PENDING]" not in content:
+                return
+
+            # Preguntar al usuario
+            reply = QMessageBox.question(
+                self, 
+                tr("crash_detected_title", self.current_lang),
+                tr("crash_detected_msg", self.current_lang),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+
+            if reply == QMessageBox.StandardButton.Yes:
+                self._send_error_report(content)
+
+            # Marcar como HANDLED re-escribiendo el archivo
+            new_content = content.replace("[STATUS: PENDING]", "[STATUS: HANDLED]")
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+        except Exception as e:
+            print(f"Error al procesar el log de fallos: {e}")
+
+    def _send_error_report(self, log_text):
+        """Abre el cliente de correo con el log codificado."""
+        email = "fomtstudio.logs@gmail.com" # Placeholder solicitado
+        subject = tr("crash_report_subject", self.current_lang)
+        
+        # Limpiar el texto para el mailto (escapar caracteres especiales)
+        # Solo enviamos el contenido útil (después del tag)
+        body = log_text.replace("[STATUS: PENDING]", "").strip()
+        
+        from urllib.parse import quote
+        mailto_url = f"mailto:{email}?subject={quote(subject)}&body={quote(body)}"
+        
+        QDesktopServices.openUrl(QUrl(mailto_url))
+
+    def filter_events(self, event_ids):
+        """Oculta todos los eventos excepto los que coinciden con los resultados de búsqueda global."""
+        if not self.cat_events_item: return
+        self.tree_view.setUpdatesEnabled(False)
+        try:
+            for row in range(self.cat_events_item.rowCount()):
+                item = self.cat_events_item.child(row)
+                eid = item.data(Qt.ItemDataRole.UserRole)
+                # Ocultar si el ID no está en los resultados
+                self.tree_view.setRowHidden(row, self.cat_events_item.index(), eid not in event_ids)
+            
+            self.tree_view.expand(self.cat_events_item.index())
+            self.status.showMessage(f"Filtro global activo: {len(event_ids)} resultados.")
+        finally:
+            self.tree_view.setUpdatesEnabled(True)
+
+    def clear_event_filter(self):
+        """Muestra todos los eventos nuevamente."""
+        if not self.cat_events_item: return
+        self.tree_view.setUpdatesEnabled(False)
+        try:
+            for row in range(self.cat_events_item.rowCount()):
+                self.tree_view.setRowHidden(row, self.cat_events_item.index(), False)
+            self.status.showMessage("Filtro global limpiado.")
+        finally:
+            self.tree_view.setUpdatesEnabled(True)
+
+    def on_search_text_changed(self, text):
+        """Filtra el árbol de proyecto según el texto ingresado."""
+        if not self.tree_model or self.tree_model.rowCount() == 0: return
+        
+        text = text.lower().strip()
+        self.tree_view.setUpdatesEnabled(False) # Evitar parpadeo
+        try:
+            for i in range(self.tree_model.rowCount()):
+                parent_item = self.tree_model.item(i)
+                self._filter_item_recursive(parent_item, text)
+            
+            if not text:
+                # Si se limpia la búsqueda, colapsar categorías grandes por orden
+                self.tree_view.collapseAll()
+                if self.cat_events_item:
+                    self.tree_view.expand(self.cat_events_item.index()) # Mantener eventos expandidos
+        finally:
+            self.tree_view.setUpdatesEnabled(True)
+
+    def _filter_item_recursive(self, item, text):
+        """Oculta/Muestra items recursivamente y expande resultados."""
+        has_visible_child = False
+        for i in range(item.rowCount()):
+            child = item.child(i)
+            if self._filter_item_recursive(child, text):
+                has_visible_child = True
+        
+        # Un item es visible si coincide con el texto O si alguno de sus hijos es visible
+        match = not text or (text in item.text().lower())
+        visible = match or has_visible_child
+        
+        index = item.index()
+        if index.isValid():
+            parent_index = index.parent()
+            self.tree_view.setRowHidden(index.row(), parent_index, not visible)
+            
+            # Auto-expandir si hay resultados internos
+            if text and has_visible_child:
+                self.tree_view.setExpanded(index, True)
+        
+        return visible
+
+    def _on_tab_changed(self, index):
+        """Inicializa los editores pesados bajo demanda para evitar el congelamiento al abrir la ROM."""
+        if not self.project: return
+        
+        tab_text = self.tabs.tabText(index)
+        lang = self.current_lang
+        
+        # Si la pestaña tiene un widget vacío (placeholder), lo reemplazamos con el editor real
+        current_widget = self.tabs.widget(index)
+        if current_widget and current_widget.layout() is None:
+            from PyQt6.QtWidgets import QApplication
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+            try:
+                if tab_text == tr("tab_items", lang):
+                    self.item_editor = ItemEditorWidget(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.item_editor, tr("tab_items", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_npcs", lang):
+                    self.npc_editor = NpcEditorWidget(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.npc_editor, tr("tab_npcs", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_pointers", lang):
+                    self.pointer_editor = MasterPointerEditor(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.pointer_editor, tr("tab_pointers", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == tr("tab_menu_editor", lang):
+                    self.menu_editor = MenuEditorWidget(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.menu_editor, tr("tab_menu_editor", lang))
+                    self.tabs.setCurrentIndex(index)
+                elif tab_text == "Bloques 🧩":
+                    self.block_editor = BlockPuzzleEditor(self.project, self)
+                    self.tabs.removeTab(index)
+                    self.tabs.insertTab(index, self.block_editor, "Bloques 🧩")
+                    self.tabs.setCurrentIndex(index)
+                    
+                    # Cargar evento actual si hay uno seleccionado en el árbol
+                    current_index = self.tree_view.currentIndex()
+                    if current_index.isValid():
+                        item = self.tree_model.itemFromIndex(current_index)
+                        if item and item.data(Qt.ItemDataRole.UserRole + 1) == "EVENT":
+                            self.block_editor.load_event(item.data(Qt.ItemDataRole.UserRole))
+                
+                self.apply_theme(self.current_theme)
+            finally:
+                QApplication.restoreOverrideCursor()
