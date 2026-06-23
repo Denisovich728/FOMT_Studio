@@ -344,29 +344,8 @@ class VisorMapas(QWidget):
         tools_row1.addWidget(self.chk_invert_bg)
         tools_row1.addStretch()
         
-        # Paleta de Colisiones
+        # Paleta de Colisiones (se llenará dinámicamente al cargar el mapa)
         self.cmb_col_brush = QComboBox()
-        self.behavior_names = [
-            "00: Caminable",
-            "01: Trigger Caminable A",
-            "02: Trigger Caminable B",
-            "03: Agua",
-            "04: Pared",
-            "05: Trigger Sólido A",
-            "06: Trigger Solido B",
-            "07: Sólido C",
-            "08: Trigger Solido D",
-            "09: Trigger Solido E",
-            "0A: Trigger Solido F",
-            "0B: Trigger Solido G",
-            "0C: Trigger Solido H",
-            "0D: Trigger Solido I",
-            "0E: Trigger Solido J",
-            "0F: Trigger Solido K",
-            "10: Trigger Solido L",
-            "11: Trigger Solido M"
-        ]
-        self.cmb_col_brush.addItems(self.behavior_names)
         self.cmb_col_brush.setVisible(False)
         self.lbl_col_brush = QLabel("Pincel Colisión:")
         self.lbl_col_brush.setVisible(False)
@@ -604,6 +583,15 @@ class VisorMapas(QWidget):
             for y in range(0, ts_img.height, 8):
                 painter.drawLine(0, y, ts_img.width, y)
                 
+            if hasattr(self, 'selected_tile'):
+                idx_only = self.selected_tile & 0x03FF
+                sel_x = (idx_only % 32) * 8
+                sel_y = (idx_only // 32) * 8
+                pen_sel = QPen(QColor(255, 0, 0, 200))
+                pen_sel.setWidth(2)
+                painter.setPen(pen_sel)
+                painter.drawRect(sel_x, sel_y, 8, 8)
+                
             painter.end()
             
             pix = QPixmap.fromImage(qim)
@@ -645,6 +633,8 @@ class VisorMapas(QWidget):
         info += f"{len(palettes)} paletas | {len(self.renderer.tiles)} tiles | "
         info += f"Triggers: Ptr6=0x{mh.p_obj1:08X}, Ptr7=0x{mh.p_obj2:08X}"
         self.lbl_info.setText(info)
+        
+        self._update_collision_brush()
 
     def _on_map_error(self, error_msg):
         self.progress.setVisible(False)
@@ -659,10 +649,46 @@ class VisorMapas(QWidget):
         cell_y = py // 8
         tileset_width = 32 # 256 pixels / 8
         self.selected_tile = cell_y * tileset_width + cell_x
+        self._copied_from_map = False
         self.lbl_info.setText(f"Pincel Tile: 0x{self.selected_tile:03X}")
+        self._re_render_tileset()
 
     def _on_map_mouse_released(self):
         self._save_state_pending = False
+
+    def _update_collision_brush(self):
+        self.cmb_col_brush.blockSignals(True)
+        self.cmb_col_brush.clear()
+        
+        if not self.renderer.behavior_dict:
+            self.cmb_col_brush.addItems([f"{i:02X}: Desconocido" for i in range(256)])
+            self.cmb_col_brush.blockSignals(False)
+            return
+
+        max_val = min(256, len(self.renderer.behavior_dict) // 4)
+        items = []
+        for val in range(max_val):
+            behavior = struct.unpack_from('<H', self.renderer.behavior_dict, val * 4)[0]
+            script_id = struct.unpack_from('<H', self.renderer.behavior_dict, val * 4 + 2)[0]
+            
+            is_solid = bool(behavior & 1)
+            has_script = (script_id > 0)
+            
+            if val == 0:
+                name = "Caminable (Vacío)"
+            elif is_solid and has_script:
+                name = "Sólido + Evento"
+            elif is_solid:
+                name = "Sólido (Pared/Obstáculo)"
+            elif has_script:
+                name = "Caminable + Evento (Warp/Trigger)"
+            else:
+                name = "Caminable Especial (Agua/Borde)"
+                
+            items.append(f"{val:02X}: {name}")
+            
+        self.cmb_col_brush.addItems(items)
+        self.cmb_col_brush.blockSignals(False)
 
     def _on_map_clicked(self, px, py):
         px = int(px / self.zoom_factor)
@@ -683,12 +709,21 @@ class VisorMapas(QWidget):
         # Lógica de pintado según la pestaña activa
         tab_idx = self.tabs_edit_mode.currentIndex()
         if hasattr(self, 'selected_tile') and tab_idx in [1, 2, 3]: # Modo pintar BG
+            copied_from_map = getattr(self, '_copied_from_map', False)
+            
+            # Si no fue clonado (se eligió del panel), inyectamos la paleta activa del combobox
+            if not copied_from_map:
+                active_pal = self.cmb_ts_pal.currentIndex()
+                new_val = (active_pal << 12) | (self.selected_tile & 0x03FF)
+            else:
+                new_val = self.selected_tile
+
             if tab_idx == 1 and idx < len(self.renderer.tilemap_bg3):
-                self.renderer.tilemap_bg3[idx] = (self.renderer.tilemap_bg3[idx] & 0xFC00) | self.selected_tile
+                self.renderer.tilemap_bg3[idx] = new_val
             elif tab_idx == 2 and idx < len(self.renderer.tilemap_bg2):
-                self.renderer.tilemap_bg2[idx] = (self.renderer.tilemap_bg2[idx] & 0xFC00) | self.selected_tile
+                self.renderer.tilemap_bg2[idx] = new_val
             elif tab_idx == 3 and idx < len(self.renderer.tilemap_bg1):
-                self.renderer.tilemap_bg1[idx] = (self.renderer.tilemap_bg1[idx] & 0xFC00) | self.selected_tile
+                self.renderer.tilemap_bg1[idx] = new_val
             self._re_render()
         elif tab_idx == 4 and self.renderer.collision_map: # Modo pintar colisión
             val_text = self.cmb_col_brush.currentText()
@@ -703,7 +738,6 @@ class VisorMapas(QWidget):
 
     def _on_map_right_clicked(self, px, py):
         tab_idx = self.tabs_edit_mode.currentIndex()
-        if tab_idx != 4: return
         
         px = int(px / self.zoom_factor)
         py = int(py / self.zoom_factor)
@@ -711,6 +745,25 @@ class VisorMapas(QWidget):
         cell_y = py // 8
         w = self.renderer.width
         idx = cell_y * w + cell_x
+
+        # Eyedropper (Copiar Tile)
+        if tab_idx in [1, 2, 3]:
+            if tab_idx == 1 and idx < len(self.renderer.tilemap_bg3):
+                val = self.renderer.tilemap_bg3[idx]
+            elif tab_idx == 2 and idx < len(self.renderer.tilemap_bg2):
+                val = self.renderer.tilemap_bg2[idx]
+            elif tab_idx == 3 and idx < len(self.renderer.tilemap_bg1):
+                val = self.renderer.tilemap_bg1[idx]
+            else:
+                return
+            
+            self.selected_tile = val
+            self._copied_from_map = True
+            self.lbl_info.setText(f"Cuentagotas: Tile 0x{self.selected_tile:04X} copiado (incluye paleta).")
+            self._re_render_tileset()
+            return
+
+        if tab_idx != 4: return
         
         if not self.renderer.collision_map or idx >= len(self.renderer.collision_map):
             return

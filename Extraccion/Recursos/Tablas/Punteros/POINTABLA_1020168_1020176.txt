@@ -1,0 +1,2 @@
+Puntero 1 Evento 0461 | Locación ROM: 0x0F9108 -> Apunta a: 0x082F4724 | Little-Endian: [24 47 2F 08]
+Puntero 2 Evento 0462 | Locación ROM: 0x0F910C -> Apunta a: 0x082F47A8 | Little-Endian: [A8 47 2F 08]

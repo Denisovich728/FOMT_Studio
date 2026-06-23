@@ -1,0 +1,4 @@
+Puntero 1 Evento 0009 | Locación ROM: 0x0F89F8 -> Apunta a: 0x082AD6F4 | Little-Endian: [F4 D6 2A 08]
+Puntero 2 Evento 0010 | Locación ROM: 0x0F89FC -> Apunta a: 0x082AD798 | Little-Endian: [98 D7 2A 08]
+Puntero 3 Evento 0011 | Locación ROM: 0x0F8A00 -> Apunta a: 0x082AD800 | Little-Endian: [00 D8 2A 08]
+Puntero 4 Evento 0012 | Locación ROM: 0x0F8A04 -> Apunta a: 0x082AD874 | Little-Endian: [74 D8 2A 08]

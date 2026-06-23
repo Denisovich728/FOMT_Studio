@@ -36,40 +36,18 @@ from Nucleos_Positronicos.Nucleo_de_Sprites.visor_sprites import VisorSprites
 from Nucleos_Positronicos.Nucleo_de_Sprites.visor_metasprites import VisorMetasprites
 from PyQt6.QtGui import QAction, QShortcut, QKeySequence, QCursor
 from PyQt6.QtWidgets import QDialog
+from Consola_de_Comando.settings_dialog import SettingsDialog
 
 class FloatingWindow(QMainWindow):
     def __init__(self, widget, title, parent=None):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setCentralWidget(widget)
-                # lsrs r4, r4, #4 (Camera Tile Y)
-                0x24, 0x09,
-                # adds r4, #7 (Player Tile Y = Camera + 7 tiles)
-                0x07, 0x34,
-                # movs r5, #0x1F (Mask 31)
-                0x1F, 0x25,
-                # ands r4, r5 (Player_Tile_Y &= 31)
-                0x2C, 0x40,
-                
-                # Crop Tile Y from VRAM offset (r0)
-                # lsrs r6, r0, #6
-                0x46, 0x09,
-                # ands r6, r5 (Crop_Tile_Y &= 31)
-                0x2E, 0x40,
-                
-                # Compare Crop vs Player
-                # subs r6, r6, r4
-                0xE6, 0x1A,
-                # adds r6, #1 (Shift logic 1 tile down)
-                0x01, 0x36,
-                # ands r6, r5 (Diff = (Crop - Player) & 31)
-                0x2E, 0x40,
-                
-                # If Diff is between 0 and 3, hide Top Tile!
-                # cmp r6, #4
-                0x04, 0x2E,
-                # bge .draw_normal
-                0x01, 0xDA,
+
+class ProjectLoaderThread(QThread):
+    progress = pyqtSignal(int, str)
+    step_finished = pyqtSignal(int)
+    finished = pyqtSignal(bool, str)
     def __init__(self, mode, rom_path, proj_path):
         super().__init__()
         self.mode = mode
@@ -182,6 +160,9 @@ class FoMTStudioApp(QMainWindow):
         else:
             self.konami_index = 0
         super().keyPressEvent(event)
+    def _open_settings_dialog(self):
+        dlg = SettingsDialog(self)
+        dlg.exec()
 
     def toggle_ai_copilot(self):
         self.ai_copilot_active = not self.ai_copilot_active
@@ -431,6 +412,12 @@ class FoMTStudioApp(QMainWindow):
             act = QAction(tr(f"lang_{l_code}", lang), self)
             act.triggered.connect(lambda checked, lc=l_code: self.apply_language(lc))
             lang_menu.addAction(act)
+            
+        config_menu.addSeparator()
+        settings_action = QAction("⚙ Ajustes del Sistema", self)
+        settings_action.setShortcut("Ctrl+Alt+S")
+        settings_action.triggered.connect(self._open_settings_dialog)
+        config_menu.addAction(settings_action)
         
         # Menú Herramientas / Utilidades
         tools_menu = menubar.addMenu(tr("menu_tools", lang))
@@ -464,6 +451,14 @@ class FoMTStudioApp(QMainWindow):
         m_bulk.addAction(tr("bulk_tools", lang), lambda: self.open_bulk_items(tr("bulk_tools", lang), "Herramienta"))
         m_bulk.addAction(tr("bulk_foods", lang), lambda: self.open_bulk_items(tr("bulk_foods", lang), "Consumible/Comida"))
         m_bulk.addAction(tr("bulk_misc", lang), lambda: self.open_bulk_items(tr("bulk_misc", lang), "Artículo"))
+        
+        # --- Parches y Modificaciones del Juego ---
+        m_farm = tools_menu.addMenu("🌱 Granja y Entorno")
+        m_farm.addAction("🌱 Aplicar Cultivos Caminables (Fix Z-Sorting)", self._apply_z_sorting_patch)
+
+        m_mine = tools_menu.addMenu("⛏️ Mina y Exploración")
+        m_mine.addAction("⛏️ Aplicar Escaleras Visibles (Anti-Softlock)", self._apply_stairs_patch)
+        m_mine.addAction("💎 Desbloquear Piedra Teletransporte (Año 1)", self._apply_teleport_stone_patch)
         
         tools_menu.addSeparator()
         
@@ -1488,3 +1483,28 @@ class FoMTStudioApp(QMainWindow):
                 self.apply_theme(self.current_theme)
             finally:
                 QApplication.restoreOverrideCursor()
+
+    def _apply_z_sorting_patch(self):
+        from Banco_de_Datos.Parches.parche_cultivos_caminables import aplicar_parche_cultivos
+        try:
+            aplicar_parche_cultivos(self.project)
+            QMessageBox.information(self, "Éxito", "¡El parche de Cultivos Caminables y Z-Sorting se ha aplicado con éxito!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+
+    def _apply_stairs_patch(self):
+        from Banco_de_Datos.Parches.parche_escaleras_minas import aplicar_parche_escaleras
+        try:
+            aplicar_parche_escaleras(self.project)
+            QMessageBox.information(self, "Éxito", "¡El parche Anti-Softlock de Escaleras Visibles se ha aplicado con éxito!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+
+    def _apply_teleport_stone_patch(self):
+        from Banco_de_Datos.Parches.parche_teleport_stone import aplicar_parche_teleport_stone
+        try:
+            aplicar_parche_teleport_stone(self.project)
+            QMessageBox.information(self, "Éxito", "¡El parche de la Piedra de Teletransporte (Año 1) se ha aplicado con éxito!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+

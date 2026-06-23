@@ -1,0 +1,2 @@
+Puntero 1 Evento 0930 | Locación ROM: 0x0F985C -> Apunta a: 0x083854C8 | Little-Endian: [C8 54 38 08]
+Puntero 2 Evento 0931 | Locación ROM: 0x0F9860 -> Apunta a: 0x08385644 | Little-Endian: [44 56 38 08]

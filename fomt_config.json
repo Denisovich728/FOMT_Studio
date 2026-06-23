@@ -1,0 +1,7 @@
+{
+    "max_ram_mb": 2048,
+    "cpu_p_cores": 6,
+    "cpu_e_cores": 4,
+    "cpu_threads": 2,
+    "default_project_dir": ""
+}

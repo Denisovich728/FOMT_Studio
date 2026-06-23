@@ -74,6 +74,46 @@ def _read_rom_palette(hex_id: int, rom_path: str = ROM_PATH) -> list:
         return [(0, 0, 0)] * 16
 
 
+def _read_rom_portrait_palette_from_bytes(rom: bytes | bytearray, hex_id: int) -> list:
+    """
+    Igual que _read_rom_palette pero opera sobre un bytearray ya cargado en memoria.
+    Se usa para recargar la paleta inmediatamente después de una inyección,
+    sin necesidad de releer el archivo de disco.
+    """
+    try:
+        header_addr = struct.unpack('<I', rom[0xadc7c:0xadc7c + 4])[0] - FOMT_BASE
+
+        counts = []
+        ptrs   = []
+        r1     = header_addr
+        for shift in [2, 4, 3, 5, 5, 3, 2]:
+            cnt = struct.unpack('<I', rom[r1:r1 + 4])[0]
+            counts.append(cnt)
+            r1 += 4
+            ptrs.append(r1)
+            r1 += cnt * (1 << shift)
+
+        t1_base      = ptrs[0]
+        internal_idx = struct.unpack('<H', rom[t1_base + hex_id * 4 + 2:
+                                               t1_base + hex_id * 4 + 4])[0]
+        if internal_idx >= counts[1]:
+            return [(0, 0, 0)] * 16
+
+        meta_base = ptrs[1] + internal_idx * 16
+        fA        = struct.unpack('<H', rom[meta_base + 10: meta_base + 12])[0]
+
+        pal_base = ptrs[4] + fA * 32
+        colors   = []
+        for i in range(16):
+            c16 = struct.unpack('<H', rom[pal_base + i * 2: pal_base + i * 2 + 2])[0]
+            r, g, b = gba_to_rgb888(c16)
+            colors.append((r, g, b))
+        return colors
+
+    except Exception:
+        return [(0, 0, 0)] * 16
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Portrait Editor Dialog
 # ─────────────────────────────────────────────────────────────────────────────
@@ -170,9 +210,16 @@ class PortraitEditorDialog(QDialog):
         )
 
         # Paleta cargada de la ROM (se actualiza si el usuario edita)
-        self._palette: list = _read_rom_palette(hex_id, self.rom_path)
+        # Prioridad: virtual_rom en memoria → disco (source.gba)
+        if self.project and hasattr(self.project, 'virtual_rom') and self.project.virtual_rom:
+            self._palette: list = _read_rom_portrait_palette_from_bytes(
+                self.project.virtual_rom, hex_id)
+        else:
+            self._palette: list = _read_rom_palette(hex_id, self.rom_path)
         # None = sin cambios (usará la paleta de la ROM original en el repacking)
         self._edited_palette: list | None = None
+        # ROM más reciente inyectada — prioridad máxima en el render
+        self._injected_rom: bytes | None = None
 
         self.setWindowTitle(
             f"Melody Portrait Engine  ·  {npc_name}  (ID: {hex_id:02X})"
@@ -315,8 +362,11 @@ class PortraitEditorDialog(QDialog):
             from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.repack_portraits import _load_tables, _parse_oams
             from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.engine import MelodyPortraitEngine
             
-            if self.project and hasattr(self.project, 'base_rom_data') and self.project.base_rom_data:
-                rom = bytearray(self.project.base_rom_data)
+            # Prioridad: ROM recién inyectada → virtual_rom del proyecto → disco
+            if self._injected_rom:
+                rom = bytearray(self._injected_rom)
+            elif self.project and hasattr(self.project, 'virtual_rom') and self.project.virtual_rom:
+                rom = bytearray(self.project.virtual_rom)
             else:
                 with open(self.rom_path, 'rb') as f:
                     rom = bytearray(f.read())
@@ -433,18 +483,18 @@ class PortraitEditorDialog(QDialog):
     # ── Export PNG ────────────────────────────────────────────────────────────
 
     def _export_png(self):
-        if not os.path.exists(self.current_img_path):
-            QMessageBox.warning(self, "Sin volcado",
-                                "El retrato no existe en la carpeta de volcados.\n"
-                                "Ejecuta el volcado global desde el menú principal primero.")
+        pixmap = self.lbl_image.pixmap()
+        if not pixmap or pixmap.isNull():
+            QMessageBox.warning(self, "Error", "No hay imagen en el visor para exportar.")
             return
+            
         save_path, _ = QFileDialog.getSaveFileName(
             self, "Guardar PNG", f"{self.npc_name}_Portrait.png", "Images (*.png)"
         )
         if save_path:
             try:
-                shutil.copy2(self.current_img_path, save_path)
-                QMessageBox.information(self, "Éxito", f"Retrato guardado en:\n{save_path}")
+                pixmap.toImage().save(save_path, "PNG")
+                QMessageBox.information(self, "Éxito", f"Retrato actual exportado a:\n{save_path}")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"No se pudo guardar:\n{e}")
 
@@ -496,7 +546,11 @@ class PortraitEditorDialog(QDialog):
             from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.repack_portraits import repack
 
             rom_data = None
-            if self.project and hasattr(self.project, 'base_rom_data') and self.project.base_rom_data:
+            if self.project and hasattr(self.project, 'virtual_rom') and self.project.virtual_rom:
+                # Operar siempre sobre el virtual_rom: contiene la ROM base
+                # más todos los parches y portraits ya inyectados en esta sesión.
+                rom_data = bytes(self.project.virtual_rom)
+            elif self.project and hasattr(self.project, 'base_rom_data') and self.project.base_rom_data:
                 rom_data = self.project.base_rom_data
 
             new_rom = repack(
@@ -507,16 +561,52 @@ class PortraitEditorDialog(QDialog):
                 rom_data=rom_data
             )
 
+            # Cachear la ROM inyectada para render inmediato (sin depender de disco).
+            self._injected_rom = bytes(new_rom)
+
             if self.project:
-                self.project.base_rom_data = bytes(new_rom)
+                # Calcular diff contra el virtual_rom ACTUAL (no base_rom_data)
+                # para que inyecciones sucesivas se acumulen correctamente.
+                current_virtual = bytes(self.project.virtual_rom) if hasattr(self.project, 'virtual_rom') and self.project.virtual_rom else self.project.base_rom_data
+                old_rom_len = len(current_virtual)
+                
+                for i in range(0, len(new_rom), 4096):
+                    chunk_new = new_rom[i:i+4096]
+                    chunk_old = current_virtual[i:i+4096] if i < old_rom_len else b'\x00' * len(chunk_new)
+                    
+                    if chunk_new != chunk_old:
+                        start = 0
+                        while start < len(chunk_new) and start < len(chunk_old) and chunk_new[start] == chunk_old[start]:
+                            start += 1
+                        end = len(chunk_new)
+                        while end > start and end <= len(chunk_old) and chunk_new[end-1] == chunk_old[end-1]:
+                            end -= 1
+                            
+                        if hasattr(self.project, 'write_patch'):
+                            self.project.write_patch(i + start, bytes(chunk_new[start:end]))
+                
+                # virtual_rom recibe la ROM completa ya inyectada
                 if hasattr(self.project, 'virtual_rom'):
                     self.project.virtual_rom = bytearray(new_rom)
-                
-                with open(self.rom_path, 'wb') as f:
-                    f.write(new_rom)
-                self.project.unsaved_changes = True
+                    
+                if hasattr(self.project, 'unsaved_changes'):
+                    self.project.unsaved_changes = True
 
+            # Recargar la paleta desde la ROM nueva para que el visor
+            # refleje el estado real post-inyección (incluyendo cambios de paleta).
+            self._palette = _read_rom_portrait_palette_from_bytes(new_rom, self.hex_id)
+            self._edited_palette = None          # ya quedó grabada en la ROM
+            self.pal_strip.set_palette(self._palette)
+            self.lbl_pal_status.setText("Paleta: usando original de la ROM")
+            self.lbl_pal_status.setStyleSheet("color: #6C7086; font-size: 10px;")
+
+            # Forzar render ANTES de mostrar el QMessageBox.
+            # Qt no procesa repaints mientras un QDialog/QMessageBox está bloqueando el
+            # event loop, por lo que hay que procesar eventos explícitamente.
             self._refresh_preview()
+            from PyQt6.QtWidgets import QApplication
+            QApplication.processEvents()          # ← garantiza que el pixmap se pinte
+
             modo_ok = "Vainilla (in-place)" if use_vanilla else "Expansión (metadata actualizada)"
             QMessageBox.information(
                 self, "Inyección Exitosa",
@@ -527,9 +617,10 @@ class PortraitEditorDialog(QDialog):
             )
 
         except Exception as e:
+            import traceback
             QMessageBox.critical(
                 self, "Error de Inyección",
-                f"Error crítico durante la recompresión:\n{e}"
+                f"Error crítico durante la recompresión:\n{e}\n\n{traceback.format_exc()}"
             )
 
 

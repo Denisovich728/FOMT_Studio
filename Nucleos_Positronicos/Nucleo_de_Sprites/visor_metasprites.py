@@ -374,11 +374,12 @@ class VisorMetasprites(QWidget):
 
         png_path = os.path.join(dump_dir, f"{hex_id_str}_{name}.png")
 
-        if not os.path.exists(png_path) and self.project and self.project.base_rom_data:
+        if not os.path.exists(png_path) and self.project and (hasattr(self.project, 'virtual_rom') or self.project.base_rom_data):
             try:
+                current_rom = bytes(self.project.virtual_rom) if hasattr(self.project, 'virtual_rom') and self.project.virtual_rom else self.project.base_rom_data
                 import Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.dump_portraits as dp
-                counts, ptrs = dp.get_bundle_headers(self.project.base_rom_data)
-                dp.dump_single(self.project.base_rom_data, self.current_hex_id, name, dump_dir, counts, ptrs)
+                counts, ptrs = dp.get_bundle_headers(current_rom)
+                dp.dump_single(current_rom, self.current_hex_id, name, dump_dir, counts, ptrs)
             except Exception as e:
                 print(f"Error dumpeando retrato al vuelo: {e}")
 
@@ -394,8 +395,8 @@ class VisorMetasprites(QWidget):
 
     def _load_palette_from_rom(self, decimal_id):
         self.palette_colors = []
-        if self.project and self.project.base_rom_data:
-            rom = self.project.base_rom_data
+        if self.project and (hasattr(self.project, 'virtual_rom') or self.project.base_rom_data):
+            rom = bytes(self.project.virtual_rom) if hasattr(self.project, 'virtual_rom') and self.project.virtual_rom else self.project.base_rom_data
             offset = None
             try:
                 import Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.dump_portraits as dp
@@ -542,7 +543,7 @@ class VisorMetasprites(QWidget):
             QMessageBox.information(self, "Éxito", "PNG guardado correctamente.")
 
     def _dump_all_portraits(self):
-        if not self.project or not self.project.base_rom_data:
+        if not self.project or (not hasattr(self.project, 'virtual_rom') and not self.project.base_rom_data):
             QMessageBox.warning(self, "Error", "Debes tener un ROM cargado en el proyecto.")
             return
             
@@ -554,11 +555,13 @@ class VisorMetasprites(QWidget):
             try:
                 import Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.dump_portraits as dp
                 
-                # Escribimos el rom en un archivo temporal si no tenemos la ruta a source
+                # Usamos el rom actual (virtual_rom si existe) en un archivo temporal si no tenemos la ruta a source
                 rom_path = getattr(self.project, 'base_rom_path', 'temp_rom.gba')
-                if not os.path.exists(rom_path):
-                    with open(rom_path, 'wb') as f:
-                        f.write(self.project.base_rom_data)
+                current_rom = bytes(self.project.virtual_rom) if hasattr(self.project, 'virtual_rom') and self.project.virtual_rom else self.project.base_rom_data
+                if not os.path.exists(rom_path) or current_rom != self.project.base_rom_data:
+                    with open("temp_rom.gba", 'wb') as f:
+                        f.write(current_rom)
+                    rom_path = "temp_rom.gba"
                         
                 csv_path = get_data_path("fomt", "Fomt_Portraits.csv")
                 out_dir = os.path.join(os.getcwd(), "portraits_dump")
@@ -609,14 +612,19 @@ class VisorMetasprites(QWidget):
                 import importlib
                 importlib.reload(rp)
                 
-                # Guardar PNG temporal
-                temp_path = os.path.join(os.getcwd(), "portraits_dump", "temp_inject.png")
+                # Definir directorios correctos
+                dump_dir = os.path.join(os.getcwd(), "portraits_dump")
+                if self.project and hasattr(self.project, 'project_dir') and self.project.project_dir:
+                    dump_dir = os.path.join(self.project.project_dir, "portraits_dump")
+                
+                os.makedirs(dump_dir, exist_ok=True)
+                temp_path = os.path.join(dump_dir, "temp_inject.png")
                 self.canvas.image.save(temp_path)
                 
-                # Inyectar
+                # Inyectar usando la ROM actual (virtual si existe)
                 rom_data = None
-                if self.project and self.project.base_rom_data:
-                    rom_data = self.project.base_rom_data
+                if self.project:
+                    rom_data = bytes(self.project.virtual_rom) if hasattr(self.project, 'virtual_rom') and self.project.virtual_rom else self.project.base_rom_data
                     
                 new_rom = rp.repack(
                     self.current_hex_id, 
@@ -627,18 +635,30 @@ class VisorMetasprites(QWidget):
                 )
                 
                 if self.project:
-                    # Aplicar a la memoria
-                    self.project.base_rom_data = bytes(new_rom)
+                    current_virtual = bytes(self.project.virtual_rom) if hasattr(self.project, 'virtual_rom') and self.project.virtual_rom else self.project.base_rom_data
+                    old_rom_len = len(current_virtual)
+                    
+                    # Generar parche delta
+                    for i in range(0, len(new_rom), 4096):
+                        chunk_new = new_rom[i:i+4096]
+                        chunk_old = current_virtual[i:i+4096] if i < old_rom_len else b'\x00' * len(chunk_new)
+                        
+                        if chunk_new != chunk_old:
+                            start = 0
+                            while start < len(chunk_new) and start < len(chunk_old) and chunk_new[start] == chunk_old[start]:
+                                start += 1
+                            end = len(chunk_new)
+                            while end > start and end <= len(chunk_old) and chunk_new[end-1] == chunk_old[end-1]:
+                                end -= 1
+                                
+                            if hasattr(self.project, 'write_patch'):
+                                self.project.write_patch(i + start, bytes(chunk_new[start:end]))
+                    
                     if hasattr(self.project, 'virtual_rom'):
                         self.project.virtual_rom = bytearray(new_rom)
-                    
-                    # Sobrescribir físicamente la ROM del proyecto (source.gba)
-                    with open(self.project.base_rom_path, "wb") as f:
-                        f.write(new_rom)
                         
                     # Limpiar caché de retratos para forzar re-dumpeo con los nuevos datos/paletas
                     import glob
-                    dump_dir = os.path.dirname(temp_path)
                     for f_path in glob.glob(os.path.join(dump_dir, "*.png")):
                         if "temp_inject" not in f_path:
                             try:

@@ -1,0 +1,2 @@
+Puntero 1 Evento 0625 | Locación ROM: 0x0F9398 -> Apunta a: 0x0833D940 | Little-Endian: [40 D9 33 08]
+Puntero 2 Evento 0626 | Locación ROM: 0x0F939C -> Apunta a: 0x0833E1CC | Little-Endian: [CC E1 33 08]

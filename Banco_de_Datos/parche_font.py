@@ -93,8 +93,8 @@ def apply_font_patch(project):
         "í": (0x4F9DB0, 0xF7),
         "ó": (0x4F9DBC, 0xF8),
         "ú": (0x4F9DC8, 0xF9),
-        "Ñ": (0x4F921C + 0x2B * 12, 0x2B),
-        "ñ": (0x4F921C + 0x2D * 12, 0x2D)
+        "Ñ": (0x4F921C + 0xCB * 12, 0xCB),
+        "ñ": (0x4F921C + 0xCC * 12, 0xCC)
     }
     
     for char, (off, cid) in vowel_map.items():

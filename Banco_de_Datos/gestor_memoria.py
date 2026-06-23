@@ -175,7 +175,11 @@ class MemoryManager:
                 else:
                     self.proyecto.write_patch(old_offset, new_data)
             else:
-                self.proyecto.write_patch(old_offset, new_data)
+                padding_needed = old_size - new_size
+                if padding_needed > 0:
+                    self.proyecto.write_patch(old_offset, new_data + (b'\xFF' * padding_needed))
+                else:
+                    self.proyecto.write_patch(old_offset, new_data)
             
             repoint_callback(old_offset)
             return old_offset

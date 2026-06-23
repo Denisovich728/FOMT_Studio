@@ -1,0 +1,2 @@
+Puntero 1 Evento 0860 | Locación ROM: 0x0F9744 -> Apunta a: 0x08378008 | Little-Endian: [08 80 37 08]
+Puntero 2 Evento 0861 | Locación ROM: 0x0F9748 -> Apunta a: 0x083780C0 | Little-Endian: [C0 80 37 08]

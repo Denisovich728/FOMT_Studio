@@ -1,0 +1,173 @@
+// Script MarvDen generado para testeo individual de fuentes 0x80 - 0xFF
+// Version EFICIENTE (usando la variable directamente en TalkMessage)
+#include "Fomt_Lib.src"
+
+script 999 Menu_Test_Letras {
+    const MESSAGE_128 = "ID 80: \x80\n\WAIT_CLICK";
+    const MESSAGE_129 = "ID 81: \x81\n\WAIT_CLICK";
+    const MESSAGE_130 = "ID 82: \x82\n\WAIT_CLICK";
+    const MESSAGE_131 = "ID 83: \x83\n\WAIT_CLICK";
+    const MESSAGE_132 = "ID 84: \x84\n\WAIT_CLICK";
+    const MESSAGE_133 = "ID 85: \x85\n\WAIT_CLICK";
+    const MESSAGE_134 = "ID 86: \x86\n\WAIT_CLICK";
+    const MESSAGE_135 = "ID 87: \x87\n\WAIT_CLICK";
+    const MESSAGE_136 = "ID 88: \x88\n\WAIT_CLICK";
+    const MESSAGE_137 = "ID 89: \x89\n\WAIT_CLICK";
+    const MESSAGE_138 = "ID 8A: \x8A\n\WAIT_CLICK";
+    const MESSAGE_139 = "ID 8B: \x8B\n\WAIT_CLICK";
+    const MESSAGE_140 = "ID 8C: \x8C\n\WAIT_CLICK";
+    const MESSAGE_141 = "ID 8D: \x8D\n\WAIT_CLICK";
+    const MESSAGE_142 = "ID 8E: \x8E\n\WAIT_CLICK";
+    const MESSAGE_143 = "ID 8F: \x8F\n\WAIT_CLICK";
+    const MESSAGE_144 = "ID 90: \x90\n\WAIT_CLICK";
+    const MESSAGE_145 = "ID 91: \x91\n\WAIT_CLICK";
+    const MESSAGE_146 = "ID 92: \x92\n\WAIT_CLICK";
+    const MESSAGE_147 = "ID 93: \x93\n\WAIT_CLICK";
+    const MESSAGE_148 = "ID 94: \x94\n\WAIT_CLICK";
+    const MESSAGE_149 = "ID 95: \x95\n\WAIT_CLICK";
+    const MESSAGE_150 = "ID 96: \x96\n\WAIT_CLICK";
+    const MESSAGE_151 = "ID 97: \x97\n\WAIT_CLICK";
+    const MESSAGE_152 = "ID 98: \x98\n\WAIT_CLICK";
+    const MESSAGE_153 = "ID 99: \x99\n\WAIT_CLICK";
+    const MESSAGE_154 = "ID 9A: \x9A\n\WAIT_CLICK";
+    const MESSAGE_155 = "ID 9B: \x9B\n\WAIT_CLICK";
+    const MESSAGE_156 = "ID 9C: \x9C\n\WAIT_CLICK";
+    const MESSAGE_157 = "ID 9D: \x9D\n\WAIT_CLICK";
+    const MESSAGE_158 = "ID 9E: \x9E\n\WAIT_CLICK";
+    const MESSAGE_159 = "ID 9F: \x9F\n\WAIT_CLICK";
+    const MESSAGE_160 = "ID A0: \xA0\n\WAIT_CLICK";
+    const MESSAGE_161 = "ID A1: \xA1\n\WAIT_CLICK";
+    const MESSAGE_162 = "ID A2: \xA2\n\WAIT_CLICK";
+    const MESSAGE_163 = "ID A3: \xA3\n\WAIT_CLICK";
+    const MESSAGE_164 = "ID A4: \xA4\n\WAIT_CLICK";
+    const MESSAGE_165 = "ID A5: \xA5\n\WAIT_CLICK";
+    const MESSAGE_166 = "ID A6: \xA6\n\WAIT_CLICK";
+    const MESSAGE_167 = "ID A7: \xA7\n\WAIT_CLICK";
+    const MESSAGE_168 = "ID A8: \xA8\n\WAIT_CLICK";
+    const MESSAGE_169 = "ID A9: \xA9\n\WAIT_CLICK";
+    const MESSAGE_170 = "ID AA: \xAA\n\WAIT_CLICK";
+    const MESSAGE_171 = "ID AB: \xAB\n\WAIT_CLICK";
+    const MESSAGE_172 = "ID AC: \xAC\n\WAIT_CLICK";
+    const MESSAGE_173 = "ID AD: \xAD\n\WAIT_CLICK";
+    const MESSAGE_174 = "ID AE: \xAE\n\WAIT_CLICK";
+    const MESSAGE_175 = "ID AF: \xAF\n\WAIT_CLICK";
+    const MESSAGE_176 = "ID B0: \xB0\n\WAIT_CLICK";
+    const MESSAGE_177 = "ID B1: \xB1\n\WAIT_CLICK";
+    const MESSAGE_178 = "ID B2: \xB2\n\WAIT_CLICK";
+    const MESSAGE_179 = "ID B3: \xB3\n\WAIT_CLICK";
+    const MESSAGE_180 = "ID B4: \xB4\n\WAIT_CLICK";
+    const MESSAGE_181 = "ID B5: \xB5\n\WAIT_CLICK";
+    const MESSAGE_182 = "ID B6: \xB6\n\WAIT_CLICK";
+    const MESSAGE_183 = "ID B7: \xB7\n\WAIT_CLICK";
+    const MESSAGE_184 = "ID B8: \xB8\n\WAIT_CLICK";
+    const MESSAGE_185 = "ID B9: \xB9\n\WAIT_CLICK";
+    const MESSAGE_186 = "ID BA: \xBA\n\WAIT_CLICK";
+    const MESSAGE_187 = "ID BB: \xBB\n\WAIT_CLICK";
+    const MESSAGE_188 = "ID BC: \xBC\n\WAIT_CLICK";
+    const MESSAGE_189 = "ID BD: \xBD\n\WAIT_CLICK";
+    const MESSAGE_190 = "ID BE: \xBE\n\WAIT_CLICK";
+    const MESSAGE_191 = "ID BF: \xBF\n\WAIT_CLICK";
+    const MESSAGE_192 = "ID C0: \xC0\n\WAIT_CLICK";
+    const MESSAGE_193 = "ID C1: \xC1\n\WAIT_CLICK";
+    const MESSAGE_194 = "ID C2: \xC2\n\WAIT_CLICK";
+    const MESSAGE_195 = "ID C3: \xC3\n\WAIT_CLICK";
+    const MESSAGE_196 = "ID C4: \xC4\n\WAIT_CLICK";
+    const MESSAGE_197 = "ID C5: \xC5\n\WAIT_CLICK";
+    const MESSAGE_198 = "ID C6: \xC6\n\WAIT_CLICK";
+    const MESSAGE_199 = "ID C7: \xC7\n\WAIT_CLICK";
+    const MESSAGE_200 = "ID C8: \xC8\n\WAIT_CLICK";
+    const MESSAGE_201 = "ID C9: \xC9\n\WAIT_CLICK";
+    const MESSAGE_202 = "ID CA: \xCA\n\WAIT_CLICK";
+    const MESSAGE_203 = "ID CB: \xCB\n\WAIT_CLICK";
+    const MESSAGE_204 = "ID CC: \xCC\n\WAIT_CLICK";
+    const MESSAGE_205 = "ID CD: \xCD\n\WAIT_CLICK";
+    const MESSAGE_206 = "ID CE: \xCE\n\WAIT_CLICK";
+    const MESSAGE_207 = "ID CF: \xCF\n\WAIT_CLICK";
+    const MESSAGE_208 = "ID D0: \xD0\n\WAIT_CLICK";
+    const MESSAGE_209 = "ID D1: \xD1\n\WAIT_CLICK";
+    const MESSAGE_210 = "ID D2: \xD2\n\WAIT_CLICK";
+    const MESSAGE_211 = "ID D3: \xD3\n\WAIT_CLICK";
+    const MESSAGE_212 = "ID D4: \xD4\n\WAIT_CLICK";
+    const MESSAGE_213 = "ID D5: \xD5\n\WAIT_CLICK";
+    const MESSAGE_214 = "ID D6: \xD6\n\WAIT_CLICK";
+    const MESSAGE_215 = "ID D7: \xD7\n\WAIT_CLICK";
+    const MESSAGE_216 = "ID D8: \xD8\n\WAIT_CLICK";
+    const MESSAGE_217 = "ID D9: \xD9\n\WAIT_CLICK";
+    const MESSAGE_218 = "ID DA: \xDA\n\WAIT_CLICK";
+    const MESSAGE_219 = "ID DB: \xDB\n\WAIT_CLICK";
+    const MESSAGE_220 = "ID DC: \xDC\n\WAIT_CLICK";
+    const MESSAGE_221 = "ID DD: \xDD\n\WAIT_CLICK";
+    const MESSAGE_222 = "ID DE: \xDE\n\WAIT_CLICK";
+    const MESSAGE_223 = "ID DF: \xDF\n\WAIT_CLICK";
+    const MESSAGE_224 = "ID E0: \xE0\n\WAIT_CLICK";
+    const MESSAGE_225 = "ID E1: \xE1\n\WAIT_CLICK";
+    const MESSAGE_226 = "ID E2: \xE2\n\WAIT_CLICK";
+    const MESSAGE_227 = "ID E3: \xE3\n\WAIT_CLICK";
+    const MESSAGE_228 = "ID E4: \xE4\n\WAIT_CLICK";
+    const MESSAGE_229 = "ID E5: \xE5\n\WAIT_CLICK";
+    const MESSAGE_230 = "ID E6: \xE6\n\WAIT_CLICK";
+    const MESSAGE_231 = "ID E7: \xE7\n\WAIT_CLICK";
+    const MESSAGE_232 = "ID E8: \xE8\n\WAIT_CLICK";
+    const MESSAGE_233 = "ID E9: \xE9\n\WAIT_CLICK";
+    const MESSAGE_234 = "ID EA: \xEA\n\WAIT_CLICK";
+    const MESSAGE_235 = "ID EB: \xEB\n\WAIT_CLICK";
+    const MESSAGE_236 = "ID EC: \xEC\n\WAIT_CLICK";
+    const MESSAGE_237 = "ID ED: \xED\n\WAIT_CLICK";
+    const MESSAGE_238 = "ID EE: \xEE\n\WAIT_CLICK";
+    const MESSAGE_239 = "ID EF: \xEF\n\WAIT_CLICK";
+    const MESSAGE_240 = "ID F0: \xF0\n\WAIT_CLICK";
+    const MESSAGE_241 = "ID F1: \xF1\n\WAIT_CLICK";
+    const MESSAGE_242 = "ID F2: \xF2\n\WAIT_CLICK";
+    const MESSAGE_243 = "ID F3: \xF3\n\WAIT_CLICK";
+    const MESSAGE_244 = "ID F4: \xF4\n\WAIT_CLICK";
+    const MESSAGE_245 = "ID F5: \xF5\n\WAIT_CLICK";
+    const MESSAGE_246 = "ID F6: \xF6\n\WAIT_CLICK";
+    const MESSAGE_247 = "ID F7: \xF7\n\WAIT_CLICK";
+    const MESSAGE_248 = "ID F8: \xF8\n\WAIT_CLICK";
+    const MESSAGE_249 = "ID F9: \xF9\n\WAIT_CLICK";
+    const MESSAGE_250 = "ID FA: \xFA\n\WAIT_CLICK";
+    const MESSAGE_251 = "ID FB: \xFB\n\WAIT_CLICK";
+    const MESSAGE_252 = "ID FC: \xFC\n\WAIT_CLICK";
+    const MESSAGE_253 = "ID FD: \xFD\n\WAIT_CLICK";
+    const MESSAGE_254 = "ID FE: \xFE\n\WAIT_CLICK";
+    const MESSAGE_255 = "ID FF: \xFF\n\WAIT_CLICK";
+
+    const MESSAGE_256 = "¿Qué deseas hacer?";
+    const MESSAGE_257 = "Siguiente (+1)";
+    const MESSAGE_258 = "Anterior (-1)";
+    const MESSAGE_259 = "Salir";
+
+    var current_id = 128;
+    var choice;
+
+lbl_loop:
+    // Mostrar el caracter correspondiente pasando la variable directamente
+    TalkOpen();
+    TalkMessage(current_id);
+    TalkClose();
+
+    TalkOpen();
+    TalkMessage(256);
+    choice = TalkChoice3(257, 258, 259);
+    TalkClose();
+
+    if (choice == 1) {
+        current_id++;
+        if (current_id > 255) {
+            current_id = 128;
+        }
+        goto lbl_loop;
+    }
+    if (choice == 2) {
+        current_id--;
+        if (current_id < 128) {
+            current_id = 255;
+        }
+        goto lbl_loop;
+    }
+    if (choice == 3) {
+        exit;
+    }
+
+    goto lbl_loop;
+}

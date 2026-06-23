@@ -130,6 +130,9 @@ def _flush_tables(rom, tables, counts, save_path=None):
     rom[0xadc7c:0xadc7c+4] = ptr_bytes
     rom[0xadd00:0xadd00+4] = ptr_bytes
     rom[0xadd3c:0xadd3c+4] = ptr_bytes
+    # NUEVO: Actualizar la pool de literales que usa dump_portraits.py para encontrar la cabecera
+    # Esto asegura que el visor exporte y muestre la version nueva y no la vainilla
+    rom[0xadc94:0xadc94+4] = ptr_bytes
 
     if save_path:
         with open(save_path, 'wb') as f:
@@ -398,21 +401,27 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
     f4   = struct.unpack('<H', t2[meta+4:meta+6])[0]   # tiles actuales del portrait
     f6   = struct.unpack('<H', t2[meta+6:meta+8])[0]   # inicio GFX actual en T4
 
-    # Leer OAMs originales para obtener el anchor (min_x, min_y)
+    # Leer OAMs originales (solo para el log de diagnóstico)
     oams = _parse_oams(t3, t2, engine, f0, f2)
     if not oams:
         raise ValueError("No se encontraron OAMs para este portrait.")
 
-    min_x, min_y, _, _ = _bounding_box(oams)
-    print(f"[Expansion] Portrait {target_portrait_hex:02X}: anchor=({min_x},{min_y}), "
+    orig_min_x, orig_min_y, _, _ = _bounding_box(oams)
+
+    # Centro absoluto basado en el ancho del PNG nuevo (convención GBA estándar).
+    # No se hereda min_x del portrait original para evitar desplazamientos cuando
+    # el nuevo portrait tiene distinto ancho.
+    anchor_x = -(img.width // 2)
+    print(f"[Expansion] Portrait {target_portrait_hex:02X}: "
+          f"anchor_orig=({orig_min_x},{orig_min_y}) → anchor_nuevo=({anchor_x},0), "
           f"PNG={img.width}x{img.height}px")
 
     # ── Smart Slicer (Natsume-style): omite OAMs 100%% transparentes ──
     slices = engine.calculate_slices_smart(img, img.width, img.height,
-                                           anchor_x=min_x,
+                                           anchor_x=anchor_x,
                                            anchor_y=0)
     print(f"[Expansion] Smart slicer: {len(slices)} OAMs generados "
-          f"(vs {len(oams)} originales). anchor=({min_x},0)")
+          f"(vs {len(oams)} originales). anchor=({anchor_x},0)")
 
     # ── GFX y Paleta ──
     if custom_palette and len(custom_palette) == 16:

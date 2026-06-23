@@ -1,0 +1,2 @@
+Puntero 1 Evento 1214 | Locación ROM: 0x0F9CCC -> Apunta a: 0x084E49B0 | Little-Endian: [B0 49 4E 08]
+Puntero 2 Evento 1215 | Locación ROM: 0x0F9CD0 -> Apunta a: 0x084E4AAC | Little-Endian: [AC 4A 4E 08]

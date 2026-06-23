@@ -136,7 +136,7 @@ class Lexer:
             "{HORSE}": 0x19,
             "Á": 0xF0, "É": 0xF1, "Í": 0xF2, "Ó": 0xF3, "Ú": 0xF4,
             "á": 0xF5, "é": 0xF6, "í": 0xF7, "ó": 0xF8, "ú": 0xF9,
-            "Ñ": 0x2B, "ñ": 0x2D
+            "Ñ": 0xCB, "ñ": 0xCC
         }
 
         while True:

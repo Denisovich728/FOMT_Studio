@@ -1,0 +1,2 @@
+Puntero 1 Evento 0927 | Locación ROM: 0x0F9850 -> Apunta a: 0x08384E5C | Little-Endian: [5C 4E 38 08]
+Puntero 2 Evento 0928 | Locación ROM: 0x0F9854 -> Apunta a: 0x08384EDC | Little-Endian: [DC 4E 38 08]

@@ -1,0 +1,8 @@
+Puntero 1 Evento 1205 | Locación ROM: 0x0F9CA8 -> Apunta a: 0x084E3A60 | Little-Endian: [60 3A 4E 08]
+Puntero 2 Evento 1206 | Locación ROM: 0x0F9CAC -> Apunta a: 0x084E3BF8 | Little-Endian: [F8 3B 4E 08]
+Puntero 3 Evento 1207 | Locación ROM: 0x0F9CB0 -> Apunta a: 0x084E3CDC | Little-Endian: [DC 3C 4E 08]
+Puntero 4 Evento 1208 | Locación ROM: 0x0F9CB4 -> Apunta a: 0x084E3E8C | Little-Endian: [8C 3E 4E 08]
+Puntero 5 Evento 1209 | Locación ROM: 0x0F9CB8 -> Apunta a: 0x084E3F74 | Little-Endian: [74 3F 4E 08]
+Puntero 6 Evento 1210 | Locación ROM: 0x0F9CBC -> Apunta a: 0x084E414C | Little-Endian: [4C 41 4E 08]
+Puntero 7 Evento 1211 | Locación ROM: 0x0F9CC0 -> Apunta a: 0x084E4318 | Little-Endian: [18 43 4E 08]
+Puntero 8 Evento 1212 | Locación ROM: 0x0F9CC4 -> Apunta a: 0x084E44C0 | Little-Endian: [C0 44 4E 08]

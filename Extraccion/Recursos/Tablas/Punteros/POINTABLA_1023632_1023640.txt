@@ -1,0 +1,2 @@
+Puntero 1 Evento 1327 | Locación ROM: 0x0F9E90 -> Apunta a: 0x084F907C | Little-Endian: [7C 90 4F 08]
+Puntero 2 Evento 1328 | Locación ROM: 0x0F9E94 -> Apunta a: 0x084F90A4 | Little-Endian: [A4 90 4F 08]

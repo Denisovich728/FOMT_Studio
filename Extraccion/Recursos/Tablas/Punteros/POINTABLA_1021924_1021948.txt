@@ -1,0 +1,6 @@
+Puntero 1 Evento 0900 | Locación ROM: 0x0F97E4 -> Apunta a: 0x08380298 | Little-Endian: [98 02 38 08]
+Puntero 2 Evento 0901 | Locación ROM: 0x0F97E8 -> Apunta a: 0x08380404 | Little-Endian: [04 04 38 08]
+Puntero 3 Evento 0902 | Locación ROM: 0x0F97EC -> Apunta a: 0x08380568 | Little-Endian: [68 05 38 08]
+Puntero 4 Evento 0903 | Locación ROM: 0x0F97F0 -> Apunta a: 0x083806D0 | Little-Endian: [D0 06 38 08]
+Puntero 5 Evento 0904 | Locación ROM: 0x0F97F4 -> Apunta a: 0x083809F4 | Little-Endian: [F4 09 38 08]
+Puntero 6 Evento 0905 | Locación ROM: 0x0F97F8 -> Apunta a: 0x08380C58 | Little-Endian: [58 0C 38 08]

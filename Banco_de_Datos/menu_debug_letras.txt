@@ -1,0 +1,556 @@
+// Script MarvDen generado para testeo individual de fuentes 0x80 - 0xFF
+#include "Fomt_Lib.src"
+
+script 999 Menu_Test_Letras {
+    const MESSAGE_0 = "ID 80: \x80\n\WAIT_CLICK";
+    const MESSAGE_1 = "ID 81: \x81\n\WAIT_CLICK";
+    const MESSAGE_2 = "ID 82: \x82\n\WAIT_CLICK";
+    const MESSAGE_3 = "ID 83: \x83\n\WAIT_CLICK";
+    const MESSAGE_4 = "ID 84: \x84\n\WAIT_CLICK";
+    const MESSAGE_5 = "ID 85: \x85\n\WAIT_CLICK";
+    const MESSAGE_6 = "ID 86: \x86\n\WAIT_CLICK";
+    const MESSAGE_7 = "ID 87: \x87\n\WAIT_CLICK";
+    const MESSAGE_8 = "ID 88: \x88\n\WAIT_CLICK";
+    const MESSAGE_9 = "ID 89: \x89\n\WAIT_CLICK";
+    const MESSAGE_10 = "ID 8A: \x8A\n\WAIT_CLICK";
+    const MESSAGE_11 = "ID 8B: \x8B\n\WAIT_CLICK";
+    const MESSAGE_12 = "ID 8C: \x8C\n\WAIT_CLICK";
+    const MESSAGE_13 = "ID 8D: \x8D\n\WAIT_CLICK";
+    const MESSAGE_14 = "ID 8E: \x8E\n\WAIT_CLICK";
+    const MESSAGE_15 = "ID 8F: \x8F\n\WAIT_CLICK";
+    const MESSAGE_16 = "ID 90: \x90\n\WAIT_CLICK";
+    const MESSAGE_17 = "ID 91: \x91\n\WAIT_CLICK";
+    const MESSAGE_18 = "ID 92: \x92\n\WAIT_CLICK";
+    const MESSAGE_19 = "ID 93: \x93\n\WAIT_CLICK";
+    const MESSAGE_20 = "ID 94: \x94\n\WAIT_CLICK";
+    const MESSAGE_21 = "ID 95: \x95\n\WAIT_CLICK";
+    const MESSAGE_22 = "ID 96: \x96\n\WAIT_CLICK";
+    const MESSAGE_23 = "ID 97: \x97\n\WAIT_CLICK";
+    const MESSAGE_24 = "ID 98: \x98\n\WAIT_CLICK";
+    const MESSAGE_25 = "ID 99: \x99\n\WAIT_CLICK";
+    const MESSAGE_26 = "ID 9A: \x9A\n\WAIT_CLICK";
+    const MESSAGE_27 = "ID 9B: \x9B\n\WAIT_CLICK";
+    const MESSAGE_28 = "ID 9C: \x9C\n\WAIT_CLICK";
+    const MESSAGE_29 = "ID 9D: \x9D\n\WAIT_CLICK";
+    const MESSAGE_30 = "ID 9E: \x9E\n\WAIT_CLICK";
+    const MESSAGE_31 = "ID 9F: \x9F\n\WAIT_CLICK";
+    const MESSAGE_32 = "ID A0: \xA0\n\WAIT_CLICK";
+    const MESSAGE_33 = "ID A1: \xA1\n\WAIT_CLICK";
+    const MESSAGE_34 = "ID A2: \xA2\n\WAIT_CLICK";
+    const MESSAGE_35 = "ID A3: \xA3\n\WAIT_CLICK";
+    const MESSAGE_36 = "ID A4: \xA4\n\WAIT_CLICK";
+    const MESSAGE_37 = "ID A5: \xA5\n\WAIT_CLICK";
+    const MESSAGE_38 = "ID A6: \xA6\n\WAIT_CLICK";
+    const MESSAGE_39 = "ID A7: \xA7\n\WAIT_CLICK";
+    const MESSAGE_40 = "ID A8: \xA8\n\WAIT_CLICK";
+    const MESSAGE_41 = "ID A9: \xA9\n\WAIT_CLICK";
+    const MESSAGE_42 = "ID AA: \xAA\n\WAIT_CLICK";
+    const MESSAGE_43 = "ID AB: \xAB\n\WAIT_CLICK";
+    const MESSAGE_44 = "ID AC: \xAC\n\WAIT_CLICK";
+    const MESSAGE_45 = "ID AD: \xAD\n\WAIT_CLICK";
+    const MESSAGE_46 = "ID AE: \xAE\n\WAIT_CLICK";
+    const MESSAGE_47 = "ID AF: \xAF\n\WAIT_CLICK";
+    const MESSAGE_48 = "ID B0: \xB0\n\WAIT_CLICK";
+    const MESSAGE_49 = "ID B1: \xB1\n\WAIT_CLICK";
+    const MESSAGE_50 = "ID B2: \xB2\n\WAIT_CLICK";
+    const MESSAGE_51 = "ID B3: \xB3\n\WAIT_CLICK";
+    const MESSAGE_52 = "ID B4: \xB4\n\WAIT_CLICK";
+    const MESSAGE_53 = "ID B5: \xB5\n\WAIT_CLICK";
+    const MESSAGE_54 = "ID B6: \xB6\n\WAIT_CLICK";
+    const MESSAGE_55 = "ID B7: \xB7\n\WAIT_CLICK";
+    const MESSAGE_56 = "ID B8: \xB8\n\WAIT_CLICK";
+    const MESSAGE_57 = "ID B9: \xB9\n\WAIT_CLICK";
+    const MESSAGE_58 = "ID BA: \xBA\n\WAIT_CLICK";
+    const MESSAGE_59 = "ID BB: \xBB\n\WAIT_CLICK";
+    const MESSAGE_60 = "ID BC: \xBC\n\WAIT_CLICK";
+    const MESSAGE_61 = "ID BD: \xBD\n\WAIT_CLICK";
+    const MESSAGE_62 = "ID BE: \xBE\n\WAIT_CLICK";
+    const MESSAGE_63 = "ID BF: \xBF\n\WAIT_CLICK";
+    const MESSAGE_64 = "ID C0: \xC0\n\WAIT_CLICK";
+    const MESSAGE_65 = "ID C1: \xC1\n\WAIT_CLICK";
+    const MESSAGE_66 = "ID C2: \xC2\n\WAIT_CLICK";
+    const MESSAGE_67 = "ID C3: \xC3\n\WAIT_CLICK";
+    const MESSAGE_68 = "ID C4: \xC4\n\WAIT_CLICK";
+    const MESSAGE_69 = "ID C5: \xC5\n\WAIT_CLICK";
+    const MESSAGE_70 = "ID C6: \xC6\n\WAIT_CLICK";
+    const MESSAGE_71 = "ID C7: \xC7\n\WAIT_CLICK";
+    const MESSAGE_72 = "ID C8: \xC8\n\WAIT_CLICK";
+    const MESSAGE_73 = "ID C9: \xC9\n\WAIT_CLICK";
+    const MESSAGE_74 = "ID CA: \xCA\n\WAIT_CLICK";
+    const MESSAGE_75 = "ID CB: \xCB\n\WAIT_CLICK";
+    const MESSAGE_76 = "ID CC: \xCC\n\WAIT_CLICK";
+    const MESSAGE_77 = "ID CD: \xCD\n\WAIT_CLICK";
+    const MESSAGE_78 = "ID CE: \xCE\n\WAIT_CLICK";
+    const MESSAGE_79 = "ID CF: \xCF\n\WAIT_CLICK";
+    const MESSAGE_80 = "ID D0: \xD0\n\WAIT_CLICK";
+    const MESSAGE_81 = "ID D1: \xD1\n\WAIT_CLICK";
+    const MESSAGE_82 = "ID D2: \xD2\n\WAIT_CLICK";
+    const MESSAGE_83 = "ID D3: \xD3\n\WAIT_CLICK";
+    const MESSAGE_84 = "ID D4: \xD4\n\WAIT_CLICK";
+    const MESSAGE_85 = "ID D5: \xD5\n\WAIT_CLICK";
+    const MESSAGE_86 = "ID D6: \xD6\n\WAIT_CLICK";
+    const MESSAGE_87 = "ID D7: \xD7\n\WAIT_CLICK";
+    const MESSAGE_88 = "ID D8: \xD8\n\WAIT_CLICK";
+    const MESSAGE_89 = "ID D9: \xD9\n\WAIT_CLICK";
+    const MESSAGE_90 = "ID DA: \xDA\n\WAIT_CLICK";
+    const MESSAGE_91 = "ID DB: \xDB\n\WAIT_CLICK";
+    const MESSAGE_92 = "ID DC: \xDC\n\WAIT_CLICK";
+    const MESSAGE_93 = "ID DD: \xDD\n\WAIT_CLICK";
+    const MESSAGE_94 = "ID DE: \xDE\n\WAIT_CLICK";
+    const MESSAGE_95 = "ID DF: \xDF\n\WAIT_CLICK";
+    const MESSAGE_96 = "ID E0: \xE0\n\WAIT_CLICK";
+    const MESSAGE_97 = "ID E1: \xE1\n\WAIT_CLICK";
+    const MESSAGE_98 = "ID E2: \xE2\n\WAIT_CLICK";
+    const MESSAGE_99 = "ID E3: \xE3\n\WAIT_CLICK";
+    const MESSAGE_100 = "ID E4: \xE4\n\WAIT_CLICK";
+    const MESSAGE_101 = "ID E5: \xE5\n\WAIT_CLICK";
+    const MESSAGE_102 = "ID E6: \xE6\n\WAIT_CLICK";
+    const MESSAGE_103 = "ID E7: \xE7\n\WAIT_CLICK";
+    const MESSAGE_104 = "ID E8: \xE8\n\WAIT_CLICK";
+    const MESSAGE_105 = "ID E9: \xE9\n\WAIT_CLICK";
+    const MESSAGE_106 = "ID EA: \xEA\n\WAIT_CLICK";
+    const MESSAGE_107 = "ID EB: \xEB\n\WAIT_CLICK";
+    const MESSAGE_108 = "ID EC: \xEC\n\WAIT_CLICK";
+    const MESSAGE_109 = "ID ED: \xED\n\WAIT_CLICK";
+    const MESSAGE_110 = "ID EE: \xEE\n\WAIT_CLICK";
+    const MESSAGE_111 = "ID EF: \xEF\n\WAIT_CLICK";
+    const MESSAGE_112 = "ID F0: \xF0\n\WAIT_CLICK";
+    const MESSAGE_113 = "ID F1: \xF1\n\WAIT_CLICK";
+    const MESSAGE_114 = "ID F2: \xF2\n\WAIT_CLICK";
+    const MESSAGE_115 = "ID F3: \xF3\n\WAIT_CLICK";
+    const MESSAGE_116 = "ID F4: \xF4\n\WAIT_CLICK";
+    const MESSAGE_117 = "ID F5: \xF5\n\WAIT_CLICK";
+    const MESSAGE_118 = "ID F6: \xF6\n\WAIT_CLICK";
+    const MESSAGE_119 = "ID F7: \xF7\n\WAIT_CLICK";
+    const MESSAGE_120 = "ID F8: \xF8\n\WAIT_CLICK";
+    const MESSAGE_121 = "ID F9: \xF9\n\WAIT_CLICK";
+    const MESSAGE_122 = "ID FA: \xFA\n\WAIT_CLICK";
+    const MESSAGE_123 = "ID FB: \xFB\n\WAIT_CLICK";
+    const MESSAGE_124 = "ID FC: \xFC\n\WAIT_CLICK";
+    const MESSAGE_125 = "ID FD: \xFD\n\WAIT_CLICK";
+    const MESSAGE_126 = "ID FE: \xFE\n\WAIT_CLICK";
+    const MESSAGE_127 = "ID FF: \xFF\n\WAIT_CLICK";
+
+    const MESSAGE_128 = "¿Qué deseas hacer?";
+    const MESSAGE_129 = "Siguiente (+1)";
+    const MESSAGE_130 = "Anterior (-1)";
+    const MESSAGE_131 = "Salir";
+
+    var current_id = 128;
+    var choice;
+
+lbl_loop:
+    TalkOpen();
+    switch (current_id) {
+        case 128:
+            TalkMessage(0);
+            break;
+        case 129:
+            TalkMessage(1);
+            break;
+        case 130:
+            TalkMessage(2);
+            break;
+        case 131:
+            TalkMessage(3);
+            break;
+        case 132:
+            TalkMessage(4);
+            break;
+        case 133:
+            TalkMessage(5);
+            break;
+        case 134:
+            TalkMessage(6);
+            break;
+        case 135:
+            TalkMessage(7);
+            break;
+        case 136:
+            TalkMessage(8);
+            break;
+        case 137:
+            TalkMessage(9);
+            break;
+        case 138:
+            TalkMessage(10);
+            break;
+        case 139:
+            TalkMessage(11);
+            break;
+        case 140:
+            TalkMessage(12);
+            break;
+        case 141:
+            TalkMessage(13);
+            break;
+        case 142:
+            TalkMessage(14);
+            break;
+        case 143:
+            TalkMessage(15);
+            break;
+        case 144:
+            TalkMessage(16);
+            break;
+        case 145:
+            TalkMessage(17);
+            break;
+        case 146:
+            TalkMessage(18);
+            break;
+        case 147:
+            TalkMessage(19);
+            break;
+        case 148:
+            TalkMessage(20);
+            break;
+        case 149:
+            TalkMessage(21);
+            break;
+        case 150:
+            TalkMessage(22);
+            break;
+        case 151:
+            TalkMessage(23);
+            break;
+        case 152:
+            TalkMessage(24);
+            break;
+        case 153:
+            TalkMessage(25);
+            break;
+        case 154:
+            TalkMessage(26);
+            break;
+        case 155:
+            TalkMessage(27);
+            break;
+        case 156:
+            TalkMessage(28);
+            break;
+        case 157:
+            TalkMessage(29);
+            break;
+        case 158:
+            TalkMessage(30);
+            break;
+        case 159:
+            TalkMessage(31);
+            break;
+        case 160:
+            TalkMessage(32);
+            break;
+        case 161:
+            TalkMessage(33);
+            break;
+        case 162:
+            TalkMessage(34);
+            break;
+        case 163:
+            TalkMessage(35);
+            break;
+        case 164:
+            TalkMessage(36);
+            break;
+        case 165:
+            TalkMessage(37);
+            break;
+        case 166:
+            TalkMessage(38);
+            break;
+        case 167:
+            TalkMessage(39);
+            break;
+        case 168:
+            TalkMessage(40);
+            break;
+        case 169:
+            TalkMessage(41);
+            break;
+        case 170:
+            TalkMessage(42);
+            break;
+        case 171:
+            TalkMessage(43);
+            break;
+        case 172:
+            TalkMessage(44);
+            break;
+        case 173:
+            TalkMessage(45);
+            break;
+        case 174:
+            TalkMessage(46);
+            break;
+        case 175:
+            TalkMessage(47);
+            break;
+        case 176:
+            TalkMessage(48);
+            break;
+        case 177:
+            TalkMessage(49);
+            break;
+        case 178:
+            TalkMessage(50);
+            break;
+        case 179:
+            TalkMessage(51);
+            break;
+        case 180:
+            TalkMessage(52);
+            break;
+        case 181:
+            TalkMessage(53);
+            break;
+        case 182:
+            TalkMessage(54);
+            break;
+        case 183:
+            TalkMessage(55);
+            break;
+        case 184:
+            TalkMessage(56);
+            break;
+        case 185:
+            TalkMessage(57);
+            break;
+        case 186:
+            TalkMessage(58);
+            break;
+        case 187:
+            TalkMessage(59);
+            break;
+        case 188:
+            TalkMessage(60);
+            break;
+        case 189:
+            TalkMessage(61);
+            break;
+        case 190:
+            TalkMessage(62);
+            break;
+        case 191:
+            TalkMessage(63);
+            break;
+        case 192:
+            TalkMessage(64);
+            break;
+        case 193:
+            TalkMessage(65);
+            break;
+        case 194:
+            TalkMessage(66);
+            break;
+        case 195:
+            TalkMessage(67);
+            break;
+        case 196:
+            TalkMessage(68);
+            break;
+        case 197:
+            TalkMessage(69);
+            break;
+        case 198:
+            TalkMessage(70);
+            break;
+        case 199:
+            TalkMessage(71);
+            break;
+        case 200:
+            TalkMessage(72);
+            break;
+        case 201:
+            TalkMessage(73);
+            break;
+        case 202:
+            TalkMessage(74);
+            break;
+        case 203:
+            TalkMessage(75);
+            break;
+        case 204:
+            TalkMessage(76);
+            break;
+        case 205:
+            TalkMessage(77);
+            break;
+        case 206:
+            TalkMessage(78);
+            break;
+        case 207:
+            TalkMessage(79);
+            break;
+        case 208:
+            TalkMessage(80);
+            break;
+        case 209:
+            TalkMessage(81);
+            break;
+        case 210:
+            TalkMessage(82);
+            break;
+        case 211:
+            TalkMessage(83);
+            break;
+        case 212:
+            TalkMessage(84);
+            break;
+        case 213:
+            TalkMessage(85);
+            break;
+        case 214:
+            TalkMessage(86);
+            break;
+        case 215:
+            TalkMessage(87);
+            break;
+        case 216:
+            TalkMessage(88);
+            break;
+        case 217:
+            TalkMessage(89);
+            break;
+        case 218:
+            TalkMessage(90);
+            break;
+        case 219:
+            TalkMessage(91);
+            break;
+        case 220:
+            TalkMessage(92);
+            break;
+        case 221:
+            TalkMessage(93);
+            break;
+        case 222:
+            TalkMessage(94);
+            break;
+        case 223:
+            TalkMessage(95);
+            break;
+        case 224:
+            TalkMessage(96);
+            break;
+        case 225:
+            TalkMessage(97);
+            break;
+        case 226:
+            TalkMessage(98);
+            break;
+        case 227:
+            TalkMessage(99);
+            break;
+        case 228:
+            TalkMessage(100);
+            break;
+        case 229:
+            TalkMessage(101);
+            break;
+        case 230:
+            TalkMessage(102);
+            break;
+        case 231:
+            TalkMessage(103);
+            break;
+        case 232:
+            TalkMessage(104);
+            break;
+        case 233:
+            TalkMessage(105);
+            break;
+        case 234:
+            TalkMessage(106);
+            break;
+        case 235:
+            TalkMessage(107);
+            break;
+        case 236:
+            TalkMessage(108);
+            break;
+        case 237:
+            TalkMessage(109);
+            break;
+        case 238:
+            TalkMessage(110);
+            break;
+        case 239:
+            TalkMessage(111);
+            break;
+        case 240:
+            TalkMessage(112);
+            break;
+        case 241:
+            TalkMessage(113);
+            break;
+        case 242:
+            TalkMessage(114);
+            break;
+        case 243:
+            TalkMessage(115);
+            break;
+        case 244:
+            TalkMessage(116);
+            break;
+        case 245:
+            TalkMessage(117);
+            break;
+        case 246:
+            TalkMessage(118);
+            break;
+        case 247:
+            TalkMessage(119);
+            break;
+        case 248:
+            TalkMessage(120);
+            break;
+        case 249:
+            TalkMessage(121);
+            break;
+        case 250:
+            TalkMessage(122);
+            break;
+        case 251:
+            TalkMessage(123);
+            break;
+        case 252:
+            TalkMessage(124);
+            break;
+        case 253:
+            TalkMessage(125);
+            break;
+        case 254:
+            TalkMessage(126);
+            break;
+        case 255:
+            TalkMessage(127);
+            break;
+    }
+    TalkClose();
+
+    TalkOpen();
+    TalkMessage(128);
+    choice = TalkChoice3(129, 130, 131);
+    TalkClose();
+
+    if (choice == 1) {
+        current_id++;
+        if (current_id > 255) {
+            current_id = 128;
+        }
+        goto lbl_loop;
+    }
+    if (choice == 2) {
+        current_id--;
+        if (current_id < 128) {
+            current_id = 255;
+        }
+        goto lbl_loop;
+    }
+    if (choice == 3) {
+        exit;
+    }
+
+    goto lbl_loop;
+}

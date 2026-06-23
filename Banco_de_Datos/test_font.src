@@ -1,0 +1,188 @@
+script TestFontMenu {
+    var choice;
+
+label_start:
+    TalkMessage("=== MENU DEBUG DE FUENTE ===\nElige una opcion:");
+    choice = TalkChoice6("Vista Agrupada 80-9F", "Vista Agrupada A0-BF", "Vista Agrupada C0-DF", "Vista Agrupada E0-FF", "Probar 1 a 1...", "Salir");
+
+    if (choice == 0) {
+        TalkMessage("80:\x80  81:\x81  82:\x82  83:\x83\n84:\x84  85:\x85  86:\x86  87:\x87");
+        TalkMessage("88:\x88  89:\x89  8A:\x8A  8B:\x8B\n8C:\x8C  8D:\x8D  8E:\x8E  8F:\x8F");
+        TalkMessage("90:\x90  91:\x91  92:\x92  93:\x93\n94:\x94  95:\x95  96:\x96  97:\x97");
+        TalkMessage("98:\x98  99:\x99  9A:\x9A  9B:\x9B\n9C:\x9C  9D:\x9D  9E:\x9E  9F:\x9F");
+        goto label_start;
+    }
+    if (choice == 1) {
+        TalkMessage("A0:\xA0  A1:\xA1  A2:\xA2  A3:\xA3\nA4:\xA4  A5:\xA5  A6:\xA6  A7:\xA7");
+        TalkMessage("A8:\xA8  A9:\xA9  AA:\xAA  AB:\xAB\nAC:\xAC  AD:\xAD  AE:\xAE  AF:\xAF");
+        TalkMessage("B0:\xB0  B1:\xB1  B2:\xB2  B3:\xB3\nB4:\xB4  B5:\xB5  B6:\xB6  B7:\xB7");
+        TalkMessage("B8:\xB8  B9:\xB9  BA:\xBA  BB:\xBB\nBC:\xBC  BD:\xBD  BE:\xBE  BF:\xBF");
+        goto label_start;
+    }
+    if (choice == 2) {
+        TalkMessage("C0:\xC0  C1:\xC1  C2:\xC2  C3:\xC3\nC4:\xC4  C5:\xC5  C6:\xC6  C7:\xC7");
+        TalkMessage("C8:\xC8  C9:\xC9  CA:\xCA  CB:\xCB\nCC:\xCC  CD:\xCD  CE:\xCE  CF:\xCF");
+        TalkMessage("D0:\xD0  D1:\xD1  D2:\xD2  D3:\xD3\nD4:\xD4  D5:\xD5  D6:\xD6  D7:\xD7");
+        TalkMessage("D8:\xD8  D9:\xD9  DA:\xDA  DB:\xDB\nDC:\xDC  DD:\xDD  DE:\xDE  DF:\xDF");
+        goto label_start;
+    }
+    if (choice == 3) {
+        TalkMessage("E0:\xE0  E1:\xE1  E2:\xE2  E3:\xE3\nE4:\xE4  E5:\xE5  E6:\xE6  E7:\xE7");
+        TalkMessage("E8:\xE8  E9:\xE9  EA:\xEA  EB:\xEB\nEC:\xEC  ED:\xED  EE:\xEE  EF:\xEF");
+        TalkMessage("F0:\xF0  F1:\xF1  F2:\xF2  F3:\xF3\nF4:\xF4  F5:\xF5  F6:\xF6  F7:\xF7");
+        TalkMessage("F8:\xF8  F9:\xF9  FA:\xFA  FB:\xFB\nFC:\xFC  FD:\xFD  FE:\xFE  FF:\xFF");
+        goto label_start;
+    }
+    if (choice == 4) {
+        TalkMessage("Elija el rango para probar 1 a 1:");
+        choice = TalkChoice5("Rango 80-9F", "Rango A0-BF", "Rango C0-DF", "Rango E0-FF", "Volver");
+        if (choice == 0) {
+            TalkMessage("Probando ID individual:\nID 0x80 -> \x80");
+            TalkMessage("Probando ID individual:\nID 0x81 -> \x81");
+            TalkMessage("Probando ID individual:\nID 0x82 -> \x82");
+            TalkMessage("Probando ID individual:\nID 0x83 -> \x83");
+            TalkMessage("Probando ID individual:\nID 0x84 -> \x84");
+            TalkMessage("Probando ID individual:\nID 0x85 -> \x85");
+            TalkMessage("Probando ID individual:\nID 0x86 -> \x86");
+            TalkMessage("Probando ID individual:\nID 0x87 -> \x87");
+            TalkMessage("Probando ID individual:\nID 0x88 -> \x88");
+            TalkMessage("Probando ID individual:\nID 0x89 -> \x89");
+            TalkMessage("Probando ID individual:\nID 0x8A -> \x8A");
+            TalkMessage("Probando ID individual:\nID 0x8B -> \x8B");
+            TalkMessage("Probando ID individual:\nID 0x8C -> \x8C");
+            TalkMessage("Probando ID individual:\nID 0x8D -> \x8D");
+            TalkMessage("Probando ID individual:\nID 0x8E -> \x8E");
+            TalkMessage("Probando ID individual:\nID 0x8F -> \x8F");
+            TalkMessage("Probando ID individual:\nID 0x90 -> \x90");
+            TalkMessage("Probando ID individual:\nID 0x91 -> \x91");
+            TalkMessage("Probando ID individual:\nID 0x92 -> \x92");
+            TalkMessage("Probando ID individual:\nID 0x93 -> \x93");
+            TalkMessage("Probando ID individual:\nID 0x94 -> \x94");
+            TalkMessage("Probando ID individual:\nID 0x95 -> \x95");
+            TalkMessage("Probando ID individual:\nID 0x96 -> \x96");
+            TalkMessage("Probando ID individual:\nID 0x97 -> \x97");
+            TalkMessage("Probando ID individual:\nID 0x98 -> \x98");
+            TalkMessage("Probando ID individual:\nID 0x99 -> \x99");
+            TalkMessage("Probando ID individual:\nID 0x9A -> \x9A");
+            TalkMessage("Probando ID individual:\nID 0x9B -> \x9B");
+            TalkMessage("Probando ID individual:\nID 0x9C -> \x9C");
+            TalkMessage("Probando ID individual:\nID 0x9D -> \x9D");
+            TalkMessage("Probando ID individual:\nID 0x9E -> \x9E");
+            TalkMessage("Probando ID individual:\nID 0x9F -> \x9F");
+            goto label_start;
+        }
+        if (choice == 1) {
+            TalkMessage("Probando ID individual:\nID 0xA0 -> \xA0");
+            TalkMessage("Probando ID individual:\nID 0xA1 -> \xA1");
+            TalkMessage("Probando ID individual:\nID 0xA2 -> \xA2");
+            TalkMessage("Probando ID individual:\nID 0xA3 -> \xA3");
+            TalkMessage("Probando ID individual:\nID 0xA4 -> \xA4");
+            TalkMessage("Probando ID individual:\nID 0xA5 -> \xA5");
+            TalkMessage("Probando ID individual:\nID 0xA6 -> \xA6");
+            TalkMessage("Probando ID individual:\nID 0xA7 -> \xA7");
+            TalkMessage("Probando ID individual:\nID 0xA8 -> \xA8");
+            TalkMessage("Probando ID individual:\nID 0xA9 -> \xA9");
+            TalkMessage("Probando ID individual:\nID 0xAA -> \xAA");
+            TalkMessage("Probando ID individual:\nID 0xAB -> \xAB");
+            TalkMessage("Probando ID individual:\nID 0xAC -> \xAC");
+            TalkMessage("Probando ID individual:\nID 0xAD -> \xAD");
+            TalkMessage("Probando ID individual:\nID 0xAE -> \xAE");
+            TalkMessage("Probando ID individual:\nID 0xAF -> \xAF");
+            TalkMessage("Probando ID individual:\nID 0xB0 -> \xB0");
+            TalkMessage("Probando ID individual:\nID 0xB1 -> \xB1");
+            TalkMessage("Probando ID individual:\nID 0xB2 -> \xB2");
+            TalkMessage("Probando ID individual:\nID 0xB3 -> \xB3");
+            TalkMessage("Probando ID individual:\nID 0xB4 -> \xB4");
+            TalkMessage("Probando ID individual:\nID 0xB5 -> \xB5");
+            TalkMessage("Probando ID individual:\nID 0xB6 -> \xB6");
+            TalkMessage("Probando ID individual:\nID 0xB7 -> \xB7");
+            TalkMessage("Probando ID individual:\nID 0xB8 -> \xB8");
+            TalkMessage("Probando ID individual:\nID 0xB9 -> \xB9");
+            TalkMessage("Probando ID individual:\nID 0xBA -> \xBA");
+            TalkMessage("Probando ID individual:\nID 0xBB -> \xBB");
+            TalkMessage("Probando ID individual:\nID 0xBC -> \xBC");
+            TalkMessage("Probando ID individual:\nID 0xBD -> \xBD");
+            TalkMessage("Probando ID individual:\nID 0xBE -> \xBE");
+            TalkMessage("Probando ID individual:\nID 0xBF -> \xBF");
+            goto label_start;
+        }
+        if (choice == 2) {
+            TalkMessage("Probando ID individual:\nID 0xC0 -> \xC0");
+            TalkMessage("Probando ID individual:\nID 0xC1 -> \xC1");
+            TalkMessage("Probando ID individual:\nID 0xC2 -> \xC2");
+            TalkMessage("Probando ID individual:\nID 0xC3 -> \xC3");
+            TalkMessage("Probando ID individual:\nID 0xC4 -> \xC4");
+            TalkMessage("Probando ID individual:\nID 0xC5 -> \xC5");
+            TalkMessage("Probando ID individual:\nID 0xC6 -> \xC6");
+            TalkMessage("Probando ID individual:\nID 0xC7 -> \xC7");
+            TalkMessage("Probando ID individual:\nID 0xC8 -> \xC8");
+            TalkMessage("Probando ID individual:\nID 0xC9 -> \xC9");
+            TalkMessage("Probando ID individual:\nID 0xCA -> \xCA");
+            TalkMessage("Probando ID individual:\nID 0xCB -> \xCB");
+            TalkMessage("Probando ID individual:\nID 0xCC -> \xCC");
+            TalkMessage("Probando ID individual:\nID 0xCD -> \xCD");
+            TalkMessage("Probando ID individual:\nID 0xCE -> \xCE");
+            TalkMessage("Probando ID individual:\nID 0xCF -> \xCF");
+            TalkMessage("Probando ID individual:\nID 0xD0 -> \xD0");
+            TalkMessage("Probando ID individual:\nID 0xD1 -> \xD1");
+            TalkMessage("Probando ID individual:\nID 0xD2 -> \xD2");
+            TalkMessage("Probando ID individual:\nID 0xD3 -> \xD3");
+            TalkMessage("Probando ID individual:\nID 0xD4 -> \xD4");
+            TalkMessage("Probando ID individual:\nID 0xD5 -> \xD5");
+            TalkMessage("Probando ID individual:\nID 0xD6 -> \xD6");
+            TalkMessage("Probando ID individual:\nID 0xD7 -> \xD7");
+            TalkMessage("Probando ID individual:\nID 0xD8 -> \xD8");
+            TalkMessage("Probando ID individual:\nID 0xD9 -> \xD9");
+            TalkMessage("Probando ID individual:\nID 0xDA -> \xDA");
+            TalkMessage("Probando ID individual:\nID 0xDB -> \xDB");
+            TalkMessage("Probando ID individual:\nID 0xDC -> \xDC");
+            TalkMessage("Probando ID individual:\nID 0xDD -> \xDD");
+            TalkMessage("Probando ID individual:\nID 0xDE -> \xDE");
+            TalkMessage("Probando ID individual:\nID 0xDF -> \xDF");
+            goto label_start;
+        }
+        if (choice == 3) {
+            TalkMessage("Probando ID individual:\nID 0xE0 -> \xE0");
+            TalkMessage("Probando ID individual:\nID 0xE1 -> \xE1");
+            TalkMessage("Probando ID individual:\nID 0xE2 -> \xE2");
+            TalkMessage("Probando ID individual:\nID 0xE3 -> \xE3");
+            TalkMessage("Probando ID individual:\nID 0xE4 -> \xE4");
+            TalkMessage("Probando ID individual:\nID 0xE5 -> \xE5");
+            TalkMessage("Probando ID individual:\nID 0xE6 -> \xE6");
+            TalkMessage("Probando ID individual:\nID 0xE7 -> \xE7");
+            TalkMessage("Probando ID individual:\nID 0xE8 -> \xE8");
+            TalkMessage("Probando ID individual:\nID 0xE9 -> \xE9");
+            TalkMessage("Probando ID individual:\nID 0xEA -> \xEA");
+            TalkMessage("Probando ID individual:\nID 0xEB -> \xEB");
+            TalkMessage("Probando ID individual:\nID 0xEC -> \xEC");
+            TalkMessage("Probando ID individual:\nID 0xED -> \xED");
+            TalkMessage("Probando ID individual:\nID 0xEE -> \xEE");
+            TalkMessage("Probando ID individual:\nID 0xEF -> \xEF");
+            TalkMessage("Probando ID individual:\nID 0xF0 -> \xF0");
+            TalkMessage("Probando ID individual:\nID 0xF1 -> \xF1");
+            TalkMessage("Probando ID individual:\nID 0xF2 -> \xF2");
+            TalkMessage("Probando ID individual:\nID 0xF3 -> \xF3");
+            TalkMessage("Probando ID individual:\nID 0xF4 -> \xF4");
+            TalkMessage("Probando ID individual:\nID 0xF5 -> \xF5");
+            TalkMessage("Probando ID individual:\nID 0xF6 -> \xF6");
+            TalkMessage("Probando ID individual:\nID 0xF7 -> \xF7");
+            TalkMessage("Probando ID individual:\nID 0xF8 -> \xF8");
+            TalkMessage("Probando ID individual:\nID 0xF9 -> \xF9");
+            TalkMessage("Probando ID individual:\nID 0xFA -> \xFA");
+            TalkMessage("Probando ID individual:\nID 0xFB -> \xFB");
+            TalkMessage("Probando ID individual:\nID 0xFC -> \xFC");
+            TalkMessage("Probando ID individual:\nID 0xFD -> \xFD");
+            TalkMessage("Probando ID individual:\nID 0xFE -> \xFE");
+            TalkMessage("Probando ID individual:\nID 0xFF -> \xFF");
+            goto label_start;
+        }
+        goto label_start;
+    }
+    if (choice == 5) {
+        exit;
+    }
+    if (choice == 6) {
+        exit;
+    }
+    goto label_start;
+}
