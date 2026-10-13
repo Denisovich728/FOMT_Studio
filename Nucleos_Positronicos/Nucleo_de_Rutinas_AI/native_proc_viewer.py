@@ -18,7 +18,7 @@ import os
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTextEdit,
     QLabel, QComboBox, QPushButton, QSplitter, QGroupBox, QTableWidget, 
-    QTableWidgetItem, QHeaderView, QApplication
+    QTableWidgetItem, QHeaderView, QApplication, QMessageBox, QInputDialog
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor, QTextCharFormat, QSyntaxHighlighter
@@ -590,7 +590,15 @@ class NativeProcViewerWidget(QWidget):
         self.det_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         self.det_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.det_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.det_table.doubleClicked.connect(self._on_patch_clicked)
         det_layout.addWidget(self.det_table)
+
+        btn_layout = QHBoxLayout()
+        self.btn_edit_patch = QPushButton("✏️ Modificar y Parchear en ROM")
+        self.btn_edit_patch.setStyleSheet("font-weight: bold; background-color: #0E639C; color: white; padding: 6px; border-radius: 4px;")
+        self.btn_edit_patch.clicked.connect(self._on_patch_clicked)
+        btn_layout.addWidget(self.btn_edit_patch)
+        det_layout.addLayout(btn_layout)
         splitter.addWidget(det_group)
         
         # Bottom: Pseudo-code view
@@ -669,5 +677,81 @@ class NativeProcViewerWidget(QWidget):
                 for item in items:
                     item.setForeground(color)
                     self.det_table.setItem(row, items.index(item), item)
+            self._current_call_id = call_id
         finally:
             QApplication.restoreOverrideCursor()
+
+    def _on_patch_clicked(self):
+        selected_rows = self.det_table.selectionModel().selectedRows()
+        if not selected_rows:
+            QMessageBox.information(self, "Seleccionar Valor", "Por favor seleccione un valor detectado de la tabla para editar.")
+            return
+        row = selected_rows[0].row()
+        dtype = self.det_table.item(row, 0).text()
+        curr_val = self.det_table.item(row, 1).text()
+        desc = self.det_table.item(row, 2).text()
+        offset_str = self.det_table.item(row, 3).text()
+        
+        try:
+            offset = int(offset_str, 16)
+        except ValueError:
+            QMessageBox.warning(self, "Error", "Offset inválido.")
+            return
+
+        new_val_str, ok = QInputDialog.getText(
+            self, 
+            "Modificar Parámetro en ROM",
+            f"Tipo: {dtype} ({desc})\nOffset ROM: 0x{offset:06X}\n\nIngrese nuevo valor (hex ej. 0x2A o decimal):",
+            text=curr_val
+        )
+        if not ok or not new_val_str.strip():
+            return
+            
+        try:
+            val_clean = new_val_str.strip()
+            new_val = int(val_clean, 16) if '0x' in val_clean.lower() else int(val_clean)
+        except ValueError:
+            QMessageBox.warning(self, "Error", "El valor ingresado no es un número válido.")
+            return
+
+        success, msg = self.patch_rom_value(offset, new_val)
+        if success:
+            QMessageBox.information(self, "ROM Parcheada con Éxito", msg)
+            if hasattr(self, '_current_call_id') and self._current_call_id is not None:
+                self.load_proc(self._current_call_id)
+        else:
+            QMessageBox.critical(self, "Error al Parchear ROM", msg)
+
+    def patch_rom_value(self, rom_offset, new_val):
+        if not self.project or not self.project.base_rom_path:
+            return False, "No hay una ROM cargada en el proyecto activo."
+        rom_path = self.project.base_rom_path
+        if not os.path.exists(rom_path):
+            return False, f"No se encontró el archivo de la ROM en: {rom_path}"
+            
+        try:
+            with open(rom_path, 'r+b') as f:
+                f.seek(rom_offset)
+                cur_bytes = f.read(2)
+                if len(cur_bytes) < 2:
+                    return False, "Offset fuera de los límites de la ROM."
+                w = struct.unpack('<H', cur_bytes)[0]
+                
+                # Thumb MOV Rd, #imm (0x2000) o CMP Rd, #imm (0x2800)
+                if (w & 0xF800) in (0x2000, 0x2800):
+                    new_w = (w & 0xFF00) | (new_val & 0xFF)
+                    f.seek(rom_offset)
+                    f.write(struct.pack('<H', new_w))
+                    if self.decompiler and hasattr(self.decompiler, 'rom') and self.decompiler.rom:
+                        struct.pack_into('<H', self.decompiler.rom, rom_offset, new_w)
+                    return True, f"Instrucción Thumb modificada exitosamente en 0x{rom_offset:06X}:\nOpcode anterior: 0x{w:04X} -> Nuevo Opcode: 0x{new_w:04X}"
+                else:
+                    new_val_byte = new_val & 0xFF
+                    f.seek(rom_offset)
+                    f.write(bytes([new_val_byte]))
+                    if self.decompiler and hasattr(self.decompiler, 'rom') and self.decompiler.rom:
+                        self.decompiler.rom[rom_offset] = new_val_byte
+                    return True, f"Byte parcheado directamente en 0x{rom_offset:06X} con valor 0x{new_val_byte:02X}."
+        except Exception as e:
+            return False, f"Excepción al escribir en ROM: {str(e)}"
+
