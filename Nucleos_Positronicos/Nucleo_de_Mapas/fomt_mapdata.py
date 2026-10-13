@@ -175,6 +175,9 @@ class FomtMapRenderer:
             else:
                 self.behavior_dict = None
 
+            # 6. Mapeo dinámico de paleta por tile desde el mapa
+            self._build_tile_palette_map()
+
             self._loaded = True
             return True
 
@@ -394,24 +397,70 @@ class FomtMapRenderer:
 
         return img
 
-    def render_tileset(self, pal_idx=0, bank=1) -> Image.Image | None:
-        """Genera una imagen con todos los tiles usando la paleta especificada."""
+    def _build_tile_palette_map(self):
+        """
+        Determina qué paleta le corresponde a cada tile según su uso en el mapa.
+        Prioridad: tilemap_bg3 (suelo/terreno principal), luego bg2, luego bg1.
+        """
+        from collections import Counter
+        tile_pal_counts = {}
+        total_pals = Counter()
+
+        for layer in [self.tilemap_bg3, self.tilemap_bg2, self.tilemap_bg1]:
+            if not layer:
+                continue
+            for val in layer:
+                t = val & 0x3FF
+                p = (val >> 12) & 0xF
+                if t != 0x3FF and p > 0:
+                    if t not in tile_pal_counts:
+                        tile_pal_counts[t] = Counter()
+                    tile_pal_counts[t][p] += 1
+                    total_pals[p] += 1
+
+        self.dominant_palette = total_pals.most_common(1)[0][0] if total_pals else 1
+        self.tile_palette_map = {t: c.most_common(1)[0][0] for t, c in tile_pal_counts.items()}
+
+    def get_tile_palette(self, tile_idx: int) -> int:
+        """Retorna la paleta activa en el mapa para un tile dado, o la paleta dominante."""
+        if hasattr(self, 'tile_palette_map') and tile_idx in self.tile_palette_map:
+            return self.tile_palette_map[tile_idx]
+        return getattr(self, 'dominant_palette', 1)
+
+    def render_tileset(self, pal_idx: int | None = None, bank: int = 1) -> Image.Image | None:
+        """
+        Genera una imagen con todos los tiles de 8x8.
+        Si pal_idx es None o pal_idx == 0:
+            Modo Auto: Cada tile se dibuja con la paleta activa que le manda el mapa.
+        Si pal_idx > 0:
+            Fuerza esa paleta específica para todos los tiles del tileset.
+        """
         if not self._loaded or not self.tiles:
             return None
         palettes = self.palettes_1 if bank == 1 else self.palettes_2
-        if pal_idx >= len(palettes):
+        if not palettes:
             return None
-            
+
         cols = 32
         rows = (len(self.tiles) + cols - 1) // cols
         img = Image.new('RGB', (cols * 8, rows * 8), (0, 0, 0))
-        
+
+        use_auto = (pal_idx is None or pal_idx == 0)
+
         for i, tile_data in enumerate(self.tiles):
             c = i % cols
             r = i // cols
-            tile_img = _render_tile(tile_data, palettes[pal_idx], False, False)
+            if use_auto:
+                p = self.get_tile_palette(i)
+            else:
+                p = pal_idx
+
+            if p >= len(palettes):
+                p = getattr(self, 'dominant_palette', 1)
+
+            tile_img = _render_tile(tile_data, palettes[p], False, False)
             img.paste(tile_img.convert('RGB'), (c * 8, r * 8))
-            
+
         return img
 
     def get_cell_val_at(self, layer: int, col: int, row: int) -> int:

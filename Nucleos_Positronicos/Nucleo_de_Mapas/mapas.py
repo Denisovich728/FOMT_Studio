@@ -322,7 +322,7 @@ def decompress_arcano_native(rom: bytes, offset: int) -> bytearray:
                         out[out_pos] = get_byte()
                         out_pos += 1
             elif idx == 3:
-                count = reader.read_bits(6) + 1
+                count = reader.read_bits(6) + 2
                 val = reader.read_bits(8)
                 for _ in range(count):
                     if out_pos < target_size:

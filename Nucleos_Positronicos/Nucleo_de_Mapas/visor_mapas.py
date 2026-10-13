@@ -414,7 +414,7 @@ class VisorMapas(QWidget):
         ts_controls = QHBoxLayout()
         ts_controls.addWidget(QLabel("Tileset Pal:"))
         self.cmb_ts_pal = QComboBox()
-        self.cmb_ts_pal.addItems([f"Pal {i}" for i in range(16)])
+        self.cmb_ts_pal.addItems(["Auto (Mapa)"] + [f"Pal {i}" for i in range(1, 16)])
         self.cmb_ts_pal.currentIndexChanged.connect(self._re_render_tileset)
         ts_controls.addWidget(self.cmb_ts_pal)
         
@@ -651,7 +651,9 @@ class VisorMapas(QWidget):
         tileset_width = 32 # 256 pixels / 8
         self.selected_tile = cell_y * tileset_width + cell_x
         self._copied_from_map = False
-        self.lbl_info.setText(f"Pincel Tile: 0x{self.selected_tile:03X}")
+        
+        assigned_pal = self.renderer.get_tile_palette(self.selected_tile) if self.cmb_ts_pal.currentIndex() == 0 else self.cmb_ts_pal.currentIndex()
+        self.lbl_info.setText(f"Pincel Tile: 0x{self.selected_tile:03X} (Pal {assigned_pal})")
         self._re_render_tileset()
 
     def _on_map_mouse_released(self):
@@ -712,9 +714,12 @@ class VisorMapas(QWidget):
         if hasattr(self, 'selected_tile') and tab_idx in [1, 2, 3]: # Modo pintar BG
             copied_from_map = getattr(self, '_copied_from_map', False)
             
-            # Si no fue clonado (se eligió del panel), inyectamos la paleta activa del combobox
+            # Si no fue clonado (se eligió del panel), inyectamos la paleta activa o auto del mapa
             if not copied_from_map:
-                active_pal = self.cmb_ts_pal.currentIndex()
+                if self.cmb_ts_pal.currentIndex() == 0:
+                    active_pal = self.renderer.get_tile_palette(self.selected_tile & 0x03FF)
+                else:
+                    active_pal = self.cmb_ts_pal.currentIndex()
                 new_val = (active_pal << 12) | (self.selected_tile & 0x03FF)
             else:
                 new_val = self.selected_tile
@@ -797,6 +802,11 @@ class VisorMapas(QWidget):
             
         bank_idx = self.cmb_bank.currentIndex()
         pal_idx = self.cmb_ts_pal.currentIndex()
+        if pal_idx == 0:
+            if hasattr(self, 'selected_tile'):
+                pal_idx = self.renderer.get_tile_palette(self.selected_tile & 0x03FF)
+            else:
+                pal_idx = getattr(self.renderer, 'dominant_palette', 1)
         
         palettes = self.renderer.palettes_1 if bank_idx == 0 else self.renderer.palettes_2
         if not palettes or pal_idx >= len(palettes):
