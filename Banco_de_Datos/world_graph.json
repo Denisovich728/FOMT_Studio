@@ -1,0 +1,470 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "map_id": 2,
+      "name": "Farm (Granja)",
+      "canvas_x": 400.0,
+      "canvas_y": 500.0,
+      "width": 80,
+      "height": 80,
+      "warps": [
+        {
+          "warp_id": "to_town",
+          "name": "Salida Norte hacia Pueblo Sur",
+          "x": 400,
+          "y": 32
+        },
+        {
+          "warp_id": "to_forest",
+          "name": "Salida Oeste hacia Bosque",
+          "x": 32,
+          "y": 400
+        },
+        {
+          "warp_id": "to_house",
+          "name": "Puerta de la Casa",
+          "x": 360,
+          "y": 240
+        },
+        {
+          "warp_id": "to_barn",
+          "name": "Puerta del Establo",
+          "x": 200,
+          "y": 200
+        },
+        {
+          "warp_id": "to_coop",
+          "name": "Puerta del Gallinero",
+          "x": 500,
+          "y": 200
+        }
+      ]
+    },
+    {
+      "map_id": 7,
+      "name": "South_Side_Town (Pueblo Sur)",
+      "canvas_x": 400.0,
+      "canvas_y": 250.0,
+      "width": 70,
+      "height": 50,
+      "warps": [
+        {
+          "warp_id": "to_farm",
+          "name": "Entrada Sur desde Granja",
+          "x": 350,
+          "y": 380
+        },
+        {
+          "warp_id": "to_north",
+          "name": "Camino Norte hacia Pueblo Norte",
+          "x": 350,
+          "y": 20
+        },
+        {
+          "warp_id": "to_square",
+          "name": "Camino Este hacia Plaza Rosa",
+          "x": 540,
+          "y": 200
+        },
+        {
+          "warp_id": "to_poultry",
+          "name": "Granja Avícola (Gallinas)",
+          "x": 180,
+          "y": 300
+        },
+        {
+          "warp_id": "to_barley",
+          "name": "Granja Yodel (Vacas)",
+          "x": 480,
+          "y": 320
+        },
+        {
+          "warp_id": "to_inn",
+          "name": "Taberna de Doug (Entrada Sur)",
+          "x": 300,
+          "y": 80
+        }
+      ]
+    },
+    {
+      "map_id": 5,
+      "name": "North_Side_Town (Pueblo Norte)",
+      "canvas_x": 400.0,
+      "canvas_y": 50.0,
+      "width": 70,
+      "height": 50,
+      "warps": [
+        {
+          "warp_id": "to_south",
+          "name": "Camino Sur hacia Pueblo Sur",
+          "x": 350,
+          "y": 380
+        },
+        {
+          "warp_id": "to_supermarket",
+          "name": "Supermercado Jeff",
+          "x": 180,
+          "y": 160
+        },
+        {
+          "warp_id": "to_clinic",
+          "name": "Clínica Mineral",
+          "x": 280,
+          "y": 160
+        },
+        {
+          "warp_id": "to_mayor",
+          "name": "Casa del Alcalde Thomas",
+          "x": 100,
+          "y": 280
+        },
+        {
+          "warp_id": "to_ellen",
+          "name": "Casa de Ellen",
+          "x": 480,
+          "y": 280
+        },
+        {
+          "warp_id": "to_library",
+          "name": "Biblioteca de Mary",
+          "x": 560,
+          "y": 160
+        }
+      ]
+    },
+    {
+      "map_id": 6,
+      "name": "Rose_Square (Plaza Rosa)",
+      "canvas_x": 700.0,
+      "canvas_y": 250.0,
+      "width": 60,
+      "height": 50,
+      "warps": [
+        {
+          "warp_id": "to_south",
+          "name": "Salida Oeste hacia Pueblo Sur",
+          "x": 30,
+          "y": 250
+        },
+        {
+          "warp_id": "to_beach",
+          "name": "Camino Sur hacia Playa",
+          "x": 250,
+          "y": 380
+        }
+      ]
+    },
+    {
+      "map_id": 1,
+      "name": "Mineral_Beach (Playa Mineral)",
+      "canvas_x": 700.0,
+      "canvas_y": 500.0,
+      "width": 70,
+      "height": 60,
+      "warps": [
+        {
+          "warp_id": "to_square",
+          "name": "Salida Norte hacia Plaza",
+          "x": 350,
+          "y": 20
+        },
+        {
+          "warp_id": "to_zack",
+          "name": "Casa de Zack",
+          "x": 120,
+          "y": 200
+        },
+        {
+          "warp_id": "to_kai",
+          "name": "Restaurante de Kai",
+          "x": 400,
+          "y": 200
+        }
+      ]
+    },
+    {
+      "map_id": 3,
+      "name": "Forest (Bosque)",
+      "canvas_x": 100.0,
+      "canvas_y": 500.0,
+      "width": 70,
+      "height": 70,
+      "warps": [
+        {
+          "warp_id": "to_farm",
+          "name": "Salida Este hacia Granja",
+          "x": 540,
+          "y": 350
+        },
+        {
+          "warp_id": "to_gotz",
+          "name": "Cabaña de Gotz (Carpintero)",
+          "x": 200,
+          "y": 250
+        },
+        {
+          "warp_id": "to_mountain",
+          "name": "Camino hacia Montaña",
+          "x": 100,
+          "y": 100
+        }
+      ]
+    },
+    {
+      "map_id": 0,
+      "name": "Mothers_Hill (Colina Madre)",
+      "canvas_x": 100.0,
+      "canvas_y": 250.0,
+      "width": 80,
+      "height": 80,
+      "warps": [
+        {
+          "warp_id": "to_forest",
+          "name": "Camino Sur hacia Bosque",
+          "x": 400,
+          "y": 600
+        },
+        {
+          "warp_id": "to_peak",
+          "name": "Cima de la Colina",
+          "x": 400,
+          "y": 40
+        },
+        {
+          "warp_id": "to_hotsprings",
+          "name": "Aguas Termales & Diosa",
+          "x": 250,
+          "y": 300
+        },
+        {
+          "warp_id": "to_mine",
+          "name": "Entrada a Mina",
+          "x": 150,
+          "y": 350
+        }
+      ]
+    },
+    {
+      "map_id": 12,
+      "name": "Church (Iglesia)",
+      "canvas_x": 400.0,
+      "canvas_y": -120.0,
+      "width": 40,
+      "height": 35,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta de Salida",
+          "x": 160,
+          "y": 260
+        },
+        {
+          "warp_id": "to_behind",
+          "name": "Puerta Trasera",
+          "x": 160,
+          "y": 40
+        }
+      ]
+    },
+    {
+      "map_id": 15,
+      "name": "Jeff_Shop / Supermarket",
+      "canvas_x": 160.0,
+      "canvas_y": -80.0,
+      "width": 45,
+      "height": 40,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal",
+          "x": 180,
+          "y": 280
+        },
+        {
+          "warp_id": "to_back",
+          "name": "Puerta a Trastienda",
+          "x": 80,
+          "y": 60
+        }
+      ]
+    },
+    {
+      "map_id": 19,
+      "name": "Mineral_Clinic (Clínica)",
+      "canvas_x": 280.0,
+      "canvas_y": -80.0,
+      "width": 40,
+      "height": 35,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal",
+          "x": 160,
+          "y": 260
+        }
+      ]
+    },
+    {
+      "map_id": 21,
+      "name": "Doug_Inn (Posada / Bar)",
+      "canvas_x": 600.0,
+      "canvas_y": 50.0,
+      "width": 50,
+      "height": 45,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal",
+          "x": 200,
+          "y": 300
+        },
+        {
+          "warp_id": "to_floor2",
+          "name": "Escaleras Planta Alta",
+          "x": 100,
+          "y": 60
+        }
+      ]
+    },
+    {
+      "map_id": 24,
+      "name": "Mary_Library (Biblioteca)",
+      "canvas_x": 720.0,
+      "canvas_y": -80.0,
+      "width": 45,
+      "height": 40,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal",
+          "x": 160,
+          "y": 280
+        },
+        {
+          "warp_id": "to_floor2",
+          "name": "Escaleras Planta Alta",
+          "x": 80,
+          "y": 60
+        }
+      ]
+    },
+    {
+      "map_id": 10,
+      "name": "Poultry_Farm_House (Casa Gallinas)",
+      "canvas_x": 160.0,
+      "canvas_y": 250.0,
+      "width": 40,
+      "height": 35,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal",
+          "x": 160,
+          "y": 260
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "conn_id": "c_farm_south",
+      "from_map_id": 2,
+      "from_warp_id": "to_town",
+      "to_map_id": 7,
+      "to_warp_id": "to_farm",
+      "bidirectional": true,
+      "note": "Camino Granja <-> Pueblo Sur"
+    },
+    {
+      "conn_id": "c_south_north",
+      "from_map_id": 7,
+      "from_warp_id": "to_north",
+      "to_map_id": 5,
+      "to_warp_id": "to_south",
+      "bidirectional": true,
+      "note": "Camino Pueblo Sur <-> Pueblo Norte"
+    },
+    {
+      "conn_id": "c_south_square",
+      "from_map_id": 7,
+      "from_warp_id": "to_square",
+      "to_map_id": 6,
+      "to_warp_id": "to_south",
+      "bidirectional": true,
+      "note": "Pueblo Sur <-> Plaza Rosa"
+    },
+    {
+      "conn_id": "c_square_beach",
+      "from_map_id": 6,
+      "from_warp_id": "to_beach",
+      "to_map_id": 1,
+      "to_warp_id": "to_square",
+      "bidirectional": true,
+      "note": "Plaza Rosa <-> Playa"
+    },
+    {
+      "conn_id": "c_farm_forest",
+      "from_map_id": 2,
+      "from_warp_id": "to_forest",
+      "to_map_id": 3,
+      "to_warp_id": "to_farm",
+      "bidirectional": true,
+      "note": "Granja <-> Bosque"
+    },
+    {
+      "conn_id": "c_forest_hill",
+      "from_map_id": 3,
+      "from_warp_id": "to_mountain",
+      "to_map_id": 0,
+      "to_warp_id": "to_forest",
+      "bidirectional": true,
+      "note": "Bosque <-> Colina Madre"
+    },
+    {
+      "conn_id": "c_north_super",
+      "from_map_id": 5,
+      "from_warp_id": "to_supermarket",
+      "to_map_id": 15,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Pueblo Norte <-> Supermercado"
+    },
+    {
+      "conn_id": "c_north_clinic",
+      "from_map_id": 5,
+      "from_warp_id": "to_clinic",
+      "to_map_id": 19,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Pueblo Norte <-> Clínica"
+    },
+    {
+      "conn_id": "c_north_lib",
+      "from_map_id": 5,
+      "from_warp_id": "to_library",
+      "to_map_id": 24,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Pueblo Norte <-> Biblioteca"
+    },
+    {
+      "conn_id": "c_south_poultry",
+      "from_map_id": 7,
+      "from_warp_id": "to_poultry",
+      "to_map_id": 10,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Pueblo Sur <-> Granja Avícola"
+    },
+    {
+      "conn_id": "c_south_inn",
+      "from_map_id": 7,
+      "from_warp_id": "to_inn",
+      "to_map_id": 21,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Pueblo Sur <-> Posada"
+    }
+  ]
+}

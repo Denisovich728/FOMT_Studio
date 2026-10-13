@@ -439,6 +439,8 @@ class FoMTStudioApp(QMainWindow):
         m_dm = tools_menu.addMenu("🗺️ " + tr("cat_data_maps", lang))
         m_dm.addAction(tr("tab_map_editor", lang), lambda: self._populate_ui_step(5))
         m_dm.addAction(tr("tab_npc_visual", lang), self._open_visor_npc)
+        m_dm.addAction("🗺️ Rutinas Diarias & Macromapa (NPC AI)", self._open_editor_rutinas_npc)
+        tools_menu.addAction("🗺️ Editor de Rutinas & Macromapa", self._open_editor_rutinas_npc)
         
         # --- Base de Datos Interna (Pestañas por defecto) ---
         m_db = tools_menu.addMenu("🗄️ " + tr("cat_internal_db", lang))
@@ -1102,6 +1104,18 @@ class FoMTStudioApp(QMainWindow):
             if self.tabs.tabText(i) == tr("tab_npcs", lang):
                 self.tabs.setCurrentIndex(i)
                 return
+
+    def _open_editor_rutinas_npc(self):
+        """Abre el Editor de Rutinas Diarias de NPCs y Macromapa interactivo."""
+        tab_name = "🗺️ Rutinas NPC & Macromapa"
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == tab_name:
+                self.tabs.setCurrentIndex(i)
+                return
+        from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.editor_rutinas_npc import EditorRutinasNPCWidget
+        editor = EditorRutinasNPCWidget(self.project, self)
+        self.tabs.addTab(editor, tab_name)
+        self.tabs.setCurrentWidget(editor)
 
     def open_intro_editor(self):
         """Abre el editor global de textos de la introducción."""
