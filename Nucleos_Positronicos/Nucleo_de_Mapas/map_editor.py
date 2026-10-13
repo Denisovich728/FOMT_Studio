@@ -17,6 +17,7 @@ Características:
   • Panel lateral con propiedades del elemento seleccionado
 """
 
+import struct
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
     QScrollArea, QToolButton, QLabel, QGroupBox,

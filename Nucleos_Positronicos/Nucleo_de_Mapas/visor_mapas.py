@@ -1,4 +1,5 @@
 import os
+import struct
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QLabel, QScrollArea,
     QPushButton, QSpinBox, QMessageBox, QSplitter, QProgressBar, QCheckBox, QComboBox, QFormLayout, QTabWidget, QLineEdit, QDialog
