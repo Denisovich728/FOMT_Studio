@@ -805,13 +805,22 @@ class RouteMapCanvas(QGraphicsView):
         if self._is_dragging_node and self._dragged_node_idx is not None:
             nodes = self.get_active_path_nodes()
             if 0 <= self._dragged_node_idx < len(nodes):
-                nodes[self._dragged_node_idx] = (cur_x, cur_y)
                 seg = self.get_selected_segment()
-                if seg:
-                    if self._dragged_node_idx == 0:
+                is_loop = (seg.get("is_loop", False) if seg else False) or (len(nodes) > 1 and nodes[0] == nodes[-1])
+
+                if is_loop and (self._dragged_node_idx == 0 or self._dragged_node_idx == len(nodes) - 1):
+                    nodes[0] = (cur_x, cur_y)
+                    nodes[-1] = (cur_x, cur_y)
+                    if seg:
                         seg["ax"], seg["ay"] = cur_x, cur_y
-                    elif self._dragged_node_idx == len(nodes) - 1:
                         seg["bx"], seg["by"] = cur_x, cur_y
+                else:
+                    nodes[self._dragged_node_idx] = (cur_x, cur_y)
+                    if seg:
+                        if self._dragged_node_idx == 0:
+                            seg["ax"], seg["ay"] = cur_x, cur_y
+                        elif self._dragged_node_idx == len(nodes) - 1:
+                            seg["bx"], seg["by"] = cur_x, cur_y
                 self.node_moved.emit(self._dragged_node_idx, cur_x, cur_y)
                 self.overlay_item.update()
             event.accept()
@@ -826,10 +835,17 @@ class RouteMapCanvas(QGraphicsView):
             self.setCursor(Qt.CursorShape.SizeAllCursor)
             nodes = self.get_active_path_nodes()
             nx, ny = nodes[node_i]
+            is_loop = (len(nodes) > 1 and nodes[0] == nodes[-1])
             if node_i == 0:
-                self.setToolTip(f"🟢 [Punto A (Inicio)]: ({nx}, {ny})\nArrastra para mover el inicio de la ruta")
+                if is_loop:
+                    self.setToolTip(f"🔄 [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
+                else:
+                    self.setToolTip(f"🟢 [Punto A (Inicio)]: ({nx}, {ny})\nArrastra para mover el inicio de la ruta")
             elif node_i == len(nodes) - 1:
-                self.setToolTip(f"🎯 [Punto B (Destino)]: ({nx}, {ny})\nArrastra para mover el destino de la ruta")
+                if is_loop:
+                    self.setToolTip(f"🔄 [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
+                else:
+                    self.setToolTip(f"🎯 [Punto B (Destino)]: ({nx}, {ny})\nArrastra para mover el destino de la ruta")
             else:
                 self.setToolTip(f"🔷 [Punto de Inflexión #{node_i}]: ({nx}, {ny})\nArrastra para centrar en la calle o Clic Derecho para opciones")
         else:

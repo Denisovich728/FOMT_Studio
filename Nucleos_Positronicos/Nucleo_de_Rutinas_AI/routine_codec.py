@@ -629,15 +629,13 @@ class RoutineCodec:
             # 5. Escribir rutina
             project.write_patch(target_off, compiled_blob)
 
-            # 6. Si cupo in-place y sobró espacio, rellenar el remanente original con 0xFF
-            if in_place and blob_len < orig_span:
-                rem_len = orig_span - blob_len
-                project.write_patch(target_off + blob_len, b'\xFF' * rem_len)
+            # 6. Si cupo in-place y sobró espacio, preservamos el remanente original intacto
+            # para evitar sobreescribir bytes compartidos o datos adyacentes.
 
             # 7. Si se repunteó a un bloque nuevo:
             if not in_place and orig_off is not None and orig_off != target_off:
                 # Stub de seguridad en los primeros 12 bytes del offset viejo
-                # para que jamás se desreferencie 0xFFFFFFFF
+                # para que cualquier referencia residual desreferencie los nuevos horarios
                 safe_stub = struct.pack(
                     '<III',
                     npc_data.evaluator_func & 0xFFFFFFFF,
@@ -645,8 +643,8 @@ class RoutineCodec:
                     cls.off_to_gba(target_off + 12)
                 )
                 project.write_patch(orig_off, safe_stub)
-                if orig_span > 12:
-                    project.write_patch(orig_off + 12, b'\xFF' * (orig_span - 12))
+                # NOTA: Preservamos los datos antiguos intactos en lugar de rellenar con 0xFF
+                # para evitar que punteros residuales salten a FFFFFFFE.
 
             # 8. Repuntear TODAS las referencias de la ROM a la estructura maestra de este NPC
             # (Incluye 0x3D9A4 + npc_id*4 y el literal pool de entity_manager.c en 0x35xxx)

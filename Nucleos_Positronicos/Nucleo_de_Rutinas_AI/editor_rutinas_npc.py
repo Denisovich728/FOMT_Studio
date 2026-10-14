@@ -1157,7 +1157,7 @@ class EditorRutinasNPCWidget(QWidget):
             if idx_spd >= 0:
                 self.combo_speed.setCurrentIndex(idx_spd)
 
-            is_loop = seg.get("is_loop", False)
+            is_loop = seg.get("is_loop", False) or (len(seg.get("path_nodes", [])) > 1 and seg["path_nodes"][0] == seg["path_nodes"][-1])
             loop_badge = " 🔄 Bucle" if is_loop else ""
             self.lbl_insp_badge.setText(f"Hito #{row + 1}{loop_badge} ({seg['time_str']})")
             if is_loop:
@@ -1165,10 +1165,24 @@ class EditorRutinasNPCWidget(QWidget):
                 self.lbl_auto_status.setText(f"🔄 Bucle Activo ({num_legs} tramos)")
                 self.lbl_auto_status.setStyleSheet("color: #A371F7; font-size: 10px; font-weight: bold; padding-top: 2px;")
                 self.btn_toggle_loop.setText("🔓 Abrir Bucle")
+                self.spin_bx.setEnabled(False)
+                self.spin_by.setEnabled(False)
+                self.spin_bx.setToolTip("En rutas en bucle, Destino (B) coincide siempre con Inicio (A).")
+                self.spin_by.setToolTip("En rutas en bucle, Destino (B) coincide siempre con Inicio (A).")
+                self.rb_target_b.setEnabled(False)
+                self.rb_target_b.setToolTip("Destino (B) está bloqueado en bucles (equivale a Inicio A).")
+                if self.rb_target_b.isChecked():
+                    self.rb_target_inflection.setChecked(True)
             else:
                 self.lbl_auto_status.setText("⚡ Malla AWSD: Auto-Ajuste Activo")
                 self.lbl_auto_status.setStyleSheet("color: #3FB950; font-size: 10px; font-weight: bold; padding-top: 2px;")
                 self.btn_toggle_loop.setText("🔄 Cerrar en Bucle")
+                self.spin_bx.setEnabled(True)
+                self.spin_by.setEnabled(True)
+                self.spin_bx.setToolTip("")
+                self.spin_by.setToolTip("")
+                self.rb_target_b.setEnabled(True)
+                self.rb_target_b.setToolTip("")
         finally:
             self._updating_ui = False
 
@@ -1263,14 +1277,22 @@ class EditorRutinasNPCWidget(QWidget):
         row = rows[0].row()
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
+
         if 0 < node_idx < len(wp.path_nodes) - 1:
             nx = self.spin_node_x.value()
             ny = self.spin_node_y.value()
             wp.path_nodes[node_idx] = (nx, ny)
             wp.path_nodes = ensure_orthogonal_path(wp.path_nodes)
+            if is_loop and (not wp.path_nodes or wp.path_nodes[0] != wp.path_nodes[-1]):
+                wp.path_nodes.append(wp.path_nodes[0])
             wp.is_edited = True
             wp.raw_bytes = None
             seg["path_nodes"] = list(wp.path_nodes)
+            if is_loop:
+                seg["is_loop"] = True
+                wp.dest_x, wp.dest_y = wp.path_nodes[0]
+                seg["bx"], seg["by"] = wp.path_nodes[0]
             self._on_auto_path_change(force_recalc=False)
 
     def _on_canvas_node_selected(self, node_idx: int, x: int, y: int):
@@ -1278,9 +1300,11 @@ class EditorRutinasNPCWidget(QWidget):
         if not rows or not self.current_segments:
             return
         row = rows[0].row()
-        wp = self.current_segments[row]["wp_ref"]
+        seg = self.current_segments[row]
+        wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
-        if node_idx == 0:
+        if node_idx == 0 or (is_loop and node_idx == len(wp.path_nodes) - 1):
             self.rb_target_a.setChecked(True)
         elif node_idx == len(wp.path_nodes) - 1:
             self.rb_target_b.setChecked(True)
@@ -1295,12 +1319,32 @@ class EditorRutinasNPCWidget(QWidget):
         row = rows[0].row()
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
         if 0 <= node_idx < len(wp.path_nodes):
-            wp.path_nodes[node_idx] = (x, y)
             wp.is_edited = True
             wp.raw_bytes = None
-            if node_idx == 0:
+            if is_loop and (node_idx == 0 or node_idx == len(wp.path_nodes) - 1):
+                wp.path_nodes[0] = (x, y)
+                wp.path_nodes[-1] = (x, y)
+                self.spin_ax.blockSignals(True)
+                self.spin_ay.blockSignals(True)
+                self.spin_bx.blockSignals(True)
+                self.spin_by.blockSignals(True)
+                self.spin_ax.setValue(x)
+                self.spin_ay.setValue(y)
+                self.spin_bx.setValue(x)
+                self.spin_by.setValue(y)
+                self.spin_ax.blockSignals(False)
+                self.spin_ay.blockSignals(False)
+                self.spin_bx.blockSignals(False)
+                self.spin_by.blockSignals(False)
+                wp.spawn_x, wp.spawn_y = x, y
+                wp.dest_x, wp.dest_y = x, y
+                seg["ax"], seg["ay"] = x, y
+                seg["bx"], seg["by"] = x, y
+            elif node_idx == 0:
+                wp.path_nodes[0] = (x, y)
                 self.spin_ax.blockSignals(True)
                 self.spin_ay.blockSignals(True)
                 self.spin_ax.setValue(x)
@@ -1310,6 +1354,7 @@ class EditorRutinasNPCWidget(QWidget):
                 wp.spawn_x, wp.spawn_y = x, y
                 seg["ax"], seg["ay"] = x, y
             elif node_idx == len(wp.path_nodes) - 1:
+                wp.path_nodes[-1] = (x, y)
                 self.spin_bx.blockSignals(True)
                 self.spin_by.blockSignals(True)
                 self.spin_bx.setValue(x)
@@ -1319,6 +1364,7 @@ class EditorRutinasNPCWidget(QWidget):
                 wp.dest_x, wp.dest_y = x, y
                 seg["bx"], seg["by"] = x, y
             else:
+                wp.path_nodes[node_idx] = (x, y)
                 self.spin_node_x.blockSignals(True)
                 self.spin_node_y.blockSignals(True)
                 self.spin_node_x.setValue(x)
@@ -1333,12 +1379,24 @@ class EditorRutinasNPCWidget(QWidget):
         row = rows[0].row()
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
         wp.path_nodes = ensure_orthogonal_path(wp.path_nodes)
+        if is_loop:
+            if not wp.path_nodes or len(wp.path_nodes) < 2:
+                wp.path_nodes = [(x, y), (x, y)]
+            elif wp.path_nodes[0] != wp.path_nodes[-1]:
+                wp.path_nodes.append(wp.path_nodes[0])
+            wp.dest_x, wp.dest_y = wp.path_nodes[0]
+            wp.spawn_x, wp.spawn_y = wp.path_nodes[0]
+            seg["ax"], seg["ay"] = wp.path_nodes[0]
+            seg["bx"], seg["by"] = wp.path_nodes[0]
+            seg["is_loop"] = True
+
         wp.is_edited = True
         wp.raw_bytes = None
         seg["path_nodes"] = list(wp.path_nodes)
-        self._populate_inflection_combo(wp, node_idx)
+        self._populate_inflection_combo(wp, node_idx if (0 < node_idx < len(wp.path_nodes) - 1) else None)
         self._on_auto_path_change(force_recalc=False)
 
     def _on_canvas_node_inserted(self, insert_idx: int, x: int, y: int):
@@ -1348,6 +1406,7 @@ class EditorRutinasNPCWidget(QWidget):
         row = rows[0].row()
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
         if hasattr(self.route_canvas, "pathfinder") and self.route_canvas.pathfinder:
             grid = self.route_canvas.pathfinder.get_map_grid(seg["map_id"])
@@ -1355,11 +1414,25 @@ class EditorRutinasNPCWidget(QWidget):
                 tx, ty = self.route_canvas.pathfinder.snap_to_walkable(grid, x, y)
                 x, y = tx * 8 + 4, ty * 8 + 4
 
+        if is_loop:
+            if insert_idx <= 0:
+                insert_idx = 1
+            if insert_idx >= len(wp.path_nodes):
+                insert_idx = max(1, len(wp.path_nodes) - 1)
+
         wp.path_nodes.insert(insert_idx, (x, y))
         wp.path_nodes = ensure_orthogonal_path(wp.path_nodes)
+        if is_loop and (not wp.path_nodes or wp.path_nodes[0] != wp.path_nodes[-1]):
+            wp.path_nodes.append(wp.path_nodes[0])
+
         wp.is_edited = True
         wp.raw_bytes = None
         seg["path_nodes"] = list(wp.path_nodes)
+        if is_loop:
+            seg["is_loop"] = True
+            wp.dest_x, wp.dest_y = wp.path_nodes[0]
+            seg["bx"], seg["by"] = wp.path_nodes[0]
+
         self._populate_inflection_combo(wp, insert_idx)
         self._on_auto_path_change(force_recalc=False)
         self.status_bar.showMessage(f"🔷 Punto de Inflexión #{insert_idx} insertado en ({x}, {y}).", 3000)
@@ -1371,13 +1444,22 @@ class EditorRutinasNPCWidget(QWidget):
         row = rows[0].row()
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
         if 0 < node_idx < len(wp.path_nodes) - 1:
             del wp.path_nodes[node_idx]
             wp.path_nodes = ensure_orthogonal_path(wp.path_nodes)
+            if is_loop and (not wp.path_nodes or wp.path_nodes[0] != wp.path_nodes[-1]):
+                if len(wp.path_nodes) >= 1:
+                    wp.path_nodes.append(wp.path_nodes[0])
             wp.is_edited = True
             wp.raw_bytes = None
             seg["path_nodes"] = list(wp.path_nodes)
+            if is_loop:
+                seg["is_loop"] = True
+                wp.dest_x, wp.dest_y = wp.path_nodes[0]
+                seg["bx"], seg["by"] = wp.path_nodes[0]
+
             self._populate_inflection_combo(wp)
             self._on_auto_path_change(force_recalc=False)
             self.status_bar.showMessage(f"🗑️ Punto de Inflexión #{node_idx} eliminado.", 3000)
@@ -1414,6 +1496,8 @@ class EditorRutinasNPCWidget(QWidget):
         row = rows[0].row()
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
+
         if 0 < node_idx < len(wp.path_nodes) - 1:
             nx, ny = wp.path_nodes[node_idx]
             if hasattr(self.route_canvas, "pathfinder") and self.route_canvas.pathfinder:
@@ -1423,9 +1507,15 @@ class EditorRutinasNPCWidget(QWidget):
                     snapped_x, snapped_y = tx * 8 + 4, ty * 8 + 4
                     wp.path_nodes[node_idx] = (snapped_x, snapped_y)
                     wp.path_nodes = ensure_orthogonal_path(wp.path_nodes)
+                    if is_loop and (not wp.path_nodes or wp.path_nodes[0] != wp.path_nodes[-1]):
+                        wp.path_nodes.append(wp.path_nodes[0])
                     wp.is_edited = True
                     wp.raw_bytes = None
                     seg["path_nodes"] = list(wp.path_nodes)
+                    if is_loop:
+                        seg["is_loop"] = True
+                        wp.dest_x, wp.dest_y = wp.path_nodes[0]
+                        seg["bx"], seg["by"] = wp.path_nodes[0]
                     self._populate_inflection_combo(wp, node_idx)
                     self._on_auto_path_change(force_recalc=False)
                     self.status_bar.showMessage(f"🛣️ Punto #{node_idx} centrado en tile caminable ({snapped_x}, {snapped_y}).", 3000)
@@ -1441,7 +1531,7 @@ class EditorRutinasNPCWidget(QWidget):
 
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
-        is_loop = len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
         if not is_loop:
             ax, ay = wp.spawn_x, wp.spawn_y
@@ -1455,11 +1545,19 @@ class EditorRutinasNPCWidget(QWidget):
                 nodes = list(wp.path_nodes) + (return_nodes[1:] if return_nodes else [(ax, ay)])
             wp.dest_x = ax
             wp.dest_y = ay
-            wp.path_nodes = nodes
+            wp.path_nodes = ensure_orthogonal_path(nodes)
+            if wp.path_nodes[0] != wp.path_nodes[-1]:
+                wp.path_nodes.append(wp.path_nodes[0])
             wp.is_edited = True
             wp.raw_bytes = None
+            seg["is_loop"] = True
             self.spin_bx.setValue(ax)
             self.spin_by.setValue(ay)
+            self.spin_bx.setEnabled(False)
+            self.spin_by.setEnabled(False)
+            self.rb_target_b.setEnabled(False)
+            if self.rb_target_b.isChecked():
+                self.rb_target_inflection.setChecked(True)
             self.status_bar.showMessage("🔄 Tramo convertido en bucle continuo (B = A).", 3000)
         else:
             # Abrir bucle: separar B eliminando el último nodo de retorno
@@ -1470,8 +1568,12 @@ class EditorRutinasNPCWidget(QWidget):
                 wp.path_nodes = wp.path_nodes[:-1]
                 wp.is_edited = True
                 wp.raw_bytes = None
+                seg["is_loop"] = False
                 self.spin_bx.setValue(prev_node[0])
                 self.spin_by.setValue(prev_node[1])
+                self.spin_bx.setEnabled(True)
+                self.spin_by.setEnabled(True)
+                self.rb_target_b.setEnabled(True)
                 self.status_bar.showMessage("🔓 Bucle abierto hacia destino final independiente.", 3000)
 
         if self.current_mode == "BY_NPC":
@@ -1491,6 +1593,7 @@ class EditorRutinasNPCWidget(QWidget):
 
         seg = self.current_segments[row]
         wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
         # Ajustar automáticamente al tile caminable más cercano en la matriz de colisión
         if hasattr(self.route_canvas, "pathfinder") and self.route_canvas.pathfinder:
@@ -1499,6 +1602,51 @@ class EditorRutinasNPCWidget(QWidget):
                 tx, ty = self.route_canvas.pathfinder.snap_to_walkable(grid, x, y)
                 x, y = tx * 8 + 4, ty * 8 + 4
 
+        if is_loop:
+            if self.rb_target_a.isChecked() or self.rb_target_b.isChecked():
+                # Trasladar el circuito completo al nuevo punto de origen
+                old_ax, old_ay = wp.spawn_x, wp.spawn_y
+                dx = x - old_ax
+                dy = y - old_ay
+                self._updating_ui = True
+                self.spin_ax.setValue(x)
+                self.spin_ay.setValue(y)
+                self.spin_bx.setValue(x)
+                self.spin_by.setValue(y)
+                self._updating_ui = False
+                wp.path_nodes = [(nx + dx, ny + dy) for nx, ny in wp.path_nodes]
+                wp.path_nodes[0] = (x, y)
+                wp.path_nodes[-1] = (x, y)
+                wp.spawn_x, wp.spawn_y = x, y
+                wp.dest_x, wp.dest_y = x, y
+                wp.is_edited = True
+                wp.raw_bytes = None
+                seg["ax"], seg["ay"] = x, y
+                seg["bx"], seg["by"] = x, y
+                seg["path_nodes"] = list(wp.path_nodes)
+                seg["is_loop"] = True
+                self._populate_inflection_combo(wp)
+                self._on_auto_path_change(force_recalc=False)
+                self.status_bar.showMessage(f"🔄 Circuito en bucle trasladado a ({x}, {y}).", 3500)
+                return
+            else:
+                # Inflexión (C) en bucle: insertar antes del cierre del bucle
+                insert_idx = max(1, len(wp.path_nodes) - 1)
+                wp.path_nodes.insert(insert_idx, (x, y))
+                wp.path_nodes = ensure_orthogonal_path(wp.path_nodes)
+                if wp.path_nodes[0] != wp.path_nodes[-1]:
+                    wp.path_nodes.append(wp.path_nodes[0])
+                wp.dest_x, wp.dest_y = wp.path_nodes[0]
+                wp.is_edited = True
+                wp.raw_bytes = None
+                seg["path_nodes"] = list(wp.path_nodes)
+                seg["is_loop"] = True
+                self._populate_inflection_combo(wp, insert_idx)
+                self._on_auto_path_change(force_recalc=False)
+                self.status_bar.showMessage(f"🔄 Punto de Inflexión añadido al bucle en ({x}, {y}).", 3500)
+                return
+
+        # Ruta lineal normal (no bucle)
         if self.rb_target_a.isChecked():
             target_name = "Inicio (A)"
             self.spin_ax.setValue(x)
@@ -1531,7 +1679,7 @@ class EditorRutinasNPCWidget(QWidget):
     def _on_auto_path_change(self, force_recalc: bool = False):
         """
         Sincroniza en tiempo real los nodos de la ruta ortogonal AWSD,
-        preservando puntos de inflexión manuales a menos que se fuerce un recálculo A*.
+        preservando puntos de inflexión manuales y manteniendo invariantes los circuitos en bucle.
         """
         if getattr(self, "_updating_ui", False):
             return
@@ -1548,28 +1696,48 @@ class EditorRutinasNPCWidget(QWidget):
 
         ax = self.spin_ax.value()
         ay = self.spin_ay.value()
-        bx = self.spin_bx.value()
-        by = self.spin_by.value()
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
 
-        # Recalcular ruta ortogonal AWSD respetando puntos de inflexión manuales
-        if force_recalc or not wp.path_nodes or len(wp.path_nodes) <= 2:
-            if (ax, ay) != (bx, by):
-                nodes = self.route_canvas.get_orthogonal_nodes(wp.map_id, ax, ay, bx, by)
+        if is_loop:
+            # En rutas en bucle, B siempre equivale a A
+            bx, by = ax, ay
+            self.spin_bx.blockSignals(True)
+            self.spin_by.blockSignals(True)
+            self.spin_bx.setValue(ax)
+            self.spin_by.setValue(ay)
+            self.spin_bx.blockSignals(False)
+            self.spin_by.blockSignals(False)
+
+            if len(wp.path_nodes) > 2:
+                dx = ax - wp.path_nodes[0][0]
+                dy = ay - wp.path_nodes[0][1]
+                if dx != 0 or dy != 0:
+                    nodes = [(nx + dx, ny + dy) for nx, ny in wp.path_nodes]
+                    nodes[0] = (ax, ay)
+                    nodes[-1] = (ax, ay)
+                else:
+                    existing_mid = wp.path_nodes[1:-1]
+                    candidate = [(ax, ay)] + existing_mid + [(ax, ay)]
+                    nodes = ensure_orthogonal_path(candidate)
+                    if nodes[0] != nodes[-1]:
+                        nodes.append(nodes[0])
             else:
-                if len(wp.path_nodes) > 2 and wp.path_nodes[0] == wp.path_nodes[-1]:
-                    dx = ax - wp.path_nodes[0][0]
-                    dy = ay - wp.path_nodes[0][1]
-                    if dx != 0 or dy != 0:
-                        nodes = [(nx + dx, ny + dy) for nx, ny in wp.path_nodes]
-                    else:
-                        nodes = list(wp.path_nodes)
+                nodes = [(ax, ay), (ax + 24, ay), (ax + 24, ay + 24), (ax, ay + 24), (ax, ay)]
+        else:
+            bx = self.spin_bx.value()
+            by = self.spin_by.value()
+
+            # Recalcular ruta ortogonal AWSD respetando puntos de inflexión manuales
+            if force_recalc or not wp.path_nodes or len(wp.path_nodes) <= 2:
+                if (ax, ay) != (bx, by):
+                    nodes = self.route_canvas.get_orthogonal_nodes(wp.map_id, ax, ay, bx, by)
                 else:
                     nodes = [(ax, ay)]
-        else:
-            # Preservar los puntos de inflexión intermedios ya existentes
-            existing_mid = wp.path_nodes[1:-1]
-            candidate_nodes = [(ax, ay)] + existing_mid + [(bx, by)]
-            nodes = ensure_orthogonal_path(candidate_nodes)
+            else:
+                # Preservar los puntos de inflexión intermedios ya existentes
+                existing_mid = wp.path_nodes[1:-1]
+                candidate_nodes = [(ax, ay)] + existing_mid + [(bx, by)]
+                nodes = ensure_orthogonal_path(candidate_nodes)
 
         wp.spawn_x = ax
         wp.spawn_y = ay
@@ -1581,7 +1749,8 @@ class EditorRutinasNPCWidget(QWidget):
         wp.spawn_dir = self.combo_dir.currentData()
         wp.time_val = self.spin_hour.value() * 60 + self.spin_minute.value()
 
-        is_loop = len(nodes) > 1 and nodes[0] == nodes[-1]
+        # Comprobar nuevamente condición de bucle
+        is_loop = is_loop or (len(nodes) > 1 and nodes[0] == nodes[-1])
 
         # Distancia Manhattan real sobre nodos
         if len(nodes) > 1:
@@ -1660,9 +1829,39 @@ class EditorRutinasNPCWidget(QWidget):
             return
         row = rows[0].row()
         seg = self.current_segments[row]
+        wp = seg["wp_ref"]
+        is_loop = seg.get("is_loop", False) or (len(wp.path_nodes) > 1 and wp.path_nodes[0] == wp.path_nodes[-1])
+
         if hasattr(self.route_canvas, "pathfinder") and self.route_canvas.pathfinder:
             grid = self.route_canvas.pathfinder.get_map_grid(seg["map_id"])
             if grid:
+                if is_loop:
+                    tax, tay = self.route_canvas.pathfinder.snap_to_walkable(grid, self.spin_ax.value(), self.spin_ay.value())
+                    new_ax, new_ay = tax * 8 + 4, tay * 8 + 4
+                    dx = new_ax - wp.spawn_x
+                    dy = new_ay - wp.spawn_y
+                    wp.path_nodes = [(nx + dx, ny + dy) for nx, ny in wp.path_nodes]
+                    wp.path_nodes[0] = (new_ax, new_ay)
+                    wp.path_nodes[-1] = (new_ax, new_ay)
+                    wp.spawn_x, wp.spawn_y = new_ax, new_ay
+                    wp.dest_x, wp.dest_y = new_ax, new_ay
+                    wp.is_edited = True
+                    wp.raw_bytes = None
+                    self._updating_ui = True
+                    self.spin_ax.setValue(new_ax)
+                    self.spin_ay.setValue(new_ay)
+                    self.spin_bx.setValue(new_ax)
+                    self.spin_by.setValue(new_ay)
+                    self._updating_ui = False
+                    seg["ax"], seg["ay"] = new_ax, new_ay
+                    seg["bx"], seg["by"] = new_ax, new_ay
+                    seg["path_nodes"] = list(wp.path_nodes)
+                    seg["is_loop"] = True
+                    self._populate_inflection_combo(wp)
+                    self._on_auto_path_change(force_recalc=False)
+                    self.status_bar.showMessage("🔄 Circuito en bucle centrado en tile caminable de la ROM.", 3000)
+                    return
+
                 tax, tay = self.route_canvas.pathfinder.snap_to_walkable(grid, self.spin_ax.value(), self.spin_ay.value())
                 tbx, tby = self.route_canvas.pathfinder.snap_to_walkable(grid, self.spin_bx.value(), self.spin_by.value())
                 self.spin_ax.setValue(tax * 8 + 4)

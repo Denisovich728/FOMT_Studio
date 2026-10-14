@@ -57,23 +57,30 @@ def aplicar_parche_cultivos(project):
         return False, "No hay ROM cargada."
         
     patch_collision = bytes([0x00, 0x20, 0x70, 0x47])
-    patch_bg_main = bytes([0x79, 0x69])
-    patch_bg_sub = bytes([0x71, 0x69])
+    bg2_patch_turnips = bytes([0x1A, 0x30])
+    bg2_patch_crops = bytes([0x1A, 0x31])
+    revert_bg_main = bytes([0xB9, 0x69])
+    revert_bg_sub = bytes([0xB1, 0x69])
 
     rom = project.base_rom_data if hasattr(project, 'base_rom_data') and project.base_rom_data else project.virtual_rom
-    if rom[0x00A07C : 0x00A07C + 4] == patch_collision and rom[0x0AA748 : 0x0AA748 + 2] == patch_bg_main:
+    if (rom[0x00A07C : 0x00A07C + 4] == patch_collision and 
+        rom[0x06EDCC : 0x06EDCC + 2] == bg2_patch_turnips and
+        rom[0x06EDFC : 0x06EDFC + 2] == bg2_patch_crops):
         return False, "El parche de cultivos caminables y fix BG2 ya está instalado."
 
     if hasattr(project, 'write_patch'):
         project.write_patch(0x00A07C, patch_collision)
-        project.write_patch(0x0AA748, patch_bg_main)
-        project.write_patch(0x0CFF20, patch_bg_sub)
+        project.write_patch(0x06EDCC, bg2_patch_turnips)
+        project.write_patch(0x06EDFC, bg2_patch_crops)
+        project.write_patch(0x0AA748, revert_bg_main)
+        project.write_patch(0x0CFF20, revert_bg_sub)
 
     if hasattr(project, 'base_rom_data') and isinstance(project.base_rom_data, bytearray):
         project.base_rom_data[0x00A07C : 0x00A07C + 4] = patch_collision
-        project.base_rom_data[0x0AA748 : 0x0AA748 + 2] = patch_bg_main
-        project.base_rom_data[0x0CFF20 : 0x0CFF20 + 2] = patch_bg_sub
-
+        project.base_rom_data[0x06EDCC : 0x06EDCC + 2] = bg2_patch_turnips
+        project.base_rom_data[0x06EDFC : 0x06EDFC + 2] = bg2_patch_crops
+        project.base_rom_data[0x0AA748 : 0x0AA748 + 2] = revert_bg_main
+        project.base_rom_data[0x0CFF20 : 0x0CFF20 + 2] = revert_bg_sub
 
     if hasattr(project, 'save'):
         try:
