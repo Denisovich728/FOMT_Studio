@@ -40,9 +40,18 @@ from Consola_de_Comando.settings_dialog import SettingsDialog
 
 class FloatingWindow(QMainWindow):
     def __init__(self, widget, title, parent=None):
-        super().__init__(parent)
+        super().__init__(parent, Qt.WindowType.Window)
         self.setWindowTitle(title)
         self.setCentralWidget(widget)
+        self.window_id = None
+        self.orig_parent = parent
+        self.resize(1300, 850)
+
+    def closeEvent(self, event):
+        if self.orig_parent and hasattr(self.orig_parent, 'floating_windows'):
+            if self in self.orig_parent.floating_windows:
+                self.orig_parent.floating_windows.remove(self)
+        super().closeEvent(event)
 
 class ProjectLoaderThread(QThread):
     progress = pyqtSignal(int, str)
@@ -1025,16 +1034,23 @@ class FoMTStudioApp(QMainWindow):
     def open_map_editor(self, map_id):
         map_header = self.project.map_parser.get_map_by_id(map_id)
         if map_header:
-            for i in range(self.tabs.count()):
-                if self.tabs.tabText(i).startswith(f"Map {map_id}"):
-                    self.tabs.setCurrentIndex(i)
+            window_id = f"map_editor_{map_id}"
+            for win in self.floating_windows:
+                if getattr(win, 'window_id', None) == window_id:
+                    win.show()
+                    win.raise_()
+                    win.activateWindow()
                     return
             editor = MapEditorWidget(self)
             editor.project = self.project
             editor.load_map(map_header)
             editor.openScriptRequested.connect(self.open_event)
-            self.tabs.addTab(editor, f"Map {map_id:03d}")
-            self.tabs.setCurrentWidget(editor)
+            float_win = FloatingWindow(editor, f"Map {map_id:03d} - Editor de Mapas", self)
+            float_win.window_id = window_id
+            float_win.resize(1200, 800)
+            self.floating_windows.append(float_win)
+            float_win.show()
+            self.apply_theme(self.current_theme)
         
     def _on_tree_double_click(self, index):
         item = self.tree_model.itemFromIndex(index)
@@ -1046,19 +1062,7 @@ class FoMTStudioApp(QMainWindow):
         elif type == "NPC":
             self.open_npc_routine(val)
         elif type == "MAP":
-            map_id = val
-            map_header = self.project.map_parser.get_map_by_id(map_id)
-            if map_header:
-                for i in range(self.tabs.count()):
-                    if self.tabs.tabText(i).startswith(f"Map {map_id}"):
-                        self.tabs.setCurrentIndex(i)
-                        return
-                editor = MapEditorWidget(self)
-                editor.project = self.project
-                editor.load_map(map_header)
-                editor.openScriptRequested.connect(self.open_event)
-                self.tabs.addTab(editor, f"Map {map_id:03d}")
-                self.tabs.setCurrentWidget(editor)
+            self.open_map_editor(val)
         elif type == "BULK_ITEMS":
             self.open_bulk_items("Herramientas", "Herramienta")
         elif type == "NATIVE_PROC":
@@ -1105,17 +1109,35 @@ class FoMTStudioApp(QMainWindow):
                 self.tabs.setCurrentIndex(i)
                 return
 
-    def _open_editor_rutinas_npc(self):
-        """Abre el Editor de Rutinas Diarias de NPCs y Macromapa interactivo."""
-        tab_name = "🗺️ Rutinas NPC & Macromapa"
-        for i in range(self.tabs.count()):
-            if self.tabs.tabText(i) == tab_name:
-                self.tabs.setCurrentIndex(i)
+    def _open_editor_rutinas_npc(self, target_npc_id=None):
+        """Abre el Editor de Rutinas Diarias de NPCs y Macromapa interactivo en ventana independiente."""
+        window_id = "editor_rutinas_npc"
+        for win in self.floating_windows:
+            if getattr(win, 'window_id', None) == window_id:
+                win.show()
+                win.raise_()
+                win.activateWindow()
+                if target_npc_id is not None and hasattr(win.centralWidget(), 'combo_npc'):
+                    combo = win.centralWidget().combo_npc
+                    for idx in range(combo.count()):
+                        if combo.itemData(idx) == target_npc_id:
+                            combo.setCurrentIndex(idx)
+                            break
                 return
         from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.editor_rutinas_npc import EditorRutinasNPCWidget
         editor = EditorRutinasNPCWidget(self.project, self)
-        self.tabs.addTab(editor, tab_name)
-        self.tabs.setCurrentWidget(editor)
+        float_win = FloatingWindow(editor, "🗺️ Rutinas Diarias & Macromapa (NPC AI)", self)
+        float_win.window_id = window_id
+        float_win.resize(1400, 900)
+        self.floating_windows.append(float_win)
+        float_win.show()
+        if target_npc_id is not None and hasattr(editor, 'combo_npc'):
+            combo = editor.combo_npc
+            for idx in range(combo.count()):
+                if combo.itemData(idx) == target_npc_id:
+                    combo.setCurrentIndex(idx)
+                    break
+        self.apply_theme(self.current_theme)
 
     def open_intro_editor(self):
         """Abre el editor global de textos de la introducción."""
@@ -1139,17 +1161,8 @@ class FoMTStudioApp(QMainWindow):
         self.tabs.setCurrentWidget(ide)
 
     def open_npc_routine(self, npc_id):
-        npc_data = self.project.npc_parser.npcs[npc_id]
-        tab_name = f"Routine: {npc_data.name_str.strip()}"
-        for i in range(self.tabs.count()):
-            if self.tabs.tabText(i) == tab_name:
-                self.tabs.setCurrentIndex(i)
-                return
-        ide = ScriptIDEWidget(self.project, self)
-        code, _ = self.project.schedule_parser.decode_npc_schedule(npc_data)
-        ide.editor.setPlainText(code)
-        self.tabs.addTab(ide, tab_name)
-        self.tabs.setCurrentWidget(ide)
+        """Abre el Editor de Rutinas Diarias y Orquestador de Movimientos en ventana independiente."""
+        self._open_editor_rutinas_npc(target_npc_id=npc_id)
 
     def open_native_proc(self, call_id):
         """Abre un pseudo-decompilador de rutina nativa en una pestaña nueva."""

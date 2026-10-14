@@ -242,13 +242,17 @@ class RouteOverlayItem(QGraphicsItem):
         self.setZValue(20)
         self.waypoints_data: List[dict] = []
         self.path_points: List[Tuple[QPointF, str]] = []
+        # Tramos A -> B orquestados (para modo por mapa o por NPC)
+        self.orchestrated_segments: List[dict] = []
+        self.highlighted_seg_id: Optional[str] = None
 
     def set_route(self, waypoints: List[dict], node_items: Dict[int, MapNodeItem]):
+        self.orchestrated_segments.clear()
         self.waypoints_data = waypoints
         self.path_points.clear()
 
         for idx, wp in enumerate(waypoints):
-            mid = wp.get("map_id", 0)
+            mid = wp.get("map_id", 0) & 0xFF
             n_item = node_items.get(mid)
             if not n_item:
                 continue
@@ -268,56 +272,158 @@ class RouteOverlayItem(QGraphicsItem):
         self.prepareGeometryChange()
         self.update()
 
+    def set_orchestrated_segments(self, segments: List[dict], node_items: Dict[int, MapNodeItem],
+                                  highlight_id: Optional[str] = None):
+        """Configura los tramos orquestados A -> B con delays y velocidades."""
+        self.path_points.clear()
+        self.orchestrated_segments.clear()
+        self.highlighted_seg_id = highlight_id
+
+        # Paleta de colores para NPCs distintos
+        npc_palette = [
+            "#FF1744", "#00E5FF", "#76FF03", "#FFD600", "#D500F9",
+            "#FF6D00", "#00E676", "#2979FF", "#F50057", "#00B0FF"
+        ]
+
+        for idx, seg in enumerate(segments):
+            mid = seg.get("map_id", 0) & 0xFF
+            n_item = node_items.get(mid)
+            if not n_item:
+                continue
+
+            w_rect = n_item.rect().width()
+            h_rect = n_item.rect().height()
+            mw = max(1, n_item.node.width * 16)
+            mh = max(1, n_item.node.height * 16)
+
+            # Posición punto A
+            nxa = max(0.08, min(0.92, seg.get("ax", 0) / mw))
+            nya = max(0.22, min(0.92, seg.get("ay", 0) / mh))
+            pt_a = n_item.pos() + QPointF(nxa * w_rect, nya * h_rect)
+
+            # Posición punto B
+            nxb = max(0.08, min(0.92, seg.get("bx", 0) / mw))
+            nyb = max(0.22, min(0.92, seg.get("by", 0) / mh))
+            pt_b = n_item.pos() + QPointF(nxb * w_rect, nyb * h_rect)
+
+            color = npc_palette[seg.get("npc_id", 0) % len(npc_palette)]
+
+            self.orchestrated_segments.append({
+                "id": seg.get("id", str(idx)),
+                "npc_name": seg.get("npc_name", "NPC"),
+                "pt_a": pt_a,
+                "pt_b": pt_b,
+                "color": color,
+                "speed": seg.get("speed_str", "1.0x"),
+                "delay": seg.get("delay_str", "0m"),
+                "time_str": seg.get("time_str", ""),
+                "is_highlight": (seg.get("id") == highlight_id)
+            })
+
+        self.prepareGeometryChange()
+        self.update()
+
     def boundingRect(self) -> QRectF:
-        if not self.path_points:
+        all_pts = [p for p, _ in self.path_points]
+        for s in self.orchestrated_segments:
+            all_pts.extend([s["pt_a"], s["pt_b"]])
+
+        if not all_pts:
             return QRectF()
-        rect = QRectF(self.path_points[0][0], self.path_points[0][0])
-        for pt, _ in self.path_points:
-            rect = rect.united(QRectF(pt.x() - 40, pt.y() - 40, 80, 80))
-        return rect.adjusted(-50, -50, 50, 50)
+        rect = QRectF(all_pts[0], all_pts[0])
+        for pt in all_pts:
+            rect = rect.united(QRectF(pt.x() - 50, pt.y() - 50, 100, 100))
+        return rect.adjusted(-60, -60, 60, 60)
 
     def paint(self, painter: QPainter, option, widget=None):
-        if len(self.path_points) < 1:
-            return
-
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # 1. Línea continua animada de la ruta
-        if len(self.path_points) > 1:
-            route_path = QPainterPath()
-            route_path.moveTo(self.path_points[0][0])
-            for pt, _ in self.path_points[1:]:
-                route_path.lineTo(pt)
+        # 1. Modo por defecto: Hitos secuenciales de un solo NPC
+        if self.path_points:
+            if len(self.path_points) > 1:
+                route_path = QPainterPath()
+                route_path.moveTo(self.path_points[0][0])
+                for pt, _ in self.path_points[1:]:
+                    route_path.lineTo(pt)
 
-            glow_pen = QPen(QColor(255, 64, 129, 90), 8)
-            painter.setPen(glow_pen)
-            painter.drawPath(route_path)
+                glow_pen = QPen(QColor(255, 64, 129, 90), 8)
+                painter.setPen(glow_pen)
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.strokePath(route_path, glow_pen)
 
-            route_pen = QPen(QColor("#FF4081"), 3, Qt.PenStyle.DashLine)
-            painter.setPen(route_pen)
-            painter.drawPath(route_path)
+                route_pen = QPen(QColor("#FF4081"), 3, Qt.PenStyle.DashLine)
+                painter.setPen(route_pen)
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.strokePath(route_path, route_pen)
 
-        # 2. Pines de hitos numerados (Google Maps style)
-        for idx, (pt, label) in enumerate(self.path_points):
-            # Círculo del pin
-            painter.setBrush(QBrush(QColor("#FF4081")))
-            painter.setPen(QPen(QColor("#FFFFFF"), 2))
-            painter.drawEllipse(pt, 12, 12)
+            for idx, (pt, label) in enumerate(self.path_points):
+                painter.setBrush(QBrush(QColor("#FF4081")))
+                painter.setPen(QPen(QColor("#FFFFFF"), 2))
+                painter.drawEllipse(pt, 12, 12)
 
-            # Número
-            painter.setFont(QFont("Segoe UI", 8, QFont.Weight.Bold))
-            painter.setPen(QColor("#FFFFFF"))
-            painter.drawText(QRectF(pt.x() - 10, pt.y() - 10, 20, 20),
-                             Qt.AlignmentFlag.AlignCenter, str(idx + 1))
+                painter.setFont(QFont("Segoe UI", 8, QFont.Weight.Bold))
+                painter.setPen(QColor("#FFFFFF"))
+                painter.drawText(QRectF(pt.x() - 10, pt.y() - 10, 20, 20),
+                                 Qt.AlignmentFlag.AlignCenter, str(idx + 1))
 
-            # Etiqueta con hora
-            painter.setBrush(QBrush(QColor(20, 20, 25, 220)))
-            painter.setPen(QPen(QColor("#FF80AB"), 1))
-            lbl_rect = QRectF(pt.x() - 40, pt.y() - 32, 80, 18)
-            painter.drawRoundedRect(lbl_rect, 4, 4)
+                painter.setBrush(QBrush(QColor(20, 20, 25, 220)))
+                painter.setPen(QPen(QColor("#FF80AB"), 1))
+                lbl_rect = QRectF(pt.x() - 40, pt.y() - 32, 80, 18)
+                painter.drawRoundedRect(lbl_rect, 4, 4)
+                painter.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+                painter.setPen(QColor("#FFFFFF"))
+                painter.drawText(lbl_rect, Qt.AlignmentFlag.AlignCenter, label)
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+
+        # 2. Modo Orquestador de Tramos A -> B (Delays, Velocidades, Por Mapa o NPC)
+        for seg in self.orchestrated_segments:
+            pt_a = seg["pt_a"]
+            pt_b = seg["pt_b"]
+            c = QColor(seg["color"])
+            is_hl = seg.get("is_highlight", False)
+
+            # Línea de trayectoria A -> B
+            line_w = 4.0 if is_hl else 2.5
+            alpha = 255 if is_hl else 180
+            pen_color = QColor(c.red(), c.green(), c.blue(), alpha)
+
+            if is_hl:
+                # Halo de resalto
+                halo_pen = QPen(QColor(c.red(), c.green(), c.blue(), 100), 10)
+                painter.setPen(halo_pen)
+                painter.drawLine(pt_a, pt_b)
+
+            painter.setPen(QPen(pen_color, line_w, Qt.PenStyle.SolidLine if is_hl else Qt.PenStyle.DashLine))
+            painter.drawLine(pt_a, pt_b)
+
+            # Punto A (Inicio)
+            painter.setBrush(QBrush(QColor("#00E676")))
+            painter.setPen(QPen(QColor("#FFFFFF"), 1.5))
+            painter.drawEllipse(pt_a, 7, 7)
+            painter.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+            painter.setPen(QColor("#000000"))
+            painter.drawText(QRectF(pt_a.x() - 6, pt_a.y() - 6, 12, 12), Qt.AlignmentFlag.AlignCenter, "A")
+
+            # Punto B (Llegada)
+            painter.setBrush(QBrush(QColor("#FF1744")))
+            painter.setPen(QPen(QColor("#FFFFFF"), 1.5))
+            painter.drawEllipse(pt_b, 7, 7)
             painter.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
             painter.setPen(QColor("#FFFFFF"))
-            painter.drawText(lbl_rect, Qt.AlignmentFlag.AlignCenter, label)
+            painter.drawText(QRectF(pt_b.x() - 6, pt_b.y() - 6, 12, 12), Qt.AlignmentFlag.AlignCenter, "B")
+
+            # Etiqueta de Orquestación en el centro del tramo (Velocidad, Delay, NPC)
+            mid_pt = QPointF((pt_a.x() + pt_b.x()) / 2, (pt_a.y() + pt_b.y()) / 2)
+            tag_text = f"{seg['npc_name']} | Vel:{seg['speed']} | Wait:{seg['delay']}"
+
+            painter.setBrush(QBrush(QColor(13, 17, 23, 230)))
+            painter.setPen(QPen(c if is_hl else QColor("#30363D"), 1.5 if is_hl else 1))
+            tag_rect = QRectF(mid_pt.x() - 65, mid_pt.y() - 11, 130, 22)
+            painter.drawRoundedRect(tag_rect, 5, 5)
+
+            painter.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold if is_hl else QFont.Weight.Normal))
+            painter.setPen(QColor("#FFFFFF"))
+            painter.drawText(tag_rect, Qt.AlignmentFlag.AlignCenter, tag_text)
 
 
 class MacroMapView(QGraphicsView):
@@ -454,6 +560,10 @@ class MacroMapView(QGraphicsView):
     def set_active_npc_route(self, waypoints: List[dict]):
         """Dibuja en tiempo real la ruta del NPC activo sobre el Macromapa."""
         self.route_overlay.set_route(waypoints, self.node_items)
+
+    def set_active_orchestrated_segments(self, segments: List[dict], highlight_id: Optional[str] = None):
+        """Dibuja los tramos orquestados A -> B con velocidades y delays."""
+        self.route_overlay.set_orchestrated_segments(segments, self.node_items, highlight_id)
 
     def drawBackground(self, painter: QPainter, rect: QRectF):
         super().drawBackground(painter, rect)

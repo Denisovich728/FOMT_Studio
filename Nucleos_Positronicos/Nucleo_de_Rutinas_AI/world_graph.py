@@ -18,12 +18,11 @@ import math
 import heapq
 from typing import Dict, List, Optional, Tuple, Any
 
+from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.fomt_map_names import (
+    get_map_display_name, unpack_fomt_map_id, CANONICAL_MAP_INFO
+)
+
 # Direcciones nativas FoMT GBA:
-# 0: Abajo (+Y)
-# 1: Arriba (-Y)
-# 2: Izquierda (-X)
-# 3: Derecha (+X)
-# 4: Frente / Sentado / Especial
 DIR_DOWN = 0
 DIR_UP = 1
 DIR_LEFT = 2
@@ -188,6 +187,10 @@ class WorldGraph:
                 data = json.load(f)
             for n_data in data.get("nodes", []):
                 node = MapNode.from_dict(n_data)
+                # Actualizar nombre canónico si estaba desactualizado
+                canonical_name = get_map_display_name(node.map_id)
+                if canonical_name and "Mapa 0x" not in canonical_name:
+                    node.name = canonical_name
                 graph.add_node(node)
             for c_data in data.get("connections", []):
                 conn = WarpConnection.from_dict(c_data)
@@ -200,22 +203,21 @@ class WorldGraph:
         return graph
 
     def init_default_topology(self):
-        """Inicializa una topología por defecto con los mapas principales de Mineral Town."""
+        """Inicializa una topología completa con los mapas oficiales de Mineral Town."""
         self.nodes.clear()
         self.connections.clear()
 
-        # Configuración inicial espacial tipo Google Maps / Macromapa
-        # Coordenadas canvas para un layout armónico y ordenado
+        # Configuración espacial estructurada tipo Macromapa de Mineral Town
+        # (ID base de Fomt_Mapas.csv, Nombre, CanvasX, CanvasY, Ancho, Alto, Warps)
         default_maps = [
-            # ID, Nombre, CanvasX, CanvasY, Ancho, Alto, Warps[(id, name, x, y)]
-            (0x02, "Farm (Granja)", 400, 500, 80, 80, [
+            (0x02, get_map_display_name(0x02), 400, 500, 80, 80, [
                 ("to_town", "Salida Norte hacia Pueblo Sur", 400, 32),
                 ("to_forest", "Salida Oeste hacia Bosque", 32, 400),
                 ("to_house", "Puerta de la Casa", 360, 240),
                 ("to_barn", "Puerta del Establo", 200, 200),
                 ("to_coop", "Puerta del Gallinero", 500, 200),
             ]),
-            (0x07, "South_Side_Town (Pueblo Sur)", 400, 250, 70, 50, [
+            (0x07, get_map_display_name(0x07), 400, 250, 75, 50, [
                 ("to_farm", "Entrada Sur desde Granja", 350, 380),
                 ("to_north", "Camino Norte hacia Pueblo Norte", 350, 20),
                 ("to_square", "Camino Este hacia Plaza Rosa", 540, 200),
@@ -223,55 +225,131 @@ class WorldGraph:
                 ("to_barley", "Granja Yodel (Vacas)", 480, 320),
                 ("to_inn", "Taberna de Doug (Entrada Sur)", 300, 80),
             ]),
-            (0x05, "North_Side_Town (Pueblo Norte)", 400, 50, 70, 50, [
+            (0x05, get_map_display_name(0x05), 400, 50, 75, 50, [
                 ("to_south", "Camino Sur hacia Pueblo Sur", 350, 380),
                 ("to_supermarket", "Supermercado Jeff", 180, 160),
                 ("to_clinic", "Clínica Mineral", 280, 160),
                 ("to_mayor", "Casa del Alcalde Thomas", 100, 280),
                 ("to_ellen", "Casa de Ellen", 480, 280),
                 ("to_library", "Biblioteca de Mary", 560, 160),
+                ("to_saibara", "Herrería de Saibara", 620, 280),
+                ("to_church", "Camino Norte hacia Iglesia", 350, 20),
             ]),
-            (0x06, "Rose_Square (Plaza Rosa)", 700, 250, 60, 50, [
+            (0x06, get_map_display_name(0x06), 700, 250, 60, 50, [
                 ("to_south", "Salida Oeste hacia Pueblo Sur", 30, 250),
                 ("to_beach", "Camino Sur hacia Playa", 250, 380),
+                ("to_winery", "Entrada a Bodega Aja", 150, 40),
             ]),
-            (0x01, "Mineral_Beach (Playa Mineral)", 700, 500, 70, 60, [
+            (0x01, get_map_display_name(0x01), 700, 500, 70, 60, [
                 ("to_square", "Salida Norte hacia Plaza", 350, 20),
                 ("to_zack", "Casa de Zack", 120, 200),
-                ("to_kai", "Restaurante de Kai", 400, 200),
+                ("to_kai", "Chiringuito de Kai", 400, 200),
             ]),
-            (0x03, "Forest (Bosque)", 100, 500, 70, 70, [
+            (0x03, get_map_display_name(0x03), 100, 500, 70, 70, [
                 ("to_farm", "Salida Este hacia Granja", 540, 350),
                 ("to_gotz", "Cabaña de Gotz (Carpintero)", 200, 250),
                 ("to_mountain", "Camino hacia Montaña", 100, 100),
             ]),
-            (0x00, "Mothers_Hill (Colina Madre)", 100, 250, 80, 80, [
+            (0x00, get_map_display_name(0x00), 100, 250, 80, 80, [
                 ("to_forest", "Camino Sur hacia Bosque", 400, 600),
                 ("to_peak", "Cima de la Colina", 400, 40),
-                ("to_hotsprings", "Aguas Termales & Diosa", 250, 300),
+                ("to_hotsprings", "Aguas Termales & Cascada Diosa", 250, 300),
                 ("to_mine", "Entrada a Mina", 150, 350),
             ]),
-            (0x0C, "Church (Iglesia)", 400, -120, 40, 35, [
-                ("exit", "Puerta de Salida", 160, 260),
-                ("to_behind", "Puerta Trasera", 160, 40),
+            (0x08, get_map_display_name(0x08), 100, 50, 60, 50, [
+                ("to_middle", "Camino hacia Colina Media", 300, 380),
             ]),
-            (0x0F, "Jeff_Shop / Supermarket", 160, -80, 45, 40, [
+            (0x0C, get_map_display_name(0x0C), 400, -120, 40, 35, [
+                ("exit", "Puerta Principal de Salida", 160, 260),
+                ("to_behind", "Puerta Trasera al Jardín", 160, 40),
+            ]),
+            (0x04, get_map_display_name(0x04), 400, -220, 40, 30, [
+                ("to_church", "Entrada desde Iglesia", 160, 200),
+            ]),
+            (0x0F, get_map_display_name(0x0F), 160, -80, 45, 40, [
                 ("exit", "Puerta Principal", 180, 280),
                 ("to_back", "Puerta a Trastienda", 80, 60),
             ]),
-            (0x13, "Mineral_Clinic (Clínica)", 280, -80, 40, 35, [
-                ("exit", "Puerta Principal", 160, 260),
+            (0x10, get_map_display_name(0x10), 160, -170, 40, 30, [
+                ("to_shop", "Puerta a Supermercado", 160, 200),
             ]),
-            (0x15, "Doug_Inn (Posada / Bar)", 600, 50, 50, 45, [
+            (0x13, get_map_display_name(0x13), 280, -80, 40, 35, [
+                ("exit", "Puerta Principal", 160, 260),
+                ("to_floor2", "Escaleras Planta Alta", 220, 60),
+            ]),
+            (0x14, get_map_display_name(0x14), 280, -170, 40, 30, [
+                ("to_floor1", "Escaleras Planta Baja", 220, 200),
+            ]),
+            (0x15, get_map_display_name(0x15), 600, 50, 50, 45, [
                 ("exit", "Puerta Principal", 200, 300),
                 ("to_floor2", "Escaleras Planta Alta", 100, 60),
+                ("to_kitchen", "Puerta a Cocina", 50, 100),
             ]),
-            (0x18, "Mary_Library (Biblioteca)", 720, -80, 45, 40, [
+            (0x16, get_map_display_name(0x16), 680, 50, 35, 35, [
+                ("to_inn", "Puerta a Sala Principal", 40, 160),
+            ]),
+            (0x17, get_map_display_name(0x17), 600, -60, 50, 40, [
+                ("to_floor1", "Escaleras Planta Baja", 100, 220),
+            ]),
+            (0x18, get_map_display_name(0x18), 720, -80, 45, 40, [
                 ("exit", "Puerta Principal", 160, 280),
                 ("to_floor2", "Escaleras Planta Alta", 80, 60),
             ]),
-            (0x0A, "Poultry_Farm_House (Casa Gallinas)", 160, 250, 40, 35, [
+            (0x19, get_map_display_name(0x19), 720, -170, 45, 35, [
+                ("to_floor1", "Escaleras Planta Baja", 80, 200),
+            ]),
+            (0x1A, get_map_display_name(0x1A), 840, -80, 45, 40, [
+                ("exit", "Puerta Principal", 160, 280),
+                ("to_floor2", "Escaleras Planta Alta", 80, 60),
+            ]),
+            (0x1B, get_map_display_name(0x1B), 840, -170, 45, 35, [
+                ("to_floor1", "Escaleras Planta Baja", 80, 200),
+            ]),
+            (0x0A, get_map_display_name(0x0A), 160, 250, 40, 35, [
                 ("exit", "Puerta Principal", 160, 260),
+                ("to_floor2", "Escaleras Planta Alta", 80, 60),
+            ]),
+            (0x0B, get_map_display_name(0x0B), 160, 160, 40, 30, [
+                ("to_floor1", "Escaleras Planta Baja", 80, 200),
+            ]),
+            (0x29, get_map_display_name(0x29), 600, 380, 45, 40, [
+                ("exit", "Puerta Principal", 160, 260),
+                ("to_floor2", "Escaleras Planta Alta", 80, 60),
+            ]),
+            (0x2A, get_map_display_name(0x2A), 600, 470, 45, 35, [
+                ("to_floor1", "Escaleras Planta Baja", 80, 200),
+            ]),
+            (0x26, get_map_display_name(0x26), 520, -80, 40, 35, [
+                ("exit", "Puerta Principal", 160, 260),
+            ]),
+            (0x28, get_map_display_name(0x28), -40, 500, 45, 40, [
+                ("exit", "Puerta Principal", 160, 260),
+            ]),
+            (0x1E, get_map_display_name(0x1E), 40, 50, 45, 40, [
+                ("exit", "Puerta Principal", 160, 260),
+            ]),
+            (0x0E, get_map_display_name(0x0E), -80, 50, 45, 40, [
+                ("exit", "Puerta Principal", 160, 260),
+            ]),
+            (0x0D, get_map_display_name(0x0D), 840, 500, 45, 40, [
+                ("exit", "Puerta Principal", 160, 260),
+            ]),
+            (0x24, get_map_display_name(0x24), 840, 420, 45, 35, [
+                ("exit", "Puerta Principal", 160, 200),
+            ]),
+            (0x1F, get_map_display_name(0x1F), 840, 200, 50, 45, [
+                ("exit", "Puerta Principal", 160, 260),
+                ("to_floor2", "Escaleras Planta Alta", 80, 60),
+                ("to_storage", "Puerta a Bodega", 240, 100),
+            ]),
+            (0x20, get_map_display_name(0x20), 840, 110, 50, 35, [
+                ("to_floor1", "Escaleras Planta Baja", 80, 200),
+            ]),
+            (0x22, get_map_display_name(0x22), 940, 200, 50, 45, [
+                ("exit", "Salida a Bodega", 160, 260),
+            ]),
+            (0x1D, get_map_display_name(0x1D), 400, 620, 50, 40, [
+                ("exit", "Puerta de Salida", 160, 260),
             ]),
         ]
 
@@ -289,11 +367,32 @@ class WorldGraph:
             ("c_square_beach", 0x06, "to_beach", 0x01, "to_square", True, "Plaza Rosa <-> Playa"),
             ("c_farm_forest", 0x02, "to_forest", 0x03, "to_farm", True, "Granja <-> Bosque"),
             ("c_forest_hill", 0x03, "to_mountain", 0x00, "to_forest", True, "Bosque <-> Colina Madre"),
+            ("c_hill_peak", 0x00, "to_peak", 0x08, "to_middle", True, "Colina Media <-> Cima de la Colina"),
             ("c_north_super", 0x05, "to_supermarket", 0x0F, "exit", True, "Pueblo Norte <-> Supermercado"),
+            ("c_super_back", 0x0F, "to_back", 0x10, "to_shop", True, "Supermercado <-> Trastienda"),
             ("c_north_clinic", 0x05, "to_clinic", 0x13, "exit", True, "Pueblo Norte <-> Clínica"),
+            ("c_clinic_stairs", 0x13, "to_floor2", 0x14, "to_floor1", True, "Clínica P1 <-> P2"),
             ("c_north_lib", 0x05, "to_library", 0x18, "exit", True, "Pueblo Norte <-> Biblioteca"),
+            ("c_lib_stairs", 0x18, "to_floor2", 0x19, "to_floor1", True, "Biblioteca P1 <-> P2"),
+            ("c_north_church", 0x05, "to_church", 0x0C, "exit", True, "Pueblo Norte <-> Iglesia"),
+            ("c_church_behind", 0x0C, "to_behind", 0x04, "to_church", True, "Iglesia <-> Jardín Trasero"),
             ("c_south_poultry", 0x07, "to_poultry", 0x0A, "exit", True, "Pueblo Sur <-> Granja Avícola"),
+            ("c_poultry_stairs", 0x0A, "to_floor2", 0x0B, "to_floor1", True, "Granja Avícola P1 <-> P2"),
             ("c_south_inn", 0x07, "to_inn", 0x15, "exit", True, "Pueblo Sur <-> Posada"),
+            ("c_inn_stairs", 0x15, "to_floor2", 0x17, "to_floor1", True, "Posada P1 <-> P2"),
+            ("c_inn_kitchen", 0x15, "to_kitchen", 0x16, "to_inn", True, "Posada <-> Cocina"),
+            ("c_south_barley", 0x07, "to_barley", 0x29, "exit", True, "Pueblo Sur <-> Granja Yodel"),
+            ("c_barley_stairs", 0x29, "to_floor2", 0x2A, "to_floor1", True, "Granja Yodel P1 <-> P2"),
+            ("c_forest_gotz", 0x03, "to_gotz", 0x28, "exit", True, "Bosque <-> Cabaña Gotz"),
+            ("c_north_saibara", 0x05, "to_saibara", 0x26, "exit", True, "Pueblo Norte <-> Herrería Saibara"),
+            ("c_north_mayor", 0x05, "to_mayor", 0x1E, "exit", True, "Pueblo Norte <-> Casa del Alcalde"),
+            ("c_north_ellen", 0x05, "to_ellen", 0x0E, "exit", True, "Pueblo Norte <-> Casa de Ellen"),
+            ("c_beach_zack", 0x01, "to_zack", 0x0D, "exit", True, "Playa <-> Casa de Zack"),
+            ("c_beach_kai", 0x01, "to_kai", 0x24, "exit", True, "Playa <-> Chiringuito Kai"),
+            ("c_square_winery", 0x06, "to_winery", 0x1F, "exit", True, "Plaza Rosa <-> Bodega Aja"),
+            ("c_winery_stairs", 0x1F, "to_floor2", 0x20, "to_floor1", True, "Bodega Aja P1 <-> P2"),
+            ("c_winery_cellar", 0x1F, "to_storage", 0x22, "exit", True, "Bodega Aja <-> Cava"),
+            ("c_farm_house", 0x02, "to_house", 0x1D, "exit", True, "Granja <-> Casa del Jugador"),
         ]
 
         for cid, f_m, f_w, t_m, t_w, bidir, note in default_conns:
