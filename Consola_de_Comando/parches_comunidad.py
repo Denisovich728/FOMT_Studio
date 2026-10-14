@@ -52,43 +52,37 @@ def aplicar_parche_escaleras(project):
     return True, f"Parche instalado. Rutina alojada en 0x{free_space:06X}."
 
 def aplicar_parche_cultivos(project):
-    """Inyecta la rutina de cultivos traspasables y el parche visual."""
-    if not project or not project.base_rom_data:
+    """Inyecta la rutina de cultivos caminables y corrección de Z-Sorting a BG2."""
+    if not project or (not getattr(project, 'base_rom_data', None) and not getattr(project, 'virtual_rom', None)):
         return False, "No hay ROM cargada."
         
-    rom = project.base_rom_data
-    
-    # Comprobar hook (leyendo 0x00A07C)
-    if rom[0x00A07C:0x00A07C+4] == bytearray([0x00, 0x49, 0x08, 0x47]):
-        return False, "El parche de cultivos ya está instalado."
-        
-    crops_collision_code = bytearray([
-        0x10, 0xB5, 0x01, 0x68, 0x08, 0x05, 0x00, 0x0F, 0x01, 0x28, 0x06, 0xD9, 
-        0x07, 0x28, 0x0B, 0xD8, 0x74, 0x46, 0x06, 0x4A, 0x94, 0x42, 0x07, 0xD0, 
-        0x00, 0xE0, 0xC0, 0x06, 0x00, 0x0E, 0x14, 0x28, 0x02, 0xD0, 0x00, 0x20, 
-        0x10, 0xBD, 0x00, 0x20, 0x10, 0xBD, 0x01, 0x20, 0x10, 0xBD, 0x34, 0x2A, 
-        0x01, 0x08
-    ])
-    
-    free_space = project.gestor_memoria._find_free_space(len(crops_collision_code))
-    
-    # Inyectar Crops Code
-    rom[free_space : free_space+len(crops_collision_code)] = crops_collision_code
-    crops_ptr = free_space + 0x08000000 + 1
-    
-    # Hook Crops Collision
-    hook_crops = bytearray([0x00, 0x49, 0x08, 0x47]) + crops_ptr.to_bytes(4, 'little')
-    rom[0x00A07C : 0x00A07C+8] = hook_crops
-    
-    # Visual Crops Patch
-    visual_crops_code = bytearray([
-        0x24, 0x09, 0x07, 0x34, 0x1F, 0x25, 0x2C, 0x40, 
-        0x46, 0x09, 0x2E, 0x40, 0xE6, 0x1A, 0x01, 0x36, 
-        0x2E, 0x40, 0x04, 0x2E, 0x01, 0xDA
-    ])
-    rom[0x07D5A4 : 0x07D5A4+len(visual_crops_code)] = visual_crops_code
-    
-    return True, f"Parche instalado. Rutina alojada en 0x{free_space:06X}."
+    patch_collision = bytes([0x00, 0x20, 0x70, 0x47])
+    patch_bg_main = bytes([0x79, 0x69])
+    patch_bg_sub = bytes([0x71, 0x69])
+
+    rom = project.base_rom_data if hasattr(project, 'base_rom_data') and project.base_rom_data else project.virtual_rom
+    if rom[0x00A07C : 0x00A07C + 4] == patch_collision and rom[0x0AA748 : 0x0AA748 + 2] == patch_bg_main:
+        return False, "El parche de cultivos caminables y fix BG2 ya está instalado."
+
+    if hasattr(project, 'write_patch'):
+        project.write_patch(0x00A07C, patch_collision)
+        project.write_patch(0x0AA748, patch_bg_main)
+        project.write_patch(0x0CFF20, patch_bg_sub)
+
+    if hasattr(project, 'base_rom_data') and isinstance(project.base_rom_data, bytearray):
+        project.base_rom_data[0x00A07C : 0x00A07C + 4] = patch_collision
+        project.base_rom_data[0x0AA748 : 0x0AA748 + 2] = patch_bg_main
+        project.base_rom_data[0x0CFF20 : 0x0CFF20 + 2] = patch_bg_sub
+
+
+    if hasattr(project, 'save'):
+        try:
+            project.save()
+        except Exception:
+            pass
+
+    return True, "Parche instalado: Cultivos 100% caminables y Z-sorting de BG corregido."
+
 
 def aplicar_parche_tp_stone(project):
     """Aplica un NOP para remover la restricción de año 3 para el Teleport Stone."""
