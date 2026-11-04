@@ -465,16 +465,7 @@ class NpcDetailDialog(QDialog):
         img_filename = f"{hex_id}_{target_portrait_name}.png"
         img_path = os.path.join(dump_dir, img_filename)
         
-        # Prioridad 1: Cargar PNG desde portraits_dump
-        if os.path.exists(img_path):
-            try:
-                pix = QPixmap(img_path).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
-                self.lbl_portrait.setPixmap(pix)
-                return
-            except Exception as e:
-                print(f"Error cargando PNG: {e}")
-
-        # Prioridad 2: Decodificar dinámicamente en RAM directamente vía Melody Portrait Engine
+        # Prioridad 1: Decodificar dinámicamente en RAM directamente vía Melody Portrait Engine
         try:
             proj = getattr(parent, 'project', None)
             rom = getattr(proj, 'virtual_rom', None) or getattr(proj, 'rom_data', None)
@@ -486,6 +477,15 @@ class NpcDetailDialog(QDialog):
                     return
         except Exception as e:
             print(f"Error decodificando retrato directamente desde Melody en RAM: {e}")
+
+        # Prioridad 2: Fallback a PNG en disco desde portraits_dump
+        if os.path.exists(img_path):
+            try:
+                pix = QPixmap(img_path).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
+                self.lbl_portrait.setPixmap(pix)
+                return
+            except Exception as e:
+                print(f"Error cargando PNG: {e}")
 
         self.lbl_portrait.setText(tr('no_rom_data', lang))
 

@@ -119,7 +119,10 @@ class ASTOptimizer:
                     
                     # 5. Reemplazar y limpiar la lista
                     stmts[i] = new_if_else
-                    del stmts[i + 1 : found_label_idx + 1]
+                    if self.refcounts.get(target_id, 0) <= 0:
+                        del stmts[i + 1 : found_label_idx + 1]
+                    else:
+                        del stmts[i + 1 : found_label_idx]
                     
                     # Re-analizar este mismo índice por si el nuevo IfElse es parte de otro bloque
                     continue
@@ -145,9 +148,10 @@ class ASTOptimizer:
                 s.body = self._resolve_breaks(s.body, exit_label)
             elif isinstance(s, StmtGoto) and exit_label:
                 # Heurística: es un break si apunta exactamente al final o más allá (salto de salida)
-                target_order = self.label_order.get(s.jump_id, -1)
+                target = self.alias_map.get(s.jump_id, s.jump_id)
+                target_order = self.label_order.get(target, -1)
                 exit_order = self.label_order.get(exit_label, -1)
-                if s.jump_id == exit_label or (target_order != -1 and exit_order != -1 and target_order >= exit_order):
+                if target == exit_label or (target_order != -1 and exit_order != -1 and target_order >= exit_order):
                     stmts[i] = StmtBreak()
         return stmts
 
@@ -179,30 +183,43 @@ class ASTOptimizer:
         return stmts
 
     def _find_aliases(self, stmts: List[Stmt]):
-        i = 0
-        while i < len(stmts) - 1:
-            curr = stmts[i]
-            next_s = stmts[i+1]
-            
-            # Caso A: Etiqueta -> Etiqueta
-            if isinstance(curr, StmtLabel) and isinstance(next_s, StmtLabel):
-                self.alias_map[curr.jump_id] = next_s.jump_id
-                # El refcount de la primera pasa a la segunda
-                self.refcounts[next_s.jump_id] = self.refcounts.get(next_s.jump_id, 0) + self.refcounts.get(curr.jump_id, 0)
-                self.refcounts[curr.jump_id] = 0
-                stmts.pop(i)
-                continue
-            
-            # Caso B: Etiqueta -> Goto (Redirección directa)
-            if isinstance(curr, StmtLabel) and isinstance(next_s, StmtGoto):
-                self.alias_map[curr.jump_id] = next_s.jump_id
-                self.refcounts[next_s.jump_id] = self.refcounts.get(next_s.jump_id, 0) + self.refcounts.get(curr.jump_id, 0)
-                self.refcounts[curr.jump_id] = 0
-                # No podemos borrar el goto, pero sí la etiqueta
-                stmts.pop(i)
-                continue
+        def scan_list(s_list: List[Stmt]):
+            i = 0
+            while i < len(s_list) - 1:
+                curr = s_list[i]
+                next_s = s_list[i+1]
                 
-            i += 1
+                # Caso A: Etiqueta -> Etiqueta
+                if isinstance(curr, StmtLabel) and isinstance(next_s, StmtLabel):
+                    self.alias_map[curr.jump_id] = next_s.jump_id
+                    self.refcounts[next_s.jump_id] = self.refcounts.get(next_s.jump_id, 0) + self.refcounts.get(curr.jump_id, 0)
+                    self.refcounts[curr.jump_id] = 0
+                    s_list.pop(i)
+                    continue
+                
+                # Caso B: Etiqueta -> Goto (Redirección directa)
+                if isinstance(curr, StmtLabel) and isinstance(next_s, StmtGoto):
+                    self.alias_map[curr.jump_id] = next_s.jump_id
+                    self.refcounts[next_s.jump_id] = self.refcounts.get(next_s.jump_id, 0) + self.refcounts.get(curr.jump_id, 0)
+                    self.refcounts[curr.jump_id] = 0
+                    s_list.pop(i)
+                    continue
+                    
+                i += 1
+                
+            for s in s_list:
+                if isinstance(s, StmtIf):
+                    scan_list(s.stmts)
+                elif isinstance(s, StmtIfElse):
+                    scan_list(s.true_stmts)
+                    scan_list(s.false_stmts)
+                elif isinstance(s, StmtSwitch):
+                    for case in s.cases:
+                        scan_list(case.stmts)
+                elif isinstance(s, StmtDoWhile):
+                    scan_list(s.body)
+                    
+        scan_list(stmts)
 
     def _remap_jumps(self, stmts: List[Stmt]):
         def remap_id(jid: JumpId) -> JumpId:

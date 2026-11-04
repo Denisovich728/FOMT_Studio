@@ -134,6 +134,8 @@ class PushInt(Ins):
 @dataclass
 class Jmp(Ins):
     jump_id: JumpId
+    def branch_target(self) -> Optional[JumpId]:
+        return self.jump_id
 
 # Branch Instructions
 @dataclass
