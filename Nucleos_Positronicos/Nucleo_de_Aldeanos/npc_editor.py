@@ -199,7 +199,7 @@ class NpcDetailDialog(QDialog):
         self.lbl_portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.side_graphics.addWidget(self.lbl_portrait)
         
-        self.btn_edit_portrait = QPushButton("Editar Retrato (Melody)")
+        self.btn_edit_portrait = QPushButton(tr("npc_edit_portrait", lang))
         self.btn_edit_portrait.setStyleSheet("background-color: #1F3A5F; color: #58A6FF; border: 1px solid #388BFD; font-weight: bold; padding: 6px;")
         self.btn_edit_portrait.clicked.connect(self.abrir_editor_retrato)
         self.side_graphics.addWidget(self.btn_edit_portrait)
@@ -490,14 +490,26 @@ class NpcDetailDialog(QDialog):
         self.lbl_portrait.setText(tr('no_rom_data', lang))
 
     def abrir_editor_retrato(self):
-        if not hasattr(self, 'current_hex_id') or self.current_hex_id is None:
-            QMessageBox.warning(self, "Sin Retrato", "Este NPC no tiene un retrato asociado o no se encontró en la lista.")
+        # Redirigir directamente al editor de metasprites portraits
+        top_win = self.window()
+        if hasattr(top_win, '_open_visor_metasprites'):
+            viewer = top_win._open_visor_metasprites()
+            if viewer and hasattr(self, 'current_hex_id') and self.current_hex_id is not None:
+                viewer.select_portrait_by_hex_id(self.current_hex_id)
+            self.accept()
             return
-        from Nucleos_Positronicos.Nucleo_de_Portraits.portrait_editor import PortraitEditorDialog
-        dlg = PortraitEditorDialog(self.npc.name_str.strip('\x00'), self.current_hex_id, self.base_portrait_name, parent=self)
-        dlg.exec()
-        # Recargar portrait tras cerrar el diálogo
-        self._load_npc_portrait(self.npc, self.parent())
+
+        from Nucleos_Positronicos.Nucleo_de_Sprites.visor_metasprites import VisorMetasprites
+        from Consola_de_Comando.app import FloatingWindow
+        viewer = VisorMetasprites(self)
+        if hasattr(self.parent(), 'project'):
+            viewer.set_project(self.parent().project)
+        float_win = FloatingWindow(viewer, "Editor de Metasprites y Portraits", self)
+        float_win.resize(1200, 800)
+        float_win.show()
+        if hasattr(self, 'current_hex_id') and self.current_hex_id is not None:
+            viewer.select_portrait_by_hex_id(self.current_hex_id)
+        self.accept()
 
     def _on_close(self):
         self.close()

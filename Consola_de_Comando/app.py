@@ -237,7 +237,7 @@ class FoMTStudioApp(QMainWindow):
     def open_or_switch_tab(self, tab_key):
         """Abre un editor como pestaña bajo demanda o cambia a él si ya existe."""
         if not self.project:
-            QMessageBox.warning(self, "Aviso", "Debes cargar una ROM o Proyecto primero.")
+            QMessageBox.warning(self, tr("tab_notice", self.current_lang), tr("msg_must_load_rom", self.current_lang))
             return None
         lang = self.current_lang
         tab_name_map = {
@@ -305,7 +305,7 @@ class FoMTStudioApp(QMainWindow):
         self.addToolBar(self.toolbar)
         
         # 1. Explorador lateral
-        self.action_toggle_explorer = QAction("Explorador", self)
+        self.action_toggle_explorer = QAction(tr("tb_explorer", self.current_lang), self)
         self.action_toggle_explorer.setCheckable(True)
         self.action_toggle_explorer.setChecked(True)
         self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
@@ -314,27 +314,32 @@ class FoMTStudioApp(QMainWindow):
         self.toolbar.addSeparator()
 
         # 2. Proyecto y ROM
-        act_save = QAction("Guardar ROM", self)
+        act_save = QAction(tr("tb_save_rom", self.current_lang), self)
         act_save.triggered.connect(self.action_save_project)
         self.toolbar.addAction(act_save)
 
-        act_compile = QAction("Compilar ROM", self)
+        act_compile = QAction(tr("tb_compile_rom", self.current_lang), self)
         act_compile.triggered.connect(self.action_compile_rom)
         self.toolbar.addAction(act_compile)
 
         self.toolbar.addSeparator()
 
-        # 3. Editor Principal de Espacio de Trabajo
-        act_code = QAction("Editor de Eventos (Código)", self)
-        act_code.setToolTip("Abrir o enfocar el Editor de Eventos principal")
+        # 3. Editor Principal de Espacio de Trabajo y Base de Datos de NPCs
+        act_code = QAction(tr("tb_event_editor", self.current_lang), self)
+        act_code.setToolTip(tr("tb_event_editor_tip", self.current_lang))
         act_code.triggered.connect(self._open_default_event_editor)
         self.toolbar.addAction(act_code)
+
+        act_npcs = QAction(tr("tb_npc_db", self.current_lang), self)
+        act_npcs.setToolTip(tr("tb_npc_db_tip", self.current_lang))
+        act_npcs.triggered.connect(lambda: self.open_or_switch_tab("npcs"))
+        self.toolbar.addAction(act_npcs)
 
         self.toolbar.addSeparator()
 
         # 4. Cuadro desplegable de Más Herramientas (Centralizado)
         btn_more = QToolButton(self)
-        btn_more.setText("Más Herramientas ▼")
+        btn_more.setText(tr("tb_more_tools", self.current_lang))
         btn_more.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         menu_more = QMenu(self)
 
@@ -347,8 +352,8 @@ class FoMTStudioApp(QMainWindow):
         m_ga = menu_more.addMenu(tr("cat_graphics_audio", self.current_lang))
         m_ga.addAction(tr("tab_metasprites", self.current_lang), self._open_visor_metasprites)
         m_ga.addAction(tr("tab_sprites", self.current_lang), lambda: self.open_or_switch_tab("sprites"))
-        m_ga.addAction("Visor de Animaciones", self._open_visor_animaciones)
-        m_ga.addAction("Extractor de Animaciones", self._open_anim_extractor)
+        m_ga.addAction(tr("menu_anim_viewer", self.current_lang), self._open_visor_animaciones)
+        m_ga.addAction(tr("menu_anim_extractor", self.current_lang), self._open_anim_extractor)
         m_ga.addAction(tr("tab_tile_editor", self.current_lang), self._open_tile_editor_extreme)
         m_ga.addAction(tr("tab_audio_sappy", self.current_lang), lambda: self.open_or_switch_tab("audio"))
 
@@ -356,7 +361,7 @@ class FoMTStudioApp(QMainWindow):
         m_dm = menu_more.addMenu(tr("cat_data_maps", self.current_lang))
         m_dm.addAction(tr("tab_map_editor", self.current_lang), self._open_map_viewer)
         m_dm.addAction(tr("tab_npc_visual", self.current_lang), self._open_visor_npc)
-        m_dm.addAction("Rutinas Diarias & Macromapa (NPC AI)", self._open_editor_rutinas_npc)
+        m_dm.addAction(tr("menu_npc_routines", self.current_lang), self._open_editor_rutinas_npc)
 
         # --- Base de Datos Interna (RAW) ---
         m_db = menu_more.addMenu(tr("cat_internal_db", self.current_lang))
@@ -374,11 +379,11 @@ class FoMTStudioApp(QMainWindow):
         menu_more.addSeparator()
 
         # --- Parches y Modificaciones del Juego ---
-        m_patch = menu_more.addMenu("Parches y Modificaciones")
-        m_patch.addAction("Instalar Soberanía de la Ñ", self._apply_n_patch)
-        m_patch.addAction("Aplicar Cultivos Caminables (Fix Z-Sorting)", self._apply_z_sorting_patch)
-        m_patch.addAction("Escaleras Visibles en Mina (Anti-Softlock)", self._apply_stairs_patch)
-        m_patch.addAction("Desbloquear Piedra Teletransporte (Año 1)", self._apply_teleport_stone_patch)
+        m_patch = menu_more.addMenu(tr("menu_patches", self.current_lang))
+        m_patch.addAction(tr("patch_n", self.current_lang), self._apply_n_patch)
+        m_patch.addAction(tr("patch_z_sort", self.current_lang), self._apply_z_sorting_patch)
+        m_patch.addAction(tr("patch_stairs", self.current_lang), self._apply_stairs_patch)
+        m_patch.addAction(tr("patch_teleport", self.current_lang), self._apply_teleport_stone_patch)
 
         btn_more.setMenu(menu_more)
         self.toolbar.addWidget(btn_more)
@@ -563,7 +568,7 @@ class FoMTStudioApp(QMainWindow):
             lang_menu.addAction(act)
             
         config_menu.addSeparator()
-        settings_action = QAction("Ajustes del Sistema", self)
+        settings_action = QAction(tr("menu_sys_settings", self.current_lang), self)
         settings_action.setShortcut("Ctrl+Alt+S")
         settings_action.triggered.connect(self._open_settings_dialog)
         config_menu.addAction(settings_action)
@@ -649,7 +654,7 @@ class FoMTStudioApp(QMainWindow):
         self._start_async_load('load', None, path)
 
     def _start_async_load(self, mode, rom_path, proj_path):
-        self.status.showMessage("Iniciando tarea de fondo...")
+        self.status.showMessage(tr("msg_bg_task_starting", self.current_lang))
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
             
@@ -706,7 +711,7 @@ class FoMTStudioApp(QMainWindow):
                         self.status.showMessage(f"Lista de nombres {game_label} cargada correctamente.")
         else:
             QMessageBox.critical(self, tr("err_fatal", self.current_lang), error_msg)
-            self.status.showMessage("Error en carga.")
+            self.status.showMessage(tr("msg_load_error", self.current_lang))
 
     def action_save_project(self):
         if not self.project: return
@@ -716,7 +721,7 @@ class FoMTStudioApp(QMainWindow):
             from PyQt6.QtWidgets import QApplication
             QApplication.processEvents()
             self.project.save()
-            self.status.showMessage("Progreso guardado en el archivo de proyecto.")
+            self.status.showMessage(tr("msg_saved_proj", self.current_lang))
             if hasattr(self, 'magic_circle'):
                 self.magic_circle.stop_animation()
         except Exception as e:
@@ -886,7 +891,7 @@ class FoMTStudioApp(QMainWindow):
             from Nucleos_Positronicos.Nucleo_de_Sprites.negrozma_engine import NegrozmaEngine
             from PyQt6.QtWidgets import QApplication
             
-            self.status.showMessage("Extrayendo animaciones masivamente... (Puede tardar varios segundos)")
+            self.status.showMessage(tr("msg_extracting_anim", self.current_lang))
             QApplication.processEvents() # Forzar actualización de la UI
             
             engine = NegrozmaEngine(self.project.base_rom_path)
@@ -897,12 +902,12 @@ class FoMTStudioApp(QMainWindow):
             
             engine.batch_export_all_animations(csv_path, out_dir)
             
-            self.status.showMessage("Extracción masiva completada.")
+            self.status.showMessage(tr("msg_extract_complete", self.current_lang))
             QMessageBox.information(self, "Extractor de Animaciones", f"¡Las animaciones se han exportado correctamente a:\n{out_dir}")
             
         except Exception as e:
             QMessageBox.critical(self, "Error en Extractor", f"Fallo en la extracción:\n{e}")
-            self.status.showMessage("Error durante la extracción.")
+            self.status.showMessage(tr("msg_extract_error", self.current_lang))
 
     def _on_project_loaded(self):
         self.tabs.clear()
@@ -1160,19 +1165,16 @@ class FoMTStudioApp(QMainWindow):
         for i in range(self.tabs.count()):
             if self.tabs.tabText(i) == "Metasprites":
                 self.tabs.setCurrentIndex(i)
-                return
+                return self.tabs.widget(i)
         if not self.metasprite_viewer:
             self.metasprite_viewer = VisorMetasprites(self)
             self.metasprite_viewer.set_project(self.project)
         self.tabs.addTab(self.metasprite_viewer, "Metasprites")
         self.tabs.setCurrentWidget(self.metasprite_viewer)
+        return self.metasprite_viewer
 
     def _open_visor_npc(self):
-        lang = self.current_lang
-        for i in range(self.tabs.count()):
-            if self.tabs.tabText(i) == tr("tab_npcs", lang):
-                self.tabs.setCurrentIndex(i)
-                return
+        return self.open_or_switch_tab("npcs")
 
     def _open_editor_rutinas_npc(self, target_npc_id=None):
         """Abre el Editor de Rutinas Diarias de NPCs y Macromapa interactivo en ventana independiente."""
@@ -1480,7 +1482,7 @@ class FoMTStudioApp(QMainWindow):
         try:
             for row in range(self.cat_events_item.rowCount()):
                 self.tree_view.setRowHidden(row, self.cat_events_item.index(), False)
-            self.status.showMessage("Filtro global limpiado.")
+            self.status.showMessage(tr("msg_clean_filter", self.current_lang))
         finally:
             self.tree_view.setUpdatesEnabled(True)
 

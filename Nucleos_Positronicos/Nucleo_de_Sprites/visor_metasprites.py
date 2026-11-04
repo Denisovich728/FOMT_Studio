@@ -346,6 +346,19 @@ class VisorMetasprites(QWidget):
                         item.setData(Qt.ItemDataRole.UserRole, row[1].strip()) # Hex ID
                         self.list_portraits.addItem(item)
 
+    def select_portrait_by_hex_id(self, hex_id: int):
+        """Selecciona y carga automáticamente el retrato correspondiente al hex_id indicado."""
+        for i in range(self.list_portraits.count()):
+            item = self.list_portraits.item(i)
+            raw_id = item.data(Qt.ItemDataRole.UserRole)
+            try:
+                if int(raw_id, 16) == hex_id:
+                    self.list_portraits.setCurrentRow(i)
+                    return True
+            except Exception:
+                pass
+        return False
+
     def _set_tool(self, tool_name):
         self.canvas.current_tool = tool_name
         self.btn_brush.setChecked(tool_name == "brush")
