@@ -359,27 +359,53 @@ class FoMTStudioApp(QMainWindow):
 
         self.toolbar.addSeparator()
 
-        # 4. Cuadro desplegable de Más Herramientas
+        # 4. Cuadro desplegable de Más Herramientas (Centralizado)
         btn_more = QToolButton(self)
         btn_more.setText("Más Herramientas ▼")
         btn_more.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         menu_more = QMenu(self)
 
-        menu_more.addAction("Punteros Maestros", lambda: self.open_or_switch_tab("pointers"))
-        menu_more.addAction("Textos de Menú / Interfaz", self.open_menu_editor)
-        menu_more.addAction("Textos de Intro", self.open_intro_editor)
-        menu_more.addAction("Visor de Metasprites", self._open_visor_metasprites)
-        menu_more.addAction("Visor de Animaciones", self._open_visor_animaciones)
-        menu_more.addAction("Extractor de Animaciones", self._open_anim_extractor)
+        # --- Editores de Interfaz ---
+        m_ui = menu_more.addMenu(tr("cat_editors_ui", self.current_lang))
+        m_ui.addAction(tr("menu_ui_texts", self.current_lang), self.open_menu_editor)
+        m_ui.addAction(tr("menu_intro_texts", self.current_lang), self.open_intro_editor)
+
+        # --- Gráficos & Audio ---
+        m_ga = menu_more.addMenu(tr("cat_graphics_audio", self.current_lang))
+        m_ga.addAction(tr("tab_metasprites", self.current_lang), self._open_visor_metasprites)
+        m_ga.addAction(tr("tab_sprites", self.current_lang), lambda: self.open_or_switch_tab("sprites"))
+        m_ga.addAction("Visor de Animaciones", self._open_visor_animaciones)
+        m_ga.addAction("Extractor de Animaciones", self._open_anim_extractor)
+        m_ga.addAction(tr("tab_tile_editor", self.current_lang), self._open_tile_editor_extreme)
+        m_ga.addAction(tr("tab_audio_sappy", self.current_lang), lambda: self.open_or_switch_tab("audio"))
+
+        # --- Datos y Mapas ---
+        m_dm = menu_more.addMenu(tr("cat_data_maps", self.current_lang))
+        m_dm.addAction(tr("tab_map_editor", self.current_lang), self._open_map_viewer)
+        m_dm.addAction(tr("tab_npc_visual", self.current_lang), self._open_visor_npc)
+        m_dm.addAction("Rutinas Diarias & Macromapa (NPC AI)", self._open_editor_rutinas_npc)
+
+        # --- Base de Datos Interna (RAW) ---
+        m_db = menu_more.addMenu(tr("cat_internal_db", self.current_lang))
+        m_db.addAction(tr("tab_npc_raw", self.current_lang), lambda: self.open_or_switch_tab("npcs"))
+        m_db.addAction(tr("tab_item_raw", self.current_lang), lambda: self.open_or_switch_tab("items"))
+        m_db.addAction(tr("tab_menu_editor", self.current_lang), self.open_menu_editor)
+        m_db.addAction(tr("tab_pointer_editor", self.current_lang), lambda: self.open_or_switch_tab("pointers"))
+
+        # --- Volcado Masivo ---
+        m_bulk = menu_more.addMenu(tr("menu_bulk_items", self.current_lang))
+        m_bulk.addAction(tr("bulk_tools", self.current_lang), lambda: self.open_bulk_items(tr("bulk_tools", self.current_lang), "Herramienta"))
+        m_bulk.addAction(tr("bulk_foods", self.current_lang), lambda: self.open_bulk_items(tr("bulk_foods", self.current_lang), "Consumible/Comida"))
+        m_bulk.addAction(tr("bulk_misc", self.current_lang), lambda: self.open_bulk_items(tr("bulk_misc", self.current_lang), "Artículo"))
+
         menu_more.addSeparator()
-        menu_more.addAction("Volcado Masivo de Herramientas", lambda: self.open_bulk_items("Herramientas", "Herramienta"))
-        menu_more.addAction("Volcado Masivo de Comidas", lambda: self.open_bulk_items("Comidas", "Consumible/Comida"))
-        menu_more.addAction("Volcado Masivo de Artículos", lambda: self.open_bulk_items("Artículos", "Artículo"))
-        menu_more.addSeparator()
-        menu_more.addAction("Instalar Soberanía de la Ñ", self._apply_n_patch)
-        menu_more.addAction("Aplicar Cultivos Caminables (Z-Sorting)", self._apply_z_sorting_patch)
-        menu_more.addAction("Escaleras Visibles en Mina", self._apply_stairs_patch)
-        menu_more.addAction("Desbloquear Piedra Teletransporte", self._apply_teleport_stone_patch)
+
+        # --- Parches y Modificaciones del Juego ---
+        m_patch = menu_more.addMenu("Parches y Modificaciones")
+        m_patch.addAction("Instalar Soberanía de la Ñ", self._apply_n_patch)
+        m_patch.addAction("Aplicar Cultivos Caminables (Fix Z-Sorting)", self._apply_z_sorting_patch)
+        m_patch.addAction("Escaleras Visibles en Mina (Anti-Softlock)", self._apply_stairs_patch)
+        m_patch.addAction("Desbloquear Piedra Teletransporte (Año 1)", self._apply_teleport_stone_patch)
 
         btn_more.setMenu(menu_more)
         self.toolbar.addWidget(btn_more)
@@ -564,55 +590,7 @@ class FoMTStudioApp(QMainWindow):
         settings_action.triggered.connect(self._open_settings_dialog)
         config_menu.addAction(settings_action)
         
-        # Menú Herramientas / Utilidades
-        tools_menu = menubar.addMenu(tr("menu_tools", lang))
-        
-        # --- Editores de Interfaz ---
-        m_ui = tools_menu.addMenu(tr("cat_editors_ui", lang))
-        m_ui.addAction(tr("menu_ui_texts", lang), self.open_menu_editor)
-        m_ui.addAction(tr("menu_intro_texts", lang), self.open_intro_editor)
-        
-        # --- Gráficos & Audio ---
-        m_ga = tools_menu.addMenu(tr("cat_graphics_audio", lang))
-        m_ga.addAction(tr("tab_metasprites", lang), self._open_visor_metasprites)
-        m_ga.addAction(tr("tab_sprites", lang), lambda: self._populate_ui_step(3))
-        m_ga.addAction("Visor de Animaciones", self._open_visor_animaciones)
-        m_ga.addAction(tr("tab_tile_editor", lang), self._open_tile_editor_extreme)
-        m_ga.addAction(tr("tab_audio_sappy", lang), lambda: self._populate_ui_step(4))
-        
-        # --- Editores de Datos y Mapas ---
-        m_dm = tools_menu.addMenu(tr("cat_data_maps", lang))
-        m_dm.addAction(tr("tab_map_editor", lang), lambda: self._populate_ui_step(5))
-        m_dm.addAction(tr("tab_npc_visual", lang), self._open_visor_npc)
-        m_dm.addAction("Rutinas Diarias & Macromapa (NPC AI)", self._open_editor_rutinas_npc)
-        tools_menu.addAction("Editor de Rutinas & Macromapa", self._open_editor_rutinas_npc)
-        
-        # --- Base de Datos Interna (Pestañas por defecto) ---
-        m_db = tools_menu.addMenu(tr("cat_internal_db", lang))
-        m_db.addAction(tr("tab_npc_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_npcs", lang)))
-        m_db.addAction(tr("tab_item_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_items", lang)))
-        m_db.addAction(tr("tab_menu_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_menu_editor", lang)))
-        
-        # Submenú Volcado Masivo
-        m_bulk = tools_menu.addMenu(tr("menu_bulk_items", lang))
-        m_bulk.addAction(tr("bulk_tools", lang), lambda: self.open_bulk_items(tr("bulk_tools", lang), "Herramienta"))
-        m_bulk.addAction(tr("bulk_foods", lang), lambda: self.open_bulk_items(tr("bulk_foods", lang), "Consumible/Comida"))
-        m_bulk.addAction(tr("bulk_misc", lang), lambda: self.open_bulk_items(tr("bulk_misc", lang), "Artículo"))
-        
-        # --- Parches y Modificaciones del Juego ---
-        m_farm = tools_menu.addMenu("Granja y Entorno")
-        m_farm.addAction("Aplicar Cultivos Caminables (Fix Z-Sorting)", self._apply_z_sorting_patch)
 
-        m_mine = tools_menu.addMenu("Mina y Exploracion")
-        m_mine.addAction("Aplicar Escaleras Visibles (Anti-Softlock)", self._apply_stairs_patch)
-        m_mine.addAction("Desbloquear Piedra Teletransporte (Ano 1)", self._apply_teleport_stone_patch)
-        
-        tools_menu.addSeparator()
-        
-        # --- Avanzado ---
-        m_adv = tools_menu.addMenu(tr("cat_advanced", lang))
-        m_adv.addAction(tr("tab_pointer_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_pointers", lang)))
-        # m_adv.addAction(tr("tab_block_puzzle", lang), lambda: self.open_event_theater(None))
         
         help_menu = menubar.addMenu(tr("menu_help", lang))
         shortcuts_action = QAction(tr("tab_help", lang), self)
