@@ -117,7 +117,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle("FoMT Studio v3.7.0 - Soberanía de la Ñ")
+        self.setWindowTitle("FoMT Studio v3.7.0")
         self.setMinimumSize(600, 400) # Reduced to allow small laptop screens
         self.showMaximized()
         
@@ -976,19 +976,17 @@ class FoMTStudioApp(QMainWindow):
             return
         reply = QMessageBox.question(
             self,
-            "Soberanía de la Ñ",
-            "¿Deseas inyectar el soporte nativo para la 'Ñ' en la ROM?\nEsto modificará el archivo base y habilitará los caracteres en el juego.",
+            tr("patch_n", self.current_lang),
+            "¿Desea instalar el soporte nativo para caracteres extendidos (Ñ) en la ROM?\nEsta operación actualiza las tablas de fuentes del sistema.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
             from Banco_de_Datos.parche_n import aplicar_parche_n
-            # Advertencia de seguridad solicitada por el usuario
             reply = QMessageBox.warning(
                 self, 
-                "Soberanía de la Ñ", 
-                "¡ATENCIÓN! No debe haber ningún evento editado antes de activar la Ñ.\n\n"
-                "La inyección de glifos y el repunteo de scripts pueden entrar en conflicto con cambios previos.\n"
-                "¿Deseas continuar con la instalación?",
+                tr("patch_n", self.current_lang), 
+                "Advertencia de integridad: Se recomienda aplicar esta modificación sobre ROMs sin eventos repunteados previamente.\n\n"
+                "¿Desea proceder con la inyección?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
             )
             if reply == QMessageBox.StandardButton.No:
@@ -1003,7 +1001,7 @@ class FoMTStudioApp(QMainWindow):
                 self.btn_n.setEnabled(False)
                 if hasattr(self, 'magic_circle'):
                     self.magic_circle.stop_animation()
-                QMessageBox.information(self, "¡Éxito!", "La Soberanía de la Ñ se ha instalado correctamente.")
+                QMessageBox.information(self, tr("title_info", self.current_lang), "Soporte de caracteres extendidos instalado correctamente.")
                 
                 # Refrescar Tile Editor si está abierto
                 for i in range(self.tabs.count()):
@@ -1272,7 +1270,7 @@ class FoMTStudioApp(QMainWindow):
         try:
             subprocess.Popen([sys.executable, script_path])
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"No se pudo lanzar el Tile Editor Extreme:\n{e}")
+            QMessageBox.warning(self, "Error", f"No se pudo inicializar el Editor de Tiles:\n{e}")
 
     def open_decoration_control(self):
         from Nucleos_Positronicos.Nucleo_de_Scripts.decoration_control import DecorationControlDialog
