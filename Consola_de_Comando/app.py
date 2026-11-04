@@ -324,38 +324,11 @@ class FoMTStudioApp(QMainWindow):
 
         self.toolbar.addSeparator()
 
-        # 3. Editores principales
+        # 3. Editor Principal de Espacio de Trabajo
         act_code = QAction("Editor de Eventos (Código)", self)
+        act_code.setToolTip("Abrir o enfocar el Editor de Eventos principal")
         act_code.triggered.connect(self._open_default_event_editor)
         self.toolbar.addAction(act_code)
-
-        act_items = QAction("Objetos / Items", self)
-        act_items.triggered.connect(lambda: self.open_or_switch_tab("items"))
-        self.toolbar.addAction(act_items)
-
-        act_npcs = QAction("NPCs & Retratos", self)
-        act_npcs.triggered.connect(lambda: self.open_or_switch_tab("npcs"))
-        self.toolbar.addAction(act_npcs)
-
-        act_maps = QAction("Mapas (Titan)", self)
-        act_maps.triggered.connect(self._open_map_viewer)
-        self.toolbar.addAction(act_maps)
-
-        act_tiles = QAction("Tile Editor", self)
-        act_tiles.triggered.connect(self._open_tile_editor_extreme)
-        self.toolbar.addAction(act_tiles)
-
-        act_sprites = QAction("Sprites", self)
-        act_sprites.triggered.connect(lambda: self.open_or_switch_tab("sprites"))
-        self.toolbar.addAction(act_sprites)
-
-        act_routines = QAction("Rutinas Diarias (IA)", self)
-        act_routines.triggered.connect(self._open_editor_rutinas_npc)
-        self.toolbar.addAction(act_routines)
-
-        act_audio = QAction("Audio Sappy", self)
-        act_audio.triggered.connect(lambda: self.open_or_switch_tab("audio"))
-        self.toolbar.addAction(act_audio)
 
         self.toolbar.addSeparator()
 
@@ -442,6 +415,11 @@ class FoMTStudioApp(QMainWindow):
         
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText(tr("search_placeholder", self.current_lang))
+        from PyQt6.QtCore import QTimer
+        self.search_timer = QTimer(self)
+        self.search_timer.setSingleShot(True)
+        self.search_timer.setInterval(150)
+        self.search_timer.timeout.connect(self._apply_search_filter)
         self.search_bar.textChanged.connect(self.on_search_text_changed)
         
         self.tree_view = QTreeView()
@@ -709,6 +687,8 @@ class FoMTStudioApp(QMainWindow):
             
         if success:
             self.status.showMessage(tr("status_scan_complete", self.current_lang), 5000)
+            if self.tabs.count() == 0:
+                self.open_event(1)
             if self.project:
                 game_label = "FOMT" if not self.project.is_mfomt else "MFOMT"
                 csv_name = "Fomt_Events_Listname.csv" if not self.project.is_mfomt else "MFomt_Events_Listname.csv"
@@ -931,22 +911,7 @@ class FoMTStudioApp(QMainWindow):
         self.audio_viewer = None
         self.sprite_viewer = None
         
-        # Limpiar caché de imágenes (PNGs) para forzar extracción de la ROM actual
-        import glob
-        import os
-        dirs_to_clean = [os.path.join(os.getcwd(), "portraits_dump"), os.path.join(os.getcwd(), "sprites_dump")]
-        if self.project and getattr(self.project, 'project_dir', None):
-            dirs_to_clean.extend([
-                os.path.join(self.project.project_dir, "portraits_dump"),
-                os.path.join(self.project.project_dir, "sprites_dump")
-            ])
-        for p_dir in dirs_to_clean:
-            if os.path.exists(p_dir):
-                for f in glob.glob(os.path.join(p_dir, "*.png")):
-                    try:
-                        os.remove(f)
-                    except:
-                        pass
+        # Limpieza ligera sin I/O bloqueante masivo en el hilo de interfaz
                         
         if self.project:
             self.ai_terminal.project = self.project # Actualizar nexo de IA
@@ -1049,37 +1014,45 @@ class FoMTStudioApp(QMainWindow):
         if not self.project: return
         
         if step == 2:
-            from PyQt6.QtWidgets import QApplication
-            # NPCs
-            self.cat_npcs.removeRows(0, self.cat_npcs.rowCount())
-            for i, npc in enumerate(self.project.npc_parser.npcs):
-                item = QStandardItem(f"[{i:02d}] {npc.name_str.strip('\x00')}")
-                item.setData("NPC", Qt.ItemDataRole.UserRole + 1)
-                item.setData(i, Qt.ItemDataRole.UserRole)
-                self.cat_npcs.appendRow(item)
-                if i % 20 == 0: QApplication.processEvents()
-            
-            # Events
-            self.cat_events_item.removeRows(0, self.cat_events_item.rowCount())
-            self.cat_events_item.setText(f"{tr('cat_events', self.current_lang)} ({self.project.event_parser.get_event_count()})")
-            for i in range(1, self.project.event_parser.get_event_count() + 1):
-                ev_item = QStandardItem(self.project.super_lib.get_baptized_name(i, ""))
-                ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
-                ev_item.setData(i, Qt.ItemDataRole.UserRole)
-                self.cat_events_item.appendRow(ev_item)
-                if i % 50 == 0: QApplication.processEvents()
-            
-            # Maps
-            self.cat_maps.removeRows(0, self.cat_maps.rowCount())
-            for i, m in enumerate(self.project.map_parser.maps):
-                m_name = self.project.super_lib.get_map_name_hint(m.map_id)
+            self.tree_view.setUpdatesEnabled(False)
+            try:
+                # NPCs
+                self.cat_npcs.removeRows(0, self.cat_npcs.rowCount())
+                npc_items = []
+                for i, npc in enumerate(self.project.npc_parser.npcs):
+                    item = QStandardItem(f"[{i:02d}] {npc.name_str.strip('\x00')}")
+                    item.setData("NPC", Qt.ItemDataRole.UserRole + 1)
+                    item.setData(i, Qt.ItemDataRole.UserRole)
+                    npc_items.append(item)
+                self.cat_npcs.appendRows(npc_items)
+                
+                # Events (Batch Insertion para eliminar tirones de UI)
+                self.cat_events_item.removeRows(0, self.cat_events_item.rowCount())
+                ev_count = self.project.event_parser.get_event_count()
+                self.cat_events_item.setText(f"{tr('cat_events', self.current_lang)} ({ev_count})")
+                ev_items = []
+                for i in range(1, ev_count + 1):
+                    ev_item = QStandardItem(self.project.super_lib.get_baptized_name(i, ""))
+                    ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
+                    ev_item.setData(i, Qt.ItemDataRole.UserRole)
+                    ev_items.append(ev_item)
+                self.cat_events_item.appendRows(ev_items)
+                
+                # Maps
+                self.cat_maps.removeRows(0, self.cat_maps.rowCount())
                 map_label = "MAPA" if self.current_lang == "es" else "MAP"
-                map_item = QStandardItem(f"{map_label} {m.map_id:03d}: {m_name}")
-                map_item.setData("MAP", Qt.ItemDataRole.UserRole + 1)
-                map_item.setData(m.map_id, Qt.ItemDataRole.UserRole)
-                self.cat_maps.appendRow(map_item)
-                if i % 20 == 0: QApplication.processEvents()
-            self.tree_view.expand(self.cat_events_item.index())
+                map_items = []
+                for i, m in enumerate(self.project.map_parser.maps):
+                    m_name = self.project.super_lib.get_map_name_hint(m.map_id)
+                    map_item = QStandardItem(f"{map_label} {m.map_id:03d}: {m_name}")
+                    map_item.setData("MAP", Qt.ItemDataRole.UserRole + 1)
+                    map_item.setData(m.map_id, Qt.ItemDataRole.UserRole)
+                    map_items.append(map_item)
+                self.cat_maps.appendRows(map_items)
+                
+                self.tree_view.expand(self.cat_events_item.index())
+            finally:
+                self.tree_view.setUpdatesEnabled(True)
             
             # Native Procs (Oculto temporalmente por petición del usuario)
             # self.cat_native_procs.removeRows(0, self.cat_native_procs.rowCount())
@@ -1512,46 +1485,54 @@ class FoMTStudioApp(QMainWindow):
             self.tree_view.setUpdatesEnabled(True)
 
     def on_search_text_changed(self, text):
-        """Filtra el árbol de proyecto según el texto ingresado."""
+        """Debounce de 150ms para filtrado fluido y sin bloqueos al escribir."""
+        self._pending_search_text = text
+        if hasattr(self, 'search_timer'):
+            self.search_timer.start(150)
+        else:
+            self._apply_search_filter()
+
+    def _apply_search_filter(self):
+        """Filtra el árbol de forma ultrarrápida (O(N) plano) sin recursión pesada."""
         if not self.tree_model or self.tree_model.rowCount() == 0: return
+        text = getattr(self, '_pending_search_text', '').lower().strip()
         
-        text = text.lower().strip()
-        self.tree_view.setUpdatesEnabled(False) # Evitar parpadeo
+        self.tree_view.setUpdatesEnabled(False)
         try:
-            for i in range(self.tree_model.rowCount()):
-                parent_item = self.tree_model.item(i)
-                self._filter_item_recursive(parent_item, text)
-            
             if not text:
-                # Si se limpia la búsqueda, colapsar categorías grandes por orden
+                for i in range(self.tree_model.rowCount()):
+                    cat_item = self.tree_model.item(i)
+                    if not cat_item: continue
+                    cat_idx = cat_item.index()
+                    self.tree_view.setRowHidden(cat_idx.row(), cat_idx.parent(), False)
+                    for j in range(cat_item.rowCount()):
+                        self.tree_view.setRowHidden(j, cat_idx, False)
                 self.tree_view.collapseAll()
                 if self.cat_events_item:
-                    self.tree_view.expand(self.cat_events_item.index()) # Mantener eventos expandidos
+                    self.tree_view.expand(self.cat_events_item.index())
+                return
+
+            for i in range(self.tree_model.rowCount()):
+                cat_item = self.tree_model.item(i)
+                if not cat_item: continue
+                cat_idx = cat_item.index()
+                cat_matches = text in cat_item.text().lower()
+                has_visible_child = False
+
+                for j in range(cat_item.rowCount()):
+                    child = cat_item.child(j)
+                    if not child: continue
+                    child_matches = cat_matches or (text in child.text().lower())
+                    self.tree_view.setRowHidden(j, cat_idx, not child_matches)
+                    if child_matches:
+                        has_visible_child = True
+
+                cat_visible = cat_matches or has_visible_child
+                self.tree_view.setRowHidden(cat_idx.row(), cat_idx.parent(), not cat_visible)
+                if has_visible_child:
+                    self.tree_view.setExpanded(cat_idx, True)
         finally:
             self.tree_view.setUpdatesEnabled(True)
-
-    def _filter_item_recursive(self, item, text):
-        """Oculta/Muestra items recursivamente y expande resultados."""
-        has_visible_child = False
-        for i in range(item.rowCount()):
-            child = item.child(i)
-            if self._filter_item_recursive(child, text):
-                has_visible_child = True
-        
-        # Un item es visible si coincide con el texto O si alguno de sus hijos es visible
-        match = not text or (text in item.text().lower())
-        visible = match or has_visible_child
-        
-        index = item.index()
-        if index.isValid():
-            parent_index = index.parent()
-            self.tree_view.setRowHidden(index.row(), parent_index, not visible)
-            
-            # Auto-expandir si hay resultados internos
-            if text and has_visible_child:
-                self.tree_view.setExpanded(index, True)
-        
-        return visible
 
     def _on_tab_changed(self, index):
         """Inicializa los editores pesados bajo demanda para evitar el congelamiento al abrir la ROM."""

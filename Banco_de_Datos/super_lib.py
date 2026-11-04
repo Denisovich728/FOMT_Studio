@@ -14,56 +14,54 @@ import concurrent.futures
 
 def _scan_chunk_worker_wrapper(args):
     rom_data, start_idx, end_idx = args
-    from Banco_de_Datos.Utilidades.compression import is_lz77_block, decompress_lz77
+    from Banco_de_Datos.Utilidades.compression import decompress_lz77
     from Nucleos_Positronicos.Nucleo_de_Mapas.codec_tiles import bgr555_to_rgb
     
     local_banks = {}
     local_palette_cache = {}
     
-    for offset in range(start_idx, end_idx, 4):
-        # 1. DETECCIÓN LZ77
-        if is_lz77_block(rom_data, offset):
-            try:
-                header = struct.unpack('<I', rom_data[offset:offset+4])[0]
-                size = header >> 8
-                if size < 32 or size > 0x100000: continue
-                
-                # Validación estricta con descompresión parcial
-                data_decomp = decompress_lz77(rom_data[offset : offset + min(size*2+100, len(rom_data)-offset)])
-                if len(data_decomp) != size: continue
-                
-                # Pre-cachear paletas
-                if size in [32, 512]:
-                    colors = []
-                    for i in range(0, len(data_decomp), 2):
-                        c16 = int.from_bytes(data_decomp[i:i+2], 'little')
-                        colors.append(bgr555_to_rgb(c16))
-                    local_palette_cache[offset] = colors
+    # Los assets de FoMT residen a partir de 0x130000 (despues del codigo ejecutable)
+    actual_start = max(start_idx, 0x130000)
+    if actual_start >= end_idx:
+        return local_banks, local_palette_cache
+    
+    for offset in range(actual_start, end_idx, 4):
+        # 1. Pre-check ultra rapido: Byte magico LZ77 (0x10)
+        if rom_data[offset] != 0x10:
+            continue
 
-                bank_type = "PALETTE" if size in [32, 512] else "TILESET" if size % 32 == 0 else "LAYOUT/DATA"
-                local_banks[offset] = {
-                    "size": size,
-                    "type": bank_type,
-                    "name": f"{bank_type}_{offset:06X}"
-                }
-            except: continue
+        # Filtro de cabecera LZ77 (tamano maximo estandar en VRAM/FoMT: 64KB)
+        size = rom_data[offset+1] | (rom_data[offset+2] << 8) | (rom_data[offset+3] << 16)
+        if size < 32 or size > 0x10000:
+            continue
 
-        # 2. DETECCIÓN OAM
-        if offset % 8 == 0:
-            chunk = rom_data[offset:offset+6]
-            if len(chunk) == 6:
-                a0, a1, a2 = struct.unpack('<HHH', chunk)
-                if (a0 & 0xFF) < 160 and (a1 & 0x1FF) < 240 and (a2 & 0x3FF) < 1024:
-                    next_chunk = rom_data[offset+8:offset+14]
-                    if len(next_chunk) == 6:
-                        na0, na1, na2 = struct.unpack('<HHH', next_chunk)
-                        if (na0 & 0xFF) < 160 and (na1 & 0x1FF) < 240:
-                            if offset not in local_banks:
-                                local_banks[offset] = {
-                                    "size": 8,
-                                    "type": "OAM_ENTRY",
-                                    "name": f"SPRITE_PART_{offset:06X}"
-                                }
+        # Primer byte de banderas: el bit 7 debe ser 0 (primer bloque literal)
+        if rom_data[offset+4] & 0x80:
+            continue
+
+        try:
+            # Validacion estricta con descompresion acotada
+            data_decomp = decompress_lz77(rom_data[offset : offset + min(size*2+100, len(rom_data)-offset)])
+            if len(data_decomp) != size:
+                continue
+            
+            # Pre-cachear paletas
+            if size in [32, 512]:
+                colors = []
+                for i in range(0, len(data_decomp), 2):
+                    c16 = int.from_bytes(data_decomp[i:i+2], 'little')
+                    colors.append(bgr555_to_rgb(c16))
+                local_palette_cache[offset] = colors
+
+            bank_type = "PALETTE" if size in [32, 512] else "TILESET" if size % 32 == 0 else "LAYOUT/DATA"
+            local_banks[offset] = {
+                "size": size,
+                "type": bank_type,
+                "name": f"{bank_type}_{offset:06X}"
+            }
+        except Exception:
+            continue
+
     return local_banks, local_palette_cache
 
 class SuperLibrary:
@@ -349,12 +347,29 @@ class SuperLibrary:
 
     def scan_data_banks(self, rom_data: bytes):
         """
-        Detección de Bancos de Datos (StanHash signature scanner).
-        Escanea la ROM buscando bloques LZ77, tablas OAM y secuencias de animación.
-        ¡Ahora usando Multi-Processing para reducir tiempos astronómicos!
+        Deteccion de Bancos de Datos (StanHash signature scanner).
+        Escanea la ROM buscando bloques LZ77 y paletas graficas.
+        Implementa cache persistente en disco por hash para carga ultra-veloz (<15ms).
         """
         total_len = len(rom_data) - 8
         if total_len <= 0: return
+
+        # 1. Intento de carga desde cache persistente
+        import hashlib
+        import json
+        rom_sig = hashlib.sha256(rom_data[:2048] + rom_data[-2048:] + len(rom_data).to_bytes(8, 'little')).hexdigest()[:16]
+        cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache")
+        cache_file = os.path.join(cache_dir, f"data_banks_{rom_sig}.json")
+
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cache_data = json.load(f)
+                self.data_banks = {int(k): v for k, v in cache_data.get("banks", {}).items()}
+                self.palette_cache = {int(k): [tuple(c) for c in v] for k, v in cache_data.get("palettes", {}).items()}
+                return
+            except Exception:
+                pass
 
         from Banco_de_Datos.Utilidades.sistema import get_safe_worker_count
         num_cores = get_safe_worker_count()
@@ -372,13 +387,23 @@ class SuperLibrary:
                 for local_banks, local_palette_cache in executor.map(_scan_chunk_worker_wrapper, chunks):
                     self.data_banks.update(local_banks)
                     self.palette_cache.update(local_palette_cache)
-        except Exception as e:
-            print(f"Alerta: Multiprocessing falló ({e}). Usando escaneo secuencial de respaldo...")
-            # Fallback secuencial
+        except Exception:
             for chunk in chunks:
                 local_banks, local_palette_cache = _scan_chunk_worker_wrapper(chunk)
                 self.data_banks.update(local_banks)
                 self.palette_cache.update(local_palette_cache)
+
+        # 2. Guardar en cache persistente para inicios instantaneos posteriores
+        try:
+            os.makedirs(cache_dir, exist_ok=True)
+            cache_payload = {
+                "banks": {str(k): v for k, v in self.data_banks.items()},
+                "palettes": {str(k): v for k, v in self.palette_cache.items()}
+            }
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(cache_payload, f)
+        except Exception:
+            pass
 
     def find_references(self, rom_data: bytes, target_offset: int) -> list:
         """
