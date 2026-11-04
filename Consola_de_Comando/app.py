@@ -224,33 +224,165 @@ class FoMTStudioApp(QMainWindow):
                 self.tabs.setCurrentIndex(i)
                 return
 
+    def _open_default_event_editor(self):
+        """Abre o enfoca la pestaña del editor de código de eventos."""
+        for i in range(self.tabs.count()):
+            widget = self.tabs.widget(i)
+            if type(widget).__name__ == "ScriptIDEWidget":
+                self.tabs.setCurrentIndex(i)
+                return widget
+        if self.project and self.project.event_parser:
+            return self.open_event(1)
+
+    def open_or_switch_tab(self, tab_key):
+        """Abre un editor como pestaña bajo demanda o cambia a él si ya existe."""
+        if not self.project:
+            QMessageBox.warning(self, "Aviso", "Debes cargar una ROM o Proyecto primero.")
+            return None
+        lang = self.current_lang
+        tab_name_map = {
+            "items": tr("tab_items", lang),
+            "npcs": tr("tab_npcs", lang),
+            "pointers": tr("tab_pointers", lang),
+            "menu_editor": tr("tab_menu_editor", lang),
+            "tile_editor": tr("tab_tile_editor", lang),
+            "sprites": "Sprites & Portraits",
+            "audio": tr("tab_audio", lang),
+            "metasprites": "Metasprites",
+            "animaciones": "Animaciones",
+        }
+        target_title = tab_name_map.get(tab_key, tab_key)
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == target_title:
+                self.tabs.setCurrentIndex(i)
+                return self.tabs.widget(i)
+
+        widget = None
+        if tab_key == "items":
+            if not getattr(self, 'item_editor', None):
+                self.item_editor = ItemEditorWidget(self.project, self)
+            widget = self.item_editor
+        elif tab_key == "npcs":
+            if not getattr(self, 'npc_editor', None):
+                self.npc_editor = NpcEditorWidget(self.project, self)
+            widget = self.npc_editor
+        elif tab_key == "pointers":
+            if not getattr(self, 'pointer_editor', None):
+                self.pointer_editor = MasterPointerEditor(self.project, self)
+            widget = self.pointer_editor
+        elif tab_key == "menu_editor":
+            if not getattr(self, 'menu_editor', None):
+                self.menu_editor = MenuEditorWidget(self.project, self)
+            widget = self.menu_editor
+        elif tab_key == "tile_editor":
+            widget = TileEditorWidget(project=self.project)
+        elif tab_key == "sprites":
+            if not getattr(self, 'sprite_viewer', None):
+                self.sprite_viewer = VisorSprites(self)
+                self.sprite_viewer.set_project(self.project)
+            widget = self.sprite_viewer
+        elif tab_key == "audio":
+            if not getattr(self, 'audio_viewer', None):
+                self.audio_viewer = SappyAudioViewer(self.project, self)
+            widget = self.audio_viewer
+
+        if widget:
+            idx = self.tabs.addTab(widget, target_title)
+            self.tabs.setCurrentIndex(idx)
+            self.apply_theme(self.current_theme)
+            return widget
+        return None
+
     def _setup_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget) # Cambiar a Vertical para poner la barra arriba
         
-        # --- BARRA DE HERRAMIENTAS (TOOLBAR) ---
-        from PyQt6.QtWidgets import QToolBar, QMenu
-        self.toolbar = QToolBar("Principal")
+        # --- BARRA DE HERRAMIENTAS PRINCIPAL (TOOLBAR) ---
+        from PyQt6.QtWidgets import QToolBar, QMenu, QToolButton
+        self.toolbar = QToolBar("Barra de Herramientas Principal")
         self.toolbar.setMovable(False)
         self.addToolBar(self.toolbar)
         
-        # Botón para colapsar/expandir explorador
+        # 1. Explorador lateral
         self.action_toggle_explorer = QAction("Explorador", self)
         self.action_toggle_explorer.setCheckable(True)
         self.action_toggle_explorer.setChecked(True)
         self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
         self.toolbar.addAction(self.action_toggle_explorer)
         
-        # Botón para Extractor de Animaciones
-        self.action_anim_extractor = QAction("Extractor de Animaciones", self)
-        self.action_anim_extractor.triggered.connect(self._open_anim_extractor)
-        self.toolbar.addAction(self.action_anim_extractor)
-        
-        # Botón para Visor de Mapas
-        self.action_map_viewer = QAction("Visor de Mapas (Titan)", self)
-        self.action_map_viewer.triggered.connect(self._open_map_viewer)
-        self.toolbar.addAction(self.action_map_viewer)
+        self.toolbar.addSeparator()
+
+        # 2. Proyecto y ROM
+        act_save = QAction("Guardar ROM", self)
+        act_save.triggered.connect(self.action_save_project)
+        self.toolbar.addAction(act_save)
+
+        act_compile = QAction("Compilar ROM", self)
+        act_compile.triggered.connect(self.action_compile_rom)
+        self.toolbar.addAction(act_compile)
+
+        self.toolbar.addSeparator()
+
+        # 3. Editores principales
+        act_code = QAction("Editor de Eventos (Código)", self)
+        act_code.triggered.connect(self._open_default_event_editor)
+        self.toolbar.addAction(act_code)
+
+        act_items = QAction("Objetos / Items", self)
+        act_items.triggered.connect(lambda: self.open_or_switch_tab("items"))
+        self.toolbar.addAction(act_items)
+
+        act_npcs = QAction("NPCs & Retratos", self)
+        act_npcs.triggered.connect(lambda: self.open_or_switch_tab("npcs"))
+        self.toolbar.addAction(act_npcs)
+
+        act_maps = QAction("Mapas (Titan)", self)
+        act_maps.triggered.connect(self._open_map_viewer)
+        self.toolbar.addAction(act_maps)
+
+        act_tiles = QAction("Tile Editor", self)
+        act_tiles.triggered.connect(self._open_tile_editor_extreme)
+        self.toolbar.addAction(act_tiles)
+
+        act_sprites = QAction("Sprites", self)
+        act_sprites.triggered.connect(lambda: self.open_or_switch_tab("sprites"))
+        self.toolbar.addAction(act_sprites)
+
+        act_routines = QAction("Rutinas Diarias (IA)", self)
+        act_routines.triggered.connect(self._open_editor_rutinas_npc)
+        self.toolbar.addAction(act_routines)
+
+        act_audio = QAction("Audio Sappy", self)
+        act_audio.triggered.connect(lambda: self.open_or_switch_tab("audio"))
+        self.toolbar.addAction(act_audio)
+
+        self.toolbar.addSeparator()
+
+        # 4. Cuadro desplegable de Más Herramientas
+        btn_more = QToolButton(self)
+        btn_more.setText("Más Herramientas ▼")
+        btn_more.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        menu_more = QMenu(self)
+
+        menu_more.addAction("Punteros Maestros", lambda: self.open_or_switch_tab("pointers"))
+        menu_more.addAction("Textos de Menú / Interfaz", self.open_menu_editor)
+        menu_more.addAction("Textos de Intro", self.open_intro_editor)
+        menu_more.addAction("Visor de Metasprites", self._open_visor_metasprites)
+        menu_more.addAction("Visor de Animaciones", self._open_visor_animaciones)
+        menu_more.addAction("Extractor de Animaciones", self._open_anim_extractor)
+        menu_more.addSeparator()
+        menu_more.addAction("Volcado Masivo de Herramientas", lambda: self.open_bulk_items("Herramientas", "Herramienta"))
+        menu_more.addAction("Volcado Masivo de Comidas", lambda: self.open_bulk_items("Comidas", "Consumible/Comida"))
+        menu_more.addAction("Volcado Masivo de Artículos", lambda: self.open_bulk_items("Artículos", "Artículo"))
+        menu_more.addSeparator()
+        menu_more.addAction("Instalar Soberanía de la Ñ", self._apply_n_patch)
+        menu_more.addAction("Aplicar Cultivos Caminables (Z-Sorting)", self._apply_z_sorting_patch)
+        menu_more.addAction("Escaleras Visibles en Mina", self._apply_stairs_patch)
+        menu_more.addAction("Desbloquear Piedra Teletransporte", self._apply_teleport_stone_patch)
+
+        btn_more.setMenu(menu_more)
+        self.toolbar.addWidget(btn_more)
         
         self.main_splitter = QSplitter(Qt.Orientation.Horizontal)
         self.main_splitter.setHandleWidth(4)
@@ -884,14 +1016,7 @@ class FoMTStudioApp(QMainWindow):
         except: pass
         self.tree_view.doubleClicked.connect(self._on_tree_double_click)
         
-        # ── Preparación de Pestañas (Lazy Loading) ───────────────────
-        self.tabs.addTab(QWidget(), tr("tab_items", self.current_lang))
-        self.tabs.addTab(QWidget(), tr("tab_npcs", self.current_lang))
-        self.tabs.addTab(QWidget(), tr("tab_pointers", self.current_lang))
-        self.tabs.addTab(QWidget(), tr("tab_menu_editor", self.current_lang))
-        # self.tabs.addTab(QWidget(), tr("tab_block_puzzle", self.current_lang)) # Teatro desconectado
-        
-        # Conectar el cambio de pestaña para cargar el editor bajo demanda
+        # ── Pestañas Limpias (Solo Editor de Eventos por defecto) ─────
         try: self.tabs.currentChanged.disconnect()
         except: pass
         self.tabs.currentChanged.connect(self._on_tab_changed)
@@ -1009,31 +1134,16 @@ class FoMTStudioApp(QMainWindow):
             #     self.cat_native_procs.appendRow(err_item)
 
         elif step == 3:
-            # Abrir el Tile Editor Extreme por defecto al cargar gráficos
-            exists = False
-            for i in range(self.tabs.count()):
-                if self.tabs.tabText(i) == tr("tab_tile_editor", self.current_lang):
-                    exists = True
-                    break
-            
-            if not exists:
-                tile_editor = TileEditorWidget(project=self.project)
-                self.tabs.addTab(tile_editor, tr("tab_tile_editor", self.current_lang))
-
-            if not self.sprite_viewer:
-                self.sprite_viewer = VisorSprites(self)
-                self.sprite_viewer.set_project(self.project)
-                self.tabs.addTab(self.sprite_viewer, "Sprites & Portraits")
+            # Gráficos cargados en memoria. Se acceden bajo demanda desde la barra de herramientas.
+            pass
         elif step == 4:
-            if not self.audio_viewer:
-                self.audio_viewer = SappyAudioViewer(self.project, self)
-                self.tabs.addTab(self.audio_viewer, tr("tab_audio", self.current_lang))
+            # Audio cargado en memoria. Se accede bajo demanda desde la barra de herramientas.
+            pass
         elif step == 5:
-            # Abrir el primer mapa por defecto o mostrar aviso
-            if self.project.map_parser.maps:
-                self.open_map_editor(self.project.map_parser.maps[0].map_id)
-            else:
-                self.status.showMessage("No se detectaron mapas para abrir.")
+            # Solo dejamos abierta una única pestaña por defecto: el Editor de Código de Eventos (Evento 1)
+            if self.project and self.project.event_parser:
+                if self.tabs.count() == 0:
+                    self.open_event(1)
 
     def open_map_editor(self, map_id):
         map_header = self.project.map_parser.get_map_by_id(map_id)
