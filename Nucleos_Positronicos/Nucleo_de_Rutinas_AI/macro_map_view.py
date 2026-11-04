@@ -313,6 +313,13 @@ class MapNodeItem(QGraphicsRectItem):
                 self.on_moved_callback(self)
         return super().itemChange(change, value)
 
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        if self.scene() and hasattr(self.scene(), "views"):
+            views = self.scene().views()
+            if views and hasattr(views[0], "map_selected"):
+                views[0].map_selected.emit(self.node.map_id)
+
     def mouseDoubleClickEvent(self, event):
         # Doble click para añadir una nueva puerta en esa coordenada
         p = event.pos()
@@ -785,6 +792,7 @@ class MacroMapView(QGraphicsView):
     """Vista interactiva con soporte para Zoom, Panning y Conexión de Warps."""
 
     connection_created = pyqtSignal(str, int, str, int, str)  # (id, from_m, from_w, to_m, to_w)
+    map_selected = pyqtSignal(int)                            # (map_id)
 
     def __init__(self, world_graph: WorldGraph, parent=None):
         super().__init__(parent)

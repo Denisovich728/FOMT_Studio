@@ -284,6 +284,7 @@ class WorldGraph:
                 ("to_supermarket", "Supermercado Jeff (Script 0x02F2)", 464, 136),
                 ("to_clinic", "Clínica Mineral (Script 0x02E8)", 672, 136),
                 ("to_library", "Biblioteca Mary (Script 0x02EA)", 840, 136),
+                ("to_basil", "Casa de Basil (Script 0x02EC)", 872, 136),
                 ("to_mayor", "Casa Alcalde Thomas (Script 0x02EE)", 184, 136),
                 ("to_ellen", "Casa de Ellen (Script 0x02E4)", 1216, 128),
                 ("to_saibara", "Herrería Saibara (Script 0x02E6)", 384, 136),
@@ -307,6 +308,8 @@ class WorldGraph:
                 ("to_forest", "Camino Sur hacia Bosque (Script 0x00AA)", 848, 504),
                 ("to_peak", "Cima de la Colina (Script 0x03D6)", 944, 440),
                 ("to_hotsprings", "Aguas Termales & Cascada Diosa (Script 0x03D4)", 824, 512),
+                ("to_mine", "Entrada a la Mina de Primavera", 830, 470),
+                ("to_lake_mine", "Mina del Lago (Invierno)", 400, 300),
             ]),
             (0x08, get_map_display_name(0x08), 250, 80, 60, 60, [
                 ("to_middle", "Camino hacia Colina Media", 240, 240),
@@ -317,6 +320,7 @@ class WorldGraph:
             ]),
             (0x04, get_map_display_name(0x04), 850, -480, 40, 30, [
                 ("to_church", "Entrada desde Iglesia", 160, 200),
+                ("to_sprites", "Camino a Cabaña de Duendes", 320, 160),
             ]),
             (0x0F, get_map_display_name(0x0F), 440, 50, 45, 40, [
                 ("exit", "Puerta Principal", 180, 280),
@@ -403,6 +407,24 @@ class WorldGraph:
             (0x1D, get_map_display_name(0x1D), 850, 1150, 59, 28, [
                 ("exit", "Puerta Principal de Salida (Script 0x02B4)", 272, 112),
             ]),
+            (0x11, get_map_display_name(0x11), 1150, 1150, 30, 28, [
+                ("exit", "Puerta Principal de Salida", 160, 260),
+            ]),
+            (0x25, get_map_display_name(0x25), 650, 1150, 46, 36, [
+                ("exit", "Puerta Principal de Salida", 160, 260),
+            ]),
+            (0x09, get_map_display_name(0x09), 450, 1150, 30, 28, [
+                ("exit", "Puerta del Establo", 160, 260),
+            ]),
+            (0x1C, get_map_display_name(0x1C), 1150, -480, 30, 28, [
+                ("exit", "Puerta Principal de Salida", 160, 260),
+            ]),
+            (0x33, get_map_display_name(0x33), 50, 420, 30, 26, [
+                ("exit", "Salida a la Cascada", 160, 200),
+            ]),
+            (0x2B, get_map_display_name(0x2B), 50, 250, 30, 20, [
+                ("exit", "Salida al Lago", 160, 160),
+            ]),
         ]
 
         for mid, name, cx, cy, w, h, warps in default_maps:
@@ -426,8 +448,11 @@ class WorldGraph:
             ("c_clinic_stairs", 0x13, "to_floor2", 0x14, "to_floor1", True, "Clínica P1 <-> P2"),
             ("c_north_lib", 0x05, "to_library", 0x18, "exit", True, "Pueblo Norte <-> Biblioteca"),
             ("c_lib_stairs", 0x18, "to_floor2", 0x19, "to_floor1", True, "Biblioteca P1 <-> P2"),
+            ("c_north_basil", 0x05, "to_basil", 0x1A, "exit", True, "Pueblo Norte <-> Casa de Basil"),
+            ("c_basil_stairs", 0x1A, "to_floor2", 0x1B, "to_floor1", True, "Casa de Basil P1 <-> P2"),
             ("c_north_church", 0x05, "to_church", 0x0C, "exit", True, "Pueblo Norte <-> Iglesia"),
             ("c_church_behind", 0x0C, "to_behind", 0x04, "to_church", True, "Iglesia <-> Jardín Trasero"),
+            ("c_behind_sprites", 0x04, "to_sprites", 0x1C, "exit", True, "Jardín Trasero <-> Cabaña Duendes"),
             ("c_south_poultry", 0x07, "to_poultry", 0x0A, "exit", True, "Pueblo Sur <-> Granja Avícola"),
             ("c_poultry_stairs", 0x0A, "to_floor2", 0x0B, "to_floor1", True, "Granja Avícola P1 <-> P2"),
             ("c_south_inn", 0x07, "to_inn", 0x15, "exit", True, "Pueblo Sur <-> Posada"),
@@ -445,6 +470,10 @@ class WorldGraph:
             ("c_winery_stairs", 0x1F, "to_floor2", 0x20, "to_floor1", True, "Bodega Aja P1 <-> P2"),
             ("c_winery_cellar", 0x1F, "to_storage", 0x22, "exit", True, "Bodega Aja <-> Cava"),
             ("c_farm_house", 0x02, "to_house", 0x1D, "exit", True, "Granja <-> Casa del Jugador"),
+            ("c_farm_coop", 0x02, "to_coop", 0x11, "exit", True, "Granja <-> Gallinero"),
+            ("c_farm_barn", 0x02, "to_barn", 0x25, "exit", True, "Granja <-> Establo"),
+            ("c_hill_mine", 0x00, "to_mine", 0x33, "exit", True, "Colina Madre <-> Mina Primavera"),
+            ("c_hill_lakemine", 0x00, "to_lake_mine", 0x2B, "exit", True, "Colina Madre <-> Mina Lago"),
         ]
 
         for cid, f_m, f_w, t_m, t_w, bidir, note in default_conns:

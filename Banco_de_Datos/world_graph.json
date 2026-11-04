@@ -126,6 +126,12 @@
           "y": 136
         },
         {
+          "warp_id": "to_basil",
+          "name": "Casa de Basil (Script 0x02EC)",
+          "x": 872,
+          "y": 136
+        },
+        {
           "warp_id": "to_mayor",
           "name": "Casa Alcalde Thomas (Script 0x02EE)",
           "x": 184,
@@ -254,6 +260,18 @@
           "name": "Aguas Termales & Cascada Diosa (Script 0x03D4)",
           "x": 824,
           "y": 512
+        },
+        {
+          "warp_id": "to_mine",
+          "name": "Entrada a la Mina de Primavera",
+          "x": 830,
+          "y": 470
+        },
+        {
+          "warp_id": "to_lake_mine",
+          "name": "Mina del Lago (Invierno)",
+          "x": 400,
+          "y": 300
         }
       ]
     },
@@ -308,6 +326,12 @@
           "name": "Entrada desde Iglesia",
           "x": 160,
           "y": 200
+        },
+        {
+          "warp_id": "to_sprites",
+          "name": "Camino a Cabaña de Duendes",
+          "x": 320,
+          "y": 160
         }
       ]
     },
@@ -770,6 +794,102 @@
           "y": 112
         }
       ]
+    },
+    {
+      "map_id": 17,
+      "name": "[11] Gallinero de la Granja",
+      "canvas_x": 1150.0,
+      "canvas_y": 1150.0,
+      "width": 30,
+      "height": 28,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal de Salida",
+          "x": 160,
+          "y": 260
+        }
+      ]
+    },
+    {
+      "map_id": 37,
+      "name": "[25] Establo de Animales (Granja)",
+      "canvas_x": 650.0,
+      "canvas_y": 1150.0,
+      "width": 46,
+      "height": 36,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal de Salida",
+          "x": 160,
+          "y": 260
+        }
+      ]
+    },
+    {
+      "map_id": 9,
+      "name": "[09] Establo del Caballo",
+      "canvas_x": 450.0,
+      "canvas_y": 1150.0,
+      "width": 30,
+      "height": 28,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta del Establo",
+          "x": 160,
+          "y": 260
+        }
+      ]
+    },
+    {
+      "map_id": 28,
+      "name": "[1C] Cabaña de los Duendes de la Cosecha",
+      "canvas_x": 1150.0,
+      "canvas_y": -480.0,
+      "width": 30,
+      "height": 28,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Puerta Principal de Salida",
+          "x": 160,
+          "y": 260
+        }
+      ]
+    },
+    {
+      "map_id": 51,
+      "name": "[33] Entrada a la Mina de Primavera",
+      "canvas_x": 50.0,
+      "canvas_y": 420.0,
+      "width": 30,
+      "height": 26,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Salida a la Cascada",
+          "x": 160,
+          "y": 200
+        }
+      ]
+    },
+    {
+      "map_id": 43,
+      "name": "[2B] Mina del Lago (Cenote / Isla)",
+      "canvas_x": 50.0,
+      "canvas_y": 250.0,
+      "width": 30,
+      "height": 20,
+      "warps": [
+        {
+          "warp_id": "exit",
+          "name": "Salida al Lago",
+          "x": 160,
+          "y": 160
+        }
+      ]
     }
   ],
   "connections": [
@@ -891,6 +1011,24 @@
       "note": "Biblioteca P1 <-> P2"
     },
     {
+      "conn_id": "c_north_basil",
+      "from_map_id": 5,
+      "from_warp_id": "to_basil",
+      "to_map_id": 26,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Pueblo Norte <-> Casa de Basil"
+    },
+    {
+      "conn_id": "c_basil_stairs",
+      "from_map_id": 26,
+      "from_warp_id": "to_floor2",
+      "to_map_id": 27,
+      "to_warp_id": "to_floor1",
+      "bidirectional": true,
+      "note": "Casa de Basil P1 <-> P2"
+    },
+    {
       "conn_id": "c_north_church",
       "from_map_id": 5,
       "from_warp_id": "to_church",
@@ -907,6 +1045,15 @@
       "to_warp_id": "to_church",
       "bidirectional": true,
       "note": "Iglesia <-> Jardín Trasero"
+    },
+    {
+      "conn_id": "c_behind_sprites",
+      "from_map_id": 4,
+      "from_warp_id": "to_sprites",
+      "to_map_id": 28,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Jardín Trasero <-> Cabaña Duendes"
     },
     {
       "conn_id": "c_south_poultry",
@@ -1060,6 +1207,42 @@
       "to_warp_id": "exit",
       "bidirectional": true,
       "note": "Granja <-> Casa del Jugador"
+    },
+    {
+      "conn_id": "c_farm_coop",
+      "from_map_id": 2,
+      "from_warp_id": "to_coop",
+      "to_map_id": 17,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Granja <-> Gallinero"
+    },
+    {
+      "conn_id": "c_farm_barn",
+      "from_map_id": 2,
+      "from_warp_id": "to_barn",
+      "to_map_id": 37,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Granja <-> Establo"
+    },
+    {
+      "conn_id": "c_hill_mine",
+      "from_map_id": 0,
+      "from_warp_id": "to_mine",
+      "to_map_id": 51,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Colina Madre <-> Mina Primavera"
+    },
+    {
+      "conn_id": "c_hill_lakemine",
+      "from_map_id": 0,
+      "from_warp_id": "to_lake_mine",
+      "to_map_id": 43,
+      "to_warp_id": "exit",
+      "bidirectional": true,
+      "note": "Colina Madre <-> Mina Lago"
     }
   ]
 }

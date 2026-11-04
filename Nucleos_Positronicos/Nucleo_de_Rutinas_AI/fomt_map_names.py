@@ -317,23 +317,86 @@ CANONICAL_MAP_INFO: Dict[int, Dict[str, Any]] = {
     },
     0x2B: {
         "key": "Mine_Lake",
-        "name_es": "Mina del Lago (Isla)",
-        "name_en": "Lake Mine",
-        "header_id": 14,
+        "name_es": "Mina del Lago (Cenote / Isla)",
+        "name_en": "Lake Mine (Cenote)",
+        "header_id": 60,
+        "is_outdoor": False
+    },
+    0x2C: {
+        "key": "Mothers_Hill_Top_2",
+        "name_es": "Cima de la Colina Madre (Verano)",
+        "name_en": "Mother's Hill (Peak Summer)",
+        "header_id": 16,
         "is_outdoor": True
+    },
+    0x2D: {
+        "key": "Mothers_Hill_Top_Rain",
+        "name_es": "Cima de la Colina Madre (Lluvia)",
+        "name_en": "Mother's Hill (Peak Rain)",
+        "header_id": 16,
+        "is_outdoor": True
+    },
+    0x2E: {
+        "key": "Mothers_Hill_Top_Snow",
+        "name_es": "Cima de la Colina Madre (Invierno)",
+        "name_en": "Mother's Hill (Peak Snow)",
+        "header_id": 17,
+        "is_outdoor": True
+    },
+    0x2F: {
+        "key": "Tutorial_Field",
+        "name_es": "Campo de Tutorial",
+        "name_en": "Tutorial Field",
+        "header_id": 62,
+        "is_outdoor": True
+    },
+    0x30: {
+        "key": "Tutorial_Animals_Field",
+        "name_es": "Pasto de Animales (Tutorial)",
+        "name_en": "Tutorial Animal Field",
+        "header_id": 63,
+        "is_outdoor": True
+    },
+    0x31: {
+        "key": "Tutorial_Chicken_House",
+        "name_es": "Gallinero (Tutorial)",
+        "name_en": "Tutorial Chicken Coop",
+        "header_id": 65,
+        "is_outdoor": False
+    },
+    0x32: {
+        "key": "Tutorial_Barn",
+        "name_es": "Establo (Tutorial)",
+        "name_en": "Tutorial Barn",
+        "header_id": 64,
+        "is_outdoor": False
     },
     0x33: {
         "key": "Mine_Entrance",
         "name_es": "Entrada a la Mina de Primavera",
         "name_en": "Spring Mine Entrance",
-        "header_id": 14,
+        "header_id": 56,
         "is_outdoor": False
     },
     0x34: {
         "key": "Mine_Floor_1",
-        "name_es": "Mina (Piso 1)",
-        "name_en": "Mine (Floor 1)",
-        "header_id": 14,
+        "name_es": "Mina de Primavera (Piso 1)",
+        "name_en": "Spring Mine (Floor 1)",
+        "header_id": 57,
+        "is_outdoor": False
+    },
+    0x35: {
+        "key": "Mine_Floor_2",
+        "name_es": "Mina (Piso 2)",
+        "name_en": "Mine (Floor 2)",
+        "header_id": 58,
+        "is_outdoor": False
+    },
+    0x36: {
+        "key": "Mine_Floor_3",
+        "name_es": "Mina (Piso 3)",
+        "name_en": "Mine (Floor 3)",
+        "header_id": 59,
         "is_outdoor": False
     }
 }
@@ -365,11 +428,19 @@ def get_map_display_name(map_id: int, include_season: bool = False) -> str:
     Retorna el nombre formal, exacto y amigable para el usuario en español.
     Ejemplo: "[07] Pueblo Sur" o "[15] Posada de Doug (P1)"
     """
+    raw_id = int(map_id) & 0xFFFF
     base_id, season_code = unpack_fomt_map_id(map_id)
+
+    # Detección de estado Despawn / Fuera de Mapa (bit 9 o valor canónico 0x0234 / 0x0634)
+    if (raw_id & 0x200) or (base_id == 0x34 and raw_id in (0x0234, 0x0634)):
+        return f"[{base_id:02X}] Fuera de Mapa (Despawn / Limbo)"
+
     info = CANONICAL_MAP_INFO.get(base_id)
     
     if info:
         name = info["name_es"]
+    elif 0x34 <= base_id <= 0x62:
+        name = f"Mina (Piso {base_id - 0x34 + 1})"
     else:
         name = f"Mapa 0x{base_id:02X}"
 
@@ -387,6 +458,9 @@ def get_map_header_id_for_event_map(map_id: int) -> Optional[int]:
     base_id, season_code = unpack_fomt_map_id(map_id)
     info = CANONICAL_MAP_INFO.get(base_id)
     if not info:
+        # Pisos de mina repetitivos (0x34 a 0x62) usan tipos de cabecera 57, 58, 59
+        if 0x34 <= base_id <= 0x62:
+            return 57 + ((base_id - 0x34) % 3)
         return None
 
     h_id = info.get("header_id")

@@ -489,6 +489,7 @@ class EditorRutinasNPCWidget(QWidget):
         # Lienzo MacroMapView
         self.macro_view = MacroMapView(self.world_graph, self)
         self.macro_view.connection_created.connect(self._on_connection_created_signal)
+        self.macro_view.map_selected.connect(self._on_macro_map_selected)
         tab_macro_layout.addWidget(self.macro_view)
 
         self.right_tabs.addTab(tab_macro, " Macromapa Global de Mineral Town (Red A*)")
@@ -538,7 +539,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.combo_filter_map.blockSignals(True)
         self.combo_filter_map.clear()
 
-        # Calcular estadísticas de presencia por mapa (usando base_map_id con máscara canónica 0x3FF)
+        # Calcular estadísticas de presencia por mapa (usando base_map_id con máscara canónica 0xFF)
         map_stats: Dict[int, set] = {}
         map_tramo_counts: Dict[int, int] = {}
 
@@ -547,12 +548,12 @@ class EditorRutinasNPCWidget(QWidget):
                 if not sched:
                     continue
                 for wp in sched.waypoints:
-                    base_mid = wp.map_id & 0x3FF
+                    base_mid = wp.map_id & 0xFF
                     map_stats.setdefault(base_mid, set()).add(nid)
                     map_tramo_counts[base_mid] = map_tramo_counts.get(base_mid, 0) + 1
 
         for mid, node in sorted(self.world_graph.nodes.items(), key=lambda x: x[0]):
-            base_mid = mid & 0x3FF
+            base_mid = mid & 0xFF
             npc_set = map_stats.get(base_mid, set())
             tramos = map_tramo_counts.get(base_mid, 0)
             map_name = get_map_display_name(base_mid)
@@ -673,7 +674,7 @@ class EditorRutinasNPCWidget(QWidget):
             curr_wp = wps[i]
             prev_wp = wps[i - 1] if i > 0 else curr_wp
 
-            curr_mid = curr_wp.map_id & 0x3FF
+            curr_mid = curr_wp.map_id & 0xFF
             ax, ay = curr_wp.spawn_x, curr_wp.spawn_y
             bx, by = curr_wp.dest_x, curr_wp.dest_y
 
@@ -723,10 +724,14 @@ class EditorRutinasNPCWidget(QWidget):
 
         # Actualizar vista general del mapa y trazar líneas de movimiento
         if segments:
-            first_map = segments[0]["map_id"]
+            # Buscar el primer tramo ACTIVO (con coordenadas reales distintas de 0,0 o no despawn)
+            active_seg = next((s for s in segments if s.get("ax", 0) > 0 or s.get("ay", 0) > 0 or s.get("bx", 0) > 0 or s.get("by", 0) > 0), segments[0])
+            first_map = active_seg["map_id"]
             self.route_canvas.load_map_view(first_map)
-            self.lbl_canvas_map_name.setText(f" {segments[0]['map_name']}")
-            self.route_canvas.set_route_segments(segments, highlight_id=segments[0]["id"])
+            self.lbl_canvas_map_name.setText(f" {active_seg['map_name']}")
+            self.route_canvas.set_route_segments(segments, highlight_id=active_seg["id"])
+            if active_seg.get("ax") or active_seg.get("ay"):
+                self.route_canvas.center_on_point(active_seg["ax"], active_seg["ay"])
         else:
             self.route_canvas.set_route_segments([])
 
@@ -737,7 +742,7 @@ class EditorRutinasNPCWidget(QWidget):
         if target_map_id is None:
             return
 
-        target_base = target_map_id & 0x3FF
+        target_base = target_map_id & 0xFF
         segments = []
 
         for nid, npc in self.all_npcs.items():
@@ -747,7 +752,7 @@ class EditorRutinasNPCWidget(QWidget):
                 wps = sched.waypoints
                 for wid in range(len(wps)):
                     curr_wp = wps[wid]
-                    curr_base = curr_wp.map_id & 0x3FF
+                    curr_base = curr_wp.map_id & 0xFF
 
                     if curr_base == target_base:
                         prev_wp = wps[wid - 1] if wid > 0 else curr_wp
@@ -872,6 +877,19 @@ class EditorRutinasNPCWidget(QWidget):
         header_layout.addStretch()
         header_layout.addWidget(btn_close_insp)
         insp_layout.addLayout(header_layout)
+
+        # 1.1 Selector de Mapa del Hito
+        row_map = QHBoxLayout()
+        lbl_map_tag = QLabel("Mapa:")
+        lbl_map_tag.setStyleSheet("color: #58A6FF; font-weight: bold; font-size: 11px;")
+        self.combo_seg_map = QComboBox()
+        self.combo_seg_map.setStyleSheet("font-size: 11px; padding: 2px;")
+        for mid, minfo in sorted(CANONICAL_MAP_INFO.items()):
+            self.combo_seg_map.addItem(f"[{mid:02X}] {minfo['name_es']}", mid)
+        self.combo_seg_map.currentIndexChanged.connect(self._on_segment_map_changed)
+        row_map.addWidget(lbl_map_tag)
+        row_map.addWidget(self.combo_seg_map, 1)
+        insp_layout.addLayout(row_map)
 
         # 2. Selector de asignación de clics en el lienzo
         click_target_box = QGroupBox(" Clic en Mapa Asigna a:")
@@ -1147,6 +1165,11 @@ class EditorRutinasNPCWidget(QWidget):
             if idx_dir >= 0:
                 self.combo_dir.setCurrentIndex(idx_dir)
 
+            if hasattr(self, "combo_seg_map"):
+                idx_map = self.combo_seg_map.findData(seg["base_map_id"])
+                if idx_map >= 0:
+                    self.combo_seg_map.setCurrentIndex(idx_map)
+
             speed_val = seg.get("speed_val", 1.0)
             idx_spd = self.combo_speed.findData(speed_val)
             if idx_spd >= 0:
@@ -1189,6 +1212,20 @@ class EditorRutinasNPCWidget(QWidget):
         self.lbl_canvas_map_name.setText(f" {seg['map_name']}")
         self.route_canvas.set_route_segments(self.current_segments, highlight_id=seg["id"])
 
+        # Centrar suavemente la cámara sobre las coordenadas del tramo seleccionado
+        if seg.get("ax") or seg.get("ay"):
+            self.route_canvas.center_on_point(seg["ax"], seg["ay"])
+        elif seg.get("bx") or seg.get("by"):
+            self.route_canvas.center_on_point(seg["bx"], seg["by"])
+
+        # Sincronizar el selector de mapa del filtro si estamos en modo por mapa
+        if self.current_mode == "BY_MAP":
+            idx_m = self.combo_filter_map.findData(seg["base_map_id"])
+            if idx_m >= 0 and self.combo_filter_map.currentIndex() != idx_m:
+                self.combo_filter_map.blockSignals(True)
+                self.combo_filter_map.setCurrentIndex(idx_m)
+                self.combo_filter_map.blockSignals(False)
+
         # Asegurar posicionamiento del inspector flotante
         if self.act_rc_inspector.isChecked():
             self.floating_inspector.show()
@@ -1196,6 +1233,42 @@ class EditorRutinasNPCWidget(QWidget):
 
         # Poblar controles de puntos de inflexión
         self._populate_inflection_combo(seg["wp_ref"])
+
+    def _on_segment_map_changed(self, index: int):
+        """Permite al usuario reasignar el mapa canónico del hito seleccionado."""
+        if self._updating_ui:
+            return
+        new_mid = self.combo_seg_map.currentData()
+        if new_mid is None:
+            return
+        rows = self.table_segments.selectionModel().selectedRows()
+        if not rows or not self.current_schedule:
+            return
+        row = rows[0].row()
+        if row >= len(self.current_schedule.waypoints):
+            return
+        wp = self.current_schedule.waypoints[row]
+        wp.map_id = new_mid
+        wp.is_edited = True
+        self._refresh_npc_segments()
+        self.table_segments.selectRow(row)
+
+    def _on_macro_map_selected(self, map_id: int):
+        """Responde a clics sobre nodos del Macromapa para sincronizar el visor y filtro."""
+        base_id, _ = unpack_fomt_map_id(map_id)
+        self.route_canvas.load_map_view(base_id)
+        self.lbl_canvas_map_name.setText(f" {get_map_display_name(base_id)}")
+
+        if self.current_mode == "BY_MAP":
+            idx = self.combo_filter_map.findData(base_id)
+            if idx >= 0:
+                self.combo_filter_map.setCurrentIndex(idx)
+        else:
+            # En modo Por Aldeano, si este NPC tiene algún tramo en este mapa, seleccionarlo
+            for r, s in enumerate(self.current_segments):
+                if (s.get("base_map_id", 0) & 0xFF) == base_id:
+                    self.table_segments.selectRow(r)
+                    break
 
     def _on_recalc_a_star_clicked(self):
         """Fuerza un recálculo A* completo desde Inicio (A) hasta Destino (B)."""
@@ -1880,9 +1953,16 @@ class EditorRutinasNPCWidget(QWidget):
 
         last_wp = self.current_schedule.waypoints[-1] if self.current_schedule.waypoints else None
         next_time = (last_wp.time_val + 60) if last_wp else 360
-        next_map = last_wp.map_id if last_wp else 0x02
-        next_x = last_wp.spawn_x + 16 if last_wp else 160
-        next_y = last_wp.spawn_y + 16 if last_wp else 160
+        
+        # Si el último hito es un despawn (mapa 0x34 o coords 0,0), usar el mapa actualmente en pantalla
+        if last_wp and (last_wp.map_id & 0xFF) != 0x34 and (last_wp.spawn_x > 0 or last_wp.spawn_y > 0):
+            next_map = last_wp.map_id & 0xFF
+            next_x = last_wp.spawn_x + 16
+            next_y = last_wp.spawn_y + 16
+        else:
+            next_map = self.route_canvas.current_map_id if self.route_canvas.current_map_id is not None else 0x02
+            next_x = 160
+            next_y = 160
 
         new_wp = RoutineWaypoint(
             time_val=min(1439, next_time),

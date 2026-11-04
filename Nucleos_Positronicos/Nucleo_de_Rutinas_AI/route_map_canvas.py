@@ -120,13 +120,15 @@ class RouteVectorOverlayItem(QGraphicsItem):
 
         # 1. Filtrar segmentos del mapa actual
         current_map_id = self.canvas_view.current_map_id
-        current_base_id = (current_map_id & 0x3FF) if current_map_id is not None else None
+        current_base_id = (current_map_id & 0xFF) if current_map_id is not None else None
 
         map_segments: List[Tuple[int, dict]] = []
         for idx, seg in enumerate(self.segments):
             seg_mid = seg.get("base_map_id")
             if seg_mid is None:
                 seg_mid = unpack_fomt_map_id(seg.get("map_id", 0))[0]
+            else:
+                seg_mid = seg_mid & 0xFF
 
             if current_base_id is not None and seg_mid != current_base_id:
                 continue
@@ -682,6 +684,10 @@ class RouteMapCanvas(QGraphicsView):
     def zoom_fit(self):
         if self.map_pixmap and not self.map_pixmap.isNull():
             self.fitInView(self.map_pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
+
+    def center_on_point(self, x: float, y: float):
+        """Centra suavemente la vista del mapa sobre las coordenadas dadas."""
+        self.centerOn(QPointF(float(x), float(y)))
 
     def zoom_reset(self):
         self.resetTransform()
