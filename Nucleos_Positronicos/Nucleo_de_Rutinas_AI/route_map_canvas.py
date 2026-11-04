@@ -279,6 +279,20 @@ class RouteVectorOverlayItem(QGraphicsItem):
                             painter.drawText(QRectF(p_curr.x() - 5, p_curr.y() - 5, 10, 10),
                                              Qt.AlignmentFlag.AlignCenter, str(step_i))
 
+                    # Si el nodo tiene delay > 0 en tramo resaltado, mostrar badge de delay
+                    if is_hl:
+                        wp_ref = seg.get("wp_ref")
+                        node_d = wp_ref.get_node_delay(step_i) if (wp_ref and hasattr(wp_ref, "get_node_delay")) else 0
+                        if node_d > 0:
+                            delay_badge = f"{node_d}f ({node_d/60.0:.1f}s)"
+                            painter.setFont(QFont("Segoe UI", 6, QFont.Weight.Bold))
+                            painter.setBrush(QBrush(QColor(13, 17, 23, 230)))
+                            painter.setPen(QPen(QColor("#58A6FF"), 1.0))
+                            badge_rect = QRectF(p_curr.x() - 20, p_curr.y() - 20, 40, 12)
+                            painter.drawRoundedRect(badge_rect, 3, 3)
+                            painter.setPen(QColor("#79C0FF"))
+                            painter.drawText(badge_rect, Qt.AlignmentFlag.AlignCenter, delay_badge)
+
                 # Punto A (Inicio) en Verde esmeralda con halo interactivo
                 pt_a = QPointF(path_nodes[0][0], path_nodes[0][1])
                 is_a_active = is_hl and (getattr(self.canvas_view, "active_node_idx", None) == 0)
@@ -339,7 +353,7 @@ class RouteVectorOverlayItem(QGraphicsItem):
             if self.show_labels:
                 time_str = seg.get("time_str", "")
                 delay_str = seg.get("delay_str", "0m")
-                loop_tag = " 🔄 Bucle" if is_loop else ""
+                loop_tag = "  Bucle" if is_loop else ""
                 tag_text = f"#{orig_idx+1}{loop_tag} {time_str} ({delay_str})"
 
                 lbl_w = 110 if is_loop else 90
@@ -558,14 +572,9 @@ class RouteMapCanvas(QGraphicsView):
                 with open(self.project.base_rom_path, "rb") as f:
                     rom_data = f.read()
 
-        if not rom_data:
-            default_gba = "J:/Laboratorio/Repositorios/fomt virgen.gba"
-            if os.path.exists(default_gba):
-                try:
-                    with open(default_gba, "rb") as f:
-                        rom_data = f.read()
-                except Exception:
-                    pass
+        if self.project:
+            from Banco_de_Datos.parche_splash import require_rom_signature
+            require_rom_signature(self.project, auto_sign=True, module_name="RouteMapCanvas")
 
         if not rom_data:
             return None
@@ -838,16 +847,16 @@ class RouteMapCanvas(QGraphicsView):
             is_loop = (len(nodes) > 1 and nodes[0] == nodes[-1])
             if node_i == 0:
                 if is_loop:
-                    self.setToolTip(f"🔄 [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
+                    self.setToolTip(f" [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
                 else:
-                    self.setToolTip(f"🟢 [Punto A (Inicio)]: ({nx}, {ny})\nArrastra para mover el inicio de la ruta")
+                    self.setToolTip(f" [Punto A (Inicio)]: ({nx}, {ny})\nArrastra para mover el inicio de la ruta")
             elif node_i == len(nodes) - 1:
                 if is_loop:
-                    self.setToolTip(f"🔄 [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
+                    self.setToolTip(f" [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
                 else:
-                    self.setToolTip(f"🎯 [Punto B (Destino)]: ({nx}, {ny})\nArrastra para mover el destino de la ruta")
+                    self.setToolTip(f" [Punto B (Destino)]: ({nx}, {ny})\nArrastra para mover el destino de la ruta")
             else:
-                self.setToolTip(f"🔷 [Punto de Inflexión #{node_i}]: ({nx}, {ny})\nArrastra para centrar en la calle o Clic Derecho para opciones")
+                self.setToolTip(f" [Punto de Inflexión #{node_i}]: ({nx}, {ny})\nArrastra para centrar en la calle o Clic Derecho para opciones")
         else:
             seg_match = self.find_segment_at(sc_pos, threshold=8.0)
             if seg_match is not None:
@@ -904,8 +913,8 @@ class RouteMapCanvas(QGraphicsView):
             "QMenu::item { padding: 5px 20px; border-radius: 3px; }"
             "QMenu::item:selected { background-color: #1F6FEB; color: white; }"
         )
-        act_snap = menu.addAction(f"🚶 Centrar Inflexión #{node_idx} en Calle/Tile")
-        act_del = menu.addAction(f"🗑️ Eliminar Punto de Inflexión #{node_idx}")
+        act_snap = menu.addAction(f" Centrar Inflexión #{node_idx} en Calle/Tile")
+        act_del = menu.addAction(f"️ Eliminar Punto de Inflexión #{node_idx}")
 
         pt = global_pt.toPoint() if hasattr(global_pt, "toPoint") else QPoint(int(global_pt.x()), int(global_pt.y()))
         action = menu.exec(pt)

@@ -47,6 +47,12 @@ def aplicar_parche_cultivos(project):
                 project.save()
             except Exception:
                 pass
+
+        if hasattr(project, 'save_rom'):
+            try:
+                project.save_rom()
+            except Exception:
+                pass
         return True
     except Exception as e:
         raise Exception(f"Fallo al aplicar parche de cultivos:\n{e}")

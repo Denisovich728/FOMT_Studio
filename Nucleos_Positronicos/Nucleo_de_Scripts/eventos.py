@@ -27,6 +27,8 @@ class FoMTEventParser:
     para masticar los punteros maestros del GBA y mandarlos en texto al IDE, y viceversa.
     """
     def __init__(self, project):
+        from Banco_de_Datos.parche_splash import require_rom_signature
+        require_rom_signature(project, auto_sign=True, module_name='FoMTEventParser')
         self.project = project
         self.super_lib = project.super_lib
         self.scanned_sizes = {}

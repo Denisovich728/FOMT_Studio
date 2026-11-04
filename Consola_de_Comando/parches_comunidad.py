@@ -88,6 +88,12 @@ def aplicar_parche_cultivos(project):
         except Exception:
             pass
 
+    if hasattr(project, 'save_rom'):
+        try:
+            project.save_rom()
+        except Exception:
+            pass
+
     return True, "Parche instalado: Cultivos 100% caminables y Z-sorting de BG corregido."
 
 

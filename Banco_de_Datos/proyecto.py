@@ -90,8 +90,9 @@ class FoMTProject:
             self.virtual_rom[offset : offset + len(data)] = data
             
         # Validación e Inyección Obligatoria del Splash (Control de Integridad)
-        from Banco_de_Datos.parche_splash import validar_e_inyectar_splash
+        from Banco_de_Datos.parche_splash import validar_e_inyectar_splash, assert_rom_signed
         validar_e_inyectar_splash(self)
+        assert_rom_signed(self, 'step_1_detect_rom')
             
         # Inicialización dinámica post-parches
         self.super_lib.dynamic_init(self.virtual_rom)
@@ -99,6 +100,8 @@ class FoMTProject:
         return self.game_version
 
     def step_2_scan_events(self):
+        from Banco_de_Datos.parche_splash import assert_rom_signed
+        assert_rom_signed(self, 'step_2_scan_events')
         """Paso 2: Análisis de Mapas, NPCs y Eventos (Lógica)."""
         self.item_parser = ItemParser(self)
         self.event_parser = FoMTEventParser(self)
@@ -109,12 +112,16 @@ class FoMTProject:
         return True
 
     def step_3_scan_graphics(self):
+        from Banco_de_Datos.parche_splash import assert_rom_signed
+        assert_rom_signed(self, 'step_3_scan_graphics')
         """Paso 3: Escaneo profundo de firmas StanHash (Pesado)."""
         if self.super_lib:
             self.super_lib.scan_data_banks(self.base_rom_data)
         return len(self.super_lib.data_banks)
 
     def step_4_scan_audio(self):
+        from Banco_de_Datos.parche_splash import assert_rom_signed
+        assert_rom_signed(self, 'step_4_scan_audio')
         """Paso 4: Indexación de música Sappy (Pesado)."""
         self.songs = self.sappy_engine.scan_songs()
         return len(self.songs)
@@ -223,6 +230,34 @@ class FoMTProject:
         # 2. Sincronizar el buffer de memoria virtual para lecturas inmediatas
         if hasattr(self, 'virtual_rom'):
             self.virtual_rom[offset : offset + len(data)] = data
+        # 3. Sincronizar base_rom_data si existe
+        if getattr(self, 'base_rom_data', None):
+            ba = bytearray(self.base_rom_data)
+            ba[offset : offset + len(data)] = data
+            self.base_rom_data = bytes(ba)
+
+    def save_rom(self, target_path=None):
+        from Banco_de_Datos.parche_splash import is_rom_signed, inyectar_splash_y_firmar, assert_rom_signed
+        if not is_rom_signed(self):
+            inyectar_splash_y_firmar(self)
+        assert_rom_signed(self, "ROM Export/Save")
+        from Banco_de_Datos.parche_splash import assert_rom_signed
+        assert_rom_signed(self, 'save_rom')
+        """
+        Escribe directamente todos los cambios acumulados en el archivo físico ROM base (o target_path).
+        Permite que emuladores como mGBA ejecuten inmediatamente las modificaciones.
+        """
+        out_path = target_path or getattr(self, 'base_rom_path', None)
+        if not out_path or not os.path.exists(out_path):
+            return False
+        with open(out_path, "r+b") as f:
+            for offset, patch_data in self.patches.items():
+                f.seek(offset)
+                f.write(patch_data)
+        if hasattr(self, 'virtual_rom'):
+            self.base_rom_data = bytes(self.virtual_rom)
+        print(f"[*] ROM física guardada en {out_path} ({len(self.patches)} parches aplicados).")
+        return True
 
     # write_bytes es el alias esperado por save_warps_to_rom y MapHeader
     def write_bytes(self, offset: int, data: bytes):
@@ -237,6 +272,12 @@ class FoMTProject:
         return decompress_auto(self.base_rom_data, offset)
 
     def compile_to_rom(self, export_path):
+        from Banco_de_Datos.parche_splash import is_rom_signed, inyectar_splash_y_firmar, assert_rom_signed
+        if not is_rom_signed(self):
+            inyectar_splash_y_firmar(self)
+        assert_rom_signed(self, "ROM Export/Save")
+        from Banco_de_Datos.parche_splash import assert_rom_signed
+        assert_rom_signed(self, 'compile_to_rom')
         """Aplica todos los parches virtuales a la ROM base y exporta un archivo GBA."""
         # Evitar copiar sobre sí mismo si el usuario elige source.gba por error
         if os.path.abspath(self.base_rom_path) == os.path.abspath(export_path):
@@ -251,6 +292,12 @@ class FoMTProject:
                 f.write(patch_data)
 
     def export_ips(self, export_path):
+        from Banco_de_Datos.parche_splash import is_rom_signed, inyectar_splash_y_firmar, assert_rom_signed
+        if not is_rom_signed(self):
+            inyectar_splash_y_firmar(self)
+        assert_rom_signed(self, "ROM Export/Save")
+        from Banco_de_Datos.parche_splash import assert_rom_signed
+        assert_rom_signed(self, 'export_ips')
         """Exporta los parches acumulados en el formato estándar IPS."""
         import struct
         with open(export_path, "wb") as f:

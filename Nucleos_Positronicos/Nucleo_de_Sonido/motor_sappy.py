@@ -78,6 +78,7 @@ class SappyParser:
 
     def __init__(self, proyecto):
         self.proyecto = proyecto
+        self.project = proyecto
         self.songs = []
         self.bgm_assignments = []  # Resultado de scan_bgm_assignments()
 
@@ -116,6 +117,8 @@ class SappyParser:
     # ═══════════════════════════════════════════════════════════════════
 
     def scan_songs(self):
+        from Banco_de_Datos.parche_splash import require_rom_signature
+        require_rom_signature(self.project, auto_sign=True, module_name='SappyParser')
         """Escanea la tabla de canciones y extrae los encabezados básicos."""
         self.songs = []
         offset = self.song_table_offset

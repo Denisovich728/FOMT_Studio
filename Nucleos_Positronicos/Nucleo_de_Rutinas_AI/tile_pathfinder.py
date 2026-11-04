@@ -49,14 +49,8 @@ class TilePathfinder:
                 except Exception:
                     pass
 
-        default_gba = "J:/Laboratorio/Repositorios/fomt virgen.gba"
-        if os.path.exists(default_gba):
-            try:
-                with open(default_gba, "rb") as f:
-                    self.rom_data = f.read()
-                    return self.rom_data
-            except Exception:
-                pass
+        # Solo se permite ROM del proyecto autorizado
+        pass
 
         return None
 

@@ -24,10 +24,23 @@ if os.path.exists(_BLUESPIDER_PATH) and _BLUESPIDER_PATH not in sys.path:
     sys.path.insert(0, _BLUESPIDER_PATH)
 
 
+_decomp_cache = {}
+
 def _decompress(rom: bytes, offset: int) -> bytes:
-    """Descomprime usando el motor nativo de FoMT Studio."""
-    from Nucleos_Positronicos.Nucleo_de_Mapas.mapas import decompress_auto
-    return decompress_auto(bytes(rom), offset)
+    """Descomprime usando el motor nativo de FoMT Studio con caché para máxima fluidez."""
+    key = (id(rom), offset)
+    if key in _decomp_cache:
+        return _decomp_cache[key]
+    try:
+        from Nucleos_Positronicos.Nucleo_de_Mapas.mapas import decompress_auto
+    except ImportError:
+        try:
+            from mapas import decompress_auto
+        except ImportError:
+            from .mapas import decompress_auto
+    res = decompress_auto(bytes(rom), offset)
+    _decomp_cache[key] = res
+    return res
 
 
 def _apply_delta_4bpp(data: bytes) -> bytes:
@@ -110,6 +123,30 @@ def _render_tile(tile_indices: list, palette: list,
 #  La clase principal: FomtMapRenderer
 #  Equivalente a blue-spider's MapData + BlocksData + draw_map() combined
 # ─────────────────────────────────────────────────────────────────────────────
+
+ROM_BUILDINGS_TABLE = 0x10692C
+
+BUILDING_ROM_ENTRIES = {
+    'farmhouse': {
+        'lv1': {'summer': 0, 'winter': 1, 'x': 26, 'y': 3},
+        'lv2': {'summer': 2, 'winter': 3, 'x': 26, 'y': 3},
+        'lv3': {'summer': 4, 'winter': 5, 'x': 26, 'y': 3},
+    },
+    'barn': {
+        'lv1': {'summer': 6, 'winter': 7, 'x': 58, 'y': 2},
+        'lv2': {'summer': 8, 'winter': 9, 'x': 58, 'y': 2},
+    },
+    'chicken_coop': {
+        'lv1': {'summer': 10, 'winter': 11, 'x': 14, 'y': 52},
+        'lv2': {'summer': 12, 'winter': 13, 'x': 14, 'y': 52},
+    },
+    'mailbox': {'summer': 46, 'winter': 46, 'x': 34, 'y': 6},
+    # 'doghouse': Eliminado para evitar colisión de tiles glitcheados
+    'town_cottage': {'summer': 38, 'winter': 39, 'x': 20, 'y': 15},
+    'beach_cottage': {'summer': 40, 'winter': 41, 'x': 30, 'y': 26},
+    'mountain_cottage': {'summer': 44, 'winter': 45, 'x': 23, 'y': 20},
+}
+
 class FomtMapRenderer:
     """
     Motor de renderizado de mapas FoMT basado en la arquitectura de blue-spider.
@@ -136,6 +173,18 @@ class FomtMapRenderer:
         self.height = 0
         self._loaded = False
         self._map_header = None
+        self._tile_cache = {}          # Caché acelerado de tiles renderizados
+        self.dynamic_config = {
+            'enabled': True,
+            'farmhouse': 'lv1',        # 'none', 'lv1', 'lv2', 'lv3'
+            'barn': 'lv1',             # 'none', 'lv1', 'lv2'
+            'chicken_coop': 'lv1',     # 'none', 'lv1', 'lv2'
+            'extras': True,            # Buzón, caseta de perro
+            'field_grid': False,       # Malla canónica de cultivo 43x25 plots
+            'beach_cottage': True,     # Villa de la playa (Mapas 08, 09)
+            'mountain_cottage': True,  # Villa de la montaña (Mapas 14, 15)
+            'town_cottage': True       # Villa de la ciudad (Mapas 04, 05, 06, 07)
+        }
 
     def load_map(self, map_header) -> bool:
         """
@@ -144,6 +193,7 @@ class FomtMapRenderer:
         """
         self._loaded = False
         self._map_header = map_header
+        self._tile_cache.clear()
         rom = self.rom
 
         try:
@@ -291,10 +341,32 @@ class FomtMapRenderer:
                 tgt.append(val)
             print(f"[FomtMapRenderer] {attr}: {n_cells} celdas (raw bytes: {len(raw)})")
 
+    def _stamp_rom_structure(self, bg3, bg2, bg1, entry_idx, map_x, map_y):
+        if not self.rom or entry_idx is None:
+            return
+        entry_off = ROM_BUILDINGS_TABLE + entry_idx * 24
+        if entry_off + 24 > len(self.rom):
+            return
+        w, h = struct.unpack_from('<BB', self.rom, entry_off)
+        p_bg3, p_bg2, p_bg1 = struct.unpack_from('<III', self.rom, entry_off + 4)
+
+        for ptr, tmap in [(p_bg3, bg3), (p_bg2, bg2), (p_bg1, bg1)]:
+            if ptr != 0 and tmap:
+                off = ptr & 0x01FFFFFF
+                if off + w * h * 2 <= len(self.rom):
+                    for y in range(h):
+                        for x in range(w):
+                            t_val = struct.unpack_from('<H', self.rom, off + (y * w + x) * 2)[0]
+                            # 0x03FF y 0xFFFF corresponden a tiles transparentes en GBA FoMT
+                            if t_val != 0x03FF and t_val != 0xFFFF:
+                                dst_idx = (map_y + y) * self.width + (map_x + x)
+                                if dst_idx < len(tmap):
+                                    tmap[dst_idx] = t_val
+
     def render(self, show_bg1=True, show_bg2=True, show_bg3=True, show_col=False, bank=1, invert_bg=False) -> Image.Image | None:
         """
-        Renderiza el mapa completo usando mapeo directo 8x8.
-        Acepta flags para ocultar/mostrar capas, elegir banco de paletas e invertir BGs.
+        Renderiza el mapa completo usando mapeo directo 8x8 optimizado con caché y
+        superposición opcional de estructuras dinámicas (Granja / Cabañas).
         """
         if not self._loaded:
             return None
@@ -302,13 +374,14 @@ class FomtMapRenderer:
         w, h = self.width, self.height
         palettes = self.palettes_1 if bank == 1 else self.palettes_2
         
-        # Renderizar usando draw_layer
+        # Renderizado de capas de tiles 8x8 con caché instantáneo
         def draw_layer(tgt_list, base_img, is_overlay=False):
             if not tgt_list: return base_img
-            overlay = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0)) if is_overlay else base_img
             for row in range(h):
+                row_offset = row * w
+                row_y = row * 8
                 for col in range(w):
-                    idx = row * w + col
+                    idx = row_offset + col
                     if idx >= len(tgt_list): continue
                     val = tgt_list[idx]
                     
@@ -318,40 +391,107 @@ class FomtMapRenderer:
                     p_idx  = (val >> 12) & 0xF
 
                     if t_idx < len(self.tiles) and p_idx < len(palettes):
-                        tile_img = _render_tile(self.tiles[t_idx], palettes[p_idx], h_flip, v_flip)
+                        cache_key = (t_idx, p_idx, h_flip, v_flip, bank)
+                        tile_img = self._tile_cache.get(cache_key)
+                        if tile_img is None:
+                            tile_img = _render_tile(self.tiles[t_idx], palettes[p_idx], h_flip, v_flip)
+                            self._tile_cache[cache_key] = tile_img
+
+                        col_x = col * 8
                         if is_overlay:
-                            overlay.paste(tile_img, (col * 8, row * 8), tile_img)
+                            base_img.paste(tile_img, (col_x, row_y), tile_img)
                         else:
-                            overlay.paste(tile_img, (col * 8, row * 8))
-            
-            if is_overlay:
-                base_img.paste(overlay, (0, 0), overlay)
+                            base_img.paste(tile_img, (col_x, row_y))
             return base_img
         
+        # Capas de trabajo clonadas para no mutar destructivamente el mapa base en edición
+        array_bg3 = list(self.tilemap_bg3) if self.tilemap_bg3 else []
+        array_bg2 = list(self.tilemap_bg2) if self.tilemap_bg2 else []
+        array_bg1 = list(self.tilemap_bg1) if self.tilemap_bg1 else []
+
+        map_id = getattr(self._map_header, 'map_id', 0) if self._map_header else 0
+        is_winter = (map_id in (1, 3, 5, 7, 9, 11, 13, 15, 17) or bank == 2)
+        season_key = 'winter' if is_winter else 'summer'
+        dyn_cfg = getattr(self, 'dynamic_config', {})
+
+        # Estampar estructuras dinámicas 100% nativas desde la tabla de la ROM
+        if dyn_cfg.get('enabled', True):
+            if map_id in (0, 1):
+                # 1. Casa de Campo (Lv1, Lv2, Lv3)
+                h_lvl = dyn_cfg.get('farmhouse', 'lv1')
+                if h_lvl in BUILDING_ROM_ENTRIES['farmhouse']:
+                    info = BUILDING_ROM_ENTRIES['farmhouse'][h_lvl]
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'])
+
+                # 2. Granero (Lv1, Lv2)
+                b_lvl = dyn_cfg.get('barn', 'lv1')
+                if b_lvl in BUILDING_ROM_ENTRIES['barn']:
+                    info = BUILDING_ROM_ENTRIES['barn'][b_lvl]
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'])
+
+                # 3. Gallinero (Lv1, Lv2)
+                c_lvl = dyn_cfg.get('chicken_coop', 'lv1')
+                if c_lvl in BUILDING_ROM_ENTRIES['chicken_coop']:
+                    info = BUILDING_ROM_ENTRIES['chicken_coop'][c_lvl]
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'])
+
+                # 4. Extras de Granja (Buzón y Caseta de Perro)
+                if dyn_cfg.get('extras', True):
+                    mb = BUILDING_ROM_ENTRIES['mailbox']
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mb[season_key], mb['x'], mb['y'])
+                    # Doghouse eliminada (ya existe nativa en el mapa base)
+
+            elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
+                # Villa de la Playa
+                bc = BUILDING_ROM_ENTRIES['beach_cottage']
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bc[season_key], bc['x'], bc['y'])
+
+            elif map_id in (14, 15) and dyn_cfg.get('mountain_cottage', True):
+                # Villa de la Montaña
+                mc = BUILDING_ROM_ENTRIES['mountain_cottage']
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mc[season_key], mc['x'], mc['y'])
+
+            elif map_id in (4, 5, 6, 7) and dyn_cfg.get('town_cottage', True):
+                # Villa de la Ciudad
+                tc = BUILDING_ROM_ENTRIES['town_cottage']
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, tc[season_key], tc['x'], tc['y'])
+
         img = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
         
-        # Determinar qué arrays van al fondo y al frente
-        array_bottom = self.tilemap_bg3  # p_bg3 es BG3 (Suelo)
-        array_top = self.tilemap_bg1     # p_bg1 es BG1 (Frente)
+        # Determinar orden de capas
+        array_bottom = array_bg3
+        array_top = array_bg1
         show_bottom = show_bg3
         show_top = show_bg1
         
         if invert_bg:
-            array_bottom = self.tilemap_bg1
-            array_top = self.tilemap_bg3
+            array_bottom = array_bg1
+            array_top = array_bg3
             show_bottom = show_bg1
             show_top = show_bg3
 
-        # Dibujar en el orden correcto (Bottom -> Middle -> Top)
         if show_bottom and array_bottom:
             img = draw_layer(array_bottom, img, is_overlay=False)
             
-        if show_bg2 and self.tilemap_bg2:
-            img = draw_layer(self.tilemap_bg2, img, is_overlay=True)
+        if show_bg2 and array_bg2:
+            img = draw_layer(array_bg2, img, is_overlay=True)
             
         if show_top and array_top:
             img = draw_layer(array_top, img, is_overlay=True)
 
+        # Malla Canónica de Cultivo (43x25 plots = 86x50 tiles, X=272, Y=176)
+        if dyn_cfg.get('enabled', True) and map_id in (0, 1) and dyn_cfg.get('field_grid', False):
+            from PIL import ImageDraw
+            grid_overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+            gdraw = ImageDraw.Draw(grid_overlay)
+            for pr in range(25):
+                for pc in range(43):
+                    px = 272 + pc * 16
+                    py = 176 + pr * 16
+                    gdraw.rectangle([px, py, px + 15, py + 15], outline=(255, 215, 0, 90), width=1)
+            img.paste(grid_overlay, (0, 0), grid_overlay)
+
+        # ── Capa de Colisiones ─────────────────────────────────────
         if show_col and self.collision_map:
             from PIL import ImageDraw
             overlay = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
@@ -374,25 +514,38 @@ class FomtMapRenderer:
                     is_solid = bool(behavior & 1)
                     has_script = (script_id > 0)
 
-                    # Dynamic color mapping based on behavior instead of raw value
                     if val == 0:
-                        # Caminable puro, sin colisión, sin nada.
-                        r, g, b, a = 255, 255, 255, 0 # Transparente
+                        r, g, b, a = 255, 255, 255, 0
+                    elif val == 0x40:
+                        # Terreno cultivable
+                        r, g, b, a = 218, 165, 32, 80
                     elif is_solid and has_script:
-                        # Solido con evento (Ej: Cartel o TV) -> Amarillo
                         r, g, b, a = 255, 215, 0, 120
                     elif is_solid:
-                        # Sólido normal (Ej: Pared) -> Rojo
                         r, g, b, a = 255, 0, 0, 100
                     elif has_script:
-                        # Caminable con evento (Ej: Warp o trigger) -> Verde
                         r, g, b, a = 0, 255, 0, 100
                     else:
-                        # Caminable especial sin script (Ej: Agua, Ledge) -> Azul claro
                         r, g, b, a = 0, 150, 255, 90
 
                     if a > 0:
                         draw.rectangle([col*8, row*8, col*8+7, row*8+7], fill=(r, g, b, a), outline=(r, g, b, 200))
+
+            # Si las estructuras dinámicas están activadas, pintar sus huellas de colisión y triggers
+            if dyn_cfg.get('enabled', True) and map_id in (0, 1):
+                # Huella Casa Lv1/2/3: X=208..272, Y=24..112 (Sólido) con puerta en (232..248, 104..108)
+                if dyn_cfg.get('farmhouse', 'lv1') != 'none':
+                    draw.rectangle([208, 24, 271, 103], fill=(255, 0, 0, 120), outline=(255, 50, 50, 220))
+                    draw.rectangle([232, 104, 247, 107], fill=(255, 215, 0, 180), outline=(255, 255, 0, 255))
+                # Huella Granero: X=464..544, Y=16..112 (Sólido) con puerta en (496..512, 104..108)
+                if dyn_cfg.get('barn', 'lv1') != 'none':
+                    draw.rectangle([464, 16, 543, 103], fill=(255, 0, 0, 120), outline=(255, 50, 50, 220))
+                    draw.rectangle([496, 104, 511, 107], fill=(255, 215, 0, 180), outline=(255, 255, 0, 255))
+                # Huella Gallinero: X=112..184, Y=416..528 con puerta en (140..156, 504..508)
+                if dyn_cfg.get('chicken_coop', 'lv1') != 'none':
+                    draw.rectangle([112, 416, 183, 503], fill=(255, 0, 0, 120), outline=(255, 50, 50, 220))
+                    draw.rectangle([140, 504, 155, 507], fill=(255, 215, 0, 180), outline=(255, 255, 0, 255))
+
             img.paste(overlay, (0, 0), overlay)
 
         return img

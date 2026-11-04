@@ -20,8 +20,8 @@ from Nucleos_Positronicos.Nucleo_de_Sprites.palette_editor import PaletteEditorD
 
 
 # ─── Constants ───────────────────────────────────────────────────────────────
-DUMP_DIR   = r"j:\Repositorios\fomt_studio\portraits_dump"
-ROM_PATH   = r"j:\Repositorios\fomt_studio\Harvest Moon - Friends of Mineral Town.gba"
+DUMP_DIR   = os.path.join(os.getcwd(), "portraits_dump")
+ROM_PATH   = ""
 FOMT_BASE  = 0x08000000
 
 
@@ -186,6 +186,12 @@ class PortraitEditorDialog(QDialog):
         self.hex_id    = hex_id
         self.base_name = base_name
 
+        # Control de Integridad Obligatorio Cilixes
+        from Banco_de_Datos.parche_splash import require_rom_signature, SIGNATURE_OFFSET, SIGNATURE_MAGIC
+        if parent and hasattr(parent, 'project') and parent.project:
+            self.project = parent.project
+            require_rom_signature(self.project, auto_sign=True, module_name="MelodyPortraitEngine")
+
         # Resolving dynamic paths from project if available
         self.project = None
         self.rom_path = ROM_PATH
@@ -304,7 +310,7 @@ class PortraitEditorDialog(QDialog):
         )
         btn_import.clicked.connect(self._import_png)
 
-        btn_palette = QPushButton("🎨  Editar Paleta")
+        btn_palette = QPushButton("  Editar Paleta")
         btn_palette.setObjectName("btn_palette")
         btn_palette.setToolTip(
             "Abre el editor de paleta GBA completo (HSV picker, RGB, HEX).\n"
@@ -358,7 +364,8 @@ class PortraitEditorDialog(QDialog):
     def _render_hex_portrait(self):
         """Genera el QPixmap directamente desde los tiles 4bpp y OAMs en la ROM."""
         try:
-            sys.path.insert(0, r'j:\Repositorios\fomt_studio')
+            _REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+            if _REPO_DIR not in sys.path: sys.path.insert(0, _REPO_DIR)
             from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.repack_portraits import _load_tables, _parse_oams
             from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.engine import MelodyPortraitEngine
             
@@ -542,7 +549,8 @@ class PortraitEditorDialog(QDialog):
             return
 
         try:
-            sys.path.insert(0, r'j:\Repositorios\fomt_studio')
+            _REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+            if _REPO_DIR not in sys.path: sys.path.insert(0, _REPO_DIR)
             from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.repack_portraits import repack
 
             rom_data = None
@@ -560,6 +568,11 @@ class PortraitEditorDialog(QDialog):
                 custom_palette=self._edited_palette,
                 rom_data=rom_data
             )
+
+            # Estampar permanentemente la firma binaria obligatoria CILIXES en el nuevo binario
+            new_rom_ba = bytearray(new_rom)
+            new_rom_ba[SIGNATURE_OFFSET : SIGNATURE_OFFSET + len(SIGNATURE_MAGIC)] = SIGNATURE_MAGIC
+            new_rom = bytes(new_rom_ba)
 
             # Cachear la ROM inyectada para render inmediato (sin depender de disco).
             self._injected_rom = bytes(new_rom)

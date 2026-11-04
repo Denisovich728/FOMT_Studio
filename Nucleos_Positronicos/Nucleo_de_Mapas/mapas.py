@@ -1184,6 +1184,8 @@ class MapParser:
         self._literal_pool_addr: Optional[int] = None
 
     def scan_maps(self):
+        from Banco_de_Datos.parche_splash import require_rom_signature
+        require_rom_signature(self.project, auto_sign=True, module_name='MapParser')
         self.maps = []
         rom = self.project.base_rom_data
         if not rom:

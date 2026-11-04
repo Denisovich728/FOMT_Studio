@@ -1,0 +1,14 @@
+{
+  "0_1": {
+    "name": "Día de Feria y Venta",
+    "short": "☀️ Día de Feria y Venta (Martes y Jueves)",
+    "weather": "Soleado / Despejado",
+    "days": "Martes y Jueves",
+    "season": "🌸 Primavera",
+    "detail": "Atiende ventas especiales en el mostrador.",
+    "icon": "☀️",
+    "location_badge": "[0B] Granja Avícola (Planta Alta / Habitaciones)",
+    "is_marriage": false,
+    "is_festival": false
+  }
+}

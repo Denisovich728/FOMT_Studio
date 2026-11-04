@@ -4,286 +4,280 @@
     {
       "map_id": 2,
       "name": "[02] Granja del Jugador",
-      "canvas_x": 400.0,
-      "canvas_y": 500.0,
-      "width": 80,
-      "height": 80,
+      "canvas_x": 850.0,
+      "canvas_y": 800.0,
+      "width": 128,
+      "height": 88,
       "warps": [
         {
           "warp_id": "to_town",
-          "name": "Salida Norte hacia Pueblo Sur",
-          "x": 400,
-          "y": 32
+          "name": "Salida Norte hacia Pueblo Sur (Script 0x0136)",
+          "x": 392,
+          "y": 56
         },
         {
           "warp_id": "to_forest",
-          "name": "Salida Oeste hacia Bosque",
-          "x": 32,
-          "y": 400
+          "name": "Salida Oeste hacia Bosque (Script 0x0134)",
+          "x": 112,
+          "y": 352
         },
         {
           "warp_id": "to_house",
-          "name": "Puerta de la Casa",
-          "x": 360,
-          "y": 240
+          "name": "Puerta de la Casa Grande (Script 0x0146)",
+          "x": 400,
+          "y": 96
         },
         {
           "warp_id": "to_barn",
-          "name": "Puerta del Establo",
-          "x": 200,
-          "y": 200
+          "name": "Puerta del Establo (Script 0x0140)",
+          "x": 656,
+          "y": 96
         },
         {
           "warp_id": "to_coop",
-          "name": "Puerta del Gallinero",
-          "x": 500,
-          "y": 200
+          "name": "Puerta del Gallinero (Script 0x013E)",
+          "x": 776,
+          "y": 96
         }
       ]
     },
     {
       "map_id": 7,
       "name": "[07] Pueblo Sur",
-      "canvas_x": 400.0,
-      "canvas_y": 250.0,
-      "width": 75,
-      "height": 50,
+      "canvas_x": 850.0,
+      "canvas_y": 500.0,
+      "width": 173,
+      "height": 64,
       "warps": [
         {
           "warp_id": "to_farm",
-          "name": "Entrada Sur desde Granja",
-          "x": 350,
-          "y": 380
-        },
-        {
-          "warp_id": "to_north",
-          "name": "Camino Norte hacia Pueblo Norte",
-          "x": 350,
-          "y": 20
-        },
-        {
-          "warp_id": "to_square",
-          "name": "Camino Este hacia Plaza Rosa",
-          "x": 540,
+          "name": "Entrada Sur desde Granja (Script 0x0416)",
+          "x": 552,
           "y": 200
         },
         {
+          "warp_id": "to_north",
+          "name": "Camino Norte hacia Pueblo Norte (Script 0x0420)",
+          "x": 280,
+          "y": 88
+        },
+        {
+          "warp_id": "to_square",
+          "name": "Camino Este hacia Plaza Rosa (Script 0x03F6)",
+          "x": 1224,
+          "y": 104
+        },
+        {
           "warp_id": "to_poultry",
-          "name": "Granja Avícola (Gallinas)",
-          "x": 180,
-          "y": 300
+          "name": "Granja Avícola Lillia (Script 0x03F2)",
+          "x": 160,
+          "y": 112
         },
         {
           "warp_id": "to_barley",
-          "name": "Granja Yodel (Vacas)",
-          "x": 480,
-          "y": 320
+          "name": "Granja Yodel Vacas (Script 0x03FC)",
+          "x": 1016,
+          "y": 248
         },
         {
           "warp_id": "to_inn",
-          "name": "Taberna de Doug (Entrada Sur)",
-          "x": 300,
-          "y": 80
+          "name": "Taberna de Doug (Script 0x03F4)",
+          "x": 832,
+          "y": 176
         }
       ]
     },
     {
       "map_id": 5,
       "name": "[05] Pueblo Norte",
-      "canvas_x": 400.0,
+      "canvas_x": 850.0,
       "canvas_y": 50.0,
-      "width": 75,
-      "height": 50,
+      "width": 176,
+      "height": 88,
       "warps": [
         {
           "warp_id": "to_south",
-          "name": "Camino Sur hacia Pueblo Sur",
-          "x": 350,
-          "y": 380
-        },
-        {
-          "warp_id": "to_supermarket",
-          "name": "Supermercado Jeff",
-          "x": 180,
-          "y": 160
-        },
-        {
-          "warp_id": "to_clinic",
-          "name": "Clínica Mineral",
-          "x": 280,
-          "y": 160
-        },
-        {
-          "warp_id": "to_mayor",
-          "name": "Casa del Alcalde Thomas",
-          "x": 100,
-          "y": 280
-        },
-        {
-          "warp_id": "to_ellen",
-          "name": "Casa de Ellen",
-          "x": 480,
-          "y": 280
-        },
-        {
-          "warp_id": "to_library",
-          "name": "Biblioteca de Mary",
-          "x": 560,
-          "y": 160
-        },
-        {
-          "warp_id": "to_saibara",
-          "name": "Herrería de Saibara",
-          "x": 620,
-          "y": 280
+          "name": "Camino Sur hacia Pueblo Sur (Script 0x02E2)",
+          "x": 1032,
+          "y": 112
         },
         {
           "warp_id": "to_church",
-          "name": "Camino Norte hacia Iglesia",
-          "x": 350,
-          "y": 20
+          "name": "Camino Norte hacia Iglesia (Script 0x02D8)",
+          "x": 744,
+          "y": 152
+        },
+        {
+          "warp_id": "to_supermarket",
+          "name": "Supermercado Jeff (Script 0x02F2)",
+          "x": 464,
+          "y": 136
+        },
+        {
+          "warp_id": "to_clinic",
+          "name": "Clínica Mineral (Script 0x02E8)",
+          "x": 672,
+          "y": 136
+        },
+        {
+          "warp_id": "to_library",
+          "name": "Biblioteca Mary (Script 0x02EA)",
+          "x": 840,
+          "y": 136
+        },
+        {
+          "warp_id": "to_mayor",
+          "name": "Casa Alcalde Thomas (Script 0x02EE)",
+          "x": 184,
+          "y": 136
+        },
+        {
+          "warp_id": "to_ellen",
+          "name": "Casa de Ellen (Script 0x02E4)",
+          "x": 1216,
+          "y": 128
+        },
+        {
+          "warp_id": "to_saibara",
+          "name": "Herrería Saibara (Script 0x02E6)",
+          "x": 384,
+          "y": 136
         }
       ]
     },
     {
       "map_id": 6,
       "name": "[06] Plaza Rosa",
-      "canvas_x": 700.0,
-      "canvas_y": 250.0,
+      "canvas_x": 1500.0,
+      "canvas_y": 500.0,
       "width": 60,
-      "height": 50,
+      "height": 56,
       "warps": [
         {
           "warp_id": "to_south",
-          "name": "Salida Oeste hacia Pueblo Sur",
-          "x": 30,
-          "y": 250
+          "name": "Salida Oeste hacia Pueblo Sur (Script 0x0324)",
+          "x": 64,
+          "y": 40
         },
         {
           "warp_id": "to_beach",
-          "name": "Camino Sur hacia Playa",
-          "x": 250,
-          "y": 380
+          "name": "Camino Sur hacia Playa (Script 0x032A)",
+          "x": 360,
+          "y": 48
         },
         {
           "warp_id": "to_winery",
-          "name": "Entrada a Bodega Aja",
-          "x": 150,
-          "y": 40
+          "name": "Entrada a Bodega Aja (Script 0x0326)",
+          "x": 128,
+          "y": 32
         }
       ]
     },
     {
       "map_id": 1,
       "name": "[01] Playa Mineral",
-      "canvas_x": 700.0,
-      "canvas_y": 500.0,
-      "width": 70,
-      "height": 60,
+      "canvas_x": 1500.0,
+      "canvas_y": 800.0,
+      "width": 64,
+      "height": 80,
       "warps": [
         {
           "warp_id": "to_square",
-          "name": "Salida Norte hacia Plaza",
-          "x": 350,
-          "y": 20
+          "name": "Salida Norte hacia Plaza (Script 0x00C8)",
+          "x": 144,
+          "y": 88
         },
         {
           "warp_id": "to_zack",
-          "name": "Casa de Zack",
-          "x": 120,
-          "y": 200
+          "name": "Casa de Zack (Script 0x00D8)",
+          "x": 72,
+          "y": 88
         },
         {
           "warp_id": "to_kai",
-          "name": "Chiringuito de Kai",
-          "x": 400,
-          "y": 200
+          "name": "Chiringuito de Kai (Script 0x00CE)",
+          "x": 280,
+          "y": 96
         }
       ]
     },
     {
       "map_id": 3,
       "name": "[03] Bosque de Gotz",
-      "canvas_x": 100.0,
-      "canvas_y": 500.0,
-      "width": 70,
-      "height": 70,
+      "canvas_x": 250.0,
+      "canvas_y": 800.0,
+      "width": 128,
+      "height": 64,
       "warps": [
         {
           "warp_id": "to_farm",
-          "name": "Salida Este hacia Granja",
-          "x": 540,
-          "y": 350
+          "name": "Salida Este hacia Granja (Script 0x015C)",
+          "x": 704,
+          "y": 160
         },
         {
           "warp_id": "to_gotz",
-          "name": "Cabaña de Gotz (Carpintero)",
-          "x": 200,
-          "y": 250
+          "name": "Cabaña de Gotz (Script 0x0166)",
+          "x": 600,
+          "y": 216
         },
         {
           "warp_id": "to_mountain",
-          "name": "Camino hacia Montaña",
-          "x": 100,
-          "y": 100
+          "name": "Camino hacia Montaña (Script 0x03DC)",
+          "x": 624,
+          "y": 232
         }
       ]
     },
     {
       "map_id": 0,
       "name": "[00] Colina Madre (Zona Media)",
-      "canvas_x": 100.0,
-      "canvas_y": 250.0,
-      "width": 80,
-      "height": 80,
+      "canvas_x": 250.0,
+      "canvas_y": 420.0,
+      "width": 150,
+      "height": 100,
       "warps": [
         {
           "warp_id": "to_forest",
-          "name": "Camino Sur hacia Bosque",
-          "x": 400,
-          "y": 600
+          "name": "Camino Sur hacia Bosque (Script 0x00AA)",
+          "x": 848,
+          "y": 504
         },
         {
           "warp_id": "to_peak",
-          "name": "Cima de la Colina",
-          "x": 400,
-          "y": 40
+          "name": "Cima de la Colina (Script 0x03D6)",
+          "x": 944,
+          "y": 440
         },
         {
           "warp_id": "to_hotsprings",
-          "name": "Aguas Termales & Cascada Diosa",
-          "x": 250,
-          "y": 300
-        },
-        {
-          "warp_id": "to_mine",
-          "name": "Entrada a Mina",
-          "x": 150,
-          "y": 350
+          "name": "Aguas Termales & Cascada Diosa (Script 0x03D4)",
+          "x": 824,
+          "y": 512
         }
       ]
     },
     {
       "map_id": 8,
       "name": "[08] Cima de la Colina Madre",
-      "canvas_x": 100.0,
-      "canvas_y": 50.0,
+      "canvas_x": 250.0,
+      "canvas_y": 80.0,
       "width": 60,
-      "height": 50,
+      "height": 60,
       "warps": [
         {
           "warp_id": "to_middle",
           "name": "Camino hacia Colina Media",
-          "x": 300,
-          "y": 380
+          "x": 240,
+          "y": 240
         }
       ]
     },
     {
       "map_id": 12,
       "name": "[0C] Iglesia de Carter",
-      "canvas_x": 400.0,
-      "canvas_y": -120.0,
+      "canvas_x": 850.0,
+      "canvas_y": -280.0,
       "width": 40,
       "height": 35,
       "warps": [
@@ -304,8 +298,8 @@
     {
       "map_id": 4,
       "name": "[04] Jardín Trasero de la Iglesia",
-      "canvas_x": 400.0,
-      "canvas_y": -220.0,
+      "canvas_x": 850.0,
+      "canvas_y": -480.0,
       "width": 40,
       "height": 30,
       "warps": [
@@ -320,8 +314,8 @@
     {
       "map_id": 15,
       "name": "[0F] Supermercado de Jeff",
-      "canvas_x": 160.0,
-      "canvas_y": -80.0,
+      "canvas_x": 440.0,
+      "canvas_y": 50.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -342,8 +336,8 @@
     {
       "map_id": 16,
       "name": "[10] Supermercado (Trastienda y Sala)",
-      "canvas_x": 160.0,
-      "canvas_y": -170.0,
+      "canvas_x": 260.0,
+      "canvas_y": 50.0,
       "width": 40,
       "height": 30,
       "warps": [
@@ -358,8 +352,8 @@
     {
       "map_id": 19,
       "name": "[13] Clínica Mineral (Planta Baja / Consulta)",
-      "canvas_x": 280.0,
-      "canvas_y": -80.0,
+      "canvas_x": 440.0,
+      "canvas_y": -120.0,
       "width": 40,
       "height": 35,
       "warps": [
@@ -380,8 +374,8 @@
     {
       "map_id": 20,
       "name": "[14] Clínica Mineral (Planta Alta / Cuartos)",
-      "canvas_x": 280.0,
-      "canvas_y": -170.0,
+      "canvas_x": 260.0,
+      "canvas_y": -120.0,
       "width": 40,
       "height": 30,
       "warps": [
@@ -396,8 +390,8 @@
     {
       "map_id": 21,
       "name": "[15] Posada de Doug (Taberna / Planta Baja)",
-      "canvas_x": 600.0,
-      "canvas_y": 50.0,
+      "canvas_x": 850.0,
+      "canvas_y": 360.0,
       "width": 50,
       "height": 45,
       "warps": [
@@ -424,8 +418,8 @@
     {
       "map_id": 22,
       "name": "[16] Posada de Doug (Cocina)",
-      "canvas_x": 680.0,
-      "canvas_y": 50.0,
+      "canvas_x": 1030.0,
+      "canvas_y": 360.0,
       "width": 35,
       "height": 35,
       "warps": [
@@ -440,8 +434,8 @@
     {
       "map_id": 23,
       "name": "[17] Posada de Doug (Habitaciones / Planta Alta)",
-      "canvas_x": 600.0,
-      "canvas_y": -60.0,
+      "canvas_x": 670.0,
+      "canvas_y": 360.0,
       "width": 50,
       "height": 40,
       "warps": [
@@ -456,8 +450,8 @@
     {
       "map_id": 24,
       "name": "[18] Biblioteca de Mary (Planta Baja)",
-      "canvas_x": 720.0,
-      "canvas_y": -80.0,
+      "canvas_x": 1380.0,
+      "canvas_y": 50.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -478,8 +472,8 @@
     {
       "map_id": 25,
       "name": "[19] Biblioteca de Mary (Planta Alta)",
-      "canvas_x": 720.0,
-      "canvas_y": -170.0,
+      "canvas_x": 1560.0,
+      "canvas_y": 50.0,
       "width": 45,
       "height": 35,
       "warps": [
@@ -494,8 +488,8 @@
     {
       "map_id": 26,
       "name": "[1A] Casa de Basil (Planta Baja)",
-      "canvas_x": 840.0,
-      "canvas_y": -80.0,
+      "canvas_x": 1380.0,
+      "canvas_y": -200.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -516,8 +510,8 @@
     {
       "map_id": 27,
       "name": "[1B] Casa de Basil (Planta Alta / Estudio)",
-      "canvas_x": 840.0,
-      "canvas_y": -170.0,
+      "canvas_x": 1560.0,
+      "canvas_y": -200.0,
       "width": 45,
       "height": 35,
       "warps": [
@@ -531,9 +525,9 @@
     },
     {
       "map_id": 10,
-      "name": "[0A] Granja Avícola (Planta Baja / Mostrador)",
-      "canvas_x": 160.0,
-      "canvas_y": 250.0,
+      "name": "[0A] Granja Avícola (Planta Baja / Tienda de Lillia)",
+      "canvas_x": 440.0,
+      "canvas_y": 500.0,
       "width": 40,
       "height": 35,
       "warps": [
@@ -554,8 +548,8 @@
     {
       "map_id": 11,
       "name": "[0B] Granja Avícola (Planta Alta / Habitaciones)",
-      "canvas_x": 160.0,
-      "canvas_y": 160.0,
+      "canvas_x": 260.0,
+      "canvas_y": 500.0,
       "width": 40,
       "height": 30,
       "warps": [
@@ -570,8 +564,8 @@
     {
       "map_id": 41,
       "name": "[29] Granja Yodel (Casa de Barley / P1)",
-      "canvas_x": 600.0,
-      "canvas_y": 380.0,
+      "canvas_x": 1380.0,
+      "canvas_y": 500.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -592,8 +586,8 @@
     {
       "map_id": 42,
       "name": "[2A] Granja Yodel (Habitaciones / P2)",
-      "canvas_x": 600.0,
-      "canvas_y": 470.0,
+      "canvas_x": 1560.0,
+      "canvas_y": 500.0,
       "width": 45,
       "height": 35,
       "warps": [
@@ -608,8 +602,8 @@
     {
       "map_id": 38,
       "name": "[26] Herrería de Saibara",
-      "canvas_x": 520.0,
-      "canvas_y": -80.0,
+      "canvas_x": 1380.0,
+      "canvas_y": -120.0,
       "width": 40,
       "height": 35,
       "warps": [
@@ -624,8 +618,8 @@
     {
       "map_id": 40,
       "name": "[28] Cabaña de Gotz (Carpintero)",
-      "canvas_x": -40.0,
-      "canvas_y": 500.0,
+      "canvas_x": 50.0,
+      "canvas_y": 800.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -640,8 +634,8 @@
     {
       "map_id": 30,
       "name": "[1E] Casa del Alcalde Thomas",
-      "canvas_x": 40.0,
-      "canvas_y": 50.0,
+      "canvas_x": 440.0,
+      "canvas_y": 220.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -656,8 +650,8 @@
     {
       "map_id": 14,
       "name": "[0E] Casa de Ellen y Stu",
-      "canvas_x": -80.0,
-      "canvas_y": 50.0,
+      "canvas_x": 1380.0,
+      "canvas_y": 220.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -672,8 +666,8 @@
     {
       "map_id": 13,
       "name": "[0D] Casa de Zack (Playa)",
-      "canvas_x": 840.0,
-      "canvas_y": 500.0,
+      "canvas_x": 1820.0,
+      "canvas_y": 800.0,
       "width": 45,
       "height": 40,
       "warps": [
@@ -688,8 +682,8 @@
     {
       "map_id": 36,
       "name": "[24] Chiringuito de Kai (Playa)",
-      "canvas_x": 840.0,
-      "canvas_y": 420.0,
+      "canvas_x": 1820.0,
+      "canvas_y": 950.0,
       "width": 45,
       "height": 35,
       "warps": [
@@ -704,36 +698,36 @@
     {
       "map_id": 31,
       "name": "[1F] Bodega Aja (Mostrador / Tienda de Vino)",
-      "canvas_x": 840.0,
-      "canvas_y": 200.0,
+      "canvas_x": 1500.0,
+      "canvas_y": 220.0,
       "width": 50,
       "height": 45,
       "warps": [
         {
           "warp_id": "exit",
           "name": "Puerta Principal",
-          "x": 160,
-          "y": 260
+          "x": 120,
+          "y": 96
         },
         {
           "warp_id": "to_floor2",
           "name": "Escaleras Planta Alta",
-          "x": 80,
-          "y": 60
+          "x": 32,
+          "y": 120
         },
         {
           "warp_id": "to_storage",
           "name": "Puerta a Bodega",
-          "x": 240,
-          "y": 100
+          "x": 120,
+          "y": 88
         }
       ]
     },
     {
       "map_id": 32,
       "name": "[20] Bodega Aja (Planta Alta / Vivienda)",
-      "canvas_x": 840.0,
-      "canvas_y": 110.0,
+      "canvas_x": 1680.0,
+      "canvas_y": 220.0,
       "width": 50,
       "height": 35,
       "warps": [
@@ -748,8 +742,8 @@
     {
       "map_id": 34,
       "name": "[22] Bodega Aja (Sótano / Cava de Envejecimiento)",
-      "canvas_x": 940.0,
-      "canvas_y": 200.0,
+      "canvas_x": 1860.0,
+      "canvas_y": 220.0,
       "width": 50,
       "height": 45,
       "warps": [
@@ -763,17 +757,17 @@
     },
     {
       "map_id": 29,
-      "name": "[1D] Casa de la Granja (Vivienda del Jugador)",
-      "canvas_x": 400.0,
-      "canvas_y": 620.0,
-      "width": 50,
-      "height": 40,
+      "name": "[1D] Casa Grande de la Granja (Vivienda del Jugador / Casada)",
+      "canvas_x": 850.0,
+      "canvas_y": 1150.0,
+      "width": 59,
+      "height": 28,
       "warps": [
         {
           "warp_id": "exit",
-          "name": "Puerta de Salida",
-          "x": 160,
-          "y": 260
+          "name": "Puerta Principal de Salida (Script 0x02B4)",
+          "x": 272,
+          "y": 112
         }
       ]
     }

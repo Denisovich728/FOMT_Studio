@@ -218,10 +218,10 @@ CANONICAL_MAP_INFO: Dict[int, Dict[str, Any]] = {
         "is_outdoor": False
     },
     0x1D: {
-        "key": "Farm_House_1",
-        "name_es": "Casa de la Granja (Vivienda del Jugador)",
-        "name_en": "Player's Farm House",
-        "header_id": 41,
+        "key": "Farm_House_3",
+        "name_es": "Casa Grande de la Granja (Vivienda del Jugador / Casada)",
+        "name_en": "Player's Farm House (LV3 / Married)",
+        "header_id": 43,
         "is_outdoor": False
     },
     0x1E: {

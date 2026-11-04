@@ -74,7 +74,10 @@ class RoutineWaypoint:
                  x_vectors: Optional[List[Tuple[int, int]]] = None,
                  y_vectors: Optional[List[Tuple[int, int]]] = None,
                  action_rom_ptr: int = 0,
-                 raw_bytes: Optional[bytes] = None):
+                 raw_bytes: Optional[bytes] = None,
+                 node_delays: Optional[Dict[int, int]] = None,
+                 node_speeds: Optional[Dict[int, int]] = None,
+                 node_facings: Optional[Dict[int, int]] = None):
         self.time_val = int(time_val)  # Minutos del día desde las 06:00
         self.spawn_dir = int(spawn_dir)  # facing_start: 0=Abajo, 1=Arriba, 2=Izq, 3=Der
         self.spawn_x = int(spawn_x)      # Coordenada X inicial en píxeles
@@ -98,6 +101,89 @@ class RoutineWaypoint:
         self.action_rom_ptr = int(action_rom_ptr)
         self.raw_bytes = bytes(raw_bytes) if raw_bytes else None
         self.is_edited = False
+
+        # Propiedades individuales por nodo (indexadas por node_idx en path_nodes)
+        self.node_delays: Dict[int, int] = dict(node_delays) if node_delays else {}
+        self.node_speeds: Dict[int, int] = dict(node_speeds) if node_speeds else {}
+        self.node_facings: Dict[int, int] = dict(node_facings) if node_facings else {}
+
+    def get_node_delay(self, node_idx: int) -> int:
+        """Devuelve el delay en frames para el nodo especificado."""
+        if hasattr(self, 'node_delays') and node_idx in self.node_delays:
+            return self.node_delays[node_idx]
+        if node_idx == len(self.path_nodes) - 1:
+            return getattr(self, 'delay_val', 120) or 120
+        return 0
+
+    def set_node_delay(self, node_idx: int, delay_val: int):
+        """Asigna el tiempo de pausa / espera (en frames de GBA a 60 fps) en el nodo."""
+        if not hasattr(self, 'node_delays'):
+            self.node_delays = {}
+        val = max(0, int(delay_val))
+        self.node_delays[node_idx] = val
+        if node_idx == len(self.path_nodes) - 1:
+            self.delay_val = val
+        self.is_edited = True
+        self.raw_bytes = None
+
+    def get_node_speed(self, node_idx: int) -> int:
+        """Devuelve el código de velocidad hacia el nodo (1=Lento, 2=Normal, 3=Ligero, 4=Prisa)."""
+        if hasattr(self, 'node_speeds') and node_idx in self.node_speeds:
+            return self.node_speeds[node_idx]
+        return getattr(self, 'speed_code', 2) or 2
+
+    def set_node_speed(self, node_idx: int, speed: int):
+        """Asigna la velocidad de desplazamiento hacia el nodo."""
+        if not hasattr(self, 'node_speeds'):
+            self.node_speeds = {}
+        self.node_speeds[node_idx] = max(1, int(speed))
+        self.is_edited = True
+        self.raw_bytes = None
+
+    def get_node_facing(self, node_idx: int) -> Optional[int]:
+        """Devuelve la dirección de vista asignada al nodo (0=Abajo, 1=Arriba, 2=Izq, 3=Der) o None si es auto."""
+        if hasattr(self, 'node_facings') and node_idx in self.node_facings:
+            return self.node_facings[node_idx]
+        return None
+
+    def set_node_facing(self, node_idx: int, facing: Optional[int]):
+        """Asigna la orientación del NPC en este nodo."""
+        if not hasattr(self, 'node_facings'):
+            self.node_facings = {}
+        if facing is None or facing < 0:
+            self.node_facings.pop(node_idx, None)
+        else:
+            self.node_facings[node_idx] = int(facing) & 3
+        self.is_edited = True
+        self.raw_bytes = None
+
+    def shift_node_properties_insert(self, insert_idx: int):
+        """Desplaza las propiedades por nodo (+1) a partir de insert_idx."""
+        for attr in ('node_delays', 'node_speeds', 'node_facings'):
+            d = getattr(self, attr, None)
+            if d:
+                new_d = {}
+                for k, v in sorted(d.items(), reverse=True):
+                    if k >= insert_idx:
+                        new_d[k + 1] = v
+                    else:
+                        new_d[k] = v
+                setattr(self, attr, new_d)
+
+    def shift_node_properties_delete(self, del_idx: int):
+        """Elimina la propiedad del nodo del_idx y desplaza (-1) las superiores."""
+        for attr in ('node_delays', 'node_speeds', 'node_facings'):
+            d = getattr(self, attr, None)
+            if d:
+                new_d = {}
+                for k, v in sorted(d.items()):
+                    if k == del_idx:
+                        continue
+                    elif k > del_idx:
+                        new_d[k - 1] = v
+                    else:
+                        new_d[k] = v
+                setattr(self, attr, new_d)
 
     @property
     def map_name(self) -> str:
@@ -155,12 +241,18 @@ class RoutineWaypoint:
             "map_name": self.map_name,
             "point_type_select": self.point_type_select,
             "path_nodes": self.path_nodes,
-            "raw_points": self.raw_points
+            "raw_points": self.raw_points,
+            "node_delays": {str(k): v for k, v in self.node_delays.items()},
+            "node_speeds": {str(k): v for k, v in self.node_speeds.items()},
+            "node_facings": {str(k): v for k, v in self.node_facings.items()}
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> 'RoutineWaypoint':
         p_nodes = [tuple(p) for p in data.get("path_nodes", [])] if data.get("path_nodes") else None
+        n_delays = {int(k): int(v) for k, v in data.get("node_delays", {}).items()}
+        n_speeds = {int(k): int(v) for k, v in data.get("node_speeds", {}).items()}
+        n_facings = {int(k): int(v) for k, v in data.get("node_facings", {}).items()}
         return cls(
             time_val=data.get("time_val", 0),
             spawn_dir=data.get("spawn_dir", 0),
@@ -172,7 +264,10 @@ class RoutineWaypoint:
             point_type_select=data.get("point_type_select", 0),
             path_nodes=p_nodes,
             raw_points=data.get("raw_points", []),
-            x_vectors=[tuple(v) for v in data.get("x_vectors", [])] if "x_vectors" in data else None
+            x_vectors=[tuple(v) for v in data.get("x_vectors", [])] if "x_vectors" in data else None,
+            node_delays=n_delays,
+            node_speeds=n_speeds,
+            node_facings=n_facings
         )
 
 
@@ -365,6 +460,10 @@ class RoutineCodec:
                                 curr_x = coord
                             path_nodes.append((curr_x, curr_y))
 
+                    n_delays = {p + 1: pt_info.get("delay", 0) for p, pt_info in enumerate(raw_pts) if "delay" in pt_info}
+                    n_speeds = {p + 1: pt_info.get("speed", 2) for p, pt_info in enumerate(raw_pts) if "speed" in pt_info}
+                    n_facings = {p + 1: pt_info.get("facing", 0) for p, pt_info in enumerate(raw_pts) if "facing" in pt_info}
+
                     wp = RoutineWaypoint(
                         time_val=time_val,
                         spawn_dir=facing_start,
@@ -377,7 +476,10 @@ class RoutineCodec:
                         path_nodes=path_nodes,
                         raw_points=raw_pts,
                         action_rom_ptr=path_ptr,
-                        raw_bytes=raw_bytes
+                        raw_bytes=raw_bytes,
+                        node_delays=n_delays,
+                        node_speeds=n_speeds,
+                        node_facings=n_facings
                     )
                     sched.waypoints.append(wp)
 
@@ -427,7 +529,17 @@ class RoutineCodec:
             entry_path_offsets = []
             for wp in sched.waypoints:
                 pts_tuple = tuple(wp.path_nodes) if wp.path_nodes else ()
-                cache_key = (wp.map_id, wp.spawn_dir, wp.spawn_x, wp.spawn_y, wp.point_type_select, pts_tuple)
+                cache_key = (
+                    wp.map_id,
+                    wp.spawn_dir,
+                    wp.spawn_x,
+                    wp.spawn_y,
+                    wp.point_type_select,
+                    pts_tuple,
+                    tuple(sorted(wp.node_delays.items())) if hasattr(wp, 'node_delays') else (),
+                    tuple(sorted(wp.node_speeds.items())) if hasattr(wp, 'node_speeds') else (),
+                    tuple(sorted(wp.node_facings.items())) if hasattr(wp, 'node_facings') else ()
+                )
 
                 if cache_key in path_cache:
                     entry_path_offsets.append(path_cache[cache_key])
@@ -440,19 +552,36 @@ class RoutineCodec:
                     points_blob.extend(wp.raw_bytes)
                     num_points = len(wp.raw_bytes) // 8
                 elif wp.path_nodes and len(wp.path_nodes) > 1:
-                    num_points = len(wp.path_nodes) - 1
+                    # Garantizar estricta ortogonalidad sin diagonales
+                    clean_nodes = [wp.path_nodes[0]]
+                    for k in range(1, len(wp.path_nodes)):
+                        pk_x, pk_y = clean_nodes[-1]
+                        ck_x, ck_y = wp.path_nodes[k]
+                        if pk_x != ck_x and pk_y != ck_y:
+                            clean_nodes.append((ck_x, pk_y))
+                        if (ck_x, ck_y) != clean_nodes[-1]:
+                            clean_nodes.append((ck_x, ck_y))
+
+                    num_points = max(0, len(clean_nodes) - 1)
                     curr_instant = 0
-                    for step_idx in range(1, len(wp.path_nodes)):
-                        p_prev = wp.path_nodes[step_idx - 1]
-                        p_curr = wp.path_nodes[step_idx]
+
+                    for step_idx in range(1, len(clean_nodes)):
+                        p_prev = clean_nodes[step_idx - 1]
+                        p_curr = clean_nodes[step_idx]
                         dy = p_curr[1] - p_prev[1]
                         dx = p_curr[0] - p_prev[0]
                         seg_dist = abs(dy) if dy != 0 else abs(dx)
                         step_ticks = max(1, int(round(seg_dist / 24.0)))
                         curr_instant += step_ticks
 
+                        step_delay = wp.get_node_delay(step_idx) if hasattr(wp, 'get_node_delay') else (getattr(wp, 'delay_val', 120) if step_idx == len(clean_nodes) - 1 else 0)
+                        step_speed = wp.get_node_speed(step_idx) if hasattr(wp, 'get_node_speed') else (getattr(wp, 'speed_code', 2) or 2)
+                        custom_facing = wp.get_node_facing(step_idx) if hasattr(wp, 'get_node_facing') else None
+
                         if wp.point_type_select == 0:
                             # PathPointA: u16 instant, i16 coord, u32 hi (hi & 1 is is_y)
+                            if step_delay > 0:
+                                curr_instant += max(1, step_delay // 60)
                             if dy != 0:
                                 coord = p_curr[1]
                                 hi = 1
@@ -465,11 +594,13 @@ class RoutineCodec:
                             # Flags: bit 2 (0x04) = is_y; bits 0-1 = facing (0=Abajo, 1=Arriba, 2=Izquierda, 3=Derecha)
                             if dy != 0:
                                 coord = p_curr[1]
-                                flags = 4 if dy > 0 else 5  # 4 = Abajo, 5 = Arriba
+                                facing = custom_facing if custom_facing is not None else (0 if dy > 0 else 1)
+                                flags = 4 | (facing & 3)
                             else:
                                 coord = p_curr[0]
-                                flags = 3 if dx > 0 else 2  # 3 = Derecha, 2 = Izquierda
-                            points_blob.extend(struct.pack('<4H', coord & 0xFFFF, 2, 120, flags))
+                                facing = custom_facing if custom_facing is not None else (3 if dx > 0 else 2)
+                                flags = facing & 3
+                            points_blob.extend(struct.pack('<4H', coord & 0xFFFF, step_speed & 0xFFFF, step_delay & 0xFFFF, flags))
 
                 pts_off = append_aligned(bytes(points_blob), 4) if points_blob else 0
                 pts_ptr = cls.off_to_gba(base_freespace_offset + pts_off) if pts_off else 0
@@ -634,13 +765,13 @@ class RoutineCodec:
 
             # 7. Si se repunteó a un bloque nuevo:
             if not in_place and orig_off is not None and orig_off != target_off:
-                # Stub de seguridad en los primeros 12 bytes del offset viejo
-                # para que cualquier referencia residual desreferencie los nuevos horarios
+                # Neutralizar el bloque viejo poniendo evaluator_func = 0 para que el motor
+                # de GBA ignore esta entidad residual y no spawnee dos veces al NPC (evita sprites superpuestos).
                 safe_stub = struct.pack(
                     '<III',
-                    npc_data.evaluator_func & 0xFFFFFFFF,
-                    len(npc_data.schedules),
-                    cls.off_to_gba(target_off + 12)
+                    0,  # evaluator_func = 0 (entidad desactivada/neutralizada)
+                    0,  # sched_count = 0
+                    cls.off_to_gba(target_off + 12)  # puntero a los horarios por si alguna lectura residual accede
                 )
                 project.write_patch(orig_off, safe_stub)
                 # NOTA: Preservamos los datos antiguos intactos en lugar de rellenar con 0xFF
@@ -671,9 +802,28 @@ class RoutineCodec:
             if not in_place:
                 project.next_free_space = (target_off + blob_len + 15) & ~3
 
-            # 10. Persistir cambios
+            # 10. Persistir cambios en archivo de proyecto y en la ROM física
             if hasattr(project, "save"):
-                project.save()
+                try:
+                    project.save()
+                except Exception as ex_save:
+                    print(f"[RoutineCodec] Aviso al guardar .fsp: {ex_save}")
+
+            # Guardar directamente en el archivo ROM físico (.gba) para prueba inmediata en emulador
+            if hasattr(project, "save_rom"):
+                try:
+                    project.save_rom()
+                except Exception as ex_rom:
+                    print(f"[RoutineCodec] Aviso al guardar ROM física: {ex_rom}")
+            elif hasattr(project, "base_rom_path") and project.base_rom_path and os.path.exists(project.base_rom_path):
+                try:
+                    with open(project.base_rom_path, "r+b") as fp:
+                        if hasattr(project, "patches"):
+                            for off, pdata in project.patches.items():
+                                fp.seek(off)
+                                fp.write(pdata)
+                except Exception as ex_direct:
+                    print(f"[RoutineCodec] Aviso escritura directa ROM: {ex_direct}")
 
             if in_place:
                 msg = (

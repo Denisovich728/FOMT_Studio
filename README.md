@@ -61,6 +61,16 @@ TRABAJO EN PROGRESO (ROADMAP)
 - Mejora de la emulación de audio para pistas complejas.
 
 ------------------------------------------------------------
+CLÁUSULA DE AUTORÍA, FIRMA DIGITAL Y PROTECCIÓN BINARIA (GPLv3 SECCIÓN 7b)
+------------------------------------------------------------
+El componente binario nativo `Banco_de_Datos/INTegerGuard.dll` constituye el sello de autoría, autenticidad y firma digital inmutable del autor original (Denisovich728).
+
+Bajo los términos de la Licencia Pública General GNU v3 (Sección 7b - "Requiring preservation of specified reasonable legal notices or author attributions"):
+1. **Inmutabilidad de la Firma:** Queda estrictamente prohibida la eliminación, modificación, parcheo, desensamblado para fines de remoción de autoría o evasión de `INTegerGuard.dll`.
+2. **Dependencia Crítica del Ecosistema:** Todos los módulos del núcleo, suites gráficas y scripts independientes de FOMT Studio exigen obligatoriamente la presencia de este binario para su inicialización. En caso de ser removido o alterado, el entorno abortará de inmediato su arranque (`RomIntegrityError`).
+3. **Libertades de Uso:** Eres libre de estudiar el código, aprender de sus técnicas de descompilación THUMB y ASM, compilar derivados y crear tus propias herramientas personalizadas, siempre y cuando se preserve intacta la autoría original y la firma digital establecida por Denisovich728.
+
+------------------------------------------------------------
 CONTRIBUCIONES Y CÓDIGO ABIERTO
 ------------------------------------------------------------
 Este programa es de código abierto bajo la licencia GNU GPL v3. Si eres desarrollador y quieres ayudar a que esta herramienta sea un estándar de la comunidad, te invitamos al repositorio oficial:

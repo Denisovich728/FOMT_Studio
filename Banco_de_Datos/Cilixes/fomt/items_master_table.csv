@@ -1,0 +1,345 @@
+id,category,subcategory,index_in_category,name_en,name_es,description,graphic_id,tier_or_flags,stamina_effect,fatigue_effect,sell_price,buy_price,is_shippable,icon_file_16,icon_file_32
+0,Tool,Tool,0,Iron Sickle,Hoz de hierro,Sickle  Good for cutting grass or  weeds. Also cuts crops!,403,0,0,0,0,0,False,tools/tool_000_403_16.png,tools/tool_000_403_32.png
+1,Tool,Tool,1,Copper Sickle,Hoz de cobre,Copper Sickle  Good for cutting grass or  weeds. Also cuts crops!,404,0,0,0,0,0,False,tools/tool_001_404_16.png,tools/tool_001_404_32.png
+2,Tool,Tool,2,Silver Sickle,Hoz de plata,Silver Sickle  Good for cutting grass or  weeds. Also cuts crops!,405,0,0,0,0,0,False,tools/tool_002_405_16.png,tools/tool_002_405_32.png
+3,Tool,Tool,3,Gold Sickle,Hoz de oro,Gold Sickle  Good for cutting grass or  weeds. Also cuts crops!,406,0,0,0,0,0,False,tools/tool_003_406_16.png,tools/tool_003_406_32.png
+4,Tool,Tool,4,Mystrile Sickle,Hoz de mystrile,Mystrile Sickle  Good for cutting grass or  weeds. Also cuts crops!,407,0,0,0,0,0,False,tools/tool_004_407_16.png,tools/tool_004_407_32.png
+5,Tool,Tool,5,Cursed Sickle,Hoz maldita,"Cursed Sickle  Once equipped, go to church  to remove it.",409,0,0,0,0,0,False,tools/tool_005_409_16.png,tools/tool_005_409_32.png
+6,Tool,Tool,6,Blessed Sickle,Hoz bendita,Blessed Sickle  A Sickle whose curse has  been removed!,408,0,0,0,0,0,False,tools/tool_006_408_16.png,tools/tool_006_408_32.png
+7,Tool,Tool,7,Mythic Sickle,Hoz mitica,Mythic Sickle  Good for cutting grass or  weeds. Also cuts crops!,410,0,0,0,0,0,False,tools/tool_007_410_16.png,tools/tool_007_410_32.png
+8,Tool,Tool,8,Iron Hoe,Azada de hierro,"Hoe  Till earth, sown fields,  or grass right after mown.",234,0,0,0,0,0,False,tools/tool_008_234_16.png,tools/tool_008_234_32.png
+9,Tool,Tool,9,Copper Hoe,Azada de cobre,"Copper Hoe  Till earth, sown fields,  or grass right after mown.",235,0,0,0,0,0,False,tools/tool_009_235_16.png,tools/tool_009_235_32.png
+10,Tool,Tool,10,Silver Hoe,Azada de plata,"Silver Hoe  Till earth, sown fields,  or grass right after mown.",236,0,0,0,0,0,False,tools/tool_010_236_16.png,tools/tool_010_236_32.png
+11,Tool,Tool,11,Gold Hoe,Azada de oro,"Gold Hoe  Till earth, sown fields,  or grass right after mown.",237,0,0,0,0,0,False,tools/tool_011_237_16.png,tools/tool_011_237_32.png
+12,Tool,Tool,12,Mystrile Hoe,Azada de mystrile,"Mystrile Hoe  Till earth, sown fields,  or grass after mown.",238,0,0,0,0,0,False,tools/tool_012_238_16.png,tools/tool_012_238_32.png
+13,Tool,Tool,13,Cursed Hoe,Azada maldita,"Cursed Hoe  Once equipped, go to church  to remove it.",240,0,0,0,0,0,False,tools/tool_013_240_16.png,tools/tool_013_240_32.png
+14,Tool,Tool,14,Blessed Hoe,Azada bendita,Blessed Hoe  A Hoe whose curse has  been removed!,239,0,0,0,0,0,False,tools/tool_014_239_16.png,tools/tool_014_239_32.png
+15,Tool,Tool,15,Mythic Hoe,Azada mitica,"Mythic Hoe  Till earth, sown fields,  or grass after mown.",241,0,0,0,0,0,False,tools/tool_015_241_16.png,tools/tool_015_241_32.png
+16,Tool,Tool,16,Iron Axe,Hacha de hierro,Axe  Chop Branches into Lumber.  Can't break apart Stumps.,13,0,0,0,0,0,False,tools/tool_016_013_16.png,tools/tool_016_013_32.png
+17,Tool,Tool,17,Copper Axe,Hacha de cobre,Copper Axe  Chop Branches  or Stumps into Lumber.,14,0,0,0,0,0,False,tools/tool_017_014_16.png,tools/tool_017_014_32.png
+18,Tool,Tool,18,Silver Axe,Hacha de plata,Silver Axe  Chop Branches or Stumps   into Lumber.,15,0,0,0,0,0,False,tools/tool_018_015_16.png,tools/tool_018_015_32.png
+19,Tool,Tool,19,Gold Axe,Hacha de oro,Gold Axe  Chop Branches or Stumps   into Lumber.,16,0,0,0,0,0,False,tools/tool_019_016_16.png,tools/tool_019_016_32.png
+20,Tool,Tool,20,Mystrile Axe,Hacha de mystrile,Mystrile Axe  Chop Branches or Stumps   into Lumber.,17,0,0,0,0,0,False,tools/tool_020_017_16.png,tools/tool_020_017_32.png
+21,Tool,Tool,21,Cursed Axe,Hacha maldita,"Cursed Axe  Once equipped, go to church  remove it.",19,0,0,0,0,0,False,tools/tool_021_019_16.png,tools/tool_021_019_32.png
+22,Tool,Tool,22,Blessed Axe,Hacha bendita,Blessed Axe  An Axe whose curse has  been removed!,18,0,0,0,0,0,False,tools/tool_022_018_16.png,tools/tool_022_018_32.png
+23,Tool,Tool,23,Mythic Axe,Hacha mitica,Mythic Axe  Chop Branches or Stumps   into Lumber.,20,0,0,0,0,0,False,tools/tool_023_020_16.png,tools/tool_023_020_32.png
+24,Tool,Tool,24,Iron Hammer,Martillo de hierro,Hammer  Smash Stones or fences.  Prepare fields for tilling.,223,0,0,0,0,0,False,tools/tool_024_223_16.png,tools/tool_024_223_32.png
+25,Tool,Tool,25,Copper Hammer,Martillo de cobre,"Copper Hammer  Smash Stones, large Stones,   or fences. Prepare  fields.",224,0,0,0,0,0,False,tools/tool_025_224_16.png,tools/tool_025_224_32.png
+26,Tool,Tool,26,Silver Hammer,Martillo de plata,"Silver Hammer  large, huge Stones, or   fields for tilling.",225,0,0,0,0,0,False,tools/tool_026_225_16.png,tools/tool_026_225_32.png
+27,Tool,Tool,27,Gold Hammer,Martillo de oro,Gold Hammer  Smash Stones of all sizes  and fences. Prepare fields.,226,0,0,0,0,0,False,tools/tool_027_226_16.png,tools/tool_027_226_32.png
+28,Tool,Tool,28,Mystrile Hammer,Martillo de mystrile,Mystrile Hammer  Smash Stones of all sizes  and fences. Prepare fields.,227,0,0,0,0,0,False,tools/tool_028_227_16.png,tools/tool_028_227_32.png
+29,Tool,Tool,29,Cursed Hammer,Martillo maldito,"Cursed Hammer  Once equipped, go to Church  to remove it.",229,0,0,0,0,0,False,tools/tool_029_229_16.png,tools/tool_029_229_32.png
+30,Tool,Tool,30,Blessed Hammer,Martillo bendito,Blessed Hammer  A Hammer whose curse   has been removed!,228,0,0,0,0,0,False,tools/tool_030_228_16.png,tools/tool_030_228_32.png
+31,Tool,Tool,31,Mythic Hammer,Martillo mitico,Mythic Hammer  Smash Stones of all sizes  and fences. Prepare fields.,230,0,0,0,0,0,False,tools/tool_031_230_16.png,tools/tool_031_230_32.png
+32,Tool,Tool,32,Watering Can,Regadera,Watering Can  Water crops.,462,0,0,0,0,0,False,tools/tool_032_462_16.png,tools/tool_032_462_32.png
+33,Tool,Tool,33,Copper Watering Can,Regadera de cobre,Copper Watering Can  Water crops.,463,0,0,0,0,0,False,tools/tool_033_463_16.png,tools/tool_033_463_32.png
+34,Tool,Tool,34,Silver Watering Can,Regadera de plata,Silver Watering Can  Water crops.,464,0,0,0,0,0,False,tools/tool_034_464_16.png,tools/tool_034_464_32.png
+35,Tool,Tool,35,Gold Watering Can,Regadera de oro,Gold Watering Can  Water crops.,465,0,0,0,0,0,False,tools/tool_035_465_16.png,tools/tool_035_465_32.png
+36,Tool,Tool,36,Mystrile Watering Can,Regadera de mystrile,Mystrile Watering Can  Water crops.,466,0,0,0,0,0,False,tools/tool_036_466_16.png,tools/tool_036_466_32.png
+37,Tool,Tool,37,Cursed Watering Can,Regadera maldita,"Cursed Watering Can  Once equipped, go to Church  to remove it.",468,0,0,0,0,0,False,tools/tool_037_468_16.png,tools/tool_037_468_32.png
+38,Tool,Tool,38,Blessed Watering Can,Regadera bendita,Blessed Watering Can  Curse has been removed!,467,0,0,0,0,0,False,tools/tool_038_467_16.png,tools/tool_038_467_32.png
+39,Tool,Tool,39,Mythic Watering Can,Regadera mitica,Mythic Watering Can  Water crops.,469,0,0,0,0,0,False,tools/tool_039_469_16.png,tools/tool_039_469_32.png
+40,Tool,Tool,40,Fishing Rod,Cana de pescar,Fishing RodFor fishing.,148,0,0,0,0,0,False,tools/tool_040_148_16.png,tools/tool_040_148_32.png
+41,Tool,Tool,41,Copper Fishing Rod,Cana de cobre,Copper Fishing Rod  For fishing.,149,0,0,0,0,0,False,tools/tool_041_149_16.png,tools/tool_041_149_32.png
+42,Tool,Tool,42,Silver Fishing Rod,Cana de plata,Silver Fishing Rod  For fishing.,150,0,0,0,0,0,False,tools/tool_042_150_16.png,tools/tool_042_150_32.png
+43,Tool,Tool,43,Gold Fishing Rod,Cana de oro,Gold Fishing Rod  For fishing.,151,0,0,0,0,0,False,tools/tool_043_151_16.png,tools/tool_043_151_32.png
+44,Tool,Tool,44,Mystrile Fishing Rod,Cana de mystrile,Mystrile Fishing Rod  For fishing.,152,0,0,0,0,0,False,tools/tool_044_152_16.png,tools/tool_044_152_32.png
+45,Tool,Tool,45,Cursed Fishing Rod,Cana maldita,"Cursed Fishing Rod  Once equipped, go to Church  to remove it.",154,0,0,0,0,0,False,tools/tool_045_154_16.png,tools/tool_045_154_32.png
+46,Tool,Tool,46,Blessed Fishing Rod,Cana bendita,Blessed Fishing Rod  A Fishing Rod whose curse   has been removed!,153,0,0,0,0,0,False,tools/tool_046_153_16.png,tools/tool_046_153_32.png
+47,Tool,Tool,47,Mythic Fishing Rod,Cana mitica,Mythic Fishing Rod  For fishing.,155,0,0,0,0,0,False,tools/tool_047_155_16.png,tools/tool_047_155_32.png
+48,Tool,Tool,48,Cow Miracle Potion,Pocion milagro de vaca,Cow Miracle Potion  Use to impregnate adult   Cows.,91,0,0,0,0,3000,False,tools/tool_048_091_16.png,tools/tool_048_091_32.png
+49,Tool,Tool,49,Sheep Miracle Potion,Pocion milagro de oveja,Sheep Miracle Potion  Use to impregnate adult   Sheep.,402,0,0,0,0,3000,False,tools/tool_049_402_16.png,tools/tool_049_402_32.png
+50,Tool,Tool,50,Turnip Seeds,Semillas de nabo,Turnip Seeds  Plant in Spring.,458,0,0,0,0,120,False,tools/tool_050_458_16.png,tools/tool_050_458_32.png
+51,Tool,Tool,51,Potato Seeds,Semillas de papa,Potato Seeds  Plant in Spring.,348,0,0,0,0,150,False,tools/tool_051_348_16.png,tools/tool_051_348_32.png
+52,Tool,Tool,52,Cucumber Seeds,Semillas de pepino,Cucumber Seeds  Plant in Spring.,114,0,0,0,0,200,False,tools/tool_052_114_16.png,tools/tool_052_114_32.png
+53,Tool,Tool,53,Strawberry Seeds,Semillas de fresa,Strawberry Seeds  Plant in Spring.,433,0,0,0,0,150,False,tools/tool_053_433_16.png,tools/tool_053_433_32.png
+54,Tool,Tool,54,Cabbage Seeds,Semillas de repollo,Cabbage Seeds  Plant in Spring.,85,0,0,0,0,500,False,tools/tool_054_085_16.png,tools/tool_054_085_32.png
+55,Tool,Tool,55,Tomato Seeds,Semillas de tomate,Tomato Seeds  Plant in Summer.,450,0,0,0,0,200,False,tools/tool_055_450_16.png,tools/tool_055_450_32.png
+56,Tool,Tool,56,Corn Seeds,Semillas de maiz,Corn Seeds  Plant in Summer.,111,0,0,0,0,300,False,tools/tool_056_111_16.png,tools/tool_056_111_32.png
+57,Tool,Tool,57,Onion Seeds,Semillas de cebolla,Onion Seeds  Plant in Summer.,320,0,0,0,0,150,False,tools/tool_057_320_16.png,tools/tool_057_320_32.png
+58,Tool,Tool,58,Pumpkin Seeds,Semillas de calabaza,Pumpkin Seeds  Plant in Summer.,356,0,0,0,0,500,False,tools/tool_058_356_16.png,tools/tool_058_356_32.png
+59,Tool,Tool,59,Pineapple Seeds,Semillas de pina,Pineapple Seeds  Plant in Summer.,335,0,0,0,0,1000,False,tools/tool_059_335_16.png,tools/tool_059_335_32.png
+60,Tool,Tool,60,Eggplant Seeds,Semillas de berenjena,Eggplant Seeds  Plant in Fall.,134,0,0,0,0,120,False,tools/tool_060_134_16.png,tools/tool_060_134_32.png
+61,Tool,Tool,61,Carrot Seeds,Semillas de zanahoria,Carrot Seeds  Plant in Fall.,90,0,0,0,0,300,False,tools/tool_061_090_16.png,tools/tool_061_090_32.png
+62,Tool,Tool,62,Sweet Potato Seeds,Semillas de boniato,Sweet Potato Seeds  Plant in Fall.,440,0,0,0,0,300,False,tools/tool_062_440_16.png,tools/tool_062_440_32.png
+63,Tool,Tool,63,Spinach Seeds,Semillas de espinaca,Spinach Seeds  Plant in Fall.,424,0,0,0,0,200,False,tools/tool_063_424_16.png,tools/tool_063_424_32.png
+64,Tool,Tool,64,Green Pepper Seeds,Semillas de pimiento verde,Green Pepper Seeds  Plant in Fall.,219,0,0,0,0,150,False,tools/tool_064_219_16.png,tools/tool_064_219_32.png
+65,Tool,Tool,65,Grass Seeds,Semillas de hierba,Grass Seeds  Plant any season but Winter.,215,0,0,0,0,500,False,tools/tool_065_215_16.png,tools/tool_065_215_32.png
+66,Tool,Tool,66,Moon Drop Seeds,Moon Drop Seeds,Moon Drop Seeds  Plant in Spring or Fall,305,0,0,0,0,0,False,tools/tool_066_305_16.png,tools/tool_066_305_32.png
+67,Tool,Tool,67,Pink Cat Seeds,Semillas de flor pink cat,Pink Cat Seeds  Plant in Summer or Fall.,339,0,0,0,0,200,False,tools/tool_067_339_16.png,tools/tool_067_339_32.png
+68,Tool,Tool,68,Magic Seeds,Semillas de flor magica,Magic Seeds  Plant in Fall.,276,0,0,0,0,0,False,tools/tool_068_276_16.png,tools/tool_068_276_32.png
+69,Tool,Tool,69,Toy Flower Seeds,Semillas de flor toy,Toy Flower Seeds  Plant in Spring.,454,0,0,0,0,500,False,tools/tool_069_454_16.png,tools/tool_069_454_32.png
+70,Tool,Tool,70,Brush,Cepillo,"Brush  A Tool for brushing Cows,   Sheep, or Horses.",80,0,0,0,0,800,False,tools/tool_070_080_16.png,tools/tool_070_080_32.png
+71,Tool,Tool,71,Milker,Ordenadora,Milker  A Tool for milking adult  female cows.,294,0,0,0,0,2000,False,tools/tool_071_294_16.png,tools/tool_071_294_32.png
+72,Tool,Tool,72,Clipper,Clipper,A Tool for shearing Wool  from adult Sheep.,222,0,0,0,0,0,False,tools/tool_072_222_16.png,tools/tool_072_222_32.png
+73,Tool,Tool,73,Bell,Campana de ganado,Bell  Ring the Bell to call Cows  and Sheep to you.,59,0,0,0,0,500,False,tools/tool_073_059_16.png,tools/tool_073_059_32.png
+74,Tool,Tool,74,Animal Medicine,Medicina animal,Animal Medicine  Use to cure sick livestock.,6,0,0,0,0,1000,False,tools/tool_074_006_16.png,tools/tool_074_006_32.png
+75,Tool,Tool,75,Blue Feather,Pluma azul,Blue Feather  Use it to propose to that  special girl.,67,0,0,0,0,1000,False,tools/tool_075_067_16.png,tools/tool_075_067_32.png
+76,Tool,Tool,76,Pedometer,Pedometer,Pedometer,328,0,0,0,0,0,False,tools/tool_076_328_16.png,tools/tool_076_328_32.png
+77,Tool,Tool,77,Teleport Stone,Teleport Stone,Teleport Stone  Teleport to a location of  your choice.,165,0,0,0,0,0,False,tools/tool_077_165_16.png,tools/tool_077_165_32.png
+78,Tool,Tool,78,Gem of the Goddess,Gem of the Goddess,Gem of the Goddess  Recuperate Stamina   over time.,208,0,0,0,0,0,False,tools/tool_078_208_16.png,tools/tool_078_208_32.png
+79,Tool,Tool,79,Gem of the Kappa,Gem of the Kappa,Gem of the Kappa  Recuperate Fatigue   over time.,262,0,0,0,0,0,False,tools/tool_079_262_16.png,tools/tool_079_262_32.png
+80,FoodOrCrop,Crop,0,Turnip,Nabo,Turnip  Can be eaten or shipped.,457,0,3,-1,60,0,True,foods_and_crops/food_000_457_16.png,foods_and_crops/food_000_457_32.png
+81,FoodOrCrop,Crop,1,Potato,Papa,Potato  Can be eaten or shipped.,347,0,3,-1,80,0,True,foods_and_crops/food_001_347_16.png,foods_and_crops/food_001_347_32.png
+82,FoodOrCrop,Crop,2,Cucumber,Pepino,Cucumber  Can be eaten or shipped.,113,0,4,-1,60,0,True,foods_and_crops/food_002_113_16.png,foods_and_crops/food_002_113_32.png
+83,FoodOrCrop,Crop,3,Strawberry,Fresa,Strawberry  Can be eaten or shipped.,430,0,5,-2,30,0,True,foods_and_crops/food_003_430_16.png,foods_and_crops/food_003_430_32.png
+84,FoodOrCrop,Crop,4,Cabbage,Repollo,Cabbage  Can be eaten or shipped.,84,0,3,-1,250,0,True,foods_and_crops/food_004_084_16.png,foods_and_crops/food_004_084_32.png
+85,FoodOrCrop,Crop,5,Tomato,Tomate,Tomato  Can be eaten or shipped.,448,0,4,-1,60,0,True,foods_and_crops/food_005_448_16.png,foods_and_crops/food_005_448_32.png
+86,FoodOrCrop,Crop,6,Corn,Maiz,Corn  Can be eaten or shipped.,109,0,3,-1,100,0,True,foods_and_crops/food_006_109_16.png,foods_and_crops/food_006_109_32.png
+87,FoodOrCrop,Crop,7,Onion,Cebolla,Onion  Can be eaten or shipped.,319,0,3,-1,80,0,True,foods_and_crops/food_007_319_16.png,foods_and_crops/food_007_319_32.png
+88,FoodOrCrop,Crop,8,Pumpkin,Calabaza,Pumpkin  Can be eaten or shipped.,354,0,3,-1,250,0,True,foods_and_crops/food_008_354_16.png,foods_and_crops/food_008_354_32.png
+89,FoodOrCrop,Crop,9,Pineapple,Pina,Pineapple  Can be eaten or shipped.,334,0,5,-2,500,0,True,foods_and_crops/food_009_334_16.png,foods_and_crops/food_009_334_32.png
+90,FoodOrCrop,Crop,10,Eggplant,Berenjena,Eggplant  Can be eaten or shipped.,132,0,3,-1,80,0,True,foods_and_crops/food_010_132_16.png,foods_and_crops/food_010_132_32.png
+91,FoodOrCrop,Crop,11,Carrot,Zanahoria,Carrot  Can be eaten or shipped.,89,0,4,-1,120,0,True,foods_and_crops/food_011_089_16.png,foods_and_crops/food_011_089_32.png
+92,FoodOrCrop,Crop,12,Sweet Potato,Boniato,Sweet Potato  Can be eaten or shipped.,439,0,3,-1,120,0,True,foods_and_crops/food_012_439_16.png,foods_and_crops/food_012_439_32.png
+93,FoodOrCrop,Crop,13,Spinach,Espinaca,Spinach  Can be eaten or shipped.,423,0,3,-1,80,0,True,foods_and_crops/food_013_423_16.png,foods_and_crops/food_013_423_32.png
+94,FoodOrCrop,Crop,14,Green Pepper,Pimiento verde,Green Pepper  Can be eaten or shipped.,218,0,3,-1,40,0,True,foods_and_crops/food_014_218_16.png,foods_and_crops/food_014_218_32.png
+95,FoodOrCrop,AnimalProduce,15,Regular Quality Egg,Huevo normal,Regular Quality Egg  Can be eaten or shipped.,125,0,3,-1,50,0,True,foods_and_crops/food_015_125_16.png,foods_and_crops/food_015_125_32.png
+96,FoodOrCrop,AnimalProduce,16,Good Quality Egg,Huevo de buena calidad,Good Quality Egg  Can be eaten or shipped.,126,0,3,-1,60,0,True,foods_and_crops/food_016_126_16.png,foods_and_crops/food_016_126_32.png
+97,FoodOrCrop,AnimalProduce,17,High Quality Egg,Huevo de alta calidad,High Quality Egg  Can be eaten or shipped.,127,0,3,-1,80,0,True,foods_and_crops/food_017_127_16.png,foods_and_crops/food_017_127_32.png
+98,FoodOrCrop,AnimalProduce,18,Golden Egg,Huevo de oro,Golden Egg  Can be eaten or shipped.,128,0,4,-2,100,0,True,foods_and_crops/food_018_128_16.png,foods_and_crops/food_018_128_32.png
+99,FoodOrCrop,AnimalProduce,19,P Egg,Huevo P,P Egg  Can be eaten or shipped.,129,0,5,-3,180,0,True,foods_and_crops/food_019_129_16.png,foods_and_crops/food_019_129_32.png
+100,FoodOrCrop,AnimalProduce,20,X Egg,Huevo X,X Egg  Can be eaten or shipped.,130,0,6,-4,350,0,True,foods_and_crops/food_020_130_16.png,foods_and_crops/food_020_130_32.png
+101,FoodOrCrop,AnimalProduce,21,Spa-Boiled Egg,Spa-Boiled Egg,Spa-Boiled Egg  Put an Egg in Hot Spring.  Can be eaten or shipped.,131,0,4,-2,80,0,True,foods_and_crops/food_021_131_16.png,foods_and_crops/food_021_131_32.png
+102,FoodOrCrop,AnimalProduce,22,Mayonnaise (S),Mayonesa (P),Mayonnaise (S)  Place Eggs in the   Mayonnaise Maker.,284,0,1,-1,100,0,True,foods_and_crops/food_022_284_16.png,foods_and_crops/food_022_284_32.png
+103,FoodOrCrop,AnimalProduce,23,Mayonnaise (M),Mayonesa (M),Mayonnaise (M)  Place Eggs in the   Mayonnaise Maker.,285,0,2,-1,150,0,True,foods_and_crops/food_023_285_16.png,foods_and_crops/food_023_285_32.png
+104,FoodOrCrop,AnimalProduce,24,Mayonnaise (L),Mayonesa (G),Mayonnaise (L)  Place Eggs in the   Mayonnaise Maker.,286,0,3,-1,200,0,True,foods_and_crops/food_024_286_16.png,foods_and_crops/food_024_286_32.png
+105,FoodOrCrop,AnimalProduce,25,Mayonnaise (G),Mayonesa (Oro),Mayonnaise (G)  Place Eggs in the   Mayonnaise Maker.,287,0,4,-2,300,0,True,foods_and_crops/food_025_287_16.png,foods_and_crops/food_025_287_32.png
+106,FoodOrCrop,AnimalProduce,26,Mayonnaise (P),Mayonesa (P),Mayonnaise (P)  Place Eggs in the   Mayonnaise Maker.,288,0,5,-3,450,0,True,foods_and_crops/food_026_288_16.png,foods_and_crops/food_026_288_32.png
+107,FoodOrCrop,AnimalProduce,27,Mayonnaise (X),Mayonesa (X),Mayonnaise (X)  Place Eggs in the   Mayonnaise Maker.,289,0,6,-3,800,0,True,foods_and_crops/food_027_289_16.png,foods_and_crops/food_027_289_32.png
+108,FoodOrCrop,AnimalProduce,28,Milk (S),Leche (P),Milk (S)  Milk from a Cow.  Can be drunk or shipped.,296,0,2,-2,100,0,True,foods_and_crops/food_028_296_16.png,foods_and_crops/food_028_296_32.png
+109,FoodOrCrop,AnimalProduce,29,Milk (M),Leche (M),Milk (M)  Milk from a Cow.  Can be drunk or shipped.,293,0,3,-2,150,0,True,foods_and_crops/food_029_293_16.png,foods_and_crops/food_029_293_32.png
+110,FoodOrCrop,AnimalProduce,30,Milk (L),Leche (G),Milk (L)  Milk from a Cow.  Can be drunk or shipped.,292,0,4,-2,200,0,True,foods_and_crops/food_030_292_16.png,foods_and_crops/food_030_292_32.png
+111,FoodOrCrop,AnimalProduce,31,Milk (G),Leche (Oro),Milk (G)  Milk from a Cow.  Can be drunk or shipped.,291,0,5,-3,300,0,True,foods_and_crops/food_031_291_16.png,foods_and_crops/food_031_291_32.png
+112,FoodOrCrop,AnimalProduce,32,Milk (P),Leche (P),Milk (P)  Milk from a Cow.  Can be drunk or shipped.,295,0,6,-4,500,0,True,foods_and_crops/food_032_295_16.png,foods_and_crops/food_032_295_32.png
+113,FoodOrCrop,AnimalProduce,33,Milk (X),Leche (X),Milk (X)  Milk from a Cow.  Can be drunk or shipped.,297,0,7,-5,800,0,True,foods_and_crops/food_033_297_16.png,foods_and_crops/food_033_297_32.png
+114,FoodOrCrop,AnimalProduce,34,Cheese (S),Queso (P),Cheese (S)  Place Milk in the Cheese   Maker.,92,0,5,-1,300,0,True,foods_and_crops/food_034_092_16.png,foods_and_crops/food_034_092_32.png
+115,FoodOrCrop,AnimalProduce,35,Cheese (M),Queso (M),Cheese (M)  Place Milk in the Cheese   Maker.,93,0,6,-1,400,0,True,foods_and_crops/food_035_093_16.png,foods_and_crops/food_035_093_32.png
+116,FoodOrCrop,AnimalProduce,36,Cheese (L),Queso (G),Cheese (L)  Place Milk in the Cheese   Maker.,94,0,7,-1,500,0,True,foods_and_crops/food_036_094_16.png,foods_and_crops/food_036_094_32.png
+117,FoodOrCrop,AnimalProduce,37,Cheese (G),Queso (Oro),Cheese (G)  Place Milk in the Cheese   Maker.,95,0,8,-2,600,0,True,foods_and_crops/food_037_095_16.png,foods_and_crops/food_037_095_32.png
+118,FoodOrCrop,AnimalProduce,38,Cheese (P),Queso (P),Cheese (P)  Place Milk in the Cheese   Maker.,96,0,9,-3,750,0,True,foods_and_crops/food_038_096_16.png,foods_and_crops/food_038_096_32.png
+119,FoodOrCrop,AnimalProduce,39,Cheese (X),Queso (X),Cheese (X)  Place Milk in the Cheese   Maker.,97,0,10,-4,1500,0,True,foods_and_crops/food_039_097_16.png,foods_and_crops/food_039_097_32.png
+120,FoodOrCrop,WildForage,40,Apple,Manzana,Apple  Grows on Apple Trees  Can be eated or shipped.,8,0,2,-2,50,0,True,foods_and_crops/food_040_008_16.png,foods_and_crops/food_040_008_32.png
+121,FoodOrCrop,WildForage,41,Honey,Miel,Honey  Made by Honey Bees.  Can be eaten or shipped.,242,0,2,-2,50,0,True,foods_and_crops/food_041_242_16.png,foods_and_crops/food_041_242_32.png
+122,FoodOrCrop,WildForage,42,Bamboo Shoot,Brote de bambu,Bamboo Shoot  Find them in the mountains.  Can be eaten or shipped.,50,0,10,-1,50,0,True,foods_and_crops/food_042_050_16.png,foods_and_crops/food_042_050_32.png
+123,FoodOrCrop,WildForage,43,Wild Grapes,Wild Grapes,Wild Grapes  Find them in the mountains.  Can be eaten or shipped.,309,0,10,-2,50,0,True,foods_and_crops/food_043_309_16.png,foods_and_crops/food_043_309_32.png
+124,FoodOrCrop,WildForage,44,Mushroom,Seta,Mushroom  Find them in the mountains.  Can be eaten or shipped.,306,0,10,-1,70,0,True,foods_and_crops/food_044_306_16.png,foods_and_crops/food_044_306_32.png
+125,FoodOrCrop,WildForage,45,Poisonous Mushroom,Seta venenosa,Poisonous Mushroom  Find them in the mountains.  Dangerous if eaten.,245,0,-50,10,100,0,True,foods_and_crops/food_045_245_16.png,foods_and_crops/food_045_245_32.png
+126,FoodOrCrop,WildForage,46,Truffle,Trufa,Truffle  Find them in the mountains.  Very rare.,281,0,20,-1,500,0,True,foods_and_crops/food_046_281_16.png,foods_and_crops/food_046_281_32.png
+127,FoodOrCrop,WildForage,47,Blue Grass,Hierba azul,Blue Grass  Find them in the mountains.  Eat to recover some Stamina.,65,0,10,-1,100,0,True,foods_and_crops/food_047_065_16.png,foods_and_crops/food_047_065_32.png
+128,FoodOrCrop,WildForage,48,Green Grass,Hierba verde,Green Grass  Find them in the mountains.  Eat to recover some Fatigue.,216,0,0,-2,100,0,True,foods_and_crops/food_048_216_16.png,foods_and_crops/food_048_216_32.png
+129,FoodOrCrop,WildForage,49,Red Grass,Hierba roja,Red Grass  Find them in the mountains.  Dangerous if eaten.,376,0,-10,5,110,0,True,foods_and_crops/food_049_376_16.png,foods_and_crops/food_049_376_32.png
+130,FoodOrCrop,WildForage,50,Yellow Grass,Hierba amarilla,"Yellow Grass  Decreases Stamina,  but recovers some Fatigue.",490,0,-5,-5,120,0,True,foods_and_crops/food_050_490_16.png,foods_and_crops/food_050_490_32.png
+131,FoodOrCrop,WildForage,51,Orange Grass,Hierba naranja,Orange Grass  Does not affect  Stamina or Fatigue.,322,0,0,0,100,0,True,foods_and_crops/food_051_322_16.png,foods_and_crops/food_051_322_32.png
+132,FoodOrCrop,WildForage,52,Purple Grass,Hierba morada,Purple Grass  Eat to recover some  Stamina and Fatigue.,357,0,5,-2,120,0,True,foods_and_crops/food_052_357_16.png,foods_and_crops/food_052_357_32.png
+133,FoodOrCrop,WildForage,53,Indigo Grass,Hierba anil,Indigo Grass  Find them on the beach.  Eat to recover Stamina.,256,0,20,-1,100,0,True,foods_and_crops/food_053_256_16.png,foods_and_crops/food_053_256_32.png
+134,FoodOrCrop,WildForage,54,Black Grass,Hierba negra,Black Grass  Eat to recover some  Stamina and Fatigue.,63,0,5,-5,10,0,True,foods_and_crops/food_054_063_16.png,foods_and_crops/food_054_063_32.png
+135,FoodOrCrop,WildForage,55,White Grass,Hierba blanca,White Grass  Eat to recover some  Stamina and Fatigue.,473,0,10,-10,150,0,True,foods_and_crops/food_055_473_16.png,foods_and_crops/food_055_473_32.png
+136,FoodOrCrop,CropOrFood,56,Queen of the Night,Queen of the Night,Queen of the Night  Blooms on Summer nights.   Brings good luck.,58,0,0,0,0,0,False,foods_and_crops/food_056_058_16.png,foods_and_crops/food_056_058_32.png
+137,FoodOrCrop,Medicine,57,Bodigizer,Bodigizer,Bodigizer  Helps recuperate Stamina.,349,0,50,-1,0,500,False,foods_and_crops/food_057_349_16.png,foods_and_crops/food_057_349_32.png
+138,FoodOrCrop,Medicine,58,Bodigizer XL,Bodigizer XL,Bodigizer XL  Helps recuperate   lots of Stamina.,350,0,100,-1,0,1000,False,foods_and_crops/food_058_350_16.png,foods_and_crops/food_058_350_32.png
+139,FoodOrCrop,Medicine,59,Turbojolt,Turbojolt,Turbojolt  Helps recuperate Fatigue.,146,0,0,-20,0,1000,False,foods_and_crops/food_059_146_16.png,foods_and_crops/food_059_146_32.png
+140,FoodOrCrop,Medicine,60,Turbojolt XL,Turbojolt XL,Turbojolt XL  Helps recuperate   lots of Fatigue.,147,0,0,-50,0,2000,False,foods_and_crops/food_060_147_16.png,foods_and_crops/food_060_147_32.png
+141,FoodOrCrop,CropOrFood,61,Wine,Vino,Wine  Made with Grapes from the   winery or the mountain.,475,0,1,-5,0,300,False,foods_and_crops/food_061_475_16.png,foods_and_crops/food_061_475_32.png
+142,FoodOrCrop,CropOrFood,62,Grape Juice,Zumo de uva,Grape Juice  Made with Grapes from the   winery or the mountain.,221,0,5,-5,0,200,False,foods_and_crops/food_062_221_16.png,foods_and_crops/food_062_221_32.png
+143,FoodOrCrop,CropOrFood,63,Rice Ball,Bola de arroz,"Rice Ball  May be eaten as is,  or used for cooking.",380,0,2,-1,0,100,False,foods_and_crops/food_063_380_16.png,foods_and_crops/food_063_380_32.png
+144,FoodOrCrop,CropOrFood,64,Bread,Pan,"Bread  May be eaten as is,  or used for cooking.",78,0,2,-1,0,100,False,foods_and_crops/food_064_078_16.png,foods_and_crops/food_064_078_32.png
+145,FoodOrCrop,CropOrFood,65,Oil,Aceite,"Oil  May be eaten as is,  or used for cooking.",315,0,1,1,0,50,False,foods_and_crops/food_065_315_16.png,foods_and_crops/food_065_315_32.png
+146,FoodOrCrop,CropOrFood,66,Flower,Flower,"Flower  May be eaten as is,  or used for cooking.",163,0,1,1,0,0,False,foods_and_crops/food_066_163_16.png,foods_and_crops/food_066_163_32.png
+147,FoodOrCrop,CropOrFood,67,Curry Powder,Curry en polvo,"Curry Powder  May be eaten as is,  or used for cooking.",118,0,1,1,0,50,False,foods_and_crops/food_067_118_16.png,foods_and_crops/food_067_118_32.png
+148,FoodOrCrop,CropOrFood,68,Muffin Mix,Muffin Mix,"Muffin Mix  May be eaten as is,  or used for cooking.",122,0,1,1,0,0,False,foods_and_crops/food_068_122_16.png,foods_and_crops/food_068_122_32.png
+149,FoodOrCrop,CropOrFood,69,Chocolate,Chocolate,"Chocolate  May be eaten as is,  or used for cooking.",102,0,2,-2,100,0,True,foods_and_crops/food_069_102_16.png,foods_and_crops/food_069_102_32.png
+150,FoodOrCrop,CookedDish,70,Relax Tea Leaves,Relax Tea Leaves,Relaxation Tea Leaves  Present from the Harvest  Sprite's Tea Party.,379,0,2,-3,1000,0,True,foods_and_crops/food_070_379_16.png,foods_and_crops/food_070_379_32.png
+151,FoodOrCrop,CookedDish,71,SUGDW Apple,SUGDW Apple,SUGDW Apple  Full name: Super Ultra Great  Delicious Wonderful Apple.,435,0,2,-2,50,0,True,foods_and_crops/food_071_435_16.png,foods_and_crops/food_071_435_32.png
+152,FoodOrCrop,CookedDish,72,HMSGB Apple,HMSGB Apple,HMSGB Apple  Stands for Hyper-Miracle   Sweet-Gorgeous-Beautiful.,233,0,2,-2,50,0,True,foods_and_crops/food_072_233_16.png,foods_and_crops/food_072_233_32.png
+153,FoodOrCrop,CookedDish,73,AEPFE Apple,AEPFE Apple,AEPFE Apple  Stands for Angelic-Eternal-  Pure-Fresh-Elegant.,1,0,2,-2,50,0,True,foods_and_crops/food_073_001_16.png,foods_and_crops/food_073_001_32.png
+154,FoodOrCrop,CookedDish,74,Buckwheat Flour,Buckwheat Flour,"Buckwheat Flour  May be eaten as is,  or used for cooking.",81,0,1,1,0,0,False,foods_and_crops/food_074_081_16.png,foods_and_crops/food_074_081_32.png
+155,FoodOrCrop,CookedDish,75,Wild Grape Juice,Wild Grape Juice,A wine made with   Wild Grapes.,214,0,1,-40,0,0,False,foods_and_crops/food_075_214_16.png,foods_and_crops/food_075_214_32.png
+156,FoodOrCrop,CookedDish,76,Salad,Salad,Salad  Made with fresh vegetables.  To eat or use as a gift.,396,0,20,-5,0,0,False,foods_and_crops/food_076_396_16.png,foods_and_crops/food_076_396_32.png
+157,FoodOrCrop,CookedDish,77,Curry Rice,Curry Rice,Curry Rice  Curry eaten with Rice.  To eat or use as a gift.,115,0,30,-2,0,0,False,foods_and_crops/food_077_115_16.png,foods_and_crops/food_077_115_32.png
+158,FoodOrCrop,CookedDish,78,Stew,Stew,Stew  Stewed vegetables.  To eat or use as a gift.,427,0,30,-2,0,0,False,foods_and_crops/food_078_427_16.png,foods_and_crops/food_078_427_32.png
+159,FoodOrCrop,CookedDish,79,Miso Soup,Miso Soup,Miso Soup  A delicious soup.  To drink or use as a gift.,298,0,5,-3,0,0,False,foods_and_crops/food_079_298_16.png,foods_and_crops/food_079_298_32.png
+160,FoodOrCrop,CookedDish,80,Stir Fry,Stir Fry,Stir Fry  Healthy veggy stir fry.  To eat or use as a gift.,206,0,40,-1,0,0,False,foods_and_crops/food_080_206_16.png,foods_and_crops/food_080_206_32.png
+161,FoodOrCrop,CookedDish,81,Fried Rice,Fried Rice,Fried Rice  A yummy rice dish.  To eat or use as a gift.,388,0,40,-1,0,0,False,foods_and_crops/food_081_388_16.png,foods_and_crops/food_081_388_32.png
+162,FoodOrCrop,CookedDish,82,Savory Pancake,Savory Pancake,Savory Pancake  Made with flour and veggies.  To eat or use as a gift.,316,0,50,-1,0,0,False,foods_and_crops/food_082_316_16.png,foods_and_crops/food_082_316_32.png
+163,FoodOrCrop,CookedDish,83,Sandwich,Sandwich,Sandwich  An old favorite.  To eat or use as a gift.,398,0,40,-5,0,0,False,foods_and_crops/food_083_398_16.png,foods_and_crops/food_083_398_32.png
+164,FoodOrCrop,CookedDish,84,Fruit Juice,Fruit Juice,Fruit Juice  A drink made with fruits.  To drink or use as a gift.,202,0,20,-15,0,0,False,foods_and_crops/food_084_202_16.png,foods_and_crops/food_084_202_32.png
+165,FoodOrCrop,CookedDish,85,Vegetable Juice,Vegetable Juice,Vegetable Juice  A drink made with veggies.  To drink or use as a gift.,459,0,20,-20,0,0,False,foods_and_crops/food_085_459_16.png,foods_and_crops/food_085_459_32.png
+166,FoodOrCrop,CookedDish,86,Mixed Juice,Mixed Juice,Mixed Juice  A drink made with fruits.  To drink or use as a gift.,300,0,50,-30,0,0,False,foods_and_crops/food_086_300_16.png,foods_and_crops/food_086_300_32.png
+167,FoodOrCrop,CookedDish,87,Fruit Latte,Fruit Latte,Fruit Latte  Made with fruits and Milk.  To eat or use as a gift.,203,0,30,-15,0,0,False,foods_and_crops/food_087_203_16.png,foods_and_crops/food_087_203_32.png
+168,FoodOrCrop,CookedDish,88,Vegetable Latte,Vegetable Latte,Vegetable Latte  A drink made with    vegetables and Milk.,460,0,30,-20,0,0,False,foods_and_crops/food_088_460_16.png,foods_and_crops/food_088_460_32.png
+169,FoodOrCrop,CookedDish,89,Mixed Latte,Mixed Latte,"Mixed Latte  A drink made with fruit,   vegetables and Milk.",301,0,60,-20,0,0,False,foods_and_crops/food_089_301_16.png,foods_and_crops/food_089_301_32.png
+170,FoodOrCrop,CookedDish,90,Strawberry Milk,Strawberry Milk,A drink made with  Strawberries and Milk.  To drink or use as a gift.,432,0,30,-15,0,0,False,foods_and_crops/food_090_432_16.png,foods_and_crops/food_090_432_32.png
+171,FoodOrCrop,CookedDish,91,Strawberry Jam,Strawberry Jam,Strawberry Jam  Jam made with Strawberries.  To eat or use as a gift.,431,0,5,-5,0,0,False,foods_and_crops/food_091_431_16.png,foods_and_crops/food_091_431_32.png
+172,FoodOrCrop,CookedDish,92,Tomato Juice,Tomato Juice,Tomato Juice  A juice made from Tomatoes.  To drink or use as a gift.,449,0,20,-20,0,0,False,foods_and_crops/food_092_449_16.png,foods_and_crops/food_092_449_32.png
+173,FoodOrCrop,CookedDish,93,Pickled Turnip,Pickled Turnip,Pickled Turnip  A Turnip dish.  To eat or use as a gift.,333,0,20,-4,0,0,False,foods_and_crops/food_093_333_16.png,foods_and_crops/food_093_333_32.png
+174,FoodOrCrop,CookedDish,94,French Fries,French Fries,French Fries  Everyone's favorite.  To eat or use as a gift.,205,0,30,-2,0,0,False,foods_and_crops/food_094_205_16.png,foods_and_crops/food_094_205_32.png
+175,FoodOrCrop,CookedDish,95,Pickles,Pickles,Pickles  A Pickled Cucumber.  To eat or use as a gift.,332,0,20,-7,0,0,False,foods_and_crops/food_095_332_16.png,foods_and_crops/food_095_332_32.png
+176,FoodOrCrop,CookedDish,96,Ketchup,Ketchup,Ketchup  Made with fresh Tomatoes.  To eat or use as a gift.,264,0,1,0,0,0,False,foods_and_crops/food_096_264_16.png,foods_and_crops/food_096_264_32.png
+177,FoodOrCrop,CookedDish,97,Popcorn,Popcorn,Popcorn  Made with fresh Corn.  To eat or use as a gift.,343,0,30,-1,0,0,False,foods_and_crops/food_097_343_16.png,foods_and_crops/food_097_343_32.png
+178,FoodOrCrop,CookedDish,98,Corn Flakes,Corn Flakes,Corn Flakes  Great in the morning.  To eat or use as a gift.,110,0,10,-2,0,0,False,foods_and_crops/food_098_110_16.png,foods_and_crops/food_098_110_32.png
+179,FoodOrCrop,CookedDish,99,Baked Corn,Baked Corn,Baked Corn  Made with fresh Corn.  To eat or use as a gift.,384,0,7,-1,0,0,False,foods_and_crops/food_099_384_16.png,foods_and_crops/food_099_384_32.png
+180,FoodOrCrop,CookedDish,100,Pineapple Juice,Pineapple Juice,Pineapple Juice  Freshly squeezed Pinapple.  To drink or use as a gift.,359,0,5,-15,0,0,False,foods_and_crops/food_100_359_16.png,foods_and_crops/food_100_359_32.png
+181,FoodOrCrop,CookedDish,101,Pumpkin Pudding,Pumpkin Pudding,Pumpkin Pudding  A delicious dessert.  To eat or use as a gift.,355,0,50,-10,0,0,False,foods_and_crops/food_101_355_16.png,foods_and_crops/food_101_355_32.png
+182,FoodOrCrop,CookedDish,102,Pumpkin Stew,Pumpkin Stew,Pumpkin Stew  Savory Pumpkin dish.  To eat or use as a gift.,70,0,8,-1,0,0,False,foods_and_crops/food_102_070_16.png,foods_and_crops/food_102_070_32.png
+183,FoodOrCrop,CookedDish,103,Happy Eggplant,Happy Eggplant,Happy Eggplant  Using Eggplant and Miso.  To eat or use as a gift.,133,0,30,-2,0,0,False,foods_and_crops/food_103_133_16.png,foods_and_crops/food_103_133_32.png
+184,FoodOrCrop,CookedDish,104,Sweet Potatoes,Sweet Potatoes,Sweet Potatoes  Sweet and yummy.  To eat or use as a gift.,441,0,40,-5,0,0,False,foods_and_crops/food_104_441_16.png,foods_and_crops/food_104_441_32.png
+185,FoodOrCrop,CookedDish,105,Baked Sweet Potato,Baked Sweet Potato,Baked Sweet Potato  Sweet and delicious.  To eat or use as a gift.,387,0,40,-5,0,0,False,foods_and_crops/food_105_387_16.png,foods_and_crops/food_105_387_32.png
+186,FoodOrCrop,CookedDish,106,Greens,Greens,Greens  Healthy and delicious.  To eat or use as a gift.,314,0,20,-1,0,0,False,foods_and_crops/food_106_314_16.png,foods_and_crops/food_106_314_32.png
+187,FoodOrCrop,CookedDish,107,Scrambled Eggs,Scrambled Eggs,Scrambled Eggs  Made with fresh Eggs.  To eat or use as a gift.,385,0,40,-3,0,0,False,foods_and_crops/food_107_385_16.png,foods_and_crops/food_107_385_32.png
+188,FoodOrCrop,CookedDish,108,Omelet,Omelet,Omelet  Made with fresh Eggs.  To eat or use as a gift.,317,0,50,-4,0,0,False,foods_and_crops/food_108_317_16.png,foods_and_crops/food_108_317_32.png
+189,FoodOrCrop,CookedDish,109,Omelet Rice,Omelet Rice,Omelet Rice  Made with fresh Eggs.  To eat or use as a gift.,318,0,60,-4,0,0,False,foods_and_crops/food_109_318_16.png,foods_and_crops/food_109_318_32.png
+190,FoodOrCrop,CookedDish,110,Boiled Egg,Boiled Egg,Boiled Egg  Made with a fresh Egg.  To eat or use as a gift.,68,0,20,-2,0,0,False,foods_and_crops/food_110_068_16.png,foods_and_crops/food_110_068_32.png
+191,FoodOrCrop,CookedDish,111,Hot Milk,Hot Milk,Hot Milk  Made with fresh Milk.  To eat or use as a gift.,244,0,20,-10,0,0,False,foods_and_crops/food_111_244_16.png,foods_and_crops/food_111_244_32.png
+192,FoodOrCrop,CookedDish,112,Butter,Butter,Butter  Made with fresh Milk.  To eat or use as a gift.,82,0,1,0,0,0,False,foods_and_crops/food_112_082_16.png,foods_and_crops/food_112_082_32.png
+193,FoodOrCrop,CookedDish,113,Cheese Cake,Cheese Cake,Cheese Cake  Made with fresh Cheese.  To eat or use as a gift.,98,0,50,-5,0,0,False,foods_and_crops/food_113_098_16.png,foods_and_crops/food_113_098_32.png
+194,FoodOrCrop,CookedDish,114,Cheese Fondue,Cheese Fondue,Cheese Fondue  Made with fresh Cheese.  To eat or use as a gift.,99,0,40,-3,0,0,False,foods_and_crops/food_114_099_16.png,foods_and_crops/food_114_099_32.png
+195,FoodOrCrop,CookedDish,115,Apple Pie,Apple Pie,Apple Pie  A traditional dessert.  To eat or use as a gift.,11,0,50,-8,0,0,False,foods_and_crops/food_115_011_16.png,foods_and_crops/food_115_011_32.png
+196,FoodOrCrop,CookedDish,116,Apple Jam,Apple Jam,Apple Jam  Made with fresh Apples.  To eat or use as a gift.,10,0,5,-5,0,0,False,foods_and_crops/food_116_010_16.png,foods_and_crops/food_116_010_32.png
+197,FoodOrCrop,CookedDish,117,Apple Souffl?,Apple Souffl?,Apple Souffl?  Made with fresh Apples.  To eat or use as a gift.,383,0,8,-2,0,0,False,foods_and_crops/food_117_383_16.png,foods_and_crops/food_117_383_32.png
+198,FoodOrCrop,CookedDish,118,Mushroom Rice,Mushroom Rice,Mushroom Rice  Mushroom-mixed Rice.  To eat or use as a gift.,308,0,30,-1,0,0,False,foods_and_crops/food_118_308_16.png,foods_and_crops/food_118_308_32.png
+199,FoodOrCrop,CookedDish,119,Bamboo Rice,Bamboo Rice,Bamboo Rice  Bamboo Shoots-mixed Rice.  To eat or use as a gift.,442,0,30,-1,0,0,False,foods_and_crops/food_119_442_16.png,foods_and_crops/food_119_442_32.png
+200,FoodOrCrop,CookedDish,120,Truffle Rice,Truffle Rice,Truffle Rice  Truffle-mixed Rice.  To eat or use as a gift.,283,0,60,-1,0,0,False,foods_and_crops/food_120_283_16.png,foods_and_crops/food_120_283_32.png
+201,FoodOrCrop,CookedDish,121,Sushi,Sushi,"Sushi  Made with Sashimi, Rice,  and Vinegar.",438,0,40,-1,0,0,False,foods_and_crops/food_121_438_16.png,foods_and_crops/food_121_438_32.png
+202,FoodOrCrop,CookedDish,122,Jam Bun,Jam Bun,Jam Bun  Made with Jam and Bread.  To eat or use as a gift.,260,0,40,-5,0,0,False,foods_and_crops/food_122_260_16.png,foods_and_crops/food_122_260_32.png
+203,FoodOrCrop,CookedDish,123,Dinner Role,Dinner Role,Dinner Role  Made with Bread and Butter.  To eat or use as a gift.,83,0,40,-2,0,0,False,foods_and_crops/food_123_083_16.png,foods_and_crops/food_123_083_32.png
+204,FoodOrCrop,CookedDish,124,Raisin Bread,Raisin Bread,Raisin Bread  Made with Wild Grapes.  To eat or use as a gift.,212,0,30,-4,0,0,False,foods_and_crops/food_124_212_16.png,foods_and_crops/food_124_212_32.png
+205,FoodOrCrop,CookedDish,125,Grape Jam,Grape Jam,Grape Jam  Made with Wild Grapes.  To eat or use as a gift.,213,0,5,-5,0,0,False,foods_and_crops/food_125_213_16.png,foods_and_crops/food_125_213_32.png
+206,FoodOrCrop,CookedDish,126,Curry Bread,Curry Bread,Curry Bread  Made with Curry and Bread.  To eat or use as a gift.,116,0,30,-2,0,0,False,foods_and_crops/food_126_116_16.png,foods_and_crops/food_126_116_32.png
+207,FoodOrCrop,CookedDish,127,Sashimi,Sashimi,Sashimi  Thinly sliced raw fish.  To eat or use as a gift.,399,0,30,-3,0,0,False,foods_and_crops/food_127_399_16.png,foods_and_crops/food_127_399_32.png
+208,FoodOrCrop,CookedDish,128,Grilled Fish,Grilled Fish,Grilled Fish  Made with fresh fish.  To eat or use as a gift.,220,0,30,-1,0,0,False,foods_and_crops/food_128_220_16.png,foods_and_crops/food_128_220_32.png
+209,FoodOrCrop,CookedDish,129,Chirashi Sushi,Chirashi Sushi,Sashimi and other goodies  on top of Rice.  To eat or use as a gift.,101,0,50,-1,0,0,False,foods_and_crops/food_129_101_16.png,foods_and_crops/food_129_101_32.png
+210,FoodOrCrop,CookedDish,130,Pizza,Pizza,Pizza  Savory Italian Pizza.  To eat or use as a gift.,341,0,40,-1,0,0,False,foods_and_crops/food_130_341_16.png,foods_and_crops/food_130_341_32.png
+211,FoodOrCrop,CookedDish,131,Noodles,Noodles,Noodles  Made with Flour.  To eat or use as a gift.,312,0,40,-3,0,0,False,foods_and_crops/food_131_312_16.png,foods_and_crops/food_131_312_32.png
+212,FoodOrCrop,CookedDish,132,Curry Noodles,Curry Noodles,Curry Noodles  Made with Curry and Noodles.  To eat or use as a gift.,117,0,60,-3,0,0,False,foods_and_crops/food_132_117_16.png,foods_and_crops/food_132_117_32.png
+213,FoodOrCrop,CookedDish,133,Tempura Noodles,Tempura Noodles,Tempura Noodles  Made with Noodles.  To eat or use as a gift.,445,0,60,-3,0,0,False,foods_and_crops/food_133_445_16.png,foods_and_crops/food_133_445_32.png
+214,FoodOrCrop,CookedDish,134,Fried Noodles,Fried Noodles,Fried Noodles  Made with Noodles.  To eat or use as a gift.,386,0,60,-2,0,0,False,foods_and_crops/food_134_386_16.png,foods_and_crops/food_134_386_32.png
+215,FoodOrCrop,CookedDish,135,Buckwheat Noodles,Buckwheat Noodles,Buckwheat Noodles  Noodles made with   Buckwheat flour.,492,0,40,-3,0,0,False,foods_and_crops/food_135_492_16.png,foods_and_crops/food_135_492_32.png
+216,FoodOrCrop,CookedDish,136,Noodles w/ Tempura,Noodles w/ Tempura,Tempura Buckwheat Noodles  Made with Tempura.  To eat or use as a gift.,446,0,60,-3,0,0,False,foods_and_crops/food_136_446_16.png,foods_and_crops/food_136_446_32.png
+217,FoodOrCrop,CookedDish,137,Fried Noodles,Fried Noodles,Fried Noodles  Made with Noodles.  To eat or use as a gift.,391,0,60,-2,0,0,False,foods_and_crops/food_137_391_16.png,foods_and_crops/food_137_391_32.png
+218,FoodOrCrop,CookedDish,138,Buckwheat Chips,Buckwheat Chips,Buckwheat Chips  Made with Buckwheat Flour.  To eat or use as a gift.,421,0,15,-2,0,0,False,foods_and_crops/food_138_421_16.png,foods_and_crops/food_138_421_32.png
+219,FoodOrCrop,CookedDish,139,Cookies,Cookies,Cookies  A delicious treat.  To eat or use as a gift.,107,0,15,-5,0,0,False,foods_and_crops/food_139_107_16.png,foods_and_crops/food_139_107_32.png
+220,FoodOrCrop,CookedDish,140,Chocolate Cookies,Chocolate Cookies,Chocolate Cookies  A delicious treat.  To eat or use as a gift.,104,0,30,-5,0,0,False,foods_and_crops/food_140_104_16.png,foods_and_crops/food_140_104_32.png
+221,FoodOrCrop,CookedDish,141,Tempura,Tempura,Tempura  Deep-fried.  To eat or use as a gift.,443,0,20,-2,0,0,False,foods_and_crops/food_141_443_16.png,foods_and_crops/food_141_443_32.png
+222,FoodOrCrop,CookedDish,142,Ice Cream,Ice Cream,Ice Cream  Cold and sweet.  To eat or use as a gift.,248,0,30,-20,0,0,False,foods_and_crops/food_142_248_16.png,foods_and_crops/food_142_248_32.png
+223,FoodOrCrop,CookedDish,143,Cake,Cake,Cake  A sweet treat.  To eat or use as a gift.,86,0,40,-8,0,0,False,foods_and_crops/food_143_086_16.png,foods_and_crops/food_143_086_32.png
+224,FoodOrCrop,CookedDish,144,Chocolate Cake,Chocolate Cake,Chocolate Cake  A delicious treat.  To eat or use as a gift.,103,0,70,-8,0,0,False,foods_and_crops/food_144_103_16.png,foods_and_crops/food_144_103_32.png
+225,FoodOrCrop,CookedDish,145,Relaxation Tea,Relaxation Tea,Relaxation Tea   An English Tea.  To drink or use as a gift.,378,0,50,-50,0,0,False,foods_and_crops/food_145_378_16.png,foods_and_crops/food_145_378_32.png
+226,FoodOrCrop,CookedDish,146,Toast,Toast,Toast  Toasted Bread.  To eat or use as a gift.,447,0,7,-1,0,0,False,foods_and_crops/food_146_447_16.png,foods_and_crops/food_146_447_32.png
+227,FoodOrCrop,CookedDish,147,French Toast,French Toast,French Toast  Made with fresh Bread.  To eat or use as a gift.,168,0,30,-2,0,0,False,foods_and_crops/food_147_168_16.png,foods_and_crops/food_147_168_32.png
+228,FoodOrCrop,CookedDish,148,Pudding,Pudding,Pudding  A delicious dessert.  To eat or use as a gift.,353,0,30,-8,0,0,False,foods_and_crops/food_148_353_16.png,foods_and_crops/food_148_353_32.png
+229,FoodOrCrop,CookedDish,149,Mountain Stew,Mountain Stew,Mountain Stew  A very healthy dish.  To eat or use as a gift.,100,0,40,-1,0,0,False,foods_and_crops/food_149_100_16.png,foods_and_crops/food_149_100_32.png
+230,FoodOrCrop,CookedDish,150,Moon Dumplings,Moon Dumplings,Moon Dumplings  Roasted veggies on a stick.  To eat or use as a gift.,119,0,40,-3,0,0,False,foods_and_crops/food_150_119_16.png,foods_and_crops/food_150_119_32.png
+231,FoodOrCrop,CookedDish,151,Rice Cake,Rice Cake,Rice Cake  Eaten on New Yearfs day.  To eat or use as a gift.,381,0,2,-1,0,0,False,foods_and_crops/food_151_381_16.png,foods_and_crops/food_151_381_32.png
+232,FoodOrCrop,CookedDish,152,Roasted Rice Cake,Roasted Rice Cake,Roasted Rice Cake  Made with Rice Cakes.  To eat or use as a gift.,390,0,10,-2,0,0,False,foods_and_crops/food_152_390_16.png,foods_and_crops/food_152_390_32.png
+233,FoodOrCrop,CookedDish,153,Elli Leaves,Elli Leaves,Elli Leaves  Recover Stamina and Fatigue.  To eat or use as a gift.,138,0,100,-50,0,0,False,foods_and_crops/food_153_138_16.png,foods_and_crops/food_153_138_32.png
+234,FoodOrCrop,CookedDish,154,Failed Dish,Failed Dish,Failure  Too bad the recipe didn't  work out...,140,0,-10,10,0,0,False,foods_and_crops/food_154_140_16.png,foods_and_crops/food_154_140_32.png
+235,FoodOrCrop,CookedDish,155,Failed Drink,Failed Drink,Failure  Too bad the recipe didn't  work out...,143,0,-10,10,0,0,False,foods_and_crops/food_155_143_16.png,foods_and_crops/food_155_143_32.png
+236,FoodOrCrop,CookedDish,156,Failed Pot Dish,Failed Pot Dish,Failure  Too bad the recipe didn't  work out...,145,0,-10,10,0,0,False,foods_and_crops/food_156_145_16.png,foods_and_crops/food_156_145_32.png
+237,FoodOrCrop,CookedDish,157,Failed Dessert,Failed Dessert,Failure  Too bad the recipe didn't  work out...,142,0,-10,10,0,0,False,foods_and_crops/food_157_142_16.png,foods_and_crops/food_157_142_32.png
+238,FoodOrCrop,CookedDish,158,Failed Bread,Failed Bread,Failure  Too bad the recipe didn't  work out...,141,0,-10,10,0,0,False,foods_and_crops/food_158_141_16.png,foods_and_crops/food_158_141_32.png
+239,FoodOrCrop,CookedDish,159,Failed Noodles,Failed Noodles,Failure  Too bad the recipe didn't  work out...,144,0,-10,10,0,0,False,foods_and_crops/food_159_144_16.png,foods_and_crops/food_159_144_32.png
+240,FoodOrCrop,CookedDish,160,Small Fish,Pez pequeno,Small Fish  Caught in ocean or river.  Can be eaten or shipped.,159,0,2,-1,50,0,True,foods_and_crops/food_160_159_16.png,foods_and_crops/food_160_159_32.png
+241,FoodOrCrop,CookedDish,161,Medium Fish,Pez mediano,Medium Fish  Caught in ocean or river.  Can be eaten or shipped.,158,0,3,-1,120,0,True,foods_and_crops/food_161_158_16.png,foods_and_crops/food_161_158_32.png
+242,FoodOrCrop,CookedDish,162,Large Fish,Pez grande,Large Fish  Caught in ocean or river.  Can be eaten or shipped.,157,0,4,-1,200,0,True,foods_and_crops/food_162_157_16.png,foods_and_crops/food_162_157_32.png
+243,FoodOrCrop,CookedDish,163,Toasted Rice Ball,Toasted Rice Ball,Toasted Rice Ball  Made with Rice.  To eat or use as a gift.,389,0,5,-1,0,0,False,foods_and_crops/food_163_389_16.png,foods_and_crops/food_163_389_32.png
+244,FoodOrCrop,CookedDish,164,Tempura Rice,Tempura Rice,Tempura Rice  Tempura with Rice.  To eat or use as a gift.,444,0,30,-2,0,0,False,foods_and_crops/food_164_444_16.png,foods_and_crops/food_164_444_32.png
+245,FoodOrCrop,CookedDish,165,Egg Over Rice,Egg Over Rice,Egg Over Rice  Made with Eggs and Rice.  To eat or use as a gift.,135,0,20,-1,0,0,False,foods_and_crops/food_165_135_16.png,foods_and_crops/food_165_135_32.png
+246,FoodOrCrop,CookedDish,166,Rice Gruel,Rice Gruel,Rice Gruel  A soft Rice soup.  To eat or use as a gift.,382,0,5,-3,0,0,False,foods_and_crops/food_166_382_16.png,foods_and_crops/food_166_382_32.png
+247,FoodOrCrop,CookedDish,167,Pancakes,Pancakes,Pancakes  Made with Flour.  To eat or use as a gift.,243,0,20,-3,0,0,False,foods_and_crops/food_167_243_16.png,foods_and_crops/food_167_243_32.png
+248,FoodOrCrop,CookedDish,168,Fish Sticks,Fish Sticks,Fish Sticks  Made with Fish.  To eat or use as a gift.,69,0,5,-1,0,0,False,foods_and_crops/food_168_069_16.png,foods_and_crops/food_168_069_32.png
+249,FoodOrCrop,CookedDish,169,Candied Potato,Candied Potato,Candied Potato  Potato with sweet glaze.  To eat or use as a gift.,88,0,8,-1,0,0,False,foods_and_crops/food_169_088_16.png,foods_and_crops/food_169_088_32.png
+250,MineralOrMisc,FlowerOrPlant,0,Moon Drop Grass,Hierba gota de luna,Moon Drop Grass  Flowers in Spring.  Cannot be shipped.,303,0,0,0,0,0,False,minerals_and_misc/misc_000_303_16.png,minerals_and_misc/misc_000_303_32.png
+251,MineralOrMisc,FlowerOrPlant,1,Pink Cat Grass,Hierba pink cat,Pink Cat Grass  Flowers in Summer.  Cannot be shipped.,337,0,0,0,0,0,False,minerals_and_misc/misc_001_337_16.png,minerals_and_misc/misc_001_337_32.png
+252,MineralOrMisc,FlowerOrPlant,2,Blue Magic Grass,Hierba magica azul,Blue Magic Grass  Flowers in Fall.  Cannot be shipped.,272,0,0,0,0,0,False,minerals_and_misc/misc_002_272_16.png,minerals_and_misc/misc_002_272_32.png
+253,MineralOrMisc,FlowerOrPlant,3,Red Magic Grass,Hierba magica roja,Red Magic Grass  Flowers in Fall.  Cannot be shipped.,274,0,0,0,200,0,True,minerals_and_misc/misc_003_274_16.png,minerals_and_misc/misc_003_274_32.png
+254,MineralOrMisc,FlowerOrPlant,4,Toy Flower,Flor de juguete,Toy Flower  Flowers in Spring.  Cannot be shipped.,452,0,0,0,0,0,False,minerals_and_misc/misc_004_452_16.png,minerals_and_misc/misc_004_452_32.png
+255,MineralOrMisc,WoolOrYarn,5,Wool (S),Lana (P),Wool (S)  Shorn from Sheep.,488,0,0,0,100,0,True,minerals_and_misc/misc_005_488_16.png,minerals_and_misc/misc_005_488_32.png
+256,MineralOrMisc,WoolOrYarn,6,Wool (M),Lana (M),Wool (M)  Shorn from Sheep.,486,0,0,0,400,0,True,minerals_and_misc/misc_006_486_16.png,minerals_and_misc/misc_006_486_32.png
+257,MineralOrMisc,WoolOrYarn,7,Wool (L),Lana (G),Wool (L)  Shorn from Sheep.,485,0,0,0,500,0,True,minerals_and_misc/misc_007_485_16.png,minerals_and_misc/misc_007_485_32.png
+258,MineralOrMisc,WoolOrYarn,8,Wool (G),Lana (Oro),Wool (G)  Shorn from Sheep.,484,0,0,0,600,0,True,minerals_and_misc/misc_008_484_16.png,minerals_and_misc/misc_008_484_32.png
+259,MineralOrMisc,WoolOrYarn,9,Wool (P),Lana (P),Wool (P)  Shorn from Sheep.,487,0,0,0,1000,0,True,minerals_and_misc/misc_009_487_16.png,minerals_and_misc/misc_009_487_32.png
+260,MineralOrMisc,WoolOrYarn,10,Wool (P),Lana (P),Wool (P)  Shorn from Sheep.,489,0,0,0,2000,0,True,minerals_and_misc/misc_010_489_16.png,minerals_and_misc/misc_010_489_32.png
+261,MineralOrMisc,WoolOrYarn,11,Yarn (S),Ovillo de lana (P),Yarn (S)  Made by putting Wool   in a Yarn Maker.,482,0,0,0,300,0,True,minerals_and_misc/misc_011_482_16.png,minerals_and_misc/misc_011_482_32.png
+262,MineralOrMisc,WoolOrYarn,12,Yarn (M),Ovillo de lana (M),Yarn (M)  Made by putting Wool   in a Yarn Maker.,480,0,0,0,700,0,True,minerals_and_misc/misc_012_480_16.png,minerals_and_misc/misc_012_480_32.png
+263,MineralOrMisc,WoolOrYarn,13,Yarn (L),Ovillo de lana (G),Yarn (L)  Made by putting Wool   in a Yarn Maker.,479,0,0,0,800,0,True,minerals_and_misc/misc_013_479_16.png,minerals_and_misc/misc_013_479_32.png
+264,MineralOrMisc,WoolOrYarn,14,Yarn (G),Ovillo de lana (Oro),Yarn (G)  Made by putting Wool   in a Yarn Maker.,478,0,0,0,1000,0,True,minerals_and_misc/misc_014_478_16.png,minerals_and_misc/misc_014_478_32.png
+265,MineralOrMisc,WoolOrYarn,15,Yarn (P),Ovillo de lana (P),Yarn (P)  Made by putting Wool   in a Yarn Maker.,481,0,0,0,1500,0,True,minerals_and_misc/misc_015_481_16.png,minerals_and_misc/misc_015_481_32.png
+266,MineralOrMisc,WoolOrYarn,16,Yarn (X),Ovillo de lana (X),Yarn (X)  Made by putting Wool   in a Yarn Maker.,483,0,0,0,4000,0,True,minerals_and_misc/misc_016_483_16.png,minerals_and_misc/misc_016_483_32.png
+267,MineralOrMisc,MineralOrOre,17,Junk Ore,Mineral chatarra,Junk Ore  Found in mines. Not very  valuable so it's cheap.,267,0,0,0,1,0,True,minerals_and_misc/misc_017_267_16.png,minerals_and_misc/misc_017_267_32.png
+268,MineralOrMisc,MineralOrOre,18,Copper,Copper,Copper  Found in mines. Used to   upgrade Tools.,108,0,0,0,15,0,True,minerals_and_misc/misc_018_108_16.png,minerals_and_misc/misc_018_108_32.png
+269,MineralOrMisc,MineralOrOre,19,Silver,Silver,Silver  Found in mines. Used to   upgrade Tools.,411,0,0,0,20,0,True,minerals_and_misc/misc_019_411_16.png,minerals_and_misc/misc_019_411_32.png
+270,MineralOrMisc,MineralOrOre,20,Gold,Gold,Gold  Found in mines. Used to   upgrade Tools.,209,0,0,0,25,0,True,minerals_and_misc/misc_020_209_16.png,minerals_and_misc/misc_020_209_32.png
+271,MineralOrMisc,MineralOrOre,21,Mystrile,Mystrile,Mystrile  Found in mines. Used to   upgrade Tools.,299,0,0,0,40,0,True,minerals_and_misc/misc_021_299_16.png,minerals_and_misc/misc_021_299_32.png
+272,MineralOrMisc,MineralOrOre,22,Orichalc,Oricalco,Orichalc  Found in mines. Used to   make jewelry.,326,0,0,0,50,0,True,minerals_and_misc/misc_022_326_16.png,minerals_and_misc/misc_022_326_32.png
+273,MineralOrMisc,MineralOrOre,23,Adamantite,Adamantita,Adamantite  Found in mines. Used to  create Makers.,0,0,0,0,50,0,True,minerals_and_misc/misc_023_000_16.png,minerals_and_misc/misc_023_000_32.png
+274,MineralOrMisc,MineralOrOre,24,Moon Stone,Moon Stone,"Moon Stone  Found in mines, and   relatively valuable.",302,0,0,0,55,0,True,minerals_and_misc/misc_024_302_16.png,minerals_and_misc/misc_024_302_32.png
+275,MineralOrMisc,MineralOrOre,25,Sand Rose,Rosa del desierto,"Sand Rose  Found in mines, and   relatively valuable.",397,0,0,0,60,0,True,minerals_and_misc/misc_025_397_16.png,minerals_and_misc/misc_025_397_32.png
+276,MineralOrMisc,MineralOrOre,26,Pink Diamond,Diamante rosa,Pink Diamond  Found in mines. Very   rare and valuable.,336,0,0,0,10000,0,True,minerals_and_misc/misc_026_336_16.png,minerals_and_misc/misc_026_336_32.png
+277,MineralOrMisc,MineralOrOre,27,Alexandrite,Alejandrita,Alexandrite  Found in mines. Very   rare and valuable.,3,0,0,0,10000,0,True,minerals_and_misc/misc_027_003_16.png,minerals_and_misc/misc_027_003_32.png
+278,MineralOrMisc,MineralOrOre,28,Mythic Stone,Piedra mitica,Mythic Stone  Found rarely in mines.   Used to upgrade Tools.,395,0,0,0,20000,0,True,minerals_and_misc/misc_028_395_16.png,minerals_and_misc/misc_028_395_32.png
+279,MineralOrMisc,MineralOrOre,29,Diamond,Diamante,Diamond  Found in mines.   Rare and valuable.,120,0,0,0,100,0,True,minerals_and_misc/misc_029_120_16.png,minerals_and_misc/misc_029_120_32.png
+280,MineralOrMisc,MineralOrOre,30,Emerald,Esmeralda,Emerald  Found in mines.   Rare and valuable.,137,0,0,0,80,0,True,minerals_and_misc/misc_030_137_16.png,minerals_and_misc/misc_030_137_32.png
+281,MineralOrMisc,MineralOrOre,31,Ruby,Rubi,"Ruby  Found in mines, and   relatively valuable.",393,0,0,0,75,0,True,minerals_and_misc/misc_031_393_16.png,minerals_and_misc/misc_031_393_32.png
+282,MineralOrMisc,MineralOrOre,32,Topaz,Topacio,"Ruby  Topaz in mines, and   relatively valuable.",451,0,0,0,70,0,True,minerals_and_misc/misc_032_451_16.png,minerals_and_misc/misc_032_451_32.png
+283,MineralOrMisc,MineralOrOre,33,Peridot,Peridoto,"Peridot  Found in mines, and   relatively valuable.",330,0,0,0,68,0,True,minerals_and_misc/misc_033_330_16.png,minerals_and_misc/misc_033_330_32.png
+284,MineralOrMisc,MineralOrOre,34,Fluorite,Fluorita,"Fluorite  Found in mines, and   relatively valuable.",164,0,0,0,65,0,True,minerals_and_misc/misc_034_164_16.png,minerals_and_misc/misc_034_164_32.png
+285,MineralOrMisc,MineralOrOre,35,Agate,Agata,"Agate  Found in mines, and   relatively valuable.",2,0,0,0,62,0,True,minerals_and_misc/misc_035_002_16.png,minerals_and_misc/misc_035_002_32.png
+286,MineralOrMisc,MineralOrOre,36,Amethyst,Amatista,"Amethyst  Found in mines, and   relatively valuable.",5,0,0,0,60,0,True,minerals_and_misc/misc_036_005_16.png,minerals_and_misc/misc_036_005_32.png
+287,MineralOrMisc,Misc,37,Harvest Goddess Jewel,Harvest Goddess Jewel,Harvest Goddess Jewel  Found in mines. Collect 9  and see what happens.,207,0,0,0,0,0,False,minerals_and_misc/misc_037_207_16.png,minerals_and_misc/misc_037_207_32.png
+288,MineralOrMisc,Misc,38,Kappa Jewel,Kappa Jewel,Kappa Jewel  Found in mines. Collect 9  and see what happens.,261,0,0,0,0,0,False,minerals_and_misc/misc_038_261_16.png,minerals_and_misc/misc_038_261_32.png
+289,MineralOrMisc,Misc,39,Jewel of Truth,Jewel of Truth,Jewel of Truth  Collect 9 and see what  happens.,455,0,0,0,0,0,False,minerals_and_misc/misc_039_455_16.png,minerals_and_misc/misc_039_455_32.png
+290,MineralOrMisc,Misc,40,The Spring Sun,The Spring Sun,Unused Item  You can cook it.,426,0,0,0,0,0,False,minerals_and_misc/misc_040_426_16.png,minerals_and_misc/misc_040_426_32.png
+291,MineralOrMisc,Misc,41,The Summer Sun,The Summer Sun,Unused Item  You can cook it.,436,0,0,0,0,0,False,minerals_and_misc/misc_041_436_16.png,minerals_and_misc/misc_041_436_32.png
+292,MineralOrMisc,Misc,42,The Autumn Sun,The Autumn Sun,Unused Item  You can cook it.,12,0,0,0,0,0,False,minerals_and_misc/misc_042_012_16.png,minerals_and_misc/misc_042_012_32.png
+293,MineralOrMisc,Misc,43,The Winter Sun,The Winter Sun,Unused Item  You can cook it.,476,0,0,0,0,0,False,minerals_and_misc/misc_043_476_16.png,minerals_and_misc/misc_043_476_32.png
+294,MineralOrMisc,Jewelry,44,Bracelet,Bracelet,Bracelet  Jewelry that the blacksmith  can make.,75,0,0,0,2000,0,True,minerals_and_misc/misc_044_075_16.png,minerals_and_misc/misc_044_075_32.png
+295,MineralOrMisc,Jewelry,45,Necklace,Necklace,Necklace  Jewelry that the blacksmith  can make.,311,0,0,0,2000,0,True,minerals_and_misc/misc_045_311_16.png,minerals_and_misc/misc_045_311_32.png
+296,MineralOrMisc,Jewelry,46,Earrings,Earrings,Earrings  Jewelry that the blacksmith  can make.,123,0,0,0,2000,0,True,minerals_and_misc/misc_046_123_16.png,minerals_and_misc/misc_046_123_32.png
+297,MineralOrMisc,Jewelry,47,Broach,Broach,Broach  Jewelry that the blacksmith  can make.,79,0,0,0,2000,0,True,minerals_and_misc/misc_047_079_16.png,minerals_and_misc/misc_047_079_32.png
+298,MineralOrMisc,Lumber,48,Weeds,Weeds,Weeds  Grow in Spring and Fall.  Should be removed.,471,0,0,0,0,0,False,minerals_and_misc/misc_048_471_16.png,minerals_and_misc/misc_048_471_32.png
+299,MineralOrMisc,Lumber,49,Stones,Stones,Stones  Can be smashed with Hammer.  or placed on tillable land.,428,0,0,0,0,0,False,minerals_and_misc/misc_049_428_16.png,minerals_and_misc/misc_049_428_32.png
+300,MineralOrMisc,Misc,50,Branches,Branches,Branches  Material for Lumber. Can be  placed on tillable land.,76,0,0,0,0,0,False,minerals_and_misc/misc_050_076_16.png,minerals_and_misc/misc_050_076_32.png
+301,MineralOrMisc,Misc,51,Lithograph,Lithograph,"Recipe for French Fries  Ingredients: Potato, Oil  Utensils: Frying Pan, Knife",270,0,0,0,0,0,False,minerals_and_misc/misc_051_270_16.png,minerals_and_misc/misc_051_270_32.png
+302,MineralOrMisc,Misc,52,Message in a Bottle,Message in a Bottle,"Recipe for Ketchup  Tomato, Onion, Sugar, Salt,  Vinegar and Mixer.",74,0,0,0,0,0,False,minerals_and_misc/misc_052_074_16.png,minerals_and_misc/misc_052_074_32.png
+303,MineralOrMisc,Misc,53,Ball,Ball,Ball  A dog toy.,49,0,0,0,0,0,False,minerals_and_misc/misc_053_049_16.png,minerals_and_misc/misc_053_049_32.png
+304,MineralOrMisc,Misc,54,Pirate Treasure,Pirate Treasure,Pirate Treasure  Very valuable Pirate   Treasure from long ago.,340,0,0,0,10000,0,True,minerals_and_misc/misc_054_340_16.png,minerals_and_misc/misc_054_340_32.png
+305,MineralOrMisc,Misc,55,Fossil of Fish,Fossil of Fish,Fossil of Ancient Fish  A very valuable fossil.,167,0,0,0,5000,0,True,minerals_and_misc/misc_055_167_16.png,minerals_and_misc/misc_055_167_32.png
+306,MineralOrMisc,Misc,56,Empty Can,Empty Can,Empty Can  Garbage.,87,0,0,0,0,0,False,minerals_and_misc/misc_056_087_16.png,minerals_and_misc/misc_056_087_32.png
+307,MineralOrMisc,Misc,57,Boots,Boots,Boots  Garbage,73,0,0,0,0,0,False,minerals_and_misc/misc_057_073_16.png,minerals_and_misc/misc_057_073_32.png
+308,MineralOrMisc,Misc,58,Fish Bones,Fish Bones,Fish Bones  Garbage,71,0,0,0,0,0,False,minerals_and_misc/misc_058_071_16.png,minerals_and_misc/misc_058_071_32.png
+309,MineralOrMisc,Misc,59,Karen's Wine,Karen's Wine,Karen's Wine  Wine received from Karen.  The label has her name.,263,0,0,0,0,0,False,minerals_and_misc/misc_059_263_16.png,minerals_and_misc/misc_059_263_32.png
+310,MineralOrMisc,Misc,60,Popuri's Mud Ball,Popuri's Mud Ball,Popuri's Mud Ball  A ball of mud made by   Popuri.,345,0,0,0,0,0,False,minerals_and_misc/misc_060_345_16.png,minerals_and_misc/misc_060_345_32.png
+311,MineralOrMisc,Misc,61,Ann's Music Box,Ann's Music Box,"A Music Box received from   Ann. It's broken, so it   plays no music.",360,0,0,0,0,0,False,minerals_and_misc/misc_061_360_16.png,minerals_and_misc/misc_061_360_32.png
+312,MineralOrMisc,Misc,62,Mary's Great Book,Mary's Great Book,Mary's Great Book  A fabulous novel received  from Mary.,277,0,0,0,0,0,False,minerals_and_misc/misc_062_277_16.png,minerals_and_misc/misc_062_277_32.png
+313,MineralOrMisc,Misc,63,Elli's Pressed Flwr,Elli's Pressed Flwr,Elli's Pressed Flower  A pressed flower made by  Elli. Quite pretty.,136,0,0,0,0,0,False,minerals_and_misc/misc_063_136_16.png,minerals_and_misc/misc_063_136_32.png
+314,MineralOrMisc,Misc,64,Album 1,Album 1,Album 1  Spring song for SFC Map,361,0,0,0,0,0,False,minerals_and_misc/misc_064_361_16.png,minerals_and_misc/misc_064_361_32.png
+315,MineralOrMisc,Misc,65,Album 2,Album 2,Album 2  Song for SFC Event,362,0,0,0,0,0,False,minerals_and_misc/misc_065_362_16.png,minerals_and_misc/misc_065_362_32.png
+316,MineralOrMisc,Misc,66,Album 3,Album 3,Album 3  Fall song for N64 Map,363,0,0,0,0,0,False,minerals_and_misc/misc_066_363_16.png,minerals_and_misc/misc_066_363_32.png
+317,MineralOrMisc,Misc,67,Album 4,Album 4,Album 4  N64 opening song,364,0,0,0,0,0,False,minerals_and_misc/misc_067_364_16.png,minerals_and_misc/misc_067_364_32.png
+318,MineralOrMisc,Misc,68,Album 5,Album 5,Album 5  PS girl opening song,365,0,0,0,0,0,False,minerals_and_misc/misc_068_365_16.png,minerals_and_misc/misc_068_365_32.png
+319,MineralOrMisc,Misc,69,Album 6,Album 6,Album 6  PS girl love event song,366,0,0,0,0,0,False,minerals_and_misc/misc_069_366_16.png,minerals_and_misc/misc_069_366_32.png
+320,MineralOrMisc,Misc,70,Album 7,Album 7,Album 7  Summer song for PS2 map,367,0,0,0,0,0,False,minerals_and_misc/misc_070_367_16.png,minerals_and_misc/misc_070_367_32.png
+321,MineralOrMisc,Misc,71,Album 8,Album 8,Album 8  Fall song for PS2 forest,368,0,0,0,0,0,False,minerals_and_misc/misc_071_368_16.png,minerals_and_misc/misc_071_368_32.png
+322,MineralOrMisc,Misc,72,Album 9,Album 9,Album 9  GC farm Fall/Winter song,369,0,0,0,0,0,False,minerals_and_misc/misc_072_369_16.png,minerals_and_misc/misc_072_369_32.png
+323,MineralOrMisc,Misc,73,Album 10,Album 10,Album 10  GC bar night song,370,0,0,0,0,0,False,minerals_and_misc/misc_073_370_16.png,minerals_and_misc/misc_073_370_32.png
+324,MineralOrMisc,Misc,74,Album 11,Album 11,Unused item  Received after 90 straight  Rock-Papers-Scissors wins.,371,0,0,0,0,0,False,minerals_and_misc/misc_074_371_16.png,minerals_and_misc/misc_074_371_32.png
+325,MineralOrMisc,Misc,75,Album 12,Album 12,Unused item  Received after 80 straight  Rock-Papers-Scissors wins.,372,0,0,0,0,0,False,minerals_and_misc/misc_075_372_16.png,minerals_and_misc/misc_075_372_32.png
+326,MineralOrMisc,Misc,76,Album 13,Album 13,Unused item  Received after 70 straight  Rock-Papers-Scissors wins.,373,0,0,0,0,0,False,minerals_and_misc/misc_076_373_16.png,minerals_and_misc/misc_076_373_32.png
+327,MineralOrMisc,Misc,77,Album 14,Album 14,Unused item  Received after 60 straight  Rock-Papers-Scissors wins.,374,0,0,0,0,0,False,minerals_and_misc/misc_077_374_16.png,minerals_and_misc/misc_077_374_32.png
+328,MineralOrMisc,Misc,78,Album 15,Album 15,Unused item  Received after 50 straight  Rock-Papers-Scissors wins.,375,0,0,0,0,0,False,minerals_and_misc/misc_078_375_16.png,minerals_and_misc/misc_078_375_32.png
+329,MineralOrMisc,Misc,79,Band-Aid,Band-Aid,Band-Aid  Always a good idea to  keep one around!,52,0,0,0,0,0,False,minerals_and_misc/misc_079_052_16.png,minerals_and_misc/misc_079_052_32.png
+330,MineralOrMisc,Misc,80,Book,Book,Guess if the number is small  or large. Win 100 times and  get this book from H.G.,72,0,0,0,0,0,False,minerals_and_misc/misc_080_072_16.png,minerals_and_misc/misc_080_072_32.png
+331,MineralOrMisc,Misc,81,Perfume,Perfume,Perfume  This elegant perfume is a   perfect gift for women.,329,0,0,0,0,0,False,minerals_and_misc/misc_081_329_16.png,minerals_and_misc/misc_081_329_32.png
+332,MineralOrMisc,Misc,82,Photo,Photo,Photo  A photo fallen next to   Cliff. A family picture?,331,0,0,0,0,0,False,minerals_and_misc/misc_082_331_16.png,minerals_and_misc/misc_082_331_32.png
+333,MineralOrMisc,Misc,83,Plant Encyclopedia,Plant Encyclopedia,Plant Encyclopedia  This book from the Library  contains every plant ever.,342,0,0,0,0,0,False,minerals_and_misc/misc_083_342_16.png,minerals_and_misc/misc_083_342_32.png
+334,MineralOrMisc,Misc,84,Invitation,Invitation,Invitation  An invitation to the Harvest  Sprites' Tea party.,258,0,0,0,0,0,False,minerals_and_misc/misc_084_258_16.png,minerals_and_misc/misc_084_258_32.png
+335,MineralOrMisc,Misc,85,Dress,Dress,"Dress  Sure to please girls, and  wrapped in a pretty box.",121,0,0,0,0,0,False,minerals_and_misc/misc_085_121_16.png,minerals_and_misc/misc_085_121_32.png
+336,MineralOrMisc,Misc,86,Facial Pack,Facial Pack,"Facial Pack  Makes skin silky smooth,  but looks silly when on.",139,0,0,0,0,0,False,minerals_and_misc/misc_086_139_16.png,minerals_and_misc/misc_086_139_32.png
+337,MineralOrMisc,Misc,87,Skin Lotion,Skin Lotion,Skin Lotion   This special lotion is great  for skin. Girls like it.,412,0,0,0,0,0,False,minerals_and_misc/misc_087_412_16.png,minerals_and_misc/misc_087_412_32.png
+338,MineralOrMisc,Misc,88,Sunblock,Sunblock,Sunblock  Helps avoid sunburn in  the summertime.,437,0,0,0,0,0,False,minerals_and_misc/misc_088_437_16.png,minerals_and_misc/misc_088_437_32.png
+339,MineralOrMisc,Misc,89,Lumber,Madera / Lena,"Lumber  Use for construction, fire-  wood, or Fences.",278,0,0,0,0,50,False,minerals_and_misc/misc_089_278_16.png,minerals_and_misc/misc_089_278_32.png
+340,MineralOrMisc,Misc,90,Golden Lumber,Madera dorada,Golden Lumber  Can be used to build Fences.  Won't rot ever.,210,0,0,0,0,0,False,minerals_and_misc/misc_090_210_16.png,minerals_and_misc/misc_090_210_32.png
+341,MineralOrMisc,Misc,91,Animal Fodder,Animal Fodder,Animal Fodder  Feed for Cows and Sheep.  Place in Feed Boxes.,166,0,0,0,0,0,False,minerals_and_misc/misc_091_166_16.png,minerals_and_misc/misc_091_166_32.png
+342,MineralOrMisc,Misc,92,Chicken Feed,Comida de gallina,Chicken Feed  Place in the Feed Bin in   the Chicken Coop.,231,0,0,0,0,10,False,minerals_and_misc/misc_092_231_16.png,minerals_and_misc/misc_092_231_32.png
+343,MineralOrMisc,Misc,93,Lottery,Lottery,Certificate of Rock-Papers-  Scissors Mastery. Win after  100 straight wins over H.G.,271,0,0,0,0,0,False,minerals_and_misc/misc_093_271_16.png,minerals_and_misc/misc_093_271_32.png

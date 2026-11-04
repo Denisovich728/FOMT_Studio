@@ -376,68 +376,114 @@ class MelodyPortraitEngine:
     def encode_4bpp(self, img, oam_slices, custom_palette=None, respect_indices=False):
         """
         Convierte los slices del PNG a GBA 4bpp y extrae la paleta.
+        Soporta modo indexado ('P') de 16 colores y modo RGBA/RGB con cuantización
+        inteligente basada en frecuencia y distancia euclidiana mínima.
         """
         is_indexed = respect_indices and img.mode == 'P'
         palette_data = bytearray(32)
         
-        if not is_indexed:
-            img = img.convert("RGBA")
+        if is_indexed:
             pixels = img.load()
+            raw_pal = img.getpalette() or []
+            trans_info = img.info.get('transparency')
+            
+            if custom_palette and len(custom_palette) == 16:
+                for i, (cr, cg, cb) in enumerate(custom_palette):
+                    c16 = ((cr >> 3) & 0x1F) | (((cg >> 3) & 0x1F) << 5) | (((cb >> 3) & 0x1F) << 10)
+                    struct.pack_into('<H', palette_data, i * 2, c16)
+            elif raw_pal:
+                num_pals = min(16, len(raw_pal) // 3)
+                for i in range(num_pals):
+                    cr = raw_pal[i * 3]
+                    cg = raw_pal[i * 3 + 1]
+                    cb = raw_pal[i * 3 + 2]
+                    c16 = ((cr >> 3) & 0x1F) | (((cg >> 3) & 0x1F) << 5) | (((cb >> 3) & 0x1F) << 10)
+                    struct.pack_into('<H', palette_data, i * 2, c16)
+                    
+            def get_color_idx(cx, cy):
+                if cx < 0 or cx >= img.width or cy < 0 or cy >= img.height:
+                    return 0
+                idx = pixels[cx, cy]
+                if trans_info is not None:
+                    if isinstance(trans_info, int):
+                        if idx == trans_info:
+                            return 0
+                        if idx == 0 and trans_info < 16:
+                            idx = trans_info
+                    elif isinstance(trans_info, (bytes, bytearray)):
+                        if idx < len(trans_info) and trans_info[idx] < 128:
+                            return 0
+                if idx >= 16:
+                    if raw_pal and idx * 3 + 2 < len(raw_pal):
+                        pr, pg, pb = raw_pal[idx*3], raw_pal[idx*3+1], raw_pal[idx*3+2]
+                        pal_ref = custom_palette if (custom_palette and len(custom_palette) == 16) else [
+                            (raw_pal[k*3], raw_pal[k*3+1], raw_pal[k*3+2]) if k*3+2 < len(raw_pal) else (0,0,0) for k in range(16)
+                        ]
+                        best_i = 1
+                        min_d = float('inf')
+                        for k in range(1, 16):
+                            kr, kg, kb = pal_ref[k]
+                            d = (pr - kr)**2 + (pg - kg)**2 + (pb - kb)**2
+                            if d < min_d:
+                                min_d = d
+                                best_i = k
+                        return best_i
+                    return 0
+                return idx
+        else:
+            img_rgba = img.convert("RGBA")
+            pixels = img_rgba.load()
+            from collections import Counter
+            
+            color_counts = Counter()
+            for y in range(img_rgba.height):
+                for x in range(img_rgba.width):
+                    r, g, b, a = pixels[x, y]
+                    if a < 128:
+                        continue
+                    color = ((r >> 3), (g >> 3), (b >> 3))
+                    color_counts[color] += 1
 
-            # 1. Extraer colores únicos
             colors = []
             if custom_palette and len(custom_palette) == 16:
                 for cr, cg, cb in custom_palette[1:]:
                     colors.append(((cr >> 3), (cg >> 3), (cb >> 3)))
+                for i, (cr, cg, cb) in enumerate(custom_palette):
+                    c16 = ((cr >> 3) & 0x1F) | (((cg >> 3) & 0x1F) << 5) | (((cb >> 3) & 0x1F) << 10)
+                    struct.pack_into('<H', palette_data, i * 2, c16)
             else:
-                for y in range(img.height):
-                    for x in range(img.width):
-                        r, g, b, a = pixels[x, y]
-                        if a < 128:
-                            continue
-                        color = ((r >> 3), (g >> 3), (b >> 3))
-                        if color not in colors:
-                            colors.append(color)
+                sorted_dominant = [c for c, _ in color_counts.most_common(15)]
+                colors = sorted_dominant
+                struct.pack_into('<H', palette_data, 0, 0)
+                for i, c in enumerate(colors):
+                    c16 = c[0] | (c[1] << 5) | (c[2] << 10)
+                    struct.pack_into('<H', palette_data, (i + 1) * 2, c16)
 
-                if len(colors) > 15:
-                    colors = colors[:15]
-
-            for i, c in enumerate(colors):
-                c16 = c[0] | (c[1] << 5) | (c[2] << 10)
-                struct.pack_into('<H', palette_data, (i + 1) * 2, c16)
+            color_map = {c: i + 1 for i, c in enumerate(colors)}
 
             def get_color_idx(cx, cy):
+                if cx < 0 or cx >= img_rgba.width or cy < 0 or cy >= img_rgba.height:
+                    return 0
                 r, g, b, a = pixels[cx, cy]
                 if a < 128:
                     return 0
                 c = ((r >> 3), (g >> 3), (b >> 3))
                 
-                if custom_palette:
-                    best_idx = 1
-                    best_dist = float('inf')
-                    for i, pc in enumerate(colors):
-                        dist = (c[0]-pc[0])**2 + (c[1]-pc[1])**2 + (c[2]-pc[2])**2
-                        if dist < best_dist:
-                            best_dist = dist
-                            best_idx = i + 1
-                    return best_idx
-                else:
-                    if c in colors:
-                        return colors.index(c) + 1
-                    return 1
-        else:
-            # Indexed Mode
-            pixels = img.load()
-            if custom_palette and len(custom_palette) == 16:
-                for i, (cr, cg, cb) in enumerate(custom_palette):
-                    c16 = ((cr>>3)&0x1F) | (((cg>>3)&0x1F)<<5) | (((cb>>3)&0x1F)<<10)
-                    struct.pack_into('<H', palette_data, i*2, c16)
-                    
-            def get_color_idx(cx, cy):
-                idx = pixels[cx, cy]
-                if idx >= 16:
+                if c in color_map:
+                    return color_map[c]
+                
+                if not colors:
                     return 0
-                return idx
+                
+                # Cuantización euclidiana de reserva al color más próximo (evita corrupciones)
+                best_idx = 1
+                best_dist = float('inf')
+                for i, pc in enumerate(colors):
+                    dist = (c[0] - pc[0]) ** 2 + (c[1] - pc[1]) ** 2 + (c[2] - pc[2]) ** 2
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_idx = i + 1
+                return best_idx
 
         # 2. Generar Tiles usando png_x/png_y del slice
         tile_data = bytearray()

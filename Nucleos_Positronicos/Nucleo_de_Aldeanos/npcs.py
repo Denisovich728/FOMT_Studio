@@ -119,6 +119,8 @@ class NpcParser:
         self.master_palette_off = 0x58B3E0
 
     def scan_npcs(self):
+        from Banco_de_Datos.parche_splash import require_rom_signature
+        require_rom_signature(self.project, auto_sign=True, module_name='NpcParser')
         self.npcs = []
         
         print(f"\nRastreo NPC (CSV-Driven, filas de {self.NPC_ROW_SIZE} bytes)")

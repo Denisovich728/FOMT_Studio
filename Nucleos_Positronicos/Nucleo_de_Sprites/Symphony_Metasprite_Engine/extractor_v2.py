@@ -1,229 +1,205 @@
-import struct
-import csv
 import os
-import math
+import csv
+import struct
 from PIL import Image
 
-ROM = b''
-pointers = {}
-animations = []
+# ═══════════════════════════════════════════════════════════════════
+#  SYMPHONY METASPRITE ENGINE - EXTRACTOR CANÓNICO FoMT GBA
+#  Bases maestras verificadas en ROM limpia:
+#  - SPRITE_TILES_BASE = 0x085A33FC (Todos los tiles 4bpp de personajes)
+#  - SPRITE_PAL_BASE   = 0x08661DC0 (Tabla maestra de paletas BGR555)
+#  - FRAME_ARRAY_BASE  = 0x0858E20C (16 bytes por FrameStruct)
+#  - OAM_ARRAY_BASE    = 0x08599E20 (8 bytes por OAM nativo GBA)
+#  - ANIM_TABLE_BASE   = 0x0858BA2C (Header de animaciones)
+#  - SCRIPT_BASE       = 0x08663208 (Scripts secuenciales de frames)
+# ═══════════════════════════════════════════════════════════════════
+
+SPRITE_TILES_BASE = 0x5A33FC
+SPRITE_PAL_BASE = 0x661DC0
+FRAME_ARRAY_BASE = 0x58E20C
+OAM_ARRAY_BASE = 0x599E20
+ANIM_TABLE_BASE = 0x58BA2C
+SCRIPT_BASE = 0x663208
 
 OAM_DIMS = {
     (0,0):(8,8),(0,1):(16,16),(0,2):(32,32),(0,3):(64,64),
     (1,0):(16,8),(1,1):(32,8),(1,2):(32,16),(1,3):(64,32),
-    (2,0):(8,16),(2,1):(8,32),(2,2):(16,32),(2,3):(32,64),
+    (2,0):(8,16),(2,1):(8,32),(2,2):(16,32),(2,3):(32,64)
 }
 
-def decode_pal(addr):
-    pal = []
-    off = addr - 0x08000000
-    for i in range(16):
-        c = struct.unpack_from('<H', ROM, off + i*2)[0]
-        r = (c & 0x1F) << 3
-        g = ((c >> 5) & 0x1F) << 3
-        b = ((c >> 10) & 0x1F) << 3
-        a = 0 if i == 0 else 255
-        pal.append((r, g, b, a))
-    return pal
+class SymphonyExtractor:
+    def __init__(self, rom_path, anim_csv_path):
+        with open(rom_path, 'rb') as f:
+            self.rom = f.read()
+        self.animations = self._load_animations(anim_csv_path)
 
-def decode_tile(addr):
-    off = addr - 0x08000000
-    px = []
-    for byte in ROM[off:off+32]:
-        px.append(byte & 0x0F)
-        px.append((byte >> 4) & 0x0F)
-    return px
-
-def render_sub_sprite(pal, gfx_base, start_tile, w_tiles, h_tiles):
-    img = Image.new('RGBA', (w_tiles*8, h_tiles*8), (0,0,0,0))
-    t = start_tile
-    for ty in range(h_tiles):
-        for tx in range(w_tiles):
-            off = gfx_base + t*32
-            if off - 0x08000000 >= len(ROM): break
-            px = decode_tile(off)
-            for y in range(8):
-                for x in range(8):
-                    idx = px[y*8+x]
-                    if idx > 0:
-                        img.putpixel((tx*8+x, ty*8+y), pal[idx])
-            t += 1
-    return img
-
-def parse_oam_template(oam_base, arg1):
-    off = oam_base - 0x08000000 + arg1 * 12
-    if off < 0 or off + 12 > len(ROM): return None
-    attr0, attr1, attr2 = struct.unpack_from('<hhh', ROM, off)
-    y = attr0 & 0xFF
-    if y > 127: y -= 256
-    shape = (attr0 >> 14) & 3
-    x = attr1 & 0x1FF
-    if x > 255: x -= 512
-    size = (attr1 >> 14) & 3
-    tile_idx = attr2 & 0x3FF
-    return x, y, shape, size, tile_idx
-
-def get_script_commands(script_addr):
-    off = script_addr - 0x08000000
-    cmds = []
-    last_cmd = None
-    count = 0
-    while off < len(ROM) and count < 1000:
-        count += 1
-        b0 = ROM[off]; off += 1
-        if b0 == 0xBD: break
-        if b0 < 0x80:
-            arg1 = b0; arg2 = ROM[off] if off < len(ROM) else 0; off += 1
-            cmds.append({'type': 'draw', 'cmd': last_cmd, 'arg1': arg1, 'arg2': arg2})
-        elif 0x80 <= b0 <= 0xB0:
-            cmds.append({'type': 'wait', 'frames': b0 - 0x80})
-        elif 0xB1 <= b0 <= 0xCE:
-            last_cmd = b0
-        elif b0 >= 0xCF:
-            arg1 = ROM[off]; off += 1
-            arg2 = ROM[off]; off += 1
-            cmds.append({'type': 'draw', 'cmd': b0, 'arg1': arg1, 'arg2': arg2})
-            last_cmd = b0
-    return cmds
-
-def get_gfx_pal_for_anim(anim_name):
-    if "Weeding" in anim_name: anim_name = anim_name.replace("Weeding", "Wedding")
-    if "Wedding" in anim_name:
-        for k in pointers:
-            if "Wedding" in k and anim_name.split('_')[0] in k: return pointers[k]
-    if "Baby" in anim_name:
-        for k in pointers:
-            if "Baby" in k and anim_name.split('_')[0] in k: return pointers[k]
-    if "Sleeping" in anim_name:
-        for k in pointers:
-            if "Sleeping" in k and anim_name.split('_')[0] in k: return pointers[k]
-            
-    char_name = anim_name.split('_')[0]
-    if f"{char_name}-Daily" in pointers: return pointers[f"{char_name}-Daily"]
-    if char_name in pointers: return pointers[char_name]
-    return None
-
-if __name__ == "__main__":
-    ROM_PATH = r'j:\scratch\Harvest Moon - Friends of Mineral Town.gba'
-    if os.path.exists(ROM_PATH):
-        with open(ROM_PATH, 'rb') as f:
-            ROM = f.read()
-    else:
-        print(f"[!] ROM not found at {ROM_PATH}. Extractor will fail on run.")
-        ROM = b''
-
-    sprite_csv = r'j:\Repositorios\fomt_studio\Banco_de_Datos\Cilixes\fomt\Fomt_Sprite_data.csv'
-    if os.path.exists(sprite_csv):
-        with open(sprite_csv, 'r') as f:
-            reader = csv.reader(f)
-            next(reader)
-            for row in reader:
-                if len(row) >= 3 and row[1].strip():
+    def _load_animations(self, csv_path):
+        anims = []
+        if not os.path.exists(csv_path): return anims
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            r = csv.reader(f)
+            next(r)
+            for row in r:
+                if row and len(row) > 1 and row[1].strip():
                     name = row[0].strip()
-                    if ' ' in row[1]:
-                        b = bytes([int(x, 16) for x in row[1].split()])
-                        gfx = struct.unpack('<I', b)[0]
-                        bp = bytes([int(x, 16) for x in row[2].split()])
-                        pal = struct.unpack('<I', bp)[0]
-                    else:
-                        gfx = int(row[1], 16) | 0x08000000
-                        pal = int(row[2], 16) | 0x08000000
-                    pointers[name] = (gfx, pal)
-
-    anim_csv = r'j:\Repositorios\fomt_studio\Banco_de_Datos\Cilixes\fomt\Fomt_Animations.csv'
-    if os.path.exists(anim_csv):
-        with open(anim_csv, 'r') as f:
-            reader = csv.reader(f)
-            next(reader)
-            for row in reader:
-                name = row[0]
-                if len(row) > 1 and row[1].strip():
                     anim_id = int(row[1], 16)
-                    animations.append((anim_id, name))
+                    anims.append((anim_id, name))
+        return anims
 
-    out_dir_gifs = r'j:\Repositorios\fomt_studio\scratch\all_gifs'
-    out_dir_sheets = r'j:\Repositorios\fomt_studio\scratch\all_sheets'
-    os.makedirs(out_dir_gifs, exist_ok=True)
-    os.makedirs(out_dir_sheets, exist_ok=True)
+    def decode_palette(self, pal_idx):
+        pal = []
+        off = SPRITE_PAL_BASE + pal_idx * 32
+        for i in range(16):
+            if off + i*2 + 2 <= len(self.rom):
+                c = struct.unpack_from('<H', self.rom, off + i*2)[0]
+                r = (c & 0x1F) << 3
+                g = ((c >> 5) & 0x1F) << 3
+                b = ((c >> 10) & 0x1F) << 3
+                pal.append((r, g, b, 255 if i > 0 else 0))
+            else:
+                pal.append((0, 0, 0, 0))
+        return pal
 
-    oam_base = 0x0813B28C
+    def decode_tile(self, tile_idx):
+        off = SPRITE_TILES_BASE + tile_idx * 32
+        px = []
+        for y in range(8):
+            for x in range(4):
+                if off + y*4 + x < len(self.rom):
+                    b = self.rom[off + y*4 + x]
+                    px.append(b & 0x0F)
+                    px.append(b >> 4)
+                else:
+                    px.extend([0, 0])
+        return px
 
-    print(f"Extracting {len(animations)} animations...")
-    success_count = 0
+    def render_frame(self, frame_idx):
+        frame_off = FRAME_ARRAY_BASE + frame_idx * 16
+        if frame_off + 16 > len(self.rom):
+            return None
 
-    for anim_id, name in animations:
-        ptrs = get_gfx_pal_for_anim(name)
-        if not ptrs: continue
-        gfx_base, pal_base = ptrs
-        if not (0x08000000 <= gfx_base < 0x09000000) or not (0x08000000 <= pal_base < 0x09000000):
-            continue
-        
-        anim_data = ROM[0x58BA2C + anim_id * 4 : 0x58BA2C + anim_id * 4 + 4]
-        if len(anim_data) < 4: continue
-        offset_hi = struct.unpack_from('<H', anim_data, 2)[0]
-        script_addr = 0x08663208 + (offset_hi * 4)
-        if script_addr == 0 or script_addr < 0x08000000: continue
-            
-        pal = decode_pal(pal_base)
-        cmds = get_script_commands(script_addr)
-        
+        fields = struct.unpack_from('<HHHHHHHH', self.rom, frame_off)
+        oam_count = fields[0]
+        oam_offset = fields[1]
+        gfx_off_tiles = fields[3]
+        pal_idx = fields[5]
+
+        if oam_count == 0 or oam_count > 64:
+            return None
+
+        pal = self.decode_palette(pal_idx)
+        canvas = Image.new('RGBA', (64, 64), (0,0,0,0))
+        origin_x, origin_y = 32, 48
+
+        for p_i in range(oam_count):
+            part_off = OAM_ARRAY_BASE + (oam_offset + p_i) * 8
+            if part_off + 8 > len(self.rom): continue
+
+            attr0, attr1, attr2, attr3 = struct.unpack_from('<hhhh', self.rom, part_off)
+            y = attr0 & 0xFF
+            if y > 127: y -= 256
+            shape = (attr0 >> 14) & 3
+
+            x = attr1 & 0x1FF
+            if x > 255: x -= 512
+            size = (attr1 >> 14) & 3
+            h_flip = (attr1 >> 12) & 1
+            v_flip = (attr1 >> 13) & 1
+            tile_rel = attr2 & 0x3FF
+
+            final_tile = gfx_off_tiles + tile_rel
+            w, h = OAM_DIMS.get((shape, size), (8,8))
+            w_tiles = w // 8
+            h_tiles = h // 8
+
+            sub = Image.new('RGBA', (w, h), (0,0,0,0))
+            sub_pix = sub.load()
+
+            t = 0
+            for ty in range(h_tiles):
+                for tx in range(w_tiles):
+                    pixels = self.decode_tile(final_tile + t)
+                    for py in range(8):
+                        for px in range(8):
+                            c_idx = pixels[py*8 + px]
+                            if c_idx > 0:
+                                sub_pix[tx*8 + px, ty*8 + py] = pal[c_idx]
+                    t += 1
+
+            if h_flip: sub = sub.transpose(Image.FLIP_LEFT_RIGHT)
+            if v_flip: sub = sub.transpose(Image.FLIP_TOP_BOTTOM)
+
+            canvas.paste(sub, (origin_x + x, origin_y + y), sub)
+
+        return canvas
+
+    def extract_animation(self, anim_id, name, out_dir_gifs, out_dir_sheets):
+        anim_off = ANIM_TABLE_BASE + anim_id * 4
+        if anim_off + 4 > len(self.rom):
+            return False
+
+        val = struct.unpack_from('<I', self.rom, anim_off)[0]
+        frame_count = val & 0xFFFF
+        script_offset = val >> 16
+        script_off = SCRIPT_BASE + script_offset * 4
+
+        if script_off >= len(self.rom) or frame_count == 0 or frame_count > 128:
+            return False
+
         frames = []
+        durations = []
         unique_frames = []
-        seen_hashes = set()
-        
-        current_frame_img = None
-        bg = Image.new('RGBA', (64, 64), (50, 50, 50, 255))
-        transparent_canvas = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
-        
-        for c in cmds:
-            if c['type'] == 'draw':
-                if current_frame_img is None:
-                    current_frame_img = bg.copy()
-                    current_transparent = transparent_canvas.copy()
-                    
-                res = parse_oam_template(oam_base, c['arg1'])
-                if not res: continue
-                x, y, shape, size, tile_idx = res
-                
-                w, h = OAM_DIMS.get((shape, size), (8,8))
-                
-                try:
-                    sub = render_sub_sprite(pal, gfx_base, tile_idx, w//8, h//8)
-                except Exception:
-                    continue
-                
-                dest_x = 32 + x
-                dest_y = 64 + y - h
-                
-                current_frame_img.paste(sub, (dest_x, dest_y), sub)
-                current_transparent.paste(sub, (dest_x, dest_y), sub)
-                
-            elif c['type'] == 'wait':
-                if current_frame_img:
-                    frames.append(current_frame_img)
-                    img_hash = current_transparent.tobytes()
-                    if img_hash not in seen_hashes:
-                        seen_hashes.add(img_hash)
-                        unique_frames.append(current_transparent)
-                    current_frame_img = None
-                    
-        if frames:
-            gif_path = os.path.join(out_dir_gifs, f"{name}.gif")
-            frames[0].save(gif_path, save_all=True, append_images=frames[1:], duration=100, loop=0)
-            
-            if unique_frames:
-                cols = min(8, len(unique_frames))
-                rows = math.ceil(len(unique_frames) / cols)
-                sheet = Image.new('RGBA', (cols * 64, rows * 64), (0,0,0,0))
-                for i, f in enumerate(unique_frames):
-                    cx = (i % cols) * 64
-                    cy = (i // cols) * 64
-                    sheet.paste(f, (cx, cy))
-                sheet_path = os.path.join(out_dir_sheets, f"{name}_sheet.png")
-                sheet.save(sheet_path)
-                
-            success_count += 1
-            if success_count % 50 == 0:
-                print(f"  Processed {success_count} animations...")
+        seen = set()
 
-    print(f"Successfully processed {success_count} animations!")
+        for i in range(frame_count):
+            if script_off + i*4 + 4 > len(self.rom): break
+            f_idx, wait_f = struct.unpack_from('<HH', self.rom, script_off + i * 4)
+            canvas = self.render_frame(f_idx)
+            if canvas:
+                frames.append(canvas)
+                durations.append(max(20, int(wait_f * 16.6)))
+                h_b = canvas.tobytes()
+                if h_b not in seen:
+                    seen.add(h_b)
+                    unique_frames.append(canvas)
+
+        if not frames:
+            return False
+
+        os.makedirs(out_dir_gifs, exist_ok=True)
+        os.makedirs(out_dir_sheets, exist_ok=True)
+
+        clean_name = "".join(c if c not in '\\/:*?"<>|' else '_' for c in name)
+        gif_path = os.path.join(out_dir_gifs, f'{clean_name}.gif')
+        frames[0].save(gif_path, save_all=True, append_images=frames[1:], duration=durations, loop=0, disposal=2)
+
+        # Spritesheet
+        if unique_frames:
+            cols = min(8, len(unique_frames))
+            rows = (len(unique_frames) + cols - 1) // cols
+            sheet = Image.new('RGBA', (cols * 64, rows * 64), (0,0,0,0))
+            for idx_f, f_img in enumerate(unique_frames):
+                cx = (idx_f % cols) * 64
+                cy = (idx_f // cols) * 64
+                sheet.paste(f_img, (cx, cy))
+            sheet_path = os.path.join(out_dir_sheets, f'{clean_name}_sheet.png')
+            sheet.save(sheet_path)
+
+        return True
+
+    def extract_all(self, out_dir_gifs, out_dir_sheets):
+        count = 0
+        for anim_id, name in self.animations:
+            if self.extract_animation(anim_id, name, out_dir_gifs, out_dir_sheets):
+                count += 1
+        return count
+
+if __name__ == '__main__':
+    ROM_PATH = r'J:\Laboratorio\Repositorios\fomt virgen.gba'
+    ANIM_CSV = r'J:\Laboratorio\FOMT_Studio\Banco_de_Datos\Cilixes\fomt\Fomt_Animations.csv'
+    OUT_GIFS = r'J:\Laboratorio\Dumps\Symphony_Metasprites_Canon\gifs'
+    OUT_SHEETS = r'J:\Laboratorio\Dumps\Symphony_Metasprites_Canon\sheets'
+
+    extractor = SymphonyExtractor(ROM_PATH, ANIM_CSV)
+    total = extractor.extract_all(OUT_GIFS, OUT_SHEETS)
+    print(f'SymphonyExtractor: {total} animaciones canónicas extraídas exitosamente.')

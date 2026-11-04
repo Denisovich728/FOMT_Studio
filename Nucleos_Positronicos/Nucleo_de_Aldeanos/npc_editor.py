@@ -3,10 +3,14 @@
 # "Actualización La Imposibilidad"
 # Desarrollado por: Denisovich728
 # ============================================================
+import os
+import sys
+import csv
+
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableView, 
     QPushButton, QLabel, QMessageBox, QHeaderView,
-    QDialog, QTextEdit, QGridLayout
+    QDialog, QTextEdit, QGridLayout, QFrame
 )
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtCore import Qt
@@ -140,9 +144,6 @@ class NpcEditorWidget(QWidget):
         QMessageBox.information(self, tr('btn_save_names', lang), f"{msg}\n{note}")
 
     def show_npc_details(self, index):
-        if index.column() != 3:
-            return
-            
         row = index.row()
         idx = self.model.item(row, 1).data(Qt.ItemDataRole.UserRole)
         if idx is None: return
@@ -155,88 +156,196 @@ class NpcDetailDialog(QDialog):
     def __init__(self, npc, parent=None):
         super().__init__(parent)
         self.npc = npc
-        name = npc.name_str.strip('\x00')
-        lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
+        self.parent_widget = parent
+        self.project = getattr(parent, 'project', None)
+        name = npc.name_str.strip('\x00').strip()
+        app = parent.window() if parent else None
+        lang = getattr(app, 'current_lang', 'es') if app else 'es'
         self.setWindowTitle(tr('npc_profile', lang).format(name=name))
-        self.resize(600, 500)
+        self.resize(540, 320)
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #0D1117;
+                color: #C9D1D9;
+            }
+            QLabel {
+                color: #C9D1D9;
+            }
+            QPushButton {
+                background-color: #21262D;
+                color: #C9D1D9;
+                border: 1px solid #30363D;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #30363D;
+                border-color: #8B949E;
+            }
+        """)
         
         self.layout_main = QHBoxLayout(self)
+        self.layout_main.setContentsMargins(16, 16, 16, 16)
+        self.layout_main.setSpacing(16)
         
-        # LADO IZQUIERDO: Visualización (Retrato)
+        # LADO IZQUIERDO: Visualización (Retrato Melody Engine)
         self.side_graphics = QVBoxLayout()
+        self.side_graphics.setSpacing(10)
+        
         self.lbl_portrait = QLabel()
         self.lbl_portrait.setFixedSize(128, 128)
-        self.lbl_portrait.setStyleSheet("background-color: #222; border: 1px solid #444;")
+        self.lbl_portrait.setStyleSheet("background-color: #090D16; border: 2px solid #1F6FEB; border-radius: 8px;")
         self.lbl_portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.side_graphics.addWidget(self.lbl_portrait)
         
-        self.btn_edit_portrait = QPushButton("👤 Editar Retrato")
-        self.btn_edit_portrait.setStyleSheet("background-color: #1F3A5F; color: #89B4FA; font-weight: bold;")
+        self.btn_edit_portrait = QPushButton("Editar Retrato (Melody)")
+        self.btn_edit_portrait.setStyleSheet("background-color: #1F3A5F; color: #58A6FF; border: 1px solid #388BFD; font-weight: bold; padding: 6px;")
         self.btn_edit_portrait.clicked.connect(self.abrir_editor_retrato)
         self.side_graphics.addWidget(self.btn_edit_portrait)
         
         self.side_graphics.addStretch()
         self.layout_main.addLayout(self.side_graphics)
         
-        # LADO DERECHO: Datos
+        # LADO DERECHO: Datos y Enlaces Interactivos
         layout = QVBoxLayout()
+        layout.setSpacing(8)
         self.layout_main.addLayout(layout)
         
         self._load_npc_portrait(npc, parent)
         
         # Cabecera
-        app = parent.window() if parent else None
-        lang = getattr(app, 'current_lang', 'es') if app else 'es'
         role_label = npc.get_translated_role(lang)
-        header = QLabel(f"<h2>{name}</h2><b>{role_label}</b><br>{tr('engine_id', lang).format(id=f'{npc.index + 1:02X}')}")
+        header = QLabel(f"<h2 style='margin:0; color:#58A6FF;'>{name}</h2><b style='color:#7EE787;'>{role_label}</b><br><span style='color:#8B949E;'>{tr('engine_id', lang).format(id=f'{npc.index + 1:02X}')}</span>")
         layout.addWidget(header)
         
         ptr_str = f"0x{getattr(npc, 'personality_ptr', 0):08X}"
-        lbl_ptr = QLabel(f"<b>{tr('ptr_rom', lang)}</b> <span style='color:blue;'><u>{ptr_str}</u></span>")
+        lbl_ptr = QLabel(f"<b>{tr('ptr_rom', lang)}</b> <span style='color:#79C0FF; font-family:Consolas;'>{ptr_str}</span>")
         lbl_ptr.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         layout.addWidget(lbl_ptr)
         
+        # Separador estilizado
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        sep.setStyleSheet("color: #30363D;")
+        layout.addWidget(sep)
+        
         # Enlace Interactivo al Script de Personalidad
+        self.script_target_id = None
+        self.script_target_name = f"{name}_Personality"
+        self._resolve_script_personality(name, parent)
+
         script_layout = QHBoxLayout()
-        lbl_script = QLabel("<b>Script Vinculado:</b>")
-        self.btn_script = QPushButton(f"📜 {name}_Personality")
-        self.btn_script.setStyleSheet("color: #4CAF50; border: none; text-decoration: underline; text-align: left;")
+        lbl_script = QLabel("<b>Script:</b>")
+        self.btn_script = QPushButton(f"{self.script_target_name}")
+        self.btn_script.setStyleSheet("color: #3FB950; background: transparent; border: 1px dashed #238636; text-align: left; font-weight: bold; padding: 4px 8px;")
         self.btn_script.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_script.clicked.connect(lambda: self.abrir_script(f"{name}_Personality"))
+        self.btn_script.setToolTip("Abrir script de personalidad en el Script IDE")
+        self.btn_script.clicked.connect(self.abrir_script)
         script_layout.addWidget(lbl_script)
         script_layout.addWidget(self.btn_script)
         script_layout.addStretch()
         layout.addLayout(script_layout)
-        
-        self.txt_data = QTextEdit()
-        self.txt_data.setReadOnly(True)
-        
-        schedule_parser = getattr(parent.project, 'schedule_parser', None)
-        if schedule_parser:
-            cpp, pseudo = schedule_parser.decode_npc_schedule(npc)
-            base_info = f"{tr('lbl_routine', lang)}\n\n"
-            base_info += f"{tr('raw_gba_code', lang)}\n"
-            base_info += cpp + "\n\n"
-            base_info += f"--- 2. {tr('sched_analysis', lang).format(name='AI')} ---\n"
-            base_info += pseudo
+
+        # Enlace Interactivo al Editor de Rutinas Diarias
+        self.routine_target_id = self._resolve_routine_id(name)
+        routine_layout = QHBoxLayout()
+        lbl_routine = QLabel("<b>Rutina AI:</b>")
+        if self.routine_target_id is not None:
+            self.btn_routine = QPushButton(f"Orquestador #{self.routine_target_id:02d}")
+            self.btn_routine.setStyleSheet("color: #58A6FF; background: transparent; border: 1px dashed #1F6FEB; text-align: left; font-weight: bold; padding: 4px 8px;")
+            self.btn_routine.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.btn_routine.setToolTip("Abrir orquestador de rutina diaria")
+            self.btn_routine.clicked.connect(self.abrir_rutina)
         else:
-            base_info = tr('err_routine_engine', lang)
-            
-        self.txt_data.setPlainText(base_info)
-        layout.addWidget(self.txt_data)
+            self.btn_routine = QLabel("<span style='color: #6E7681;'>Sin rutina de movimiento dedicada</span>")
+        routine_layout.addWidget(lbl_routine)
+        routine_layout.addWidget(self.btn_routine)
+        routine_layout.addStretch()
+        layout.addLayout(routine_layout)
+
+        # Enlace al Teatro de Eventos (desconectado/oculto temporalmente)
+        self.btn_theater = None
+
+        layout.addStretch()
 
         btn_close = QPushButton(tr('btn_close_viewer', lang))
+        btn_close.setStyleSheet("background-color: #21262D; color: #F0F6FC; border: 1px solid #30363D; padding: 6px;")
         btn_close.clicked.connect(self.close)
         layout.addWidget(btn_close)
         
-    def abrir_script(self, script_name):
+    def _resolve_routine_id(self, name):
+        from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.routine_codec import NPC_NAMES
+        name_clean = name.strip('\x00').strip().lower()
+        alias = {
+            'lillia': 0, 'lilia': 0, 'elli': 20, 'ellie': 20,
+            'gourmet': 31, 'h. goddess': 31, 'goddess': 31,
+            'lou': 30, 'lu': 30
+        }
+        if name_clean in alias:
+            return alias[name_clean]
+        for rid, full_desc in NPC_NAMES.items():
+            first = full_desc.split(' (')[0].strip().lower()
+            if first == name_clean or name_clean in full_desc.lower():
+                return rid
+        return None
+
+    def _resolve_script_personality(self, name, parent):
+        import csv
+        clean_name = name.strip('\x00').strip()
+        norm = clean_name.lower().replace(' ', '').replace('.', '')
+        alias_map = {
+            'lillia': 'lilia_personaliti',
+            'lilia': 'lilia_personaliti',
+            'chef': 'cheff_personaliti',
+            'cheff': 'cheff_personaliti',
+            'lou': 'loun_personality',
+            'lu': 'lu_personality',
+            'cliff': 'cliff_personality',
+            'h. goddess': 'goddess_personality',
+            'goddess': 'goddess_personality',
+            'harvest goddess': 'goddess_personality',
+        }
+        target_event_key = alias_map.get(norm, f"{norm}_personality")
+        csv_path = r"Banco_de_Datos\Cilixes\fomt\Fomt_Events_Listname.csv"
+        if os.path.exists(csv_path):
+            try:
+                with open(csv_path, 'r', encoding='utf-8') as f:
+                    r = csv.reader(f)
+                    next(r)
+                    for row in r:
+                        if len(row) >= 2:
+                            ev_name = row[0].strip()
+                            ev_id_str = row[1].strip()
+                            ev_low = ev_name.lower()
+                            if ev_low == target_event_key or ev_low == f"{norm}_personaliti":
+                                self.script_target_name = ev_name
+                                self.script_target_id = int(ev_id_str)
+                                return
+            except Exception as e:
+                print(f"Error resolviendo script canónico: {e}")
+
+    def abrir_rutina(self):
+        if self.routine_target_id is None:
+            return
         app = self.parent().window()
+        if hasattr(app, '_open_editor_rutinas_npc'):
+            app._open_editor_rutinas_npc(target_npc_id=self.routine_target_id)
+            self.close()
+
+    def abrir_script(self):
+        app = self.parent().window()
+        # Si tenemos un script canónico en Fomt_Events_Listname.csv y el método open_event en app
+        if self.script_target_id is not None and hasattr(app, 'open_event'):
+            app.open_event(self.script_target_id)
+            self.close()
+            return
+
         ptr = getattr(self.npc, 'personality_ptr', 0)
         if ptr == 0:
-            from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Error", "Este NPC no tiene un script de personalidad válido.")
+            QMessageBox.warning(self, "Error", "Este NPC no tiene un script de personalidad válido ni evento asociado.")
             return
-            
+
         if hasattr(app, 'tabs'):
             for i in range(app.tabs.count()):
                 widget = app.tabs.widget(i)
@@ -245,71 +354,140 @@ class NpcDetailDialog(QDialog):
                     widget.load_rom_script(ptr)
                     self.close()
                     return
-            
-            # Si no existe la pestaña IDE, la creamos usando el método de app
+
             from Nucleos_Positronicos.Nucleo_de_Scripts.script_ide import ScriptIDEWidget
             ide = ScriptIDEWidget(app.project, app)
             ide.load_rom_script(ptr)
-            app.tabs.addTab(ide, f"Script: {script_name}")
+            app.tabs.addTab(ide, f"Script: {self.script_target_name}")
             app.tabs.setCurrentWidget(ide)
             self.close()
-        
+
+    def abrir_teatro(self):
+        app = self.parent().window()
+        if hasattr(app, 'open_event_theater'):
+            target_ev = self.script_target_id if self.script_target_id is not None else 1
+            app.open_event_theater(target_ev)
+            self.close()
 
     def _load_npc_portrait(self, npc, parent):
         import os
         import csv
         from PyQt6.QtGui import QPixmap
         
-        name = npc.name_str.strip('\x00')
-        dump_dir = r"j:\Repositorios\fomt_studio\portraits_dump"
-        csv_path = r"j:\Repositorios\fomt_studio\Banco_de_Datos\Cilixes\fomt\Fomt_Portraits.csv"
-        lang = getattr(parent.window(), 'current_lang', 'es') if parent else 'es'
+        name = npc.name_str.strip('\x00').strip()
+        app = parent.window() if parent else None
+        lang = getattr(app, 'current_lang', 'es') if app else 'es'
         
-        if not os.path.exists(dump_dir):
-            self.lbl_portrait.setText(tr('no_rom_data', lang))
-            return
-            
-        target_portrait_name = f"{name}_Neutral"
-        # Manejar discrepancia Lillia vs Lilia
-        if name == "Lillia":
-            target_portrait_name = "Lilia_Neutral"
-            name = "Lilia"
-            
+        # 1. Localizar directorio portraits_dump de forma robusta y multiplataforma
+        candidates_dump = [
+            os.path.join(os.getcwd(), "portraits_dump"),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "portraits_dump")),
+            r"J:\Laboratorio\FOMT_Studio\portraits_dump"
+        ]
+        dump_dir = next((d for d in candidates_dump if os.path.exists(d)), "portraits_dump")
+        
+        # 2. Localizar Fomt_Portraits.csv
+        candidates_csv = [
+            os.path.join(os.getcwd(), "Banco_de_Datos", "Cilixes", "fomt", "Fomt_Portraits.csv"),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "Banco_de_Datos", "Cilixes", "fomt", "Fomt_Portraits.csv")),
+            r"J:\Laboratorio\FOMT_Studio\Banco_de_Datos\Cilixes\fomt\Fomt_Portraits.csv"
+        ]
+        csv_path = next((p for p in candidates_csv if os.path.exists(p)), "")
+        
+        # 3. Mapeo exhaustivo de alias para versión Neutral
+        alias_portrait = {
+            'lillia': 'Lilia_Neutral', 'lilia': 'Lilia_Neutral',
+            'elli': 'Ellie_Neutral', 'ellie': 'Ellie_Neutral',
+            'h. goddess': 'H_Goddes_Neutral', 'goddess': 'H_Goddes_Neutral',
+            'harvest goddess': 'H_Goddes_Neutral',
+            'lu': 'Ruby_Neutral', 'ruby': 'Ruby_Neutral', 'lou': 'Lou_Neutral',
+            'chef': 'Chef_Neutral', 'cheff': 'Chef_Neutral',
+            'mayor': 'Thomas_Neutral', 'thomas': 'Thomas_Neutral',
+            'pastor': 'Carter_Neutral', 'carter': 'Carter_Neutral',
+            'zack': 'Zack_Neutral', 'gotz': 'Gotz_Neutral',
+            'won': 'Won_Neutral', 'gourmet': 'Gourmet_Neutral',
+            'kappa': 'Kappa_Neutral', 'barley': 'Barley_Neutral',
+            'may': 'May_Neutral', 'saibara': 'Saibara_Neutral',
+            'gray': 'Gray_Neutral', 'duke': 'Duke_Neutral',
+            'manna': 'Manna_Neutral', 'basil': 'Basil_Neutral',
+            'anna': 'Anna_Neutral', 'mary': 'Mary_Neutral',
+            'harris': 'Harris_Neutral', 'ellen': 'Ellen_Neutral',
+            'stu': 'Stu_Neutral', 'jeff': 'Jeff_Neutral',
+            'sasha': 'Sasha_Neutral', 'karen': 'Karen_Neutral',
+            'doctor': 'Doctor_Neutral', 'cliff': 'Cliff_Neutral',
+            'doug': 'Doug_Neutral', 'ann': 'Ann_Neutral',
+            'kai': 'Kai_Neutral', 'popuri': 'Popuri_Neutral',
+            'rick': 'Rick_Neutral', 'staid': 'Staid_Neutral',
+            'nappy': 'Nappy_Neutral', 'bold': 'Bold_Neutral',
+            'aqua': 'Aqua_Neutral', 'hoggy': 'Hoggy_Neutral',
+            'timid': 'Timid_Neutral'
+        }
+        
+        name_lower = name.lower()
+        target_portrait_name = alias_portrait.get(name_lower, f"{name.capitalize()}_Neutral")
+        base_name = target_portrait_name.replace("_Neutral", "")
+        
         hex_id = None
-        
-        # Read the CSV to find the hex ID mapped to this NPC
-        try:
-            with open(csv_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                next(reader) # skip header
-                for row in reader:
-                    if len(row) >= 2 and row[0].strip() == target_portrait_name:
-                        hex_id = row[1].strip()
-                        break
-        except Exception as e:
-            print(f"Error reading Fomt_Portraits.csv: {e}")
-            
+        if os.path.exists(csv_path):
+            try:
+                with open(csv_path, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    next(reader)
+                    for row in reader:
+                        if len(row) >= 2 and row[0].strip().lower() == target_portrait_name.lower():
+                            hex_id = row[1].strip()
+                            target_portrait_name = row[0].strip()
+                            break
+            except Exception as e:
+                print(f"Error reading Fomt_Portraits.csv: {e}")
+                
         if not hex_id:
-            # Fallback for NPCs that might not have a Neutral portrait
+            try:
+                with open(csv_path, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    next(reader)
+                    for row in reader:
+                        if len(row) >= 2 and name_lower in row[0].strip().lower() and 'neutral' in row[0].strip().lower():
+                            hex_id = row[1].strip()
+                            target_portrait_name = row[0].strip()
+                            base_name = target_portrait_name.replace("_Neutral", "")
+                            break
+            except Exception:
+                pass
+                
+        if not hex_id:
             self.lbl_portrait.setText(tr('no_rom_data', lang))
             return
             
         self.current_hex_id = int(hex_id, 16)
-        self.base_portrait_name = name
+        self.base_portrait_name = base_name
             
-        # The dump script generates names like "00_Rick_Neutral.png"
         img_filename = f"{hex_id}_{target_portrait_name}.png"
         img_path = os.path.join(dump_dir, img_filename)
         
+        # Prioridad 1: Cargar PNG desde portraits_dump
         if os.path.exists(img_path):
             try:
                 pix = QPixmap(img_path).scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
                 self.lbl_portrait.setPixmap(pix)
+                return
             except Exception as e:
                 print(f"Error cargando PNG: {e}")
-                self.lbl_portrait.setText(tr('render_error', lang))
-        else:
-            self.lbl_portrait.setText(tr('no_rom_data', lang))
+
+        # Prioridad 2: Decodificar dinámicamente en RAM directamente vía Melody Portrait Engine
+        try:
+            proj = getattr(parent, 'project', None)
+            rom = getattr(proj, 'virtual_rom', None) or getattr(proj, 'rom_data', None)
+            if rom:
+                from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.dump_portraits import decode_portrait_pixmap
+                pix = decode_portrait_pixmap(rom, self.current_hex_id)
+                if pix and not pix.isNull():
+                    self.lbl_portrait.setPixmap(pix.scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation))
+                    return
+        except Exception as e:
+            print(f"Error decodificando retrato directamente desde Melody en RAM: {e}")
+
+        self.lbl_portrait.setText(tr('no_rom_data', lang))
 
     def abrir_editor_retrato(self):
         if not hasattr(self, 'current_hex_id') or self.current_hex_id is None:

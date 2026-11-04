@@ -22,6 +22,7 @@ from Banco_de_Datos.proyecto import FoMTProject
 from Nucleos_Positronicos.Nucleo_de_Items.item_editor import ItemEditorWidget
 from Nucleos_Positronicos.Nucleo_de_Scripts.script_ide import ScriptIDEWidget
 from Nucleos_Positronicos.Nucleo_de_Scripts.block_puzzle import BlockPuzzleEditor
+from Nucleos_Positronicos.Nucleo_de_Scripts.teatro_eventos import TeatroEventosWidget
 from Consola_de_Comando.pointer_editor import MasterPointerEditor
 from Nucleos_Positronicos.Nucleo_de_Aldeanos.npc_editor import NpcEditorWidget
 from Consola_de_Comando.menu_editor import MenuEditorWidget
@@ -126,6 +127,7 @@ class FoMTStudioApp(QMainWindow):
         self.pointer_editor = None
         self.script_ide = None
         self.block_editor = None
+        self.theater_editor = None
         self.map_editor = None
         self.tile_viewer = None
         self.audio_viewer = None
@@ -234,19 +236,19 @@ class FoMTStudioApp(QMainWindow):
         self.addToolBar(self.toolbar)
         
         # Botón para colapsar/expandir explorador
-        self.action_toggle_explorer = QAction("📂 Explorador", self)
+        self.action_toggle_explorer = QAction("Explorador", self)
         self.action_toggle_explorer.setCheckable(True)
         self.action_toggle_explorer.setChecked(True)
         self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
         self.toolbar.addAction(self.action_toggle_explorer)
         
         # Botón para Extractor de Animaciones
-        self.action_anim_extractor = QAction("🏃 Extractor de Animaciones", self)
+        self.action_anim_extractor = QAction("Extractor de Animaciones", self)
         self.action_anim_extractor.triggered.connect(self._open_anim_extractor)
         self.toolbar.addAction(self.action_anim_extractor)
         
         # Botón para Visor de Mapas
-        self.action_map_viewer = QAction("🗺️ Visor de Mapas (Titán)", self)
+        self.action_map_viewer = QAction("Visor de Mapas (Titan)", self)
         self.action_map_viewer.triggered.connect(self._open_map_viewer)
         self.toolbar.addAction(self.action_map_viewer)
         
@@ -288,6 +290,8 @@ class FoMTStudioApp(QMainWindow):
         self.tree_model = QStandardItemModel()
         self.tree_model.setHorizontalHeaderLabels([tr("explorer_header", self.current_lang)])
         self.tree_view.setModel(self.tree_model)
+        self.tree_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tree_view.customContextMenuRequested.connect(self._on_tree_context_menu)
         
         left_panel.addWidget(self.search_bar)
         left_panel.addWidget(self.tree_view)
@@ -423,7 +427,7 @@ class FoMTStudioApp(QMainWindow):
             lang_menu.addAction(act)
             
         config_menu.addSeparator()
-        settings_action = QAction("⚙ Ajustes del Sistema", self)
+        settings_action = QAction("Ajustes del Sistema", self)
         settings_action.setShortcut("Ctrl+Alt+S")
         settings_action.triggered.connect(self._open_settings_dialog)
         config_menu.addAction(settings_action)
@@ -432,51 +436,51 @@ class FoMTStudioApp(QMainWindow):
         tools_menu = menubar.addMenu(tr("menu_tools", lang))
         
         # --- Editores de Interfaz ---
-        m_ui = tools_menu.addMenu("📝 " + tr("cat_editors_ui", lang))
+        m_ui = tools_menu.addMenu(tr("cat_editors_ui", lang))
         m_ui.addAction(tr("menu_ui_texts", lang), self.open_menu_editor)
         m_ui.addAction(tr("menu_intro_texts", lang), self.open_intro_editor)
         
         # --- Gráficos & Audio ---
-        m_ga = tools_menu.addMenu("🎨 " + tr("cat_graphics_audio", lang))
+        m_ga = tools_menu.addMenu(tr("cat_graphics_audio", lang))
         m_ga.addAction(tr("tab_metasprites", lang), self._open_visor_metasprites)
         m_ga.addAction(tr("tab_sprites", lang), lambda: self._populate_ui_step(3))
-        m_ga.addAction("🎬 Visor de Animaciones", self._open_visor_animaciones)
+        m_ga.addAction("Visor de Animaciones", self._open_visor_animaciones)
         m_ga.addAction(tr("tab_tile_editor", lang), self._open_tile_editor_extreme)
         m_ga.addAction(tr("tab_audio_sappy", lang), lambda: self._populate_ui_step(4))
         
         # --- Editores de Datos y Mapas ---
-        m_dm = tools_menu.addMenu("🗺️ " + tr("cat_data_maps", lang))
+        m_dm = tools_menu.addMenu(tr("cat_data_maps", lang))
         m_dm.addAction(tr("tab_map_editor", lang), lambda: self._populate_ui_step(5))
         m_dm.addAction(tr("tab_npc_visual", lang), self._open_visor_npc)
-        m_dm.addAction("🗺️ Rutinas Diarias & Macromapa (NPC AI)", self._open_editor_rutinas_npc)
-        tools_menu.addAction("🗺️ Editor de Rutinas & Macromapa", self._open_editor_rutinas_npc)
+        m_dm.addAction("Rutinas Diarias & Macromapa (NPC AI)", self._open_editor_rutinas_npc)
+        tools_menu.addAction("Editor de Rutinas & Macromapa", self._open_editor_rutinas_npc)
         
         # --- Base de Datos Interna (Pestañas por defecto) ---
-        m_db = tools_menu.addMenu("🗄️ " + tr("cat_internal_db", lang))
+        m_db = tools_menu.addMenu(tr("cat_internal_db", lang))
         m_db.addAction(tr("tab_npc_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_npcs", lang)))
         m_db.addAction(tr("tab_item_raw", lang), lambda: self._switch_to_tab_by_name(tr("tab_items", lang)))
         m_db.addAction(tr("tab_menu_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_menu_editor", lang)))
         
         # Submenú Volcado Masivo
-        m_bulk = tools_menu.addMenu("📦 " + tr("menu_bulk_items", lang))
+        m_bulk = tools_menu.addMenu(tr("menu_bulk_items", lang))
         m_bulk.addAction(tr("bulk_tools", lang), lambda: self.open_bulk_items(tr("bulk_tools", lang), "Herramienta"))
         m_bulk.addAction(tr("bulk_foods", lang), lambda: self.open_bulk_items(tr("bulk_foods", lang), "Consumible/Comida"))
         m_bulk.addAction(tr("bulk_misc", lang), lambda: self.open_bulk_items(tr("bulk_misc", lang), "Artículo"))
         
         # --- Parches y Modificaciones del Juego ---
-        m_farm = tools_menu.addMenu("🌱 Granja y Entorno")
-        m_farm.addAction("🌱 Aplicar Cultivos Caminables (Fix Z-Sorting)", self._apply_z_sorting_patch)
+        m_farm = tools_menu.addMenu("Granja y Entorno")
+        m_farm.addAction("Aplicar Cultivos Caminables (Fix Z-Sorting)", self._apply_z_sorting_patch)
 
-        m_mine = tools_menu.addMenu("⛏️ Mina y Exploración")
-        m_mine.addAction("⛏️ Aplicar Escaleras Visibles (Anti-Softlock)", self._apply_stairs_patch)
-        m_mine.addAction("💎 Desbloquear Piedra Teletransporte (Año 1)", self._apply_teleport_stone_patch)
+        m_mine = tools_menu.addMenu("Mina y Exploracion")
+        m_mine.addAction("Aplicar Escaleras Visibles (Anti-Softlock)", self._apply_stairs_patch)
+        m_mine.addAction("Desbloquear Piedra Teletransporte (Ano 1)", self._apply_teleport_stone_patch)
         
         tools_menu.addSeparator()
         
         # --- Avanzado ---
-        m_adv = tools_menu.addMenu("⚙️ " + tr("cat_advanced", lang))
+        m_adv = tools_menu.addMenu(tr("cat_advanced", lang))
         m_adv.addAction(tr("tab_pointer_editor", lang), lambda: self._switch_to_tab_by_name(tr("tab_pointers", lang)))
-        m_adv.addAction(tr("tab_block_puzzle", lang), lambda: self._switch_to_tab_by_name("Bloques 🧩"))
+        # m_adv.addAction(tr("tab_block_puzzle", lang), lambda: self.open_event_theater(None))
         
         help_menu = menubar.addMenu(tr("menu_help", lang))
         shortcuts_action = QAction(tr("tab_help", lang), self)
@@ -666,7 +670,7 @@ class FoMTStudioApp(QMainWindow):
             return
         from Nucleos_Positronicos.Nucleo_de_Mapas.visor_mapas import VisorMapas
         viewer = VisorMapas(self.project)
-        win = FloatingWindow(viewer, "🗺️ Visor de Mapas", self)
+        win = FloatingWindow(viewer, "Visor de Mapas", self)
         self.floating_windows.append(win)
         win.show()
         self.apply_theme(self.current_theme)
@@ -677,7 +681,7 @@ class FoMTStudioApp(QMainWindow):
             self.visor_animaciones = VisorAnimaciones(self)
             self.visor_animaciones.set_project(self.project)
             self.visor_animaciones.openEditorRequested.connect(self._open_anim_editor)
-            self.tabs.addTab(self.visor_animaciones, "🎬 Animaciones")
+            self.tabs.addTab(self.visor_animaciones, "Animaciones")
         
         # Focus tab
         for i in range(self.tabs.count()):
@@ -885,7 +889,7 @@ class FoMTStudioApp(QMainWindow):
         self.tabs.addTab(QWidget(), tr("tab_npcs", self.current_lang))
         self.tabs.addTab(QWidget(), tr("tab_pointers", self.current_lang))
         self.tabs.addTab(QWidget(), tr("tab_menu_editor", self.current_lang))
-        self.tabs.addTab(QWidget(), "Bloques 🧩")
+        # self.tabs.addTab(QWidget(), tr("tab_block_puzzle", self.current_lang)) # Teatro desconectado
         
         # Conectar el cambio de pestaña para cargar el editor bajo demanda
         try: self.tabs.currentChanged.disconnect()
@@ -1019,7 +1023,7 @@ class FoMTStudioApp(QMainWindow):
             if not self.sprite_viewer:
                 self.sprite_viewer = VisorSprites(self)
                 self.sprite_viewer.set_project(self.project)
-                self.tabs.addTab(self.sprite_viewer, "🎨 Sprites & Portraits")
+                self.tabs.addTab(self.sprite_viewer, "Sprites & Portraits")
         elif step == 4:
             if not self.audio_viewer:
                 self.audio_viewer = SappyAudioViewer(self.project, self)
@@ -1093,13 +1097,13 @@ class FoMTStudioApp(QMainWindow):
 
     def _open_visor_metasprites(self):
         for i in range(self.tabs.count()):
-            if self.tabs.tabText(i) == "🖼 Metasprites":
+            if self.tabs.tabText(i) == "Metasprites":
                 self.tabs.setCurrentIndex(i)
                 return
         if not self.metasprite_viewer:
             self.metasprite_viewer = VisorMetasprites(self)
             self.metasprite_viewer.set_project(self.project)
-        self.tabs.addTab(self.metasprite_viewer, "🖼 Metasprites")
+        self.tabs.addTab(self.metasprite_viewer, "Metasprites")
         self.tabs.setCurrentWidget(self.metasprite_viewer)
 
     def _open_visor_npc(self):
@@ -1126,7 +1130,7 @@ class FoMTStudioApp(QMainWindow):
                 return
         from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.editor_rutinas_npc import EditorRutinasNPCWidget
         editor = EditorRutinasNPCWidget(self.project, self)
-        float_win = FloatingWindow(editor, "🗺️ Rutinas Diarias & Macromapa (NPC AI)", self)
+        float_win = FloatingWindow(editor, "Rutinas Diarias & Macromapa (NPC AI)", self)
         float_win.window_id = window_id
         float_win.resize(1400, 900)
         self.floating_windows.append(float_win)
@@ -1494,22 +1498,47 @@ class FoMTStudioApp(QMainWindow):
                     self.tabs.removeTab(index)
                     self.tabs.insertTab(index, self.menu_editor, tr("tab_menu_editor", lang))
                     self.tabs.setCurrentIndex(index)
-                elif tab_text == "Bloques 🧩":
-                    self.block_editor = BlockPuzzleEditor(self.project, self)
+                elif tab_text in ("Teatro de Eventos", "Bloques", tr("tab_block_puzzle", lang)):
+                    self.theater_editor = TeatroEventosWidget(self.project, self)
+                    self.block_editor = self.theater_editor
                     self.tabs.removeTab(index)
-                    self.tabs.insertTab(index, self.block_editor, "Bloques 🧩")
+                    self.tabs.insertTab(index, self.theater_editor, tr("tab_block_puzzle", lang))
                     self.tabs.setCurrentIndex(index)
                     
-                    # Cargar evento actual si hay uno seleccionado en el árbol
+                    # Cargar evento actual si hay uno seleccionado en el arbol
                     current_index = self.tree_view.currentIndex()
                     if current_index.isValid():
                         item = self.tree_model.itemFromIndex(current_index)
                         if item and item.data(Qt.ItemDataRole.UserRole + 1) == "EVENT":
-                            self.block_editor.load_event(item.data(Qt.ItemDataRole.UserRole))
+                            self.theater_editor.load_event(item.data(Qt.ItemDataRole.UserRole))
                 
                 self.apply_theme(self.current_theme)
             finally:
                 QApplication.restoreOverrideCursor()
+
+
+    def _on_tree_context_menu(self, pos):
+        index = self.tree_view.indexAt(pos)
+        if not index.isValid():
+            return
+        item = self.tree_model.itemFromIndex(index)
+        if not item:
+            return
+        item_type = item.data(Qt.ItemDataRole.UserRole + 1)
+        val = item.data(Qt.ItemDataRole.UserRole)
+        if item_type == "EVENT":
+            menu = QMenu(self)
+            act_ide = menu.addAction("Abrir en Editor de Scripts (IDE)")
+            # act_theater = menu.addAction("Abrir en Teatro de Eventos (Visual)")
+            chosen = menu.exec(self.tree_view.viewport().mapToGlobal(pos))
+            if chosen == act_ide:
+                self.open_event(val)
+            elif chosen == act_theater:
+                self.open_event_theater(val)
+
+    def open_event_theater(self, event_id=None):
+        """Teatro de Eventos desconectado temporalmente por directiva del usuario."""
+        pass
 
     def _apply_z_sorting_patch(self):
         from Banco_de_Datos.Parches.parche_cultivos_caminables import aplicar_parche_cultivos

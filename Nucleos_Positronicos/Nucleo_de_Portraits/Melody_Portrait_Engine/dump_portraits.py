@@ -87,13 +87,20 @@ def get_bundle_headers(rom):
 
     return counts, ptrs
 
-def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
+def decode_portrait_image(rom, portrait_id, counts=None, ptrs=None):
+    """
+    Decodifica un retrato directamente en RAM desde la ROM y devuelve un PIL Image (modo P con transparencia=0).
+    Melody Portrait Engine - Single Source of Truth para retratos.
+    """
+    if counts is None or ptrs is None:
+        counts, ptrs = get_bundle_headers(rom)
+
     if portrait_id >= counts[0]:
-        return False
+        return None
 
     idx = read_hword(rom, ptrs[0] + portrait_id * 4 + 2)
     if idx >= counts[1]:
-        return False
+        return None
 
     struct_base = ptrs[1] + idx * 16
     f0 = read_hword(rom, struct_base)
@@ -105,17 +112,14 @@ def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
     ptr_GFX = ptrs[3] + f6 * 32
     ptr_PAL = ptrs[4] + fA * 32
 
-    # Read Palette
+    # Leer Paleta
     palette = decode_palette(rom, ptr_PAL)
 
-    # Read OAM
+    # Leer OAM
     oam_entries = []
-    num_oam_entries = f0 # usually f0 holds the count of OAM structs
+    num_oam_entries = f0
 
-    min_x = 999
-    min_y = 999
-    max_x = -999
-    max_y = -999
+    min_x, min_y, max_x, max_y = 999, 999, -999, -999
 
     for i in range(num_oam_entries):
         attr0 = read_hword(rom, ptr_OAM + i*8)
@@ -141,25 +145,22 @@ def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
         max_y = max(max_y, y + h)
 
     if len(oam_entries) == 0:
-        return False
+        return None
 
-    # Create Image
     img_w = max_x - min_x
     img_h = max_y - min_y
     if img_w <= 0 or img_h <= 0 or img_w > 512 or img_h > 512:
-        return False
+        return None
 
     img = Image.new('P', (img_w, img_h), 0)
-    
-    # Flatten palette for PIL: [r,g,b, r,g,b, ...]
+    img.info['transparency'] = 0
+
     flat_palette = []
     for c in palette:
         flat_palette.extend([c[0], c[1], c[2]])
-    # Pad to 256 colors
     flat_palette.extend([0] * (768 - len(flat_palette)))
     img.putpalette(flat_palette)
 
-    # Draw OAMs
     for oam in oam_entries:
         dest_x = oam['x'] - min_x
         dest_y = oam['y'] - min_y
@@ -175,9 +176,34 @@ def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
                 for py in range(8):
                     for px in range(8):
                         color_idx = pixels[py*8 + px]
-                        if color_idx != 0: # not transparent
+                        if color_idx != 0:
                             img.putpixel((dest_x + tx*8 + px, dest_y + ty*8 + py), color_idx)
 
+    return img
+
+
+def decode_portrait_pixmap(rom, portrait_id, counts=None, ptrs=None):
+    """
+    Decodifica un retrato directamente en RAM desde la ROM y devuelve un QPixmap con transparencia nativa.
+    """
+    img = decode_portrait_image(rom, portrait_id, counts, ptrs)
+    if img is None:
+        return None
+    try:
+        from PyQt6.QtGui import QImage, QPixmap
+        rgba = img.convert('RGBA')
+        data = rgba.tobytes('raw', 'RGBA')
+        qim = QImage(data, rgba.width, rgba.height, QImage.Format.Format_RGBA8888)
+        return QPixmap.fromImage(qim)
+    except Exception as e:
+        print(f"[Melody] Error convirtiendo retrato en QPixmap: {e}")
+        return None
+
+
+def dump_single(rom, portrait_id, name, output_dir, counts, ptrs):
+    img = decode_portrait_image(rom, portrait_id, counts, ptrs)
+    if img is None:
+        return False
     safe_name = "".join([c for c in name if c.isalpha() or c.isdigit() or c=='_']).strip()
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

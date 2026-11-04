@@ -83,8 +83,9 @@ class ClickableMapLabel(QLabel):
             click_x = int(event.position().x()) - x_offset
             click_y = int(event.position().y()) - y_offset
             
-            if 0 <= click_x < img_w and 0 <= click_y < img_h:
-                self.mouseMoved.emit(click_x, click_y)
+            click_x = max(0, min(click_x, img_w - 1))
+            click_y = max(0, min(click_y, img_h - 1))
+            self.mouseMoved.emit(click_x, click_y)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
@@ -134,7 +135,7 @@ class MapResizeDialog(QDialog):
         btn_layout.addWidget(btn_cancel)
         layout.addLayout(btn_layout)
         
-        self.lbl_warning = QLabel("⚠️ Al aplicar, se asignará nuevo espacio en ROM\ny se actualizará la tabla maestra y punteros.")
+        self.lbl_warning = QLabel("[Alerta] Al aplicar, se asignará nuevo espacio en ROM\ny se actualizará la tabla maestra y punteros.")
         self.lbl_warning.setStyleSheet("color: #ffaa00; font-size: 10px;")
         layout.addWidget(self.lbl_warning)
         
@@ -302,7 +303,7 @@ class VisorMapas(QWidget):
         left_layout = QVBoxLayout(left_panel)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.btn_refresh = QPushButton("🔄 Recargar Lista")
+        self.btn_refresh = QPushButton("Recargar Lista")
         self.btn_refresh.clicked.connect(self.load_maps)
         left_layout.addWidget(self.btn_refresh)
 
@@ -356,8 +357,8 @@ class VisorMapas(QWidget):
         
         # Zoom controls
         zoom_layout = QHBoxLayout()
-        self.btn_zoom_out = QPushButton("🔍 -")
-        self.btn_zoom_in = QPushButton("🔍 +")
+        self.btn_zoom_out = QPushButton("- Zoom")
+        self.btn_zoom_in = QPushButton("+ Zoom")
         self.btn_zoom_out.setMaximumWidth(40)
         self.btn_zoom_in.setMaximumWidth(40)
         self.lbl_zoom = QLabel(f"Zoom: {int(self.zoom_factor * 100)}%")
@@ -385,8 +386,92 @@ class VisorMapas(QWidget):
         self.btn_create.clicked.connect(self._open_create_dialog)
         tools_row2.addWidget(self.btn_create)
         
+        # Fila de Estructuras Dinámicas
+        self.tools_row_dyn = QHBoxLayout()
+        self.chk_dyn_enabled = QCheckBox("Estructuras Dinámicas")
+        self.chk_dyn_enabled.setChecked(True)
+        self.chk_dyn_enabled.toggled.connect(self._on_dynamic_config_changed)
+        self.tools_row_dyn.addWidget(self.chk_dyn_enabled)
+
+        # 1. Controles de Granja (Mapas 0 y 1)
+        self.widget_dyn_farm = QWidget()
+        layout_dyn_farm = QHBoxLayout(self.widget_dyn_farm)
+        layout_dyn_farm.setContentsMargins(0, 0, 0, 0)
+        layout_dyn_farm.setSpacing(6)
+
+        layout_dyn_farm.addWidget(QLabel("Casa:"))
+        self.cmb_dyn_house = QComboBox()
+        self.cmb_dyn_house.addItems(["Lv1", "Lv2", "Lv3", "Ninguna"])
+        self.cmb_dyn_house.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_farm.addWidget(self.cmb_dyn_house)
+
+        layout_dyn_farm.addWidget(QLabel("Establo:"))
+        self.cmb_dyn_barn = QComboBox()
+        self.cmb_dyn_barn.addItems(["Lv1", "Lv2", "Ninguno"])
+        self.cmb_dyn_barn.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_farm.addWidget(self.cmb_dyn_barn)
+
+        layout_dyn_farm.addWidget(QLabel("Gallinero:"))
+        self.cmb_dyn_coop = QComboBox()
+        self.cmb_dyn_coop.addItems(["Lv1", "Lv2", "Ninguno"])
+        self.cmb_dyn_coop.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_farm.addWidget(self.cmb_dyn_coop)
+
+        self.chk_dyn_extras = QCheckBox("Buzón/Caseta")
+        self.chk_dyn_extras.setChecked(True)
+        self.chk_dyn_extras.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_farm.addWidget(self.chk_dyn_extras)
+
+        self.chk_dyn_field = QCheckBox("Malla Cultivo (43x25)")
+        self.chk_dyn_field.setChecked(False)
+        self.chk_dyn_field.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_farm.addWidget(self.chk_dyn_field)
+        self.tools_row_dyn.addWidget(self.widget_dyn_farm)
+
+        # 2. Controles de Playa (Mapas 8 y 9)
+        self.widget_dyn_beach = QWidget()
+        layout_dyn_beach = QHBoxLayout(self.widget_dyn_beach)
+        layout_dyn_beach.setContentsMargins(0, 0, 0, 0)
+        self.chk_dyn_beach = QCheckBox("Villa de la Playa (Gotz)")
+        self.chk_dyn_beach.setChecked(True)
+        self.chk_dyn_beach.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_beach.addWidget(self.chk_dyn_beach)
+        self.widget_dyn_beach.setVisible(False)
+        self.tools_row_dyn.addWidget(self.widget_dyn_beach)
+
+        # 3. Controles de Montaña (Mapas 14 y 15)
+        self.widget_dyn_mountain = QWidget()
+        layout_dyn_mountain = QHBoxLayout(self.widget_dyn_mountain)
+        layout_dyn_mountain.setContentsMargins(0, 0, 0, 0)
+        self.chk_dyn_mountain = QCheckBox("Villa de la Montaña (Gotz)")
+        self.chk_dyn_mountain.setChecked(True)
+        self.chk_dyn_mountain.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_mountain.addWidget(self.chk_dyn_mountain)
+        self.widget_dyn_mountain.setVisible(False)
+        self.tools_row_dyn.addWidget(self.widget_dyn_mountain)
+
+        # 4. Controles de Ciudad (Mapas 4, 5, 6 y 7)
+        self.widget_dyn_town = QWidget()
+        layout_dyn_town = QHBoxLayout(self.widget_dyn_town)
+        layout_dyn_town.setContentsMargins(0, 0, 0, 0)
+        self.chk_dyn_town = QCheckBox("Villa de la Ciudad (100M G)")
+        self.chk_dyn_town.setChecked(True)
+        self.chk_dyn_town.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_town.addWidget(self.chk_dyn_town)
+        self.widget_dyn_town.setVisible(False)
+        self.tools_row_dyn.addWidget(self.widget_dyn_town)
+
+        # Label para mapas sin estructuras dinámicas
+        self.lbl_dyn_none = QLabel("(Sin estructuras dinámicas en este mapa)")
+        self.lbl_dyn_none.setStyleSheet("color: #777; font-style: italic;")
+        self.lbl_dyn_none.setVisible(False)
+        self.tools_row_dyn.addWidget(self.lbl_dyn_none)
+
+        self.tools_row_dyn.addStretch()
+
         tools_container_layout.addLayout(tools_row1)
         tools_container_layout.addLayout(tools_row2)
+        tools_container_layout.addLayout(self.tools_row_dyn)
         right_layout.addLayout(tools_container_layout)
 
         # Eventos
@@ -401,7 +486,7 @@ class VisorMapas(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.lbl_image = ClickableMapLabel()
         self.lbl_image.clicked.connect(self._on_map_clicked)
-        self.lbl_image.mouseMoved.connect(self._on_map_clicked)
+        self.lbl_image.mouseMoved.connect(self._on_map_dragged)
         self.lbl_image.mouseReleased.connect(self._on_map_mouse_released)
         self.lbl_image.rightClicked.connect(self._on_map_right_clicked)
         self.lbl_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -418,7 +503,7 @@ class VisorMapas(QWidget):
         self.cmb_ts_pal.currentIndexChanged.connect(self._re_render_tileset)
         ts_controls.addWidget(self.cmb_ts_pal)
         
-        self.btn_edit_palette = QPushButton("🎨 Editar Paleta")
+        self.btn_edit_palette = QPushButton("Editar Paleta")
         self.btn_edit_palette.clicked.connect(self._open_palette_editor)
         ts_controls.addWidget(self.btn_edit_palette)
         
@@ -518,7 +603,7 @@ class VisorMapas(QWidget):
 
         map_obj = self.map_parser.maps[row]
         self.lbl_info.setText(
-            f"⏳ Cargando mapa [{map_obj.map_id:03X}] {map_obj.get_name()} "
+            f"[Cargando mapa] [{map_obj.map_id:03X}] {map_obj.get_name()} "
             f"({map_obj.width}×{map_obj.height} celdas, {map_obj.width*8}×{map_obj.height*8} px)..."
         )
         self.lbl_image.clear()
@@ -546,9 +631,31 @@ class VisorMapas(QWidget):
         self.cmb_col_brush.setVisible(is_col)
         self._re_render()
         
+    def _on_dynamic_config_changed(self):
+        house_map = {0: 'lv1', 1: 'lv2', 2: 'lv3', 3: 'none'}
+        barn_map = {0: 'lv1', 1: 'lv2', 2: 'none'}
+        coop_map = {0: 'lv1', 1: 'lv2', 2: 'none'}
+
+        if hasattr(self, 'renderer') and self.renderer:
+            self.renderer.dynamic_config = {
+                'enabled': self.chk_dyn_enabled.isChecked(),
+                'farmhouse': house_map.get(self.cmb_dyn_house.currentIndex(), 'lv1'),
+                'barn': barn_map.get(self.cmb_dyn_barn.currentIndex(), 'lv1'),
+                'chicken_coop': coop_map.get(self.cmb_dyn_coop.currentIndex(), 'lv1'),
+                'extras': self.chk_dyn_extras.isChecked(),
+                'field_grid': self.chk_dyn_field.isChecked(),
+                'beach_cottage': self.chk_dyn_beach.isChecked() if hasattr(self, 'chk_dyn_beach') else True,
+                'mountain_cottage': self.chk_dyn_mountain.isChecked() if hasattr(self, 'chk_dyn_mountain') else True,
+                'town_cottage': self.chk_dyn_town.isChecked() if hasattr(self, 'chk_dyn_town') else True
+            }
+            self._re_render_map_only()
+
     def _re_render(self):
+        self._re_render_map_only()
+        self._re_render_tileset()
+
+    def _re_render_map_only(self):
         if not self.renderer._loaded: return
-        
         visibility = self._get_layer_visibility()
         img = self.renderer.render(
             show_bg1=visibility['show_bg1'], 
@@ -560,7 +667,6 @@ class VisorMapas(QWidget):
         )
         if img:
             self._set_pixmap(self.lbl_image, img)
-        self._re_render_tileset()
 
     def _re_render_tileset(self):
         if not self.renderer._loaded: return
@@ -616,7 +722,7 @@ class VisorMapas(QWidget):
         self._save_state_pending = False
         img, ts_img = result
         if img is None:
-            self.lbl_info.setText("⚠️ No se pudo renderizar el mapa (faltan datos).")
+            self.lbl_info.setText("[Alerta] No se pudo renderizar el mapa (faltan datos).")
             self.lbl_image.clear()
             self.lbl_ts.clear()
             return
@@ -630,16 +736,32 @@ class VisorMapas(QWidget):
         palettes = self.renderer.palettes_1 if self.cmb_bank.currentIndex() == 0 else self.renderer.palettes_2
         mh = self._loader_thread.map_header
         
-        info = f"✅ Renderizado: {w}×{h} celdas | "
+        info = f"[OK] Renderizado: {w}×{h} celdas | "
         info += f"{len(palettes)} paletas | {len(self.renderer.tiles)} tiles | "
         info += f"Triggers: Ptr6=0x{mh.p_obj1:08X}, Ptr7=0x{mh.p_obj2:08X}"
         self.lbl_info.setText(info)
+        
+        # Ajustar controles contextuales según el mapa cargado
+        map_id = getattr(mh, 'map_id', 0)
+        is_farm = (map_id in (0, 1) or (w == 128 and h == 88))
+        is_beach = (map_id in (8, 9))
+        is_mountain = (map_id in (14, 15))
+        is_town = (map_id in (4, 5, 6, 7))
+        has_dyn = (is_farm or is_beach or is_mountain or is_town)
+
+        if hasattr(self, 'chk_dyn_enabled'):
+            self.chk_dyn_enabled.setEnabled(has_dyn)
+            self.widget_dyn_farm.setVisible(is_farm)
+            self.widget_dyn_beach.setVisible(is_beach)
+            self.widget_dyn_mountain.setVisible(is_mountain)
+            self.widget_dyn_town.setVisible(is_town)
+            self.lbl_dyn_none.setVisible(not has_dyn)
         
         self._update_collision_brush()
 
     def _on_map_error(self, error_msg):
         self.progress.setVisible(False)
-        self.lbl_info.setText(f"❌ Error: {error_msg[:120]}")
+        self.lbl_info.setText(f"[Error] Error: {error_msg[:120]}")
         print(f"[VisorMapas] Error:\n{error_msg}")
 
     def _on_tileset_clicked(self, px, py):
@@ -657,6 +779,7 @@ class VisorMapas(QWidget):
         self._re_render_tileset()
 
     def _on_map_mouse_released(self):
+        self._last_drag_cell = None
         self._save_state_pending = False
 
     def _update_collision_brush(self):
@@ -693,28 +816,40 @@ class VisorMapas(QWidget):
         self.cmb_col_brush.addItems(items)
         self.cmb_col_brush.blockSignals(False)
 
-    def _on_map_clicked(self, px, py):
-        px = int(px / self.zoom_factor)
-        py = int(py / self.zoom_factor)
-        cell_x = px // 8
-        cell_y = py // 8
-        self.selected_cell = (cell_x, cell_y)
-        
+    @staticmethod
+    def _get_line_cells(x0, y0, x1, y1):
+        cells = []
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        sx = 1 if x0 < x1 else -1
+        sy = 1 if y0 < y1 else -1
+        err = dx - dy
+        cx, cy = x0, y0
+        while True:
+            cells.append((cx, cy))
+            if cx == x1 and cy == y1:
+                break
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                cx += sx
+            if e2 < dx:
+                err += dx
+                cy += sy
+        return cells
+
+    def _apply_paint_at_cell(self, cell_x, cell_y):
         w = self.renderer.width
         h = self.renderer.height
+        if not (0 <= cell_x < w and 0 <= cell_y < h):
+            return False
+
         idx = cell_y * w + cell_x
-        
-        # Guardar estado antes del primer cambio
-        if not self._save_state_pending:
-            self._push_undo_state()
-            self._save_state_pending = True
-        
-        # Lógica de pintado según la pestaña activa
         tab_idx = self.tabs_edit_mode.currentIndex()
+        modified = False
+
         if hasattr(self, 'selected_tile') and tab_idx in [1, 2, 3]: # Modo pintar BG
             copied_from_map = getattr(self, '_copied_from_map', False)
-            
-            # Si no fue clonado (se eligió del panel), inyectamos la paleta activa o auto del mapa
             if not copied_from_map:
                 if self.cmb_ts_pal.currentIndex() == 0:
                     active_pal = self.renderer.get_tile_palette(self.selected_tile & 0x03FF)
@@ -725,12 +860,18 @@ class VisorMapas(QWidget):
                 new_val = self.selected_tile
 
             if tab_idx == 1 and idx < len(self.renderer.tilemap_bg3):
-                self.renderer.tilemap_bg3[idx] = new_val
+                if self.renderer.tilemap_bg3[idx] != new_val:
+                    self.renderer.tilemap_bg3[idx] = new_val
+                    modified = True
             elif tab_idx == 2 and idx < len(self.renderer.tilemap_bg2):
-                self.renderer.tilemap_bg2[idx] = new_val
+                if self.renderer.tilemap_bg2[idx] != new_val:
+                    self.renderer.tilemap_bg2[idx] = new_val
+                    modified = True
             elif tab_idx == 3 and idx < len(self.renderer.tilemap_bg1):
-                self.renderer.tilemap_bg1[idx] = new_val
-            self._re_render()
+                if self.renderer.tilemap_bg1[idx] != new_val:
+                    self.renderer.tilemap_bg1[idx] = new_val
+                    modified = True
+
         elif tab_idx == 4 and self.renderer.collision_map: # Modo pintar colisión
             val_text = self.cmb_col_brush.currentText()
             if ":" in val_text:
@@ -738,9 +879,58 @@ class VisorMapas(QWidget):
             else:
                 val = 0
             if idx < len(self.renderer.collision_map):
-                self.renderer.collision_map = bytearray(self.renderer.collision_map)
-                self.renderer.collision_map[idx] = val
-                self._re_render()
+                if self.renderer.collision_map[idx] != val:
+                    self.renderer.collision_map = bytearray(self.renderer.collision_map)
+                    self.renderer.collision_map[idx] = val
+                    modified = True
+
+        return modified
+
+    def _on_map_clicked(self, px, py):
+        px = int(px / self.zoom_factor)
+        py = int(py / self.zoom_factor)
+        cell_x = px // 8
+        cell_y = py // 8
+        self.selected_cell = (cell_x, cell_y)
+        
+        if not self._save_state_pending:
+            self._push_undo_state()
+            self._save_state_pending = True
+
+        self._last_drag_cell = (cell_x, cell_y)
+        if self._apply_paint_at_cell(cell_x, cell_y):
+            self._re_render_map_only()
+
+    def _on_map_dragged(self, px, py):
+        px = int(px / self.zoom_factor)
+        py = int(py / self.zoom_factor)
+        cell_x = px // 8
+        cell_y = py // 8
+
+        last_cell = getattr(self, '_last_drag_cell', None)
+        if last_cell == (cell_x, cell_y):
+            return  # Misma celda, no hacer nada
+
+        self.selected_cell = (cell_x, cell_y)
+
+        if not self._save_state_pending:
+            self._push_undo_state()
+            self._save_state_pending = True
+
+        if last_cell is not None:
+            cells_to_paint = self._get_line_cells(last_cell[0], last_cell[1], cell_x, cell_y)
+        else:
+            cells_to_paint = [(cell_x, cell_y)]
+
+        self._last_drag_cell = (cell_x, cell_y)
+
+        any_modified = False
+        for cx, cy in cells_to_paint:
+            if self._apply_paint_at_cell(cx, cy):
+                any_modified = True
+
+        if any_modified:
+            self._re_render_map_only()
 
     def _on_map_right_clicked(self, px, py):
         tab_idx = self.tabs_edit_mode.currentIndex()

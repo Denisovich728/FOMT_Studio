@@ -4,7 +4,8 @@ import sys
 import shutil
 from PIL import Image
 
-sys.path.append(r'j:\Repositorios\fomt_studio')
+_REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+if _REPO_DIR not in sys.path: sys.path.insert(0, _REPO_DIR)
 from Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine.engine import MelodyPortraitEngine
 
 ROM_PATH     = r"j:\Repositorios\fomt_studio\Harvest Moon - Friends of Mineral Town.gba"
@@ -241,7 +242,7 @@ def _bounding_box(oams):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# _encode_custom_palette — Convierte lista (r,g,b)×16 → bytearray GBA BGR555
+# _encode_custom_palette — Convierte lista (r,g,b)×16 -> bytearray GBA BGR555
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _encode_custom_palette(custom_palette):
@@ -270,7 +271,8 @@ def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_pa
     """
     rom = bytearray(rom_data) if rom_data else bytearray(open(ROM_PATH, 'rb').read())
     engine = MelodyPortraitEngine(None)
-    img    = Image.open(input_png_path).convert("RGBA")
+    orig_img = Image.open(input_png_path)
+    img = orig_img.convert("RGBA")
 
     counts, ptrs, tables, header_addr, _ = _load_tables(rom)
     t1, t2, t3, t4, t5, t6, t7 = tables
@@ -314,6 +316,23 @@ def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_pa
         else:
             t5[pal_offset:pal_offset+32] = pal_data
         colors = list(custom_palette)
+    elif orig_img.mode == 'P':
+        raw_pal = orig_img.getpalette() or []
+        colors = []
+        for i in range(16):
+            if i * 3 + 2 < len(raw_pal):
+                colors.append((raw_pal[i*3], raw_pal[i*3+1], raw_pal[i*3+2]))
+            else:
+                colors.append((0, 0, 0))
+        pal_data = _encode_custom_palette(colors)
+        if fork_palette:
+            new_pal_idx = counts[4]
+            t5 += pal_data
+            counts[4] += 1
+            fA = new_pal_idx
+            struct.pack_into('<H', t2, meta+10, fA)
+        else:
+            t5[pal_offset:pal_offset+32] = pal_data
     else:
         pal_data = t5[pal_offset:pal_offset+32]
         colors = []
@@ -368,7 +387,7 @@ def repack_vanilla(target_portrait_hex, input_png_path, rom_data=None, custom_pa
 #
 # USO: cualquier portrait que sea distinto al original en tamaño, forma o layout.
 #      Recalcula TODOS los OAMs, tiles y metadata desde cero para el portrait.
-#      Siempre actualiza f0 (OAM count) en la metadata → SIN recorte.
+#      Siempre actualiza f0 (OAM count) en la metadata -> SIN recorte.
 # ─────────────────────────────────────────────────────────────────────────────
 
 def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_palette=None, fork_palette=False):
@@ -386,7 +405,8 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
     """
     rom    = bytearray(rom_data) if rom_data else bytearray(open(ROM_PATH, 'rb').read())
     engine = MelodyPortraitEngine(None)
-    img    = Image.open(input_png_path).convert("RGBA")
+    orig_img = Image.open(input_png_path)
+    img    = orig_img.convert("RGBA")
 
     counts, ptrs, tables, header_addr, _ = _load_tables(rom)
     t1, t2, t3, t4, t5, t6, t7 = tables
@@ -413,7 +433,7 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
     # el nuevo portrait tiene distinto ancho.
     anchor_x = -(img.width // 2)
     print(f"[Expansion] Portrait {target_portrait_hex:02X}: "
-          f"anchor_orig=({orig_min_x},{orig_min_y}) → anchor_nuevo=({anchor_x},0), "
+          f"anchor_orig=({orig_min_x},{orig_min_y}) -> anchor_nuevo=({anchor_x},0), "
           f"PNG={img.width}x{img.height}px")
 
     # ── Smart Slicer (Natsume-style): omite OAMs 100%% transparentes ──
@@ -424,11 +444,41 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
           f"(vs {len(oams)} originales). anchor=({anchor_x},0)")
 
     # ── GFX y Paleta ──
+    # Si no se pasó una paleta personalizada explícita, chequear si el PNG coincide
+    # con la paleta original de la ROM para este portrait.
+    old_fA = struct.unpack('<H', t2[meta+10:meta+12])[0]
+    if not (custom_palette and len(custom_palette) == 16):
+        pal_base = ptrs[4] + old_fA * 32
+        rom_palette = []
+        for i in range(16):
+            c16 = struct.unpack_from('<H', rom, pal_base + i * 2)[0]
+            r = (c16 & 0x1F) << 3
+            g = ((c16 >> 5) & 0x1F) << 3
+            b = ((c16 >> 10) & 0x1F) << 3
+            rom_palette.append((r, g, b))
+
+        test_img = orig_img.convert("RGBA")
+        t_pixels = test_img.load()
+        match_count = 0
+        total_opaque = 0
+        for y in range(test_img.height):
+            for x in range(test_img.width):
+                r, g, b, a = t_pixels[x, y]
+                if a >= 128:
+                    total_opaque += 1
+                    min_d = min((r-pr)**2 + (g-pg)**2 + (b-pb)**2 for pr, pg, pb in rom_palette[1:])
+                    if min_d <= 64:
+                        match_count += 1
+        
+        if total_opaque > 0 and (match_count / total_opaque) >= 0.90:
+            print(f"[Smart Palette] El PNG coincide con la paleta de la ROM ({match_count}/{total_opaque} = {match_count/total_opaque:.1%}) -> Preservando paleta canónica.")
+            custom_palette = rom_palette
+
     if custom_palette and len(custom_palette) == 16:
-        new_gfx, _ = engine.encode_4bpp(img, slices, custom_palette=custom_palette, respect_indices=True)
+        new_gfx, _ = engine.encode_4bpp(orig_img, slices, custom_palette=custom_palette, respect_indices=True)
         new_pal    = _encode_custom_palette(custom_palette)
     else:
-        new_gfx, new_pal = engine.encode_4bpp(img, slices, respect_indices=True)
+        new_gfx, new_pal = engine.encode_4bpp(orig_img, slices, respect_indices=True)
 
     new_oam_data    = engine.generate_oam_data(slices)
     new_tiles_count = len(new_gfx) // 32
@@ -477,8 +527,7 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
             print(f"[Expansion] Paleta FORK: nueva paleta agregada en índice {new_pal_idx}.")
         else:
             pal_off = old_fA * 32
-            if custom_palette:
-                t5[pal_off:pal_off+32] = new_pal
+            t5[pal_off:pal_off+32] = new_pal
             new_pal_idx = old_fA
             print(f"[Expansion] Paleta overwrite in-place: fA={old_fA}.")
 
@@ -539,10 +588,10 @@ def repack_expansion(target_portrait_hex, input_png_path, rom_data=None, custom_
 # repack — Punto de entrada unificado (mantiene compatibilidad con la UI)
 #
 # Decide automáticamente el modo correcto:
-#   - Si force_expansion=True  → siempre Expansión (nuevo portrait)
-#   - Si force_expansion=False → compara tamaño PNG vs bounding box OAM:
-#       • PNG cabe (mismo tamaño o menor) → Vanilla (retoque rápido)
-#       • PNG no cabe (más grande)        → Expansión (nuevo portrait)
+#   - Si force_expansion=True  -> siempre Expansión (nuevo portrait)
+#   - Si force_expansion=False -> compara tamaño PNG vs bounding box OAM:
+#       • PNG cabe (mismo tamaño o menor) -> Vanilla (retoque rápido)
+#       • PNG no cabe (más grande)        -> Expansión (nuevo portrait)
 #
 # NOTA: El bounding box se calcula sobre los OAMs CON sombra, lo que puede
 #       hacer que orig_w/orig_h sean más grandes que el área visible. Por eso,
@@ -559,10 +608,10 @@ def repack(target_portrait_hex, input_png_path, rom_data=None,
         target_portrait_hex:  Índice del portrait (int).
         input_png_path:       Ruta al PNG de entrada.
         rom_data:             bytearray de la ROM (opcional).
-        force_expansion:      True  → Expansión siempre (default, seguro para nuevos portraits).
-                              False → Auto-detect (Vanilla si cabe, Expansión si no).
+        force_expansion:      True  -> Expansión siempre (default, seguro para nuevos portraits).
+                              False -> Auto-detect (Vanilla si cabe, Expansión si no).
         custom_palette:       Lista de 16 tuplas (r,g,b) o None.
-        fork_palette:         True  → Crea una nueva entrada en la paleta.
+        fork_palette:         True  -> Crea una nueva entrada en la paleta.
     """
     if force_expansion:
         return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
@@ -592,10 +641,10 @@ def repack(target_portrait_hex, input_png_path, rom_data=None,
     orig_h = max_y - min_y
 
     if img.width <= orig_w and img.height <= orig_h:
-        print(f"[Auto] PNG ({img.width}×{img.height}) cabe en bbox original ({orig_w}×{orig_h}) → Vanilla")
+        print(f"[Auto] PNG ({img.width}×{img.height}) cabe en bbox original ({orig_w}×{orig_h}) -> Vanilla")
         return repack_vanilla(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
     else:
-        print(f"[Auto] PNG ({img.width}×{img.height}) > bbox original ({orig_w}×{orig_h}) → Expansion")
+        print(f"[Auto] PNG ({img.width}×{img.height}) > bbox original ({orig_w}×{orig_h}) -> Expansion")
         return repack_expansion(target_portrait_hex, input_png_path, rom_data, custom_palette, fork_palette)
 
 

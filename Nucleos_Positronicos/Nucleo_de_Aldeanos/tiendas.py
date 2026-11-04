@@ -25,6 +25,8 @@ class ShopItemEntry:
 
 class ShopParser:
     def __init__(self, project):
+        from Banco_de_Datos.parche_splash import require_rom_signature
+        require_rom_signature(project, auto_sign=True, module_name='ShopParser')
         self.project = project
         self.shop_entries = {} # Mapeo de item_name -> ShopItemEntry
         

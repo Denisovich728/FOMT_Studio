@@ -1,0 +1,297 @@
+{
+  "map_id": 0,
+  "map_name": "Farm Normal",
+  "dimensions": {
+    "world_width_px": 1024,
+    "world_height_px": 704,
+    "cols_tiles": 128,
+    "rows_tiles": 88,
+    "tile_size_px": 8
+  },
+  "dynamic_buildings": [
+    {
+      "id": "farmhouse_lv1",
+      "name": "Casa de Campo LV1",
+      "layer": "DynamicBuildings",
+      "world_x": 208,
+      "world_y": 24,
+      "width": 64,
+      "height": 88,
+      "tile_col": 26,
+      "tile_row": 3,
+      "texture_file": "exterior_farmhouse_lv1.png",
+      "colmask_file": "exterior_farmhouse_lv1_collision.colmask",
+      "door_trigger": {
+        "world_x": 232,
+        "world_y": 104,
+        "width": 16,
+        "height": 4,
+        "type": "DoorWarpTrigger",
+        "collision_value": 16,
+        "color": "#ffd166",
+        "target_warp": "farmhouse_interior"
+      }
+    },
+    {
+      "id": "mailbox",
+      "name": "Buzón de Correo",
+      "layer": "DynamicBuildings",
+      "world_x": 272,
+      "world_y": 48,
+      "width": 16,
+      "height": 24,
+      "tile_col": 34,
+      "tile_row": 6,
+      "texture_file": "exterior_mailbox.png",
+      "colmask_file": "exterior_mailbox_collision.colmask"
+    },
+    {
+      "id": "chicken_coop_lv1",
+      "name": "Gallinero LV1",
+      "layer": "DynamicBuildings",
+      "world_x": 112,
+      "world_y": 416,
+      "width": 72,
+      "height": 112,
+      "tile_col": 14,
+      "tile_row": 52,
+      "texture_file": "exterior_chicken_coop_lv1.png",
+      "colmask_file": "exterior_chicken_coop_lv1_collision.colmask",
+      "door_trigger": {
+        "world_x": 140,
+        "world_y": 504,
+        "width": 16,
+        "height": 4,
+        "type": "DoorWarpTrigger",
+        "collision_value": 16,
+        "color": "#ffd166",
+        "target_warp": "chicken_coop_interior"
+      }
+    },
+    {
+      "id": "doghouse",
+      "name": "Caseta del Perro",
+      "layer": "DynamicBuildings",
+      "world_x": 392,
+      "world_y": 56,
+      "width": 24,
+      "height": 32,
+      "tile_col": 49,
+      "tile_row": 7,
+      "texture_file": "exterior_doghouse.png",
+      "colmask_file": "exterior_doghouse_collision.colmask"
+    },
+    {
+      "id": "barn_lv1",
+      "name": "Granero LV1",
+      "layer": "DynamicBuildings",
+      "world_x": 464,
+      "world_y": 16,
+      "width": 104,
+      "height": 96,
+      "tile_col": 58,
+      "tile_row": 2,
+      "texture_file": "exterior_barn_lv1.png",
+      "colmask_file": "exterior_barn_lv1_collision.colmask",
+      "door_trigger": {
+        "world_x": 496,
+        "world_y": 104,
+        "width": 16,
+        "height": 4,
+        "type": "DoorWarpTrigger",
+        "collision_value": 16,
+        "color": "#ffd166",
+        "target_warp": "barn_interior"
+      }
+    }
+  ],
+  "static_structures_bg2": [
+    {
+      "id": "silo",
+      "name": "Silo de Almacenamiento",
+      "layer": "BG2_Structures",
+      "world_x": 416,
+      "world_y": 0,
+      "width": 48,
+      "height": 112,
+      "tile_col": 52,
+      "tile_row": 0,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "signpost_doghouse",
+      "name": "Letrero Informativo de la Granja",
+      "layer": "BG2_Structures",
+      "world_x": 400,
+      "world_y": 96,
+      "width": 16,
+      "height": 16,
+      "tile_col": 50,
+      "tile_row": 12,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "watermill_wheel",
+      "name": "Molino de Agua y Rueda",
+      "layer": "BG2_Structures",
+      "world_x": 64,
+      "world_y": 448,
+      "width": 48,
+      "height": 64,
+      "tile_col": 8,
+      "tile_row": 56,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "north_fence_left",
+      "name": "Valla Norte (Tramo Izquierdo)",
+      "layer": "BG2_Structures",
+      "world_x": 64,
+      "world_y": 40,
+      "width": 144,
+      "height": 16,
+      "tile_col": 8,
+      "tile_row": 5,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "north_fence_middle",
+      "name": "Valla Norte (Tramo Central entre Casa y Silo)",
+      "layer": "BG2_Structures",
+      "world_x": 272,
+      "world_y": 40,
+      "width": 144,
+      "height": 16,
+      "tile_col": 34,
+      "tile_row": 5,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "north_fence_right",
+      "name": "Valla Norte (Tramo Derecho tras Granero)",
+      "layer": "BG2_Structures",
+      "world_x": 568,
+      "world_y": 40,
+      "width": 438,
+      "height": 16,
+      "tile_col": 71,
+      "tile_row": 5,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "west_fence",
+      "name": "Valla Oeste (Límite Arroyo)",
+      "layer": "BG2_Structures",
+      "world_x": 64,
+      "world_y": 56,
+      "width": 8,
+      "height": 392,
+      "tile_col": 8,
+      "tile_row": 7,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "east_fence",
+      "name": "Valla Este (Límite Bosque)",
+      "layer": "BG2_Structures",
+      "world_x": 1000,
+      "world_y": 56,
+      "width": 8,
+      "height": 584,
+      "tile_col": 125,
+      "tile_row": 7,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "shipping_bin",
+      "name": "Contenedor de Envíos (Shipping Bin)",
+      "layer": "BG2_Structures",
+      "world_x": 217,
+      "world_y": 176,
+      "width": 38,
+      "height": 24,
+      "tile_col": 27,
+      "tile_row": 22,
+      "collision": "PixelBitmask"
+    },
+    {
+      "id": "south_bridge",
+      "name": "Puente Sur hacia Mineral Town",
+      "layer": "BG2_Structures",
+      "world_x": 240,
+      "world_y": 640,
+      "width": 48,
+      "height": 64,
+      "tile_col": 30,
+      "tile_row": 80,
+      "collision": "CustomPassableBridgeDeck"
+    }
+  ],
+  "static_structures_bg1": [
+    {
+      "id": "watermill_wheel_top",
+      "name": "Cresta Superior del Molino",
+      "layer": "BG1_Overhead",
+      "world_x": 72,
+      "world_y": 448,
+      "width": 40,
+      "height": 24,
+      "tile_col": 9,
+      "tile_row": 56,
+      "is_overhead": true
+    },
+    {
+      "id": "stable_roof_overhang",
+      "name": "Alero Superior del Establo",
+      "layer": "BG1_Overhead",
+      "world_x": 672,
+      "world_y": 34,
+      "width": 48,
+      "height": 22,
+      "tile_col": 84,
+      "tile_row": 4,
+      "is_overhead": true
+    }
+  ],
+  "terrain_zones": [
+    {
+      "id": "cultivable_field",
+      "name": "Terreno de Cultivo Principal (El Cuadrote Grande)",
+      "layer": "BG3_Terrain",
+      "world_x": 272,
+      "world_y": 176,
+      "width": 688,
+      "height": 400,
+      "tile_col": 34,
+      "tile_row": 22,
+      "tile_width": 86,
+      "tile_height": 50,
+      "collision_type": "WalkableAndCultivable",
+      "collision_byte": "0x40"
+    },
+    {
+      "id": "mountain_path",
+      "name": "Sendero Superior a la Montaña (entre Vallas)",
+      "layer": "BG3_Terrain",
+      "world_x": 296,
+      "world_y": 0,
+      "width": 88,
+      "height": 56,
+      "tile_col": 37,
+      "tile_row": 0,
+      "tile_width": 11,
+      "tile_height": 7,
+      "collision_type": "WalkablePath"
+    },
+    {
+      "id": "water_stream",
+      "name": "Arroyo y Estanque Natural",
+      "layer": "BG4_Water",
+      "world_x": 0,
+      "world_y": 448,
+      "width": 240,
+      "height": 256,
+      "collision_type": "ImpassableWater"
+    }
+  ]
+}

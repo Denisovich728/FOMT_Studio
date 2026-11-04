@@ -184,7 +184,7 @@ class VisorMetasprites(QWidget):
         # --- Panel Izquierdo: Lista de Retratos ---
         left_panel = QVBoxLayout()
         
-        self.lbl_title = QLabel("🖼 Tile Editor Extreme (Portraits)")
+        self.lbl_title = QLabel(" Tile Editor Extreme (Portraits)")
         self.lbl_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #00BFFF;")
         left_panel.addWidget(self.lbl_title)
         
@@ -212,20 +212,20 @@ class VisorMetasprites(QWidget):
         self.canvas = PixelCanvas()
         self.canvas.parent_visor = self
         
-        self.btn_brush = QPushButton("🖌 Pincel")
+        self.btn_brush = QPushButton(" Pincel")
         self.btn_brush.setCheckable(True)
         self.btn_brush.setChecked(True)
         self.btn_brush.clicked.connect(lambda: self._set_tool("brush"))
         
-        self.btn_eraser = QPushButton("🧹 Borrador")
+        self.btn_eraser = QPushButton(" Borrador")
         self.btn_eraser.setCheckable(True)
         self.btn_eraser.clicked.connect(lambda: self._set_tool("eraser"))
         
-        self.btn_eyedropper = QPushButton("💧 Gotero")
+        self.btn_eyedropper = QPushButton(" Gotero")
         self.btn_eyedropper.setCheckable(True)
         self.btn_eyedropper.clicked.connect(lambda: self._set_tool("eyedropper"))
         
-        self.btn_fill = QPushButton("🪣 Cubeta")
+        self.btn_fill = QPushButton(" Cubeta")
         self.btn_fill.setCheckable(True)
         self.btn_fill.clicked.connect(lambda: self._set_tool("fill"))
         
@@ -241,10 +241,10 @@ class VisorMetasprites(QWidget):
         self.btn_redo = QPushButton("↪ Rehacer")
         self.btn_redo.clicked.connect(self.canvas.redo)
         
-        self.btn_zoom_in = QPushButton("🔍+")
+        self.btn_zoom_in = QPushButton("+")
         self.btn_zoom_in.clicked.connect(lambda: self.canvas.scale(1.25, 1.25))
         
-        self.btn_zoom_out = QPushButton("🔍-")
+        self.btn_zoom_out = QPushButton("-")
         self.btn_zoom_out.clicked.connect(lambda: self.canvas.scale(0.8, 0.8))
         
         tools_layout.addWidget(self.btn_brush)
@@ -273,17 +273,17 @@ class VisorMetasprites(QWidget):
         # Botones de Acción
         action_layout = QHBoxLayout()
         
-        self.btn_import = QPushButton("📂 Importar PNG")
+        self.btn_import = QPushButton(" Importar PNG")
         self.btn_import.clicked.connect(self._import_png)
         
-        self.btn_export = QPushButton("💾 Dumpear PNG actual")
+        self.btn_export = QPushButton(" Dumpear PNG actual")
         self.btn_export.clicked.connect(self._export_png)
 
-        self.btn_dump_all = QPushButton("📥 Extraer Todos los Retratos")
+        self.btn_dump_all = QPushButton(" Extraer Todos los Retratos")
         self.btn_dump_all.setStyleSheet("background: #007ACC; color: white; font-weight: bold;")
         self.btn_dump_all.clicked.connect(self._dump_all_portraits)
         
-        self.btn_inject = QPushButton("🚀 Inyectar (Melody Engine)")
+        self.btn_inject = QPushButton(" Inyectar (Melody Engine)")
         self.btn_inject.setStyleSheet("background: #d32f2f; color: white; font-weight: bold;")
         self.btn_inject.clicked.connect(self._inject_to_rom)
         
@@ -315,7 +315,7 @@ class VisorMetasprites(QWidget):
             
         right_panel.addLayout(self.pal_grid)
         
-        self.btn_edit_pal = QPushButton("🎨 Editar Paleta")
+        self.btn_edit_pal = QPushButton(" Editar Paleta")
         self.btn_edit_pal.setStyleSheet("background: #1F3A5F; color: #89B4FA; font-weight: bold; border-color: #4A90D9;")
         self.btn_edit_pal.clicked.connect(self._open_palette_editor)
         right_panel.addWidget(self.btn_edit_pal)

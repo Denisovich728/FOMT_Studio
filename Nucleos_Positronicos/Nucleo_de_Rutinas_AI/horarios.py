@@ -13,6 +13,8 @@ class EventScheduleNode:
 
 class ScheduleParser:
     def __init__(self, project):
+        from Banco_de_Datos.parche_splash import require_rom_signature
+        require_rom_signature(project, auto_sign=True, module_name='ScheduleParser')
         self.project = project
 
     def decode_npc_schedule(self, npc, lang='es'):
