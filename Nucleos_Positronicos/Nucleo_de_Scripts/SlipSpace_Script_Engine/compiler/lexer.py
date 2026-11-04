@@ -169,7 +169,16 @@ class Lexer:
                 nc = self.peek_char()
                 
                 if nc == 'n': 
-                    buf.append(0x0A)
+                    # \n emite 0x0D 0x0A consolidado requerido por el motor FoMT
+                    buf.extend([0x0D, 0x0A])
+                    self.next_char()
+                elif nc == 'b':
+                    # \b (BRK reducido)
+                    buf.append(0x05)
+                    self.next_char()
+                elif nc == 'w':
+                    # \w (WAIT_CLICK reducido)
+                    buf.append(0x0C)
                     self.next_char()
                 elif self.source.startswith("BRK", self.pos):
                     buf.append(0x05)
@@ -177,9 +186,23 @@ class Lexer:
                 elif self.source.startswith("WAIT_CLICK", self.pos):
                     buf.append(0x0C)
                     for _ in range(10): self.next_char()
+                elif self.source.startswith("WAIT CLICK", self.pos):
+                    buf.append(0x0C)
+                    for _ in range(10): self.next_char()
                 elif nc == 'r': 
-                    buf.append(0x0D)
                     self.next_char()
+                    # Si es \r seguido de \n, no duplicar el 0x0D
+                    if self.peek_char() == '\\':
+                        saved_pos = self.pos
+                        self.next_char()
+                        if self.peek_char() == 'n':
+                            self.next_char()
+                            buf.extend([0x0D, 0x0A])
+                        else:
+                            self.pos = saved_pos
+                            buf.append(0x0D)
+                    else:
+                        buf.append(0x0D)
                 elif nc == 't': 
                     buf.append(0x09)
                     self.next_char()

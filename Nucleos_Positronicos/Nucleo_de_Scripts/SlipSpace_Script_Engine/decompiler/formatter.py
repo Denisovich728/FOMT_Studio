@@ -40,21 +40,20 @@ class Formatter:
             return base
         elif isinstance(expr, ExprStr): 
             # Mapa de Caracteres Especiales de FoMT (USA)
+            # BRK simplificado a \b y WAIT_CLICK a \w; \r\n consolidado a \n
             charmap = {
                 0x01: "{PLAYER}",
                 0x02: "{VALUE1}",
                 0x03: "{VALUE2}",
                 0x04: "{VALUE4}",
-                0x05: "\\BRK",
+                0x05: "\\b",
                 0x06: "{BREAK}",
                 0x07: "{BREAK2}",
                 0x08: "{VALUE8}",
                 0x09: "{VALUE9}",
-                0x0C: "\\WAIT_CLICK", 
+                0x0C: "\\w", 
                 0x19: "{HORSE}",
-                0x0D: "\\r",
-                0x0A: "\\n",
-                0x22: '\\"',
+                0x22: '\"',
                 0x5C: "\\\\",
                 0xF0: "Á", 0xF1: "É", 0xF2: "Í", 0xF3: "Ó", 0xF4: "Ú",
                 0xF5: "á", 0xF6: "é", 0xF7: "í", 0xF8: "ó", 0xF9: "ú",
@@ -62,15 +61,34 @@ class Formatter:
             }
             
             res = '"'
-            for b in expr.value:
-                if b in charmap:
+            val = expr.value
+            v_len = len(val)
+            i = 0
+            while i < v_len:
+                b = val[i]
+                # Consolidación: 0x0D 0x0A (\r\n) siempre van juntos -> \n
+                if b == 0x0D and i + 1 < v_len and val[i+1] == 0x0A:
+                    res += "\\n"
+                    i += 2
+                    continue
+                elif b == 0x0A:
+                    res += "\\n"
+                    i += 1
+                    continue
+                elif b == 0x0D:
+                    res += "\\r"
+                    i += 1
+                    continue
+                elif b in charmap:
                     res += charmap[b]
                 elif 0x20 <= b <= 0x7E:
                     res += chr(b)
                 elif b == 0:
+                    i += 1
                     continue # El terminador no se imprime
                 else:
                     res += f'\\x{b:02X}'
+                i += 1
             res += '"'
             return res
         elif isinstance(expr, ExprCall): 

@@ -73,10 +73,16 @@ class Emitter:
         self.location_counter = 0
         self.errors = []
         self.break_targets: List[JumpId] = []
+        self.user_labels: Dict[str, JumpId] = {}
         
     def new_label(self) -> JumpId:
         self.location_counter += 1
         return JumpId(self.location_counter)
+
+    def get_user_label(self, name: str) -> JumpId:
+        if name not in self.user_labels:
+            self.user_labels[name] = self.new_label()
+        return self.user_labels[name]
         
     def emit(self, ins: Ins):
         self.instructions.append(ins)
@@ -339,6 +345,12 @@ class Emitter:
                 self.emit(Label(switch_logic_lbl)); self.emit(Switch(s.switch_id)); self.emit(Label(nxt_lbl)); self.break_targets.pop()
             elif isinstance(s, StmtExit): self.emit(Exit())
             elif isinstance(s, StmtBreak): self.emit(Jmp(self.break_targets[-1]))
+            elif isinstance(s, StmtLabel):
+                name = s.jump_id.id if isinstance(s.jump_id, JumpId) else str(s.jump_id)
+                self.emit(Label(self.get_user_label(name)))
+            elif isinstance(s, StmtGoto):
+                name = s.jump_id.id if isinstance(s.jump_id, JumpId) else str(s.jump_id)
+                self.emit(Jmp(self.get_user_label(name)))
                 
     def end(self) -> Script:
         if self.errors: raise CompileError("\n".join(self.errors))

@@ -582,7 +582,7 @@ class InsDecompiler:
 
     def match_at_label(self, label_jump_id: JumpId):
         stack = self.back()
-        if not stack: return
+        if not stack: raise DecompileError("No pattern match for Label at empty stack")
         
         # Sensores de Stack
         s1 = stack[-1] if len(stack) >= 1 else None
@@ -842,8 +842,13 @@ class InsDecompiler:
                     if is_break:
                         if not block_stmts or not isinstance(block_stmts[0], StmtBreak):
                             block_stmts.insert(0, StmtBreak())
+                    else:
+                        # Escape GOTO explícito dentro del bloque
+                        block_stmts.insert(0, StmtGoto(tok.jump_id))
                 elif isinstance(tok, TokenLabel):
-                    pass # Ignore internal dead labels
+                    # Preservar etiqueta si es referenciada (punto de anclaje de un goto)
+                    if self.jmp_refcount.get(tok.jump_id, 0) > 0:
+                        block_stmts.insert(0, StmtLabel(tok.jump_id))
                 else:
                     if self.is_expr(tok):
                         expr = self.token_to_expr(tok)
