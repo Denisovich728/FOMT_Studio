@@ -1,147 +1,174 @@
-# Manual Técnico de Referencia: SlipSpace Script Engine
+# Manual de Referencia del Lenguaje: SlipSpace Script
 **Harvest Moon: Friends of Mineral Town (Game Boy Advance)**
-**Suite de Ingeniería Inversa - FOMT Studio**
-*Arquitectura, Especificación Formal del Lenguaje, Bytecode y Guía para Modelos de Lenguaje (LLMs)*
+**Suite de Ingeniería Inversa y Modding - FOMT Studio**
+*Especificación Formal y Guía de Programación de Alto Nivel para Desarrolladores y Modelos de Lenguaje (LLMs)*
 
 ---
 
-## 1. Resumen Ejecutivo y Arquitectura del Motor
+## 1. Introducción y Filosofía del Lenguaje
 
-El **SlipSpace Script Engine** es el compilador, descompilador y máquina virtual que orquesta la lógica de eventos, diálogos, cinemáticas, máquinas de estado de aldeanos y condiciones de juego en la ROM de *Harvest Moon: Friends of Mineral Town* (GBA).
+**SlipSpace Script** es un lenguaje imperativo estructurado con sintaxis de estilo C, diseñado específicamente para escribir, editar, descompilar y compilar la totalidad de los eventos, cinemáticas y máquinas de estado de inteligencia artificial de *Harvest Moon: Friends of Mineral Town* (FoMT) y *Harvest Moon: More Friends of Mineral Town* (MFoMT).
 
-### 1.1 Modelo de la Máquina Virtual (Stack-based VM)
-La VM opera mediante un modelo de pila de 32 bits implementado en código máquina ARM7TDMI:
-- **Pila de Operandos:** Las operaciones aritméticas, lógicas y llamadas a funciones empujan (`push`) y extraen (`pop`) valores de la pila de evaluación.
-- **Variables Locales:** Se almacenan en ranuras indexadas (`VarId: 0, 1, 2...`) gestionadas por los opcodes `PushVar` y `PopVar`.
-- **Estructura de Bloques RIFF:** Los scripts compilados residen en bloques de formato RIFF (`RIFF [longitud] SCR `) compuestos por:
-  - Sub-chunk de Código Binario (instrucciones de bytecode GBA).
-  - Sub-chunk de Cadenas de Texto (`STR `) con punteros relativos a cadenas de diálogo.
+### Principios de Diseño:
+- **Abstracción Total de Bajo Nivel:** El programador opera exclusivamente con construcciones de alto nivel (`if-else`, `switch-case`, `do-while`, funciones con nombre semántico y cadenas legibles). El compilador se encarga de resolver saltos, tablas de punteros y empaquetado binario.
+- **Sintaxis Familiar Estilo C:** Bloques delimitados por llaves `{ }`, sentencias terminadas en punto y coma `;` y operadores estándar (`==`, `!=`, `&&`, `||`, `!`).
+- **Determinismo y Tipado Estático:** Variables de trabajo declaradas explícitamente y funciones estándar con firmas semánticas validadas contra la biblioteca oficial (`Fomt_Lib.csv`).
 
 ---
 
-## 2. Gramática Formal EBNF (Extended Backus-Naur Form)
+## 2. Anatomía de un Script de Evento
 
-```ebnf
-Program         ::= ( IncludeDirective | Declaration | ScriptDefinition )* ;
+Cada archivo o bloque de script sigue una estructura canónica obligatoria:
 
-IncludeDirective::= '#include' STRING_LIT ;
+```c
+#include "Fomt_Lib.csv"
 
-Declaration     ::= ConstDecl | FuncDecl | ProcDecl ;
-ConstDecl       ::= 'const' IDENTIFIER '=' ( INTEGER_LIT | STRING_LIT ) ';' ;
-FuncDecl        ::= 'func' HEX_ID IDENTIFIER '(' ParameterList? ')' ';' ;
-ProcDecl        ::= 'proc' HEX_ID IDENTIFIER '(' ParameterList? ')' ';' ;
+script 992 Rick_Personality {
+    int var_0, var_1, var_2;
 
-ParameterList   ::= Type ( ',' Type )* ;
-Type            ::= 'integer' | 'string' ;
+    // Cuerpo de lógica de alto nivel
+    var_0 = Check_Held_Item();
+    if (var_0 != 0) {
+        TalkMessage(1);
+        TalkClose();
+        Drop_Held_Item();
+    }
 
-ScriptDefinition::= 'script' INTEGER_LIT IDENTIFIER '{' StatementList '}' ;
-
-StatementList   ::= Statement* ;
-
-Statement       ::= VarDeclStmt
-                  | AssignStmt
-                  | CallStmt
-                  | IfStmt
-                  | SwitchStmt
-                  | DoWhileStmt
-                  | BreakStmt
-                  | ExitStmt
-                  | GotoStmt
-                  | LabelStmt
-                  | BlockStmt ;
-
-VarDeclStmt     ::= 'int' IDENTIFIER ( ',' IDENTIFIER )* ';' ;
-AssignStmt      ::= IDENTIFIER AssignOp Expression ';' ;
-AssignOp        ::= '=' | '+=' | '-=' | '*=' | '/=' | '%=' ;
-
-CallStmt        ::= IDENTIFIER '(' ArgumentList? ')' ';' ;
-ArgumentList    ::= Expression ( ',' Expression )* ;
-
-IfStmt          ::= 'if' '(' Expression ')' Statement ( 'else' Statement )? ;
-
-SwitchStmt      ::= 'switch' '(' Expression ')' '{' SwitchCase* '}' ;
-SwitchCase      ::= ( 'case' Expression ':' | 'default' ':' ) StatementList ;
-
-DoWhileStmt     ::= 'do' Statement 'while' '(' Expression ')' ';' ;
-BreakStmt       ::= 'break' ';' ;
-ExitStmt        ::= 'exit' ';' ;
-
-GotoStmt        ::= 'goto' IDENTIFIER ';' ;
-LabelStmt       ::= IDENTIFIER ':' ;
-BlockStmt       ::= '{' StatementList '}' ;
-
-Expression      ::= LogicalOrExpr ;
-LogicalOrExpr   ::= LogicalAndExpr ( '||' LogicalAndExpr )* ;
-LogicalAndExpr  ::= EqualityExpr ( '&&' EqualityExpr )* ;
-EqualityExpr    ::= RelationalExpr ( ( '==' | '!=' ) RelationalExpr )* ;
-RelationalExpr  ::= AdditiveExpr ( ( '<' | '<=' | '>' | '>=' ) AdditiveExpr )* ;
-AdditiveExpr    ::= MultiplicativeExpr ( ( '+' | '-' ) MultiplicativeExpr )* ;
-MultiplicativeExpr ::= UnaryExpr ( ( '*' | '/' | '%' ) UnaryExpr )* ;
-UnaryExpr       ::= ( '!' | '-' | '++' | '--' ) UnaryExpr | PrimaryExpr ;
-PrimaryExpr     ::= IDENTIFIER
-                  | INTEGER_LIT
-                  | STRING_LIT
-                  | CallExpr
-                  | '(' Expression ')' ;
-CallExpr        ::= IDENTIFIER '(' ArgumentList? ')' ;
+    exit;
+}
 ```
+
+### Componentes Estructurales:
+1. **Directiva `#include`:** Debe figurar al inicio del archivo. Carga el espacio de nombres de procedimientos y funciones (`Fomt_Lib.csv` para FoMT o `MFomt_Lib.csv` para MFoMT).
+2. **Definición de Script:** `script <ID> <NombreIdentificador> { ... }`.
+   - `<ID>`: Índice numérico del evento dentro de la ROM (1 a 1329 en FoMT).
+   - `<NombreIdentificador>`: Nombre alfanumérico que describe la función del evento (ej. `Rick_Personality`, `Event_0001`, `Harvest_Festival`).
+3. **Cuerpo del Script:** Encerrado entre llaves `{ }`. Contiene primero la declaración de variables y a continuación las sentencias ejecutables.
 
 ---
 
 ## 3. Tipos de Datos y Variables
 
-1. **Variables de Script:**
-   - Declaradas obligatoriamente al inicio del bloque del script con `int`:
-     ```c
-     int var_0, var_1, var_2;
-     ```
-   - Representan registros de trabajo de 32 bits de la VM.
-2. **Literales Numéricos:**
-   - Decimal: `0`, `14`, `100`, `-1`
-   - Hexadecimal: `0x00`, `0x4B`, `0x082C7C08`
-3. **Cadenas de Texto:**
-   - Delimitadas por comillas dobles `"..."`.
-   - Utilizadas como argumentos de funciones de diálogo (`TalkMessage`, `Talk`, nombres de flags).
+### 3.1 Declaración de Variables Locales
+Las variables representan los registros de estado locales del script. Deben declararse **obligatoriamente al principio del script**, antes de cualquier sentencia ejecutable:
+
+```c
+int var_0, var_1, var_2;
+```
+
+- **Palabra clave:** `int`.
+- **Nomenclatura:** `var_N`, donde `N` es un entero mayor o igual a 0 (`var_0`, `var_1`, `var_2`, etc.).
+- **Ámbito:** Local al script actual. No conservan valor entre ejecuciones independientes del evento.
+- **Capacidad:** Enteros con o sin signo de 32 bits.
+
+### 3.2 Literales
+- **Enteros Decimales:** `0`, `1`, `7`, `42`, `-1`.
+- **Enteros Hexadecimales:** Prefijados por `0x` o `0X`. Ejemplos: `0x00`, `0x4B`, `0x1F4`, `0x082C7C08`.
+- **Cadenas de Texto:** Delimitadas por comillas dobles `"..."`. Se emplean en llamadas directas (`Talk`) y nombres simbólicos de banderas (`Check_Flag("Flag_0x71")`).
 
 ---
 
-## 4. Estructuras de Control y Convenciones de Compilación
+## 4. Expresiones y Operadores
 
-### 4.1 Selección Múltiple (`switch / case / break`)
-Los switch-case representan dispatch tables nativas de GBA.
-- Cada caso termina con `break;` para salir del bloque hacia la siguiente instrucción secuencial.
-- Ejemplo canónico:
+El lenguaje implementa la precedencia y asociatividad estándar de C:
+
+### 4.1 Operadores Aritméticos
+| Operador | Operación | Ejemplo |
+| :--- | :--- | :--- |
+| `+` | Suma | `var_0 = var_1 + 5;` |
+| `-` | Resta | `var_0 = var_1 - 1;` |
+| `*` | Multiplicación | `var_0 = var_1 * 2;` |
+| `/` | División entera | `var_0 = var_1 / 10;` |
+| `%` | Módulo / Residuo | `var_0 = var_1 % 4;` |
+| `++` | Pre / Post incremento | `var_0++;` |
+| `--` | Pre / Post decremento | `var_0--;` |
+
+### 4.2 Operadores de Asignación
+| Operador | Equivalente |
+| :--- | :--- |
+| `=` | Asignación directa: `var_0 = 10;` |
+| `+=` | Suma y asignación: `var_0 += 5;` |
+| `-=` | Resta y asignación: `var_0 -= 2;` |
+| `*=` | Multiplicación y asignación: `var_0 *= 3;` |
+| `/=` | División y asignación: `var_0 /= 2;` |
+| `%=` | Módulo y asignación: `var_0 %= 10;` |
+
+### 4.3 Operadores Relacionales
+| Operador | Significado |
+| :--- | :--- |
+| `==` | Igualdad |
+| `!=` | Desigualdad |
+| `<` | Menor que |
+| `<=` | Menor o igual que |
+| `>` | Mayor que |
+| `>=` | Mayor o igual que |
+
+### 4.4 Operadores Lógicos
+- `&&` : Conjunción lógica (AND).
+- `||` : Disyunción lógica (OR).
+- `!`  : Negación lógica (NOT).
+
+Ejemplo de condición compuesta:
+```c
+if (((Check_Flag("Flag_0x71") == 2) && (Check_Flag("Flag_0x72") == 0))) {
+    // Código si la bandera 0x71 es 2 y la 0x72 es 0
+}
+```
+
+---
+
+## 5. Estructuras de Control de Alto Nivel
+
+### 5.1 Bifurcación Condicional (`if / else`)
+Permite la ejecución selectiva basada en expresiones booleanas. Las sentencias `else` son opcionales y pueden encadenarse:
+
+```c
+if (Has_NPC_Talked_Today(2) == 0) {
+    Set_Portrait(0);
+    TalkMessage(14);
+} else {
+    Set_Portrait(1);
+    TalkMessage(15);
+}
+```
+
+### 5.2 Selección Múltiple (`switch / case / break`)
+Estructura idiomática preferida para evaluar estados finitos, ubicaciones en mapas o tipos de herramientas.
+
+**Regla Mandatoria:** Cada caso debe terminar con `break;` para salir del bloque del switch.
+
 ```c
 switch (GetEntityLocation(2)) {
+    case 6:
+        Set_Portrait(0);
+        TalkMessage(47);
+        break;
     case 7:
         Set_Portrait(0);
         TalkMessage(14);
         break;
-    case 6:
-        Set_Portrait(0);
-        TalkMessage(47);
+    case 0x15:
+        Set_Portrait(1);
+        TalkMessage(49);
         break;
     default:
         break;
 }
 ```
 
-### 4.2 Condicionales Anidados (`if / else`)
-El compilador y descompilador soportan anidación arbitraria de condiciones compuestas evaluadas mediante cortocircuito booleano (`&&`, `||`):
+### 5.3 Bucles Repetitivos (`do / while`)
+Ejecuta el bloque subordinado y comprueba la condición al final:
+
 ```c
-if (((Check_Flag("Flag_0x71") == 2) && (Check_Flag("Flag_0x72") == 0))) {
-    if ((Has_NPC_Talked_Today(2) == 0)) {
-        Set_Portrait(0);
-        TalkMessage(18);
-    } else {
-        Set_Portrait(0);
-        TalkMessage(19);
-    }
-}
+do {
+    var_0++;
+    TalkMessage(var_0);
+} while (var_0 < 3);
 ```
 
-### 4.3 Terminación de Script (`exit;`)
-Instrucción de corte inmediato de la ejecución de la VM de eventos. Cierra el hilo de script y restaura el control al bucle principal de la ROM:
+### 5.4 Terminación de Script (`exit;`)
+Detiene inmediatamente el script en ejecución, cerrando el contexto del hilo y devolviendo el control al bucle principal de la ROM de GBA:
+
 ```c
 TalkClose();
 SetEntityFacing(2, var_2);
@@ -150,93 +177,135 @@ exit;
 
 ---
 
-## 5. Formato de Cadenas y Tokens Especiales de Diálogo
+## 6. Sistema de Texto, Diálogos y Formato de Mensajes
 
-El motor de renderizado de texto de FoMT opera con secuencias de escape consolidadas:
+El procesador de diálogos de *Friends of Mineral Town* renderiza ventanas de texto mediante códigos de control insertados directamente en las cadenas de texto:
 
-| Token | Byte Hexadecimal | Significado Técnico | Comportamiento en Juego |
-| :--- | :--- | :--- | :--- |
-| `\n` | `0x0D 0x0A` | Salto de Línea | Pasa a la siguiente línea del cuadro de texto. |
-| `\w` | `0x0C` | Wait Click | Detiene el texto hasta que el jugador presiona el botón A. |
-| `\b` | `0x05` | Break Box | Limpia el cuadro de diálogo y abre una nueva página de texto. |
+### 6.1 Códigos de Control Oficiales
 
-### Reglas Críticas del Procesador de Texto:
-- Las nuevas líneas en la ROM son estrictamente pares `0x0D 0x0A` (100% verificado empíricamente). No emitir `0x0A` o `0x0D` aislados.
-- Los comandos heredados `\WAIT CLICK`, `\WAIT_CLICK` y `\BRK` se normalizan automáticamente a `\w` y `\b`.
+| Código | Nombre | Comportamiento en Pantalla |
+| :--- | :--- | :--- |
+| `\n` | **Salto de Línea** | Salta a la línea inferior dentro de la misma caja de diálogo. |
+| `\w` | **Pausa / Wait Click** | Detiene el avance del texto y espera a que el jugador presione el botón A. |
+| `\b` | **Salto de Cuadro / Break** | Limpia la caja actual y abre una página limpia de texto. |
 
----
+### Ejemplo Práctico de Formateo de Diálogo:
+```c
+Talk(2, "¡Hola, Denisovich!\nQué gran día hace hoy en la granja.\w\b¿Has venido a comprar suministros?\w");
+```
+- `\n` coloca *"Qué gran día..."* en la segunda línea.
+- `\w` detiene el diálogo para que el jugador lea la primera caja.
+- `\b` limpia la caja por completo y coloca *"¿Has venido a comprar...?"* en una nueva caja.
+- El `\w` final espera la confirmación del usuario antes de cerrar o pasar a la siguiente lógica.
 
-## 6. API Central y Procedimientos Estándar (Biblioteca FoMT)
-
-Los procedimientos y funciones nativos más comunes se mapean contra `Banco_de_Datos/Cilixes/fomt/Fomt_Lib.csv`:
-
-### 6.1 Diálogos y Retratos
-- `TalkMessage(int message_id)`: Imprime el mensaje predeterminado desde la tabla de strings del script.
-- `Talk(int character_id, string text)`: Imprime diálogo directo con texto explícito.
-- `Set_Portrait(int portrait_variant)`: Asigna la expresión o variante de retrato a mostrar (0 = Neutral, 1 = Feliz, 2 = Enojado, etc.).
-- `TalkClose()`: Cierra la caja de diálogo de la interfaz.
-
-### 6.2 Flags y Estado del Mundo
-- `Check_Flag(string flag_name | int flag_id) -> int`: Retorna 0 (no activo), 1 (activo) o 2 (completado/avanzado).
-- `Set_Flag(string flag_name | int flag_id, int state)`: Actualiza el estado de una bandera global del juego.
-- `Has_NPC_Talked_Today(int npc_id) -> int`: Retorna 1 si el jugador ya conversó hoy con el aldeano; 0 en caso contrario.
-
-### 6.3 Entidades y Movimiento
-- `GetEntityLocation(int entity_id) -> int`: Retorna el ID del mapa donde reside la entidad.
-- `SetEntityFacing(int entity_id, int direction)`: Ajusta la orientación cardinal de la entidad (0=Abajo, 1=Arriba, 2=Izquierda, 3=Derecha).
-- `Warp_Entity_To_Map(int map_id)`: Teletransporta a la entidad al mapa indicado.
-- `Free_Event_Entity(int entity_id)`: Libera el bloqueo de IA del personaje tras terminar una conversación o evento.
-
-### 6.4 Inventario y Objetos
-- `Drop_Held_Item()`: Descarta o remueve el objeto sostenido por el jugador.
-- `Give_Item(int item_id, int quantity)`: Entrega herramientas o artículos a la mochila.
-- `Check_Equped_Tool() -> int`: Retorna el ID de la herramienta equipada en mano.
+### 6.2 Primitivas de Diálogo y Retratos
+- `Talk(int npc_id, string mensaje)`: Imprime el texto directamente en pantalla asignado al NPC.
+- `TalkMessage(int message_id)`: Muestra el mensaje indexado en la tabla de textos del evento.
+- `Set_Portrait(int variante)`: Fija la emoción del retrato (0 = Neutral, 1 = Contento, 2 = Enojado, 3 = Triste, etc.).
+- `TalkClose()`: Cierra y desvanece el marco de diálogo en pantalla. **Debe llamarse siempre antes de teletransportar entidades o llamar a `exit;`**.
 
 ---
 
-## 7. Muestra Real Anotada: Máquina de Estados de Aldeano (Evento 992)
+## 7. Catálogo de la API Estándar (`Fomt_Lib.csv`)
 
+Funciones y procedimientos de alto nivel organizados por subsistema:
+
+### 7.1 Gestión de Banderas y Tiempo
+- `Check_Flag(string nombre_flag | int flag_id) -> int`: Consulta el valor de una bandera global (0 = inactiva, 1 = activa, 2 = completada).
+- `Set_Flag(string nombre_flag | int flag_id, int valor)`: Modifica el estado de una bandera global del juego.
+- `Has_NPC_Talked_Today(int npc_id) -> int`: Retorna 1 si el jugador ya habló con el aldeano durante el día actual; 0 si es la primera conversación.
+- `Get_Current_Time() -> int`: Retorna la hora del reloj interno de Mineral Town.
+
+### 7.2 Entidades, Orientación y Mapas
+- `GetEntityLocation(int npc_id) -> int`: Retorna el ID del mapa donde se encuentra actualmente el NPC.
+- `GetEntityFacing(int npc_id) -> int`: Retorna la orientación cardinal actual (0=Abajo, 1=Arriba, 2=Izquierda, 3=Derecha).
+- `SetEntityFacing(int npc_id, int direccion)`: Fuerza al personaje a girar hacia la dirección indicada.
+- `Warp_Entity_To_Map(int map_id)`: Teletransporta inmediatamente al aldeano al mapa objetivo.
+- `Free_Event_Entity(int npc_id)`: Libera a la entidad del bloqueo de cinemática para que retome su rutina diaria.
+
+### 7.3 Inventario, Herramientas y Regalos
+- `Check_Held_Item() -> int`: Identifica el objeto que el jugador sostiene sobre su cabeza (0 si tiene las manos vacías).
+- `Check_Gift_Reaction(int npc_id, int item_id) -> int`: Evalúa el agrado del aldeano hacia el objeto:
+  - `3`: Amor / Favorito (+800 puntos de afecto).
+  - `2`: Gusto (+500 puntos de afecto).
+  - `1`: Neutral / Indiferente (+100 puntos de afecto).
+  - `0`: Disgusto / Odio (-500 puntos de afecto).
+- `Drop_Held_Item()`: Consume o remueve el objeto sostenido (entregándolo al NPC).
+- `Give_Item(int item_id, int cantidad)`: Añade artículos a la mochila del jugador.
+- `Check_Equped_Tool() -> int`: Retorna el ID de la herramienta equipada en la ranura activa.
+
+---
+
+## 8. Muestras Completas de Código de Alto Nivel
+
+### Ejemplo 1: Cinemática Narrativa con Diálogos y Salto de Cuadro
+```c
+#include "Fomt_Lib.csv"
+
+script 1001 Encuentro_Alcalde {
+    int var_0;
+
+    Set_Portrait(0);
+    Talk(12, "¡Buenos días, joven!\nBienvenido seas a Mineral Town.\w\bVeo que te estás adaptando rápidamente al trabajo duro.\w");
+    
+    var_0 = Check_Flag("Town_Reputation");
+    if (var_0 >= 10) {
+        Set_Portrait(1);
+        Talk(12, "Todos en la villa hablan maravillas sobre tu cosecha.\w");
+        Give_Item(0x28, 1);
+    } else {
+        Set_Portrait(0);
+        Talk(12, "No olvides regar tus cultivos cada mañana sin falta.\w");
+    }
+
+    TalkClose();
+    exit;
+}
+```
+
+### Ejemplo 2: Máquina de Estados de Aldeano (Evento 992 - Rick)
 ```c
 #include "Fomt_Lib.csv"
 
 script 992 Rick_Personality {
-int var_0, var_1, var_2;
-var_2 = GetEntityFacing(2);
-SetEntityFacing(2, 0);
-var_0 = Check_Held_Item();
-var_1 = Check_Gift_Reaction(2, var_0);
-if ((var_1 == 3)) {
-    Set_Portrait(0);
-    TalkMessage(0);
-    TalkClose();
-    Drop_Held_Item();
-} else {
-    if ((var_1 == 2)) {
-        Set_Portrait(0);
-        TalkMessage(2);
+    int var_0, var_1, var_2;
+
+    var_2 = GetEntityFacing(2);
+    SetEntityFacing(2, 0);
+
+    var_0 = Check_Held_Item();
+    var_1 = Check_Gift_Reaction(2, var_0);
+
+    if (var_1 == 3) {
+        Set_Portrait(1);
+        TalkMessage(0);
         TalkClose();
         Drop_Held_Item();
     } else {
-        if ((var_1 == 1)) {
-            Set_Portrait(0);
-            TalkMessage(4);
+        if (var_1 == 2) {
+            Set_Portrait(1);
+            TalkMessage(2);
             TalkClose();
             Drop_Held_Item();
         } else {
             switch (GetEntityLocation(2)) {
                 case 7:
-                    if ((Check_Flag("Karen_Marriage_State") == 2)) {
-                        if ((Has_NPC_Talked_Today(2) == 0)) {
+                    if (Check_Flag("Karen_Marriage_State") == 2) {
+                        if (Has_NPC_Talked_Today(2) == 0) {
                             Set_Portrait(0);
                             TalkMessage(14);
                         } else {
                             Set_Portrait(1);
                             TalkMessage(15);
                         }
+                    } else {
+                        Set_Portrait(0);
+                        TalkMessage(16);
                     }
                     break;
+
                 case 6:
-                    if ((Has_NPC_Talked_Today(2) == 0)) {
+                    if (Has_NPC_Talked_Today(2) == 0) {
                         Set_Portrait(0);
                         TalkMessage(47);
                     } else {
@@ -244,28 +313,30 @@ if ((var_1 == 3)) {
                         TalkMessage(48);
                     }
                     break;
+
+                default:
+                    Set_Portrait(0);
+                    TalkMessage(30);
+                    break;
             }
             Free_Event_Entity(2);
         }
     }
-}
-TalkClose();
-SetEntityFacing(2, var_2);
-exit;
+
+    TalkClose();
+    SetEntityFacing(2, var_2);
+    exit;
 }
 ```
 
 ---
 
-## 8. Directrices Obligatorias para LLMs y Compiladores Autónomos
+## 9. Reglas Críticas para Modelos de Lenguaje (LLMs) y Desarrolladores
 
-1. **Estructuración Pura sin Gotos Fantasma:**
-   - Nunca emitas `goto` o `LBL_XXXX:` para escapes de bloques `if` o salidas de casos de `switch`. Usa `break;` dentro de switch y `exit;` para salidas globales.
-2. **Declaración Obligatoria de Variables:**
-   - Toda variable `var_X` debe ser declarada al principio del script con `int var_0, var_1;`. No utilices variables no declaradas.
-3. **Sintaxis de Include:**
-   - La primera línea debe ser siempre `#include "Fomt_Lib.csv"` (o `"MFomt_Lib.csv"` si es More Friends of Mineral Town).
-4. **Cierre de Diálogo Seguro:**
-   - Toda llamada a `TalkMessage(...)` o `Talk(...)` debe acompañarse de `TalkClose()` antes de teletransportar entidades o llamar a `exit;`.
-5. **Escape Sequences en Diálogos:**
-   - Usar estrictamente `\n` para saltos de línea, `\w` para pausas/clicks y `\b` para saltos de cuadro.
+Para garantizar que los scripts compilen limpiamente a la ROM sin errores de sintaxis, deben cumplirse las siguientes directivas:
+
+1. **Declaración en la Primera Línea:** Nunca utilices una variable `var_X` sin haberla declarado previamente en la sentencia inicial `int var_0, var_1;`.
+2. **Cero Gotos Innecesarios:** Escribe flujos de control estructurados (`if/else` y `switch/case/break`). No utilices `goto` para simular salidas de bucles o saltos de casos.
+3. **Cierre de Diálogos Obligatorio:** Si invocaste `TalkMessage` o `Talk`, debes llamar a `TalkClose()` antes de `exit;` o de realizar un teletransporte de entidad (`Warp_Entity_To_Map`).
+4. **Normalización de Cadenas:** Usa exclusivamente `\n` para saltos de renglón, `\w` para pausas con click y `\b` para saltos de cuadro. No utilices secuencias de escape no soportadas.
+5. **Comentarios de Código:** Se admiten comentarios de línea única mediante `//` y comentarios de bloque mediante `/* ... */`.
