@@ -443,77 +443,13 @@ class VisorMapas(QWidget):
         layout_dyn_house.setContentsMargins(0, 0, 0, 0)
         layout_dyn_house.setSpacing(6)
 
-        layout_dyn_house.addWidget(QLabel("Caja:"))
-        self.cmb_house_toolbox = QComboBox()
-        self.cmb_house_toolbox.addItems(["Cerrada", "Abierta", "Ocultar"])
-        self.cmb_house_toolbox.currentIndexChanged.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.cmb_house_toolbox)
-
-        layout_dyn_house.addWidget(QLabel("Tocadiscos:"))
-        self.cmb_house_record_player = QComboBox()
-        self.cmb_house_record_player.addItems(["Base", "Con Discos", "Activo", "Ocultar"])
-        self.cmb_house_record_player.currentIndexChanged.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.cmb_house_record_player)
-
-        self.lbl_house_fridge = QLabel("Refri:")
-        layout_dyn_house.addWidget(self.lbl_house_fridge)
-        self.cmb_house_fridge = QComboBox()
-        self.cmb_house_fridge.addItems(["Cerrado", "Abierto", "Ocultar"])
-        self.cmb_house_fridge.currentIndexChanged.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.cmb_house_fridge)
-
-        self.lbl_house_shelf = QLabel("Anaquel:")
-        layout_dyn_house.addWidget(self.lbl_house_shelf)
-        self.cmb_house_shelf = QComboBox()
-        self.cmb_house_shelf.addItems(["Cerrado", "Abierto", "Ocultar"])
-        self.cmb_house_shelf.currentIndexChanged.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.cmb_house_shelf)
-
-        self.chk_house_kitchen = QCheckBox("Cocina")
-        self.chk_house_kitchen.setChecked(True)
-        self.chk_house_kitchen.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_kitchen)
+        self.btn_house_config = QPushButton("Configurar Estructuras Casa...")
+        self.btn_house_config.clicked.connect(self._open_house_config_dialog)
+        layout_dyn_house.addWidget(self.btn_house_config)
 
         self.btn_house_utensils = QPushButton("Utensilios (8)...")
         self.btn_house_utensils.clicked.connect(self._open_utensils_dialog)
         layout_dyn_house.addWidget(self.btn_house_utensils)
-
-        self.lbl_house_fireplace = QLabel("Chimenea:")
-        layout_dyn_house.addWidget(self.lbl_house_fireplace)
-        self.cmb_house_fireplace = QComboBox()
-        self.cmb_house_fireplace.addItems(["Con Fuego", "Sin Fuego", "Ocultar"])
-        self.cmb_house_fireplace.currentIndexChanged.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.cmb_house_fireplace)
-
-        self.chk_house_double_bed = QCheckBox("Cama Matrimonial")
-        self.chk_house_double_bed.setChecked(True)
-        self.chk_house_double_bed.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_double_bed)
-
-        self.chk_house_bathroom_door = QCheckBox("Puerta Baño")
-        self.chk_house_bathroom_door.setChecked(True)
-        self.chk_house_bathroom_door.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_bathroom_door)
-
-        self.chk_house_dining = QCheckBox("Comedor")
-        self.chk_house_dining.setChecked(True)
-        self.chk_house_dining.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_dining)
-
-        self.chk_house_clock = QCheckBox("Reloj")
-        self.chk_house_clock.setChecked(True)
-        self.chk_house_clock.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_clock)
-
-        self.chk_house_rug = QCheckBox("Alfombra")
-        self.chk_house_rug.setChecked(True)
-        self.chk_house_rug.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_rug)
-
-        self.chk_house_vase = QCheckBox("Florero")
-        self.chk_house_vase.setChecked(True)
-        self.chk_house_vase.toggled.connect(self._on_dynamic_config_changed)
-        layout_dyn_house.addWidget(self.chk_house_vase)
 
         self.widget_dyn_house.setVisible(False)
         self.tools_row_dyn.addWidget(self.widget_dyn_house)
@@ -769,12 +705,6 @@ class VisorMapas(QWidget):
         barn_map = {0: 'lv1', 1: 'lv2', 2: 'none'}
         coop_map = {0: 'lv1', 1: 'lv2', 2: 'none'}
 
-        tb_map = {0: 'closed', 1: 'open', 2: 'none'}
-        rp_map = {0: 'base', 1: 'discs', 2: 'active', 3: 'none'}
-        fridge_map = {0: 'closed', 1: 'open', 2: 'none'}
-        shelf_map = {0: 'closed', 1: 'open', 2: 'none'}
-        fp_map = {0: 'on', 1: 'off', 2: 'none'}
-
         if hasattr(self, 'renderer') and self.renderer:
             old_positions = getattr(self.renderer, 'dynamic_config', {}).get('positions', {})
             self.renderer.dynamic_config = {
@@ -788,19 +718,19 @@ class VisorMapas(QWidget):
                 'mountain_cottage': self.chk_dyn_mountain.isChecked() if hasattr(self, 'chk_dyn_mountain') else True,
                 'town_cottage': self.chk_dyn_town.isChecked() if hasattr(self, 'chk_dyn_town') else True,
                 'house': {
-                    'tool_box': tb_map.get(self.cmb_house_toolbox.currentIndex(), 'closed') if hasattr(self, 'cmb_house_toolbox') else 'closed',
-                    'record_player': rp_map.get(self.cmb_house_record_player.currentIndex(), 'base') if hasattr(self, 'cmb_house_record_player') else 'base',
-                    'fridge': fridge_map.get(self.cmb_house_fridge.currentIndex(), 'closed') if hasattr(self, 'cmb_house_fridge') else 'closed',
-                    'shelf': shelf_map.get(self.cmb_house_shelf.currentIndex(), 'closed') if hasattr(self, 'cmb_house_shelf') else 'closed',
-                    'kitchen_counter': self.chk_house_kitchen.isChecked() if hasattr(self, 'chk_house_kitchen') else True,
+                    'tool_box': getattr(self, 'house_toolbox_choice', 'closed'),
+                    'record_player': getattr(self, 'house_record_player_choice', 'base'),
+                    'fridge': getattr(self, 'house_fridge_choice', 'closed'),
+                    'shelf': getattr(self, 'house_shelf_choice', 'closed'),
+                    'kitchen_counter': getattr(self, 'house_kitchen_choice', True),
                     'utensils': getattr(self, 'house_utensils_state', [True]*8),
-                    'fireplace': fp_map.get(self.cmb_house_fireplace.currentIndex(), 'on') if hasattr(self, 'cmb_house_fireplace') else 'on',
-                    'double_bed': self.chk_house_double_bed.isChecked() if hasattr(self, 'chk_house_double_bed') else True,
-                    'bathroom_door': self.chk_house_bathroom_door.isChecked() if hasattr(self, 'chk_house_bathroom_door') else True,
-                    'carpet_dining': self.chk_house_dining.isChecked() if hasattr(self, 'chk_house_dining') else True,
-                    'clock_mirror': self.chk_house_clock.isChecked() if hasattr(self, 'chk_house_clock') else True,
-                    'rug_mat': self.chk_house_rug.isChecked() if hasattr(self, 'chk_house_rug') else True,
-                    'table_vase': self.chk_house_vase.isChecked() if hasattr(self, 'chk_house_vase') else True,
+                    'fireplace': getattr(self, 'house_fireplace_choice', True),
+                    'bathroom_door': getattr(self, 'house_bathroom_door_choice', 'closed'),
+                    'double_bed': getattr(self, 'house_double_bed_choice', True),
+                    'carpet_dining': getattr(self, 'house_dining_choice', True),
+                    'table_vase': getattr(self, 'house_vase_choice', True),
+                    'mirror': getattr(self, 'house_mirror_choice', True),
+                    'clock': getattr(self, 'house_clock_choice', True),
                 },
                 'positions': old_positions
             }
@@ -1643,19 +1573,147 @@ class VisorMapas(QWidget):
             self._on_dynamic_config_changed()
 
     def _update_house_controls_visibility(self, map_id: int):
+        is_house = (map_id in (41, 42, 43))
         has_kitchen = (map_id in (42, 43))
-        has_double = (map_id == 43)
-        if hasattr(self, 'lbl_house_fridge'): self.lbl_house_fridge.setVisible(has_kitchen)
-        if hasattr(self, 'cmb_house_fridge'): self.cmb_house_fridge.setVisible(has_kitchen)
-        if hasattr(self, 'lbl_house_shelf'): self.lbl_house_shelf.setVisible(has_kitchen)
-        if hasattr(self, 'cmb_house_shelf'): self.cmb_house_shelf.setVisible(has_kitchen)
-        if hasattr(self, 'chk_house_kitchen'): self.chk_house_kitchen.setVisible(has_kitchen)
-        if hasattr(self, 'btn_house_utensils'): self.btn_house_utensils.setVisible(has_kitchen)
-        if hasattr(self, 'lbl_house_fireplace'): self.lbl_house_fireplace.setVisible(has_kitchen)
-        if hasattr(self, 'cmb_house_fireplace'): self.cmb_house_fireplace.setVisible(has_kitchen)
-        if hasattr(self, 'chk_house_double_bed'): self.chk_house_double_bed.setVisible(has_double)
-        if hasattr(self, 'chk_house_bathroom_door'): self.chk_house_bathroom_door.setVisible(has_double)
-        if hasattr(self, 'chk_house_dining'): self.chk_house_dining.setVisible(has_kitchen)
-        if hasattr(self, 'chk_house_vase'): self.chk_house_vase.setVisible(has_kitchen)
+        if hasattr(self, 'widget_dyn_house'):
+            self.widget_dyn_house.setVisible(is_house)
+        if hasattr(self, 'btn_house_utensils'):
+            self.btn_house_utensils.setVisible(has_kitchen)
 
+    def _open_house_config_dialog(self):
+        from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox, QComboBox, QCheckBox, QPushButton, QLabel, QDialogButtonBox
+        map_id = self.selected_map_index
+        if hasattr(self, 'map_parser') and self.selected_map_index < len(self.map_parser.maps):
+            map_id = self.map_parser.maps[self.selected_map_index].map_id
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Estructuras Dinámicas de la Casa (Mapa {map_id})")
+        dialog.setMinimumWidth(380)
+        dlg_layout = QVBoxLayout(dialog)
+
+        # 1. Muebles Principales
+        grp_main = QGroupBox("Mobiliario Principal")
+        grid_main = QGridLayout(grp_main)
+
+        grid_main.addWidget(QLabel("Caja de Herramientas:"), 0, 0)
+        cmb_tb = QComboBox()
+        cmb_tb.addItems(["Cerrada", "Abierta", "Ocultar"])
+        tb_val = getattr(self, 'house_toolbox_choice', 'closed')
+        cmb_tb.setCurrentIndex(0 if tb_val == 'closed' else (1 if tb_val == 'open' else 2))
+        grid_main.addWidget(cmb_tb, 0, 1)
+
+        grid_main.addWidget(QLabel("Mesa Tocadiscos:"), 1, 0)
+        cmb_rp = QComboBox()
+        cmb_rp.addItems(["Base", "Con Discos", "Reproduciendo", "Ocultar"])
+        rp_val = getattr(self, 'house_record_player_choice', 'base')
+        cmb_rp.setCurrentIndex(0 if rp_val == 'base' else (1 if rp_val == 'discs' else (2 if rp_val == 'active' else 3)))
+        grid_main.addWidget(cmb_rp, 1, 1)
+        dlg_layout.addWidget(grp_main)
+
+        # 2. Cocina y Almacenamiento (Mapas 42 y 43)
+        cmb_fridge = None
+        cmb_shelf = None
+        chk_kitchen = None
+        chk_fireplace = None
+        chk_dining = None
+        chk_vase = None
+        cmb_bath_door = None
+        chk_bed = None
+
+        if map_id in (42, 43):
+            grp_kitchen = QGroupBox("Cocina y Almacenamiento")
+            grid_k = QGridLayout(grp_kitchen)
+
+            grid_k.addWidget(QLabel("Refrigerador:"), 0, 0)
+            cmb_fridge = QComboBox()
+            cmb_fridge.addItems(["Cerrado", "Abierto", "Ocultar"])
+            f_val = getattr(self, 'house_fridge_choice', 'closed')
+            cmb_fridge.setCurrentIndex(0 if f_val == 'closed' else (1 if f_val == 'open' else 2))
+            grid_k.addWidget(cmb_fridge, 0, 1)
+
+            grid_k.addWidget(QLabel("Anaquel:"), 1, 0)
+            cmb_shelf = QComboBox()
+            cmb_shelf.addItems(["Cerrado", "Abierto", "Ocultar"])
+            s_val = getattr(self, 'house_shelf_choice', 'closed')
+            cmb_shelf.setCurrentIndex(0 if s_val == 'closed' else (1 if s_val == 'open' else 2))
+            grid_k.addWidget(cmb_shelf, 1, 1)
+
+            chk_kitchen = QCheckBox("Mueble de Cocina")
+            chk_kitchen.setChecked(getattr(self, 'house_kitchen_choice', True))
+            grid_k.addWidget(chk_kitchen, 2, 0)
+
+            btn_u = QPushButton("Utensilios (8)...")
+            btn_u.clicked.connect(self._open_utensils_dialog)
+            grid_k.addWidget(btn_u, 2, 1)
+            dlg_layout.addWidget(grp_kitchen)
+
+            # 3. Habitaciones y Extras
+            grp_rooms = QGroupBox("Estructuras de Casa")
+            vbox_r = QVBoxLayout(grp_rooms)
+
+            chk_fireplace = QCheckBox("Chimenea (6x8 tiles)")
+            chk_fireplace.setChecked(getattr(self, 'house_fireplace_choice', True))
+            vbox_r.addWidget(chk_fireplace)
+
+            chk_dining = QCheckBox("Comedor / Alfombra Grande")
+            chk_dining.setChecked(getattr(self, 'house_dining_choice', True))
+            vbox_r.addWidget(chk_dining)
+
+            chk_vase = QCheckBox("Florero")
+            chk_vase.setChecked(getattr(self, 'house_vase_choice', True))
+            vbox_r.addWidget(chk_vase)
+
+            if map_id == 43:
+                row_bd = QHBoxLayout()
+                row_bd.addWidget(QLabel("Puerta del Baño:"))
+                cmb_bath_door = QComboBox()
+                cmb_bath_door.addItems(["Cerrada", "Abierta", "Ocultar"])
+                bd_val = getattr(self, 'house_bathroom_door_choice', 'closed')
+                cmb_bath_door.setCurrentIndex(0 if bd_val == 'closed' else (1 if bd_val == 'open' else 2))
+                row_bd.addWidget(cmb_bath_door)
+                vbox_r.addLayout(row_bd)
+
+                chk_bed = QCheckBox("Cama Matrimonial (6x8 tiles)")
+                chk_bed.setChecked(getattr(self, 'house_double_bed_choice', True))
+                vbox_r.addWidget(chk_bed)
+
+            dlg_layout.addWidget(grp_rooms)
+
+        # 4. Decoración General
+        grp_decor = QGroupBox("Decoración")
+        vbox_d = QVBoxLayout(grp_decor)
+        chk_mirror = QCheckBox("Espejo")
+        chk_mirror.setChecked(getattr(self, 'house_mirror_choice', True))
+        vbox_d.addWidget(chk_mirror)
+        chk_clock = QCheckBox("Reloj")
+        chk_clock.setChecked(getattr(self, 'house_clock_choice', True))
+        vbox_d.addWidget(chk_clock)
+        dlg_layout.addWidget(grp_decor)
+
+        # Botones de diálogo
+        bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        bbox.accepted.connect(dialog.accept)
+        bbox.rejected.connect(dialog.reject)
+        dlg_layout.addWidget(bbox)
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            tb_map = {0: 'closed', 1: 'open', 2: 'none'}
+            rp_map = {0: 'base', 1: 'discs', 2: 'active', 3: 'none'}
+            f_map = {0: 'closed', 1: 'open', 2: 'none'}
+            s_map = {0: 'closed', 1: 'open', 2: 'none'}
+            bd_map = {0: 'closed', 1: 'open', 2: 'none'}
+
+            self.house_toolbox_choice = tb_map.get(cmb_tb.currentIndex(), 'closed')
+            self.house_record_player_choice = rp_map.get(cmb_rp.currentIndex(), 'base')
+            if cmb_fridge: self.house_fridge_choice = f_map.get(cmb_fridge.currentIndex(), 'closed')
+            if cmb_shelf: self.house_shelf_choice = s_map.get(cmb_shelf.currentIndex(), 'closed')
+            if chk_kitchen: self.house_kitchen_choice = chk_kitchen.isChecked()
+            if chk_fireplace: self.house_fireplace_choice = chk_fireplace.isChecked()
+            if cmb_bath_door: self.house_bathroom_door_choice = bd_map.get(cmb_bath_door.currentIndex(), 'closed')
+            if chk_bed: self.house_double_bed_choice = chk_bed.isChecked()
+            if chk_dining: self.house_dining_choice = chk_dining.isChecked()
+            if chk_vase: self.house_vase_choice = chk_vase.isChecked()
+            self.house_mirror_choice = chk_mirror.isChecked()
+            self.house_clock_choice = chk_clock.isChecked()
+            self._on_dynamic_config_changed()
 
