@@ -25,6 +25,7 @@ NOVEDADES PRINCIPALES DE LA VERSION 4.0.0
    - Eliminacion total de dependencias de emuladores x86 o binarios externos de 32 bits.
    - Importacion, exportacion e insercion directa de bitmaps (PNG/BMP) de mapas y tilesets en la ROM.
    - Edicion de capas graficas, metatiles, elevaciones, atributos de paso y configuracion de warps.
+   - Blitter de estructuras dinamicas y malla de colisiones 100% nativo desde la ROM (0x10692C), sincronizado con el sistema de navegacion A* (TilePathfinder).
 
 3. VISOR Y BASE DE DATOS MAESTRA DE ITEMS:
    - Modo de edicion masiva (Bulk Edit Mode) para herramientas de trabajo, alimentos/consumibles y articulos generales.
