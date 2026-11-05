@@ -340,17 +340,20 @@ class FomtMapRenderer:
                 tgt.append(val)
             print(f"[FomtMapRenderer] {attr}: {n_cells} celdas (raw bytes: {len(raw)})")
 
-    def _stamp_rom_structure(self, bg1, bg2, bg3, entry_idx, map_x, map_y, active_col=None, active_dict=None):
+    def _stamp_rom_structure(self, bg_ground, bg_overlay, bg_fore, entry_idx, map_x, map_y, active_col=None, active_dict=None):
         if not self.rom or entry_idx is None:
             return
         entry_off = ROM_BUILDINGS_TABLE + entry_idx * 24
         if entry_off + 24 > len(self.rom):
             return
         w, h = struct.unpack_from('<BB', self.rom, entry_off)
-        p_bg1, p_bg2, p_bg3, p_lut, p_map = struct.unpack_from('<IIIII', self.rom, entry_off + 4)
+        p_ground, p_overlay, p_fore, p_lut, p_map = struct.unpack_from('<IIIII', self.rom, entry_off + 4)
 
-        # 1. Capas graficas de tiles 8x8 (BG1, BG2, BG3) segun orden de hardware GBA
-        for ptr, tmap in [(p_bg1, bg1), (p_bg2, bg2), (p_bg3, bg3)]:
+        # 1. Capas graficas de tiles 8x8 segun orden de visualizacion de FoMT:
+        # +0x04 (p_ground): Suelo/despeje base -> bg_ground (array_bg3)
+        # +0x08 (p_overlay): Estructura, paredes y techos -> bg_overlay (array_bg2)
+        # +0x0C (p_fore): Detalles superiores/primer plano -> bg_fore (array_bg1)
+        for ptr, tmap in [(p_ground, bg_ground), (p_overlay, bg_overlay), (p_fore, bg_fore)]:
             if ptr != 0 and tmap is not None:
                 off = ptr & 0x01FFFFFF
                 if off + w * h * 2 <= len(self.rom):
@@ -443,45 +446,46 @@ class FomtMapRenderer:
         dyn_cfg = getattr(self, 'dynamic_config', {})
 
         # Estampar estructuras dinamicas 100% nativas desde la tabla de la ROM
+        # Orden: array_bg3 (suelo), array_bg2 (paredes/techo), array_bg1 (frente)
         if dyn_cfg.get('enabled', True):
             if map_id in (0, 1):
                 # 1. Casa de Campo (Lv1, Lv2, Lv3)
                 h_lvl = dyn_cfg.get('farmhouse', 'lv1')
                 if h_lvl in BUILDING_ROM_ENTRIES['farmhouse']:
                     info = BUILDING_ROM_ENTRIES['farmhouse'][h_lvl]
-                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, info[season_key], info['x'], info['y'], active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'], active_col, active_dict)
 
                 # 2. Granero (Lv1, Lv2)
                 b_lvl = dyn_cfg.get('barn', 'lv1')
                 if b_lvl in BUILDING_ROM_ENTRIES['barn']:
                     info = BUILDING_ROM_ENTRIES['barn'][b_lvl]
-                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, info[season_key], info['x'], info['y'], active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'], active_col, active_dict)
 
                 # 3. Gallinero (Lv1, Lv2)
                 c_lvl = dyn_cfg.get('chicken_coop', 'lv1')
                 if c_lvl in BUILDING_ROM_ENTRIES['chicken_coop']:
                     info = BUILDING_ROM_ENTRIES['chicken_coop'][c_lvl]
-                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, info[season_key], info['x'], info['y'], active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'], active_col, active_dict)
 
                 # 4. Extras de Granja (Buzon)
                 if dyn_cfg.get('extras', True):
                     mb = BUILDING_ROM_ENTRIES['mailbox']
-                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, mb[season_key], mb['x'], mb['y'], active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mb[season_key], mb['x'], mb['y'], active_col, active_dict)
 
             elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
                 # Villa de la Playa
                 bc = BUILDING_ROM_ENTRIES['beach_cottage']
-                self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, bc[season_key], bc['x'], bc['y'], active_col, active_dict)
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bc[season_key], bc['x'], bc['y'], active_col, active_dict)
 
             elif map_id in (14, 15) and dyn_cfg.get('mountain_cottage', True):
                 # Villa de la Montana
                 mc = BUILDING_ROM_ENTRIES['mountain_cottage']
-                self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, mc[season_key], mc['x'], mc['y'], active_col, active_dict)
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mc[season_key], mc['x'], mc['y'], active_col, active_dict)
 
             elif map_id in (4, 5, 6, 7) and dyn_cfg.get('town_cottage', True):
                 # Villa de la Ciudad
                 tc = BUILDING_ROM_ENTRIES['town_cottage']
-                self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, tc[season_key], tc['x'], tc['y'], active_col, active_dict)
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, tc[season_key], tc['x'], tc['y'], active_col, active_dict)
 
         self.active_collision_map = bytes(active_col) if active_col else None
         self.active_behavior_dict = bytes(active_dict) if active_dict else None
@@ -500,28 +504,28 @@ class FomtMapRenderer:
             show_bottom = show_bg1
             show_top = show_bg3
 
-        # Capa inferior (Normalmente BG3, el piso/terreno)
+        # Capa inferior (Normalmente BG3, el piso/terreno base)
         if show_bottom and array_bottom:
             img = draw_layer(array_bottom, img, is_overlay=False)
 
-        # Capa intermedia (BG2, caminos, objetos, sombras)
+        # Capa intermedia (Normalmente BG2, estructuras, techos, caminos, objetos)
         if show_bg2 and array_bg2:
             img = draw_layer(array_bg2, img, is_overlay=True)
 
-        # Capa superior (Normalmente BG1, paredes, techos, arboles altos)
+        # Capa superior (Normalmente BG1, paredes altas, copas de arboles, superposiciones)
         if show_top and array_top:
             img = draw_layer(array_top, img, is_overlay=True)
 
-        # Malla visual de cultivo (Opcional)
+        # Malla visual de cultivo (Canonico FoMT: 43x25 plots de 16x16 px = 2x2 tiles, X=272, Y=176)
         if dyn_cfg.get('enabled', True) and map_id in (0, 1) and dyn_cfg.get('field_grid', False):
             from PIL import ImageDraw
             grid_overlay = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
             gdraw = ImageDraw.Draw(grid_overlay)
-            for gy in range(25):
-                for gx in range(43):
-                    px = (14 + gx) * 8
-                    py = (14 + gy) * 8
-                    gdraw.rectangle([px, py, px + 15, py + 15], outline=(255, 255, 255, 40))
+            for row in range(25):
+                for col in range(43):
+                    px = 272 + col * 16
+                    py = 176 + row * 16
+                    gdraw.rectangle([px, py, px + 15, py + 15], outline=(255, 215, 0, 110), width=1)
             img.paste(grid_overlay, (0, 0), grid_overlay)
 
         # Capa de Colisiones / Triggers autentica (renderizado pixel-perfect sin inventar figuras)
