@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QSettings, QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QAction, QStandardItemModel, QStandardItem, QDesktopServices
 
-from Consola_de_Comando.themes import get_light_theme, get_dark_theme, get_matrix_theme, get_forerunner_theme
+from Consola_de_Comando.themes import get_light_theme, get_dark_theme, get_matrix_theme, get_forerunner_theme, get_dracula_theme
 from Consola_de_Comando.i18n import tr
 from Nucleos_Positronicos.Nucleo_de_Imagenes.tile_editor_extreme import TileEditorWidget
 
@@ -561,6 +561,7 @@ class FoMTStudioApp(QMainWindow):
         light_action.triggered.connect(lambda: self.apply_theme("light"))
         dark_action = QAction(tr("theme_dark", lang), self)
         dark_action.triggered.connect(lambda: self.apply_theme("dark"))
+        theme_menu.addAction("Dracula (VS Code)", lambda: self.apply_theme("dracula"))
         theme_menu.addAction("Matrix", lambda: self.apply_theme("matrix"))
         theme_menu.addAction("Forerunner", lambda: self.apply_theme("forerunner"))
         theme_menu.addActions([light_action, dark_action])
@@ -591,6 +592,8 @@ class FoMTStudioApp(QMainWindow):
             self.setStyleSheet(get_light_theme())
         elif theme_name == "dark":
             self.setStyleSheet(get_dark_theme())
+        elif theme_name == "dracula":
+            self.setStyleSheet(get_dracula_theme())
         elif theme_name == "matrix":
             self.setStyleSheet(get_matrix_theme())
         elif theme_name == "forerunner":
