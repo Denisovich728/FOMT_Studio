@@ -930,27 +930,39 @@ class ScriptIDEWidget(QWidget):
             return
             
         # Llamamos al MemoryManager inteligente
-        if self.current_event_id is not None:
+        matched_event_id = self.current_event_id
+        if matched_event_id is None and old_offset and hasattr(self.project, 'super_lib') and self.project.super_lib:
+            import struct
+            table_base = self.project.super_lib.table_offset
+            limit = getattr(self.project.super_lib, 'event_limit', 1328)
+            for eid in range(1, limit + 1):
+                loc_rom = table_base + ((eid - 1) * 4)
+                ptr_data = self.project.read_rom(loc_rom, 4)
+                if ptr_data and len(ptr_data) == 4:
+                    ptr_val = struct.unpack('<I', ptr_data)[0]
+                    if (ptr_val & 0x01FFFFFF) == old_offset:
+                        matched_event_id = eid
+                        self.current_event_id = eid
+                        break
+
+        if matched_event_id is not None:
             new_offset = self.project.memory.re_point_master_event(
-                self.current_event_id, old_offset, old_size, new_data
+                matched_event_id, old_offset, old_size, new_data
             )
             # FIX: Mantener el tamaño máximo si se escribe in-place para no perder el padding FF
             if new_offset == old_offset:
-                self.project.event_parser.scanned_sizes[self.current_event_id] = max(old_size, len(new_data))
+                self.project.event_parser.scanned_sizes[matched_event_id] = max(old_size, len(new_data))
             else:
-                self.project.event_parser.scanned_sizes[self.current_event_id] = len(new_data)
-            mode_prefix = "Event"
+                self.project.event_parser.scanned_sizes[matched_event_id] = len(new_data)
+            mode_prefix = f"Event #{matched_event_id}"
         else:
             # MapScripts o scripts por offset
             if old_offset:
                 self.project.event_parser.scanned_sizes[old_offset] = max(old_size, len(new_data))
-            # Si no hay event_id, asumimos que es el script del mapa actual (o el último cargado)
-            # Para la v1.5, intentamos obtener el map_id del MapEditor si está activo
             map_id = 0 # Fallback
-            if self.project.map_parser.maps:
-                # Heurística: buscar qué mapa tiene este script offset
+            if hasattr(self.project, 'map_parser') and self.project.map_parser and self.project.map_parser.maps:
                 for m in self.project.map_parser.maps:
-                    if (m.p_script & 0x01FFFFFF) == old_offset:
+                    if hasattr(m, 'p_obj1') and (m.p_obj1 & 0x01FFFFFF) == old_offset:
                         map_id = m.map_id
                         break
             
@@ -964,7 +976,7 @@ class ScriptIDEWidget(QWidget):
             else:
                 self.project.event_parser.scanned_sizes[new_offset] = len(new_data)
                 
-            mode_prefix = f"Map {map_id} (Room)"
+            mode_prefix = f"Script 0x{old_offset:06X}"
         
         from PyQt6.QtWidgets import QMessageBox
         lang = self.lang

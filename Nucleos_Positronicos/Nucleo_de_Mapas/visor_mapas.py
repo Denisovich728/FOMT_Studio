@@ -2,7 +2,9 @@ import os
 import struct
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QLabel, QScrollArea,
-    QPushButton, QSpinBox, QMessageBox, QSplitter, QProgressBar, QCheckBox, QComboBox, QFormLayout, QTabWidget, QLineEdit, QDialog
+    QPushButton, QSpinBox, QMessageBox, QSplitter, QProgressBar, QCheckBox,
+    QComboBox, QFormLayout, QTabWidget, QLineEdit, QDialog, QGroupBox,
+    QGridLayout, QDialogButtonBox
 )
 from PyQt6.QtGui import QPixmap, QImage, QShortcut, QKeySequence
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
@@ -1018,12 +1020,27 @@ class VisorMapas(QWidget):
                     clicked_struct = s
                     break
 
+            current_id = self._get_selected_dynamic_structure_id()
             if clicked_struct:
-                self._select_dynamic_structure(clicked_struct['id'])
+                if clicked_struct['id'] != current_id:
+                    self._select_dynamic_structure(clicked_struct['id'])
+                    self._dyn_grab_offset = (cell_x - clicked_struct['x'], cell_y - clicked_struct['y'])
+                else:
+                    grab_ox, grab_oy = getattr(self, '_dyn_grab_offset', (0, 0))
+                    new_x = max(0, min(cell_x - grab_ox, w - clicked_struct['w']))
+                    new_y = max(0, min(cell_y - grab_oy, h - clicked_struct['h']))
+                    if (new_x, new_y) != (clicked_struct['x'], clicked_struct['y']):
+                        self._move_dynamic_structure(current_id, new_x, new_y)
+                        modified = True
             else:
-                current_id = self._get_selected_dynamic_structure_id()
                 if current_id:
-                    self._move_dynamic_structure(current_id, cell_x, cell_y)
+                    sel_struct = next((s for s in structs if s['id'] == current_id), None)
+                    sw = sel_struct['w'] if sel_struct else 1
+                    sh = sel_struct['h'] if sel_struct else 1
+                    grab_ox, grab_oy = getattr(self, '_dyn_grab_offset', (0, 0))
+                    new_x = max(0, min(cell_x - grab_ox, w - sw))
+                    new_y = max(0, min(cell_y - grab_oy, h - sh))
+                    self._move_dynamic_structure(current_id, new_x, new_y)
                     modified = True
 
         elif tab_idx == 4 and self.renderer.collision_map: # Modo pintar colisión
@@ -1066,6 +1083,12 @@ class VisorMapas(QWidget):
             return  # Misma celda, no hacer nada
 
         self.selected_cell = (cell_x, cell_y)
+
+        if self.tabs_edit_mode.currentIndex() == 5:
+            self._last_drag_cell = (cell_x, cell_y)
+            if self._apply_paint_at_cell(cell_x, cell_y):
+                self._re_render_map_only()
+            return
 
         if not self._save_state_pending:
             self._push_undo_state()

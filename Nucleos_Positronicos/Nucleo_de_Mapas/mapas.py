@@ -1380,9 +1380,13 @@ class MapParser:
         mh = self.maps[map_index]
         
         # 1. Empaquetar tilemaps (16-bit array -> bytes)
-        bg3_raw = struct.pack(f'<{len(renderer.tilemap_bg3)}H', *renderer.tilemap_bg3)
-        bg2_raw = struct.pack(f'<{len(renderer.tilemap_bg2)}H', *renderer.tilemap_bg2)
-        bg1_raw = struct.pack(f'<{len(renderer.tilemap_bg1)}H', *renderer.tilemap_bg1)
+        # Si hay capas activas con estructuras dinámicas y spawn personalizado, se empaquetan esas
+        t_bg3 = getattr(renderer, 'active_tilemap_bg3', None) or renderer.tilemap_bg3
+        t_bg2 = getattr(renderer, 'active_tilemap_bg2', None) or renderer.tilemap_bg2
+        t_bg1 = getattr(renderer, 'active_tilemap_bg1', None) or renderer.tilemap_bg1
+        bg3_raw = struct.pack(f'<{len(t_bg3)}H', *t_bg3)
+        bg2_raw = struct.pack(f'<{len(t_bg2)}H', *t_bg2)
+        bg1_raw = struct.pack(f'<{len(t_bg1)}H', *t_bg1)
         
         # 2. Comprimir con el algoritmo nativo de FoMT (ArcanoMarvelous RLE - 0x70)
         bg3_comp = compress_arcano_marvelous(bg3_raw)
@@ -1419,8 +1423,15 @@ class MapParser:
         
         # 6. Guardar Collision Map
         obj2_off = mh.p_obj2 & 0x01FFFFFF
-        if obj2_off > 0 and renderer.collision_map and len(renderer.collision_map) == mh.width * mh.height:
-            self.project.overwrite_rom_directly(obj2_off, bytes(renderer.collision_map))
+        col_to_save = getattr(renderer, 'active_collision_map', None) or renderer.collision_map
+        if obj2_off > 0 and col_to_save and len(col_to_save) == mh.width * mh.height:
+            self.project.overwrite_rom_directly(obj2_off, bytes(col_to_save))
+            renderer.collision_map = bytes(col_to_save)
+
+        # Sincronizar capas base en memoria del renderer con lo guardado
+        renderer.tilemap_bg3 = list(t_bg3)
+        renderer.tilemap_bg2 = list(t_bg2)
+        renderer.tilemap_bg1 = list(t_bg1)
             
         # 7. Actualizar Map Header
         if self._table_offset is None:

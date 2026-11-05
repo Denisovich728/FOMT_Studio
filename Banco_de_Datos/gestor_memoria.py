@@ -141,17 +141,33 @@ class MemoryManager:
         )
 
     def re_point_map_script(self, map_id: int, old_offset: int, old_size: int, new_data: bytes) -> int:
-        """Repuntea el script de un mapa (Room)."""
+        """Repuntea el script de un mapa (Room) o script arbitrario sin corromper la cabecera."""
         import struct
         def update_header(off):
-            m = self.proyecto.map_parser.get_map_by_id(map_id)
-            if m:
-                # El puntero al script está en el offset 12 de la cabecera (24 bytes)
-                ptr_loc = m.offset + 12
-                gba_le = self._offset_to_gba_le(off)
-                self.proyecto.write_patch(ptr_loc, gba_le)
-                m.p_script = struct.unpack('<I', gba_le)[0]
-                print(f"🗺️ [MapScript] Repunteado Mapa {map_id} a 0x{off:06X} (VIRTUAL)")
+            # No tocar m.offset + 12 (que corresponde a p_bg3, puntero de tilemap).
+            # Si el script corresponde a un evento maestro, se repuntea la tabla maestra.
+            if hasattr(self.proyecto, 'super_lib') and self.proyecto.super_lib:
+                table_base = self.proyecto.super_lib.table_offset
+                limit = getattr(self.proyecto.super_lib, 'event_limit', 1328)
+                for eid in range(1, limit + 1):
+                    loc_rom = table_base + ((eid - 1) * 4)
+                    ptr_data = self.proyecto.read_rom(loc_rom, 4)
+                    if ptr_data and len(ptr_data) == 4:
+                        ptr_val = struct.unpack('<I', ptr_data)[0]
+                        if (ptr_val & 0x01FFFFFF) == old_offset:
+                            self.re_point_event(eid, off)
+                            print(f"[*] [Master Table] Evento {eid} auto-repunteado a 0x{off:06X}")
+                            return
+            # Si corresponde al personality_ptr de algún aldeano
+            if hasattr(self.proyecto, 'npc_parser') and hasattr(self.proyecto.npc_parser, 'npcs'):
+                for npc in self.proyecto.npc_parser.npcs:
+                    if (getattr(npc, 'personality_ptr', 0) & 0x01FFFFFF) == old_offset:
+                        npc.personality_ptr = off | 0x08000000
+                        ptr_off = 0xF89D4 + (npc.flag_byte_1 * 4)
+                        self.proyecto.write_patch(ptr_off, self._offset_to_gba_le(off))
+                        print(f"[*] [NPC Script] NPC {npc.id} personalidad repunteada a 0x{off:06X}")
+                        return
+            print(f"[*] [MapScript] Script en 0x{old_offset:06X} repunteado a 0x{off:06X}")
 
         return self._re_point_generic_script(new_data, old_offset, old_size, update_header)
 

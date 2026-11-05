@@ -174,8 +174,8 @@ HOUSE_ROM_ENTRIES = {
     'double_bed': {'entry': 25, 'desc_off': 0x106B84, 'w': 6, 'h': 8, 'name': 'Cama Matrimonial'},
     
     # Puerta del Baño (Bathroom Door) - 3x5 tiles
-    'bathroom_door_closed': {'entry': None, 'desc_off': 0x106C14, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Cerrada)'},
-    'bathroom_door_open': {'entry': None, 'desc_off': 0x106BFC, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Abierta)'},
+    'bathroom_door_closed': {'entry': 31, 'desc_off': 0x106C14, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Cerrada)'},
+    'bathroom_door_open': {'entry': 30, 'desc_off': 0x106BFC, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Abierta)'},
     
     # Comedor / Alfombra y Mesa Grande - 12x10 tiles (Entry 26)
     'carpet_dining': {'entry': 26, 'desc_off': 0x106B9C, 'w': 12, 'h': 10, 'name': 'Comedor / Alfombra y Mesa'},
@@ -187,11 +187,11 @@ HOUSE_ROM_ENTRIES = {
 }
 
 MAKER_ROM_ENTRIES = {
-    # Gallinero (Chicken Coop, Mapas 36 y 37) - Entry 39 / Desc 0x106C2C
-    'mayo_maker': {'entry': 39, 'desc_off': 0x106C2C, 'w': 3, 'h': 5, 'x': 2, 'y': 5, 'name': 'Máquina de Mayonesa'},
-    # Establo (Barn, Mapas 38 y 39) - Entries 40 y 41 / Descs 0x106C44 y 0x106C5C
-    'yarn_maker': {'entry': 40, 'desc_off': 0x106C44, 'w': 3, 'h': 5, 'x': 8, 'y': 5, 'name': 'Máquina de Lana'},
-    'cheese_maker': {'entry': 41, 'desc_off': 0x106C5C, 'w': 3, 'h': 5, 'x': 12, 'y': 5, 'name': 'Máquina de Queso'},
+    # Gallinero (Chicken Coop, Mapas 36 y 37) - Entry 32 / Desc 0x106C2C
+    'mayo_maker': {'entry': 32, 'desc_off': 0x106C2C, 'w': 3, 'h': 5, 'x': 2, 'y': 5, 'name': 'Máquina de Mayonesa'},
+    # Establo (Barn, Mapas 38 y 39) - Entries 33 y 34 / Descs 0x106C44 y 0x106C5C
+    'yarn_maker': {'entry': 33, 'desc_off': 0x106C44, 'w': 3, 'h': 5, 'x': 8, 'y': 5, 'name': 'Máquina de Lana'},
+    'cheese_maker': {'entry': 34, 'desc_off': 0x106C5C, 'w': 3, 'h': 5, 'x': 12, 'y': 5, 'name': 'Máquina de Queso'},
 }
 
 HOUSE_UTENSILS = [
@@ -276,16 +276,25 @@ class FomtMapRenderer:
             'beach_cottage': True,     # Villa de la playa (Mapas 08, 09)
             'mountain_cottage': True,  # Villa de la montaña (Mapas 14, 15)
             'town_cottage': True,      # Villa de la ciudad (Mapas 04, 05, 06, 07)
+            'mayo_maker': True,
+            'yarn_maker': True,
+            'cheese_maker': True,
             'house': {
-                'bed': 'auto',        # 'auto', 'single', 'double', 'none'
-                'kitchen': 'auto',    # 'auto', 'base', 'utensils', 'none'
-                'fridge': 'auto',     # 'auto', 'small', 'large', 'none'
-                'shelf': 'auto',      # 'auto', 'small', 'large', 'none'
-                'fireplace': True,    # True, False
-                'bathroom': True,     # True, False
-                'extras': True,       # Espejo, Alfombra, Mesa
+                'tool_box': 'closed',
+                'record_player': 'base',
+                'fridge': 'closed',
+                'shelf': 'closed',
+                'kitchen_counter': True,
+                'utensils': [True]*8,
+                'fireplace': True,
+                'bathroom_door': 'closed',
+                'double_bed': True,
+                'carpet_dining': True,
+                'vase': True,
+                'mirror': True,
+                'clock': True,
             },
-            'positions': {},          # Overrides: {'bed': (x, y), 'farmhouse': (x, y), ...}
+            'positions': {},          # Overrides: {'fridge': (x, y), 'mayo_maker': (x, y), ...}
         }
 
     def load_map(self, map_header) -> bool:
@@ -469,6 +478,11 @@ class FomtMapRenderer:
                             t_val = struct.unpack_from('<H', self.rom, off + (y * w + x) * 2)[0]
                             # 0x03FF y 0xFFFF corresponden a tiles transparentes en GBA FoMT
                             if t_val != 0x03FF and t_val != 0xFFFF:
+                                p_idx = (t_val >> 12) & 0xF
+                                # En mapas de casa (41, 42, 43), las paletas 11-14 no están inicializadas para tiles.
+                                # Evitamos estamparlas sobre bg_overlay para que el mueble de cocina no cree un vacío negro.
+                                if self._map_header and getattr(self._map_header, 'map_id', 0) in (41, 42, 43) and p_idx >= 11:
+                                    continue
                                 dst_idx = (map_y + y) * self.width + (map_x + x)
                                 if dst_idx < len(tmap):
                                     tmap[dst_idx] = t_val
@@ -608,6 +622,7 @@ class FomtMapRenderer:
                 # 3. Refrigerador (Mapas 42 y 43)
                 if map_id in (42, 43):
                     f_choice = house_cfg.get('fridge', 'closed') # 'closed', 'open', 'none'
+                    if f_choice == 'auto': f_choice = 'closed'
                     if f_choice in ('closed', 'open'):
                         f_type = f'fridge_{f_choice}'
                         def_pos = defaults.get('fridge', {'x': 11, 'y': 3})
@@ -617,6 +632,7 @@ class FomtMapRenderer:
                 # 4. Anaquel / Estante (Mapas 42 y 43)
                 if map_id in (42, 43):
                     s_choice = house_cfg.get('shelf', 'closed') # 'closed', 'open', 'none'
+                    if s_choice == 'auto': s_choice = 'closed'
                     if s_choice in ('closed', 'open'):
                         s_type = f'shelf_{s_choice}'
                         def_pos = defaults.get('shelf', {'x': 15, 'y': 2})
@@ -718,6 +734,9 @@ class FomtMapRenderer:
 
         self.active_collision_map = bytes(active_col) if active_col else None
         self.active_behavior_dict = bytes(active_dict) if active_dict else None
+        self.active_tilemap_bg3 = list(array_bg3) if array_bg3 else None
+        self.active_tilemap_bg2 = list(array_bg2) if array_bg2 else None
+        self.active_tilemap_bg1 = list(array_bg1) if array_bg1 else None
 
         img = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
 
@@ -1012,6 +1031,7 @@ class FomtMapRenderer:
             # 3. Refrigerador
             if map_id in (42, 43):
                 f_choice = house_cfg.get('fridge', 'closed')
+                if f_choice == 'auto': f_choice = 'closed'
                 if f_choice in ('closed', 'open'):
                     f_type = f'fridge_{f_choice}'
                     def_pos = defaults.get('fridge', {'x': 11, 'y': 3})
@@ -1022,6 +1042,7 @@ class FomtMapRenderer:
             # 4. Anaquel
             if map_id in (42, 43):
                 s_choice = house_cfg.get('shelf', 'closed')
+                if s_choice == 'auto': s_choice = 'closed'
                 if s_choice in ('closed', 'open'):
                     s_type = f'shelf_{s_choice}'
                     def_pos = defaults.get('shelf', {'x': 15, 'y': 2})
