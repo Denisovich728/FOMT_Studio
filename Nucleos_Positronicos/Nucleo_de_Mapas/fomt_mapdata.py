@@ -129,8 +129,8 @@ ROM_BUILDINGS_TABLE = 0x10692C
 BUILDING_ROM_ENTRIES = {
     'farmhouse': {
         'lv1': {'summer': 0, 'winter': 1, 'x': 26, 'y': 3},
-        'lv2': {'summer': 2, 'winter': 3, 'x': 26, 'y': 3},
-        'lv3': {'summer': 4, 'winter': 5, 'x': 26, 'y': 3},
+        'lv2': {'summer': 2, 'winter': 3, 'x': 18, 'y': 3},
+        'lv3': {'summer': 4, 'winter': 5, 'x': 10, 'y': 2},
     },
     'barn': {
         'lv1': {'summer': 6, 'winter': 7, 'x': 58, 'y': 2},
@@ -140,11 +140,10 @@ BUILDING_ROM_ENTRIES = {
         'lv1': {'summer': 10, 'winter': 11, 'x': 14, 'y': 52},
         'lv2': {'summer': 12, 'winter': 13, 'x': 14, 'y': 52},
     },
-    'mailbox': {'summer': 46, 'winter': 46, 'x': 34, 'y': 6},
-    # 'doghouse': Eliminado para evitar colisión de tiles glitcheados
-    'town_cottage': {'summer': 38, 'winter': 39, 'x': 20, 'y': 15},
-    'beach_cottage': {'summer': 40, 'winter': 41, 'x': 30, 'y': 26},
-    'mountain_cottage': {'summer': 44, 'winter': 45, 'x': 23, 'y': 20},
+    'mailbox': {'summer': 46, 'winter': 46, 'x': 33, 'y': 20},
+    'town_cottage': {'summer': 38, 'winter': 39, 'x': 60, 'y': 0},
+    'beach_cottage': {'summer': 40, 'winter': 41, 'x': 23, 'y': 52},
+    'mountain_cottage': {'summer': 44, 'winter': 45, 'x': 36, 'y': 2},
 }
 
 class FomtMapRenderer:
@@ -341,17 +340,18 @@ class FomtMapRenderer:
                 tgt.append(val)
             print(f"[FomtMapRenderer] {attr}: {n_cells} celdas (raw bytes: {len(raw)})")
 
-    def _stamp_rom_structure(self, bg3, bg2, bg1, entry_idx, map_x, map_y):
+    def _stamp_rom_structure(self, bg1, bg2, bg3, entry_idx, map_x, map_y, active_col=None, active_dict=None):
         if not self.rom or entry_idx is None:
             return
         entry_off = ROM_BUILDINGS_TABLE + entry_idx * 24
         if entry_off + 24 > len(self.rom):
             return
         w, h = struct.unpack_from('<BB', self.rom, entry_off)
-        p_bg3, p_bg2, p_bg1 = struct.unpack_from('<III', self.rom, entry_off + 4)
+        p_bg1, p_bg2, p_bg3, p_lut, p_map = struct.unpack_from('<IIIII', self.rom, entry_off + 4)
 
-        for ptr, tmap in [(p_bg3, bg3), (p_bg2, bg2), (p_bg1, bg1)]:
-            if ptr != 0 and tmap:
+        # 1. Capas graficas de tiles 8x8 (BG1, BG2, BG3) segun orden de hardware GBA
+        for ptr, tmap in [(p_bg1, bg1), (p_bg2, bg2), (p_bg3, bg3)]:
+            if ptr != 0 and tmap is not None:
                 off = ptr & 0x01FFFFFF
                 if off + w * h * 2 <= len(self.rom):
                     for y in range(h):
@@ -362,6 +362,31 @@ class FomtMapRenderer:
                                 dst_idx = (map_y + y) * self.width + (map_x + x)
                                 if dst_idx < len(tmap):
                                     tmap[dst_idx] = t_val
+
+        # 2. Malla de colision autentica de la estructura (reproduce func_08017180 / ApplyMapPatch_Blitter_080A5BD8)
+        if p_lut != 0 and p_map != 0 and active_col is not None and active_dict is not None:
+            lut_off = p_lut & 0x01FFFFFF
+            map_off = p_map & 0x01FFFFFF
+            if lut_off < len(self.rom) and map_off + w * h <= len(self.rom):
+                for y in range(h):
+                    for x in range(w):
+                        lut_idx = self.rom[map_off + (y * w + x)]
+                        attr = struct.unpack_from('<I', self.rom, lut_off + lut_idx * 4)[0]
+                        if attr == 0:
+                            # 0x00000000 es transitable/despejado sin trigger
+                            continue
+                        attr_bytes = struct.pack('<I', attr)
+                        found_idx = -1
+                        for di in range(len(active_dict) // 4):
+                            if active_dict[di*4 : di*4+4] == attr_bytes:
+                                found_idx = di
+                                break
+                        if found_idx == -1:
+                            found_idx = len(active_dict) // 4
+                            active_dict.extend(attr_bytes)
+                        dst_idx = (map_y + y) * self.width + (map_x + x)
+                        if dst_idx < len(active_col):
+                            active_col[dst_idx] = found_idx
 
     def render(self, show_bg1=True, show_bg2=True, show_bg3=True, show_col=False, bank=1, invert_bg=False) -> Image.Image | None:
         """
@@ -405,108 +430,116 @@ class FomtMapRenderer:
             return base_img
         
         # Capas de trabajo clonadas para no mutar destructivamente el mapa base en edición
+        # Capas de trabajo clonadas para no mutar destructivamente el mapa base en edicion
         array_bg3 = list(self.tilemap_bg3) if self.tilemap_bg3 else []
         array_bg2 = list(self.tilemap_bg2) if self.tilemap_bg2 else []
         array_bg1 = list(self.tilemap_bg1) if self.tilemap_bg1 else []
+        active_col = bytearray(self.collision_map) if self.collision_map else None
+        active_dict = bytearray(self.behavior_dict) if self.behavior_dict else None
 
         map_id = getattr(self._map_header, 'map_id', 0) if self._map_header else 0
         is_winter = (map_id in (1, 3, 5, 7, 9, 11, 13, 15, 17) or bank == 2)
         season_key = 'winter' if is_winter else 'summer'
         dyn_cfg = getattr(self, 'dynamic_config', {})
 
-        # Estampar estructuras dinámicas 100% nativas desde la tabla de la ROM
+        # Estampar estructuras dinamicas 100% nativas desde la tabla de la ROM
         if dyn_cfg.get('enabled', True):
             if map_id in (0, 1):
                 # 1. Casa de Campo (Lv1, Lv2, Lv3)
                 h_lvl = dyn_cfg.get('farmhouse', 'lv1')
                 if h_lvl in BUILDING_ROM_ENTRIES['farmhouse']:
                     info = BUILDING_ROM_ENTRIES['farmhouse'][h_lvl]
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'])
+                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, info[season_key], info['x'], info['y'], active_col, active_dict)
 
                 # 2. Granero (Lv1, Lv2)
                 b_lvl = dyn_cfg.get('barn', 'lv1')
                 if b_lvl in BUILDING_ROM_ENTRIES['barn']:
                     info = BUILDING_ROM_ENTRIES['barn'][b_lvl]
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'])
+                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, info[season_key], info['x'], info['y'], active_col, active_dict)
 
                 # 3. Gallinero (Lv1, Lv2)
                 c_lvl = dyn_cfg.get('chicken_coop', 'lv1')
                 if c_lvl in BUILDING_ROM_ENTRIES['chicken_coop']:
                     info = BUILDING_ROM_ENTRIES['chicken_coop'][c_lvl]
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'])
+                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, info[season_key], info['x'], info['y'], active_col, active_dict)
 
-                # 4. Extras de Granja (Buzón y Caseta de Perro)
+                # 4. Extras de Granja (Buzon)
                 if dyn_cfg.get('extras', True):
                     mb = BUILDING_ROM_ENTRIES['mailbox']
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mb[season_key], mb['x'], mb['y'])
-                    # Doghouse eliminada (ya existe nativa en el mapa base)
+                    self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, mb[season_key], mb['x'], mb['y'], active_col, active_dict)
 
             elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
                 # Villa de la Playa
                 bc = BUILDING_ROM_ENTRIES['beach_cottage']
-                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bc[season_key], bc['x'], bc['y'])
+                self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, bc[season_key], bc['x'], bc['y'], active_col, active_dict)
 
             elif map_id in (14, 15) and dyn_cfg.get('mountain_cottage', True):
-                # Villa de la Montaña
+                # Villa de la Montana
                 mc = BUILDING_ROM_ENTRIES['mountain_cottage']
-                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mc[season_key], mc['x'], mc['y'])
+                self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, mc[season_key], mc['x'], mc['y'], active_col, active_dict)
 
             elif map_id in (4, 5, 6, 7) and dyn_cfg.get('town_cottage', True):
                 # Villa de la Ciudad
                 tc = BUILDING_ROM_ENTRIES['town_cottage']
-                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, tc[season_key], tc['x'], tc['y'])
+                self._stamp_rom_structure(array_bg1, array_bg2, array_bg3, tc[season_key], tc['x'], tc['y'], active_col, active_dict)
+
+        self.active_collision_map = bytes(active_col) if active_col else None
+        self.active_behavior_dict = bytes(active_dict) if active_dict else None
 
         img = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
-        
+
         # Determinar orden de capas
         array_bottom = array_bg3
         array_top = array_bg1
         show_bottom = show_bg3
         show_top = show_bg1
-        
+
         if invert_bg:
             array_bottom = array_bg1
             array_top = array_bg3
             show_bottom = show_bg1
             show_top = show_bg3
 
+        # Capa inferior (Normalmente BG3, el piso/terreno)
         if show_bottom and array_bottom:
             img = draw_layer(array_bottom, img, is_overlay=False)
-            
+
+        # Capa intermedia (BG2, caminos, objetos, sombras)
         if show_bg2 and array_bg2:
             img = draw_layer(array_bg2, img, is_overlay=True)
-            
+
+        # Capa superior (Normalmente BG1, paredes, techos, arboles altos)
         if show_top and array_top:
             img = draw_layer(array_top, img, is_overlay=True)
 
-        # Malla Canónica de Cultivo (43x25 plots = 86x50 tiles, X=272, Y=176)
+        # Malla visual de cultivo (Opcional)
         if dyn_cfg.get('enabled', True) and map_id in (0, 1) and dyn_cfg.get('field_grid', False):
             from PIL import ImageDraw
-            grid_overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+            grid_overlay = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
             gdraw = ImageDraw.Draw(grid_overlay)
-            for pr in range(25):
-                for pc in range(43):
-                    px = 272 + pc * 16
-                    py = 176 + pr * 16
-                    gdraw.rectangle([px, py, px + 15, py + 15], outline=(255, 215, 0, 90), width=1)
+            for gy in range(25):
+                for gx in range(43):
+                    px = (14 + gx) * 8
+                    py = (14 + gy) * 8
+                    gdraw.rectangle([px, py, px + 15, py + 15], outline=(255, 255, 255, 40))
             img.paste(grid_overlay, (0, 0), grid_overlay)
 
-        # ── Capa de Colisiones ─────────────────────────────────────
-        if show_col and self.collision_map:
+        # Capa de Colisiones / Triggers autentica (renderizado pixel-perfect sin inventar figuras)
+        if show_col and active_col:
             from PIL import ImageDraw
             overlay = Image.new('RGBA', (w * 8, h * 8), (0, 0, 0, 0))
             draw = ImageDraw.Draw(overlay)
-            
+
             for row in range(h):
                 for col in range(w):
                     idx = row * w + col
-                    if idx >= len(self.collision_map):
+                    if idx >= len(active_col):
                         break
-                    val = self.collision_map[idx]
-                    
-                    if self.behavior_dict and val * 4 + 3 < len(self.behavior_dict):
-                        behavior = struct.unpack_from('<H', self.behavior_dict, val * 4)[0]
-                        script_id = struct.unpack_from('<H', self.behavior_dict, val * 4 + 2)[0]
+                    val = active_col[idx]
+
+                    if active_dict and val * 4 + 3 < len(active_dict):
+                        behavior = struct.unpack_from('<H', active_dict, val * 4)[0]
+                        script_id = struct.unpack_from('<H', active_dict, val * 4 + 2)[0]
                     else:
                         behavior = 0
                         script_id = 0
@@ -531,24 +564,15 @@ class FomtMapRenderer:
                     if a > 0:
                         draw.rectangle([col*8, row*8, col*8+7, row*8+7], fill=(r, g, b, a), outline=(r, g, b, 200))
 
-            # Si las estructuras dinámicas están activadas, pintar sus huellas de colisión y triggers
-            if dyn_cfg.get('enabled', True) and map_id in (0, 1):
-                # Huella Casa Lv1/2/3: X=208..272, Y=24..112 (Sólido) con puerta en (232..248, 104..108)
-                if dyn_cfg.get('farmhouse', 'lv1') != 'none':
-                    draw.rectangle([208, 24, 271, 103], fill=(255, 0, 0, 120), outline=(255, 50, 50, 220))
-                    draw.rectangle([232, 104, 247, 107], fill=(255, 215, 0, 180), outline=(255, 255, 0, 255))
-                # Huella Granero: X=464..544, Y=16..112 (Sólido) con puerta en (496..512, 104..108)
-                if dyn_cfg.get('barn', 'lv1') != 'none':
-                    draw.rectangle([464, 16, 543, 103], fill=(255, 0, 0, 120), outline=(255, 50, 50, 220))
-                    draw.rectangle([496, 104, 511, 107], fill=(255, 215, 0, 180), outline=(255, 255, 0, 255))
-                # Huella Gallinero: X=112..184, Y=416..528 con puerta en (140..156, 504..508)
-                if dyn_cfg.get('chicken_coop', 'lv1') != 'none':
-                    draw.rectangle([112, 416, 183, 503], fill=(255, 0, 0, 120), outline=(255, 50, 50, 220))
-                    draw.rectangle([140, 504, 155, 507], fill=(255, 215, 0, 180), outline=(255, 255, 0, 255))
-
             img.paste(overlay, (0, 0), overlay)
 
         return img
+
+    def get_effective_collision(self) -> tuple[bytes | None, bytes | None]:
+        """Devuelve (collision_map, behavior_dict) con las estructuras dinamicas estampadas."""
+        if hasattr(self, 'active_collision_map') and self.active_collision_map:
+            return self.active_collision_map, self.active_behavior_dict
+        return self.collision_map, self.behavior_dict
 
     def _build_tile_palette_map(self):
         """

@@ -97,6 +97,7 @@ class TilePathfinder:
             if not renderer.collision_map:
                 return None
 
+            col_bytes, dict_bytes = renderer.get_effective_collision() if hasattr(renderer, 'get_effective_collision') else (renderer.collision_map, renderer.behavior_dict)
             grid_info = {
                 "base_id": base_id,
                 "header_id": header_id,
@@ -104,8 +105,8 @@ class TilePathfinder:
                 "height": renderer.height,
                 "pixel_w": renderer.width * 8,
                 "pixel_h": renderer.height * 8,
-                "collision_map": renderer.collision_map,
-                "behavior_dict": renderer.behavior_dict
+                "collision_map": col_bytes,
+                "behavior_dict": dict_bytes
             }
             self._map_grids_cache[base_id] = grid_info
             return grid_info

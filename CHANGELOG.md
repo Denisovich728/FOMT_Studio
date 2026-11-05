@@ -1,6 +1,6 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Version 4.0.0 "The Mineral Valley Expansion"
+## Version 4.0.0 "The Greatest Show"
 **Fecha:** 2026-11-04
 **Estado:** Lanzamiento Mayor / Suite Integral de ROM Hacking
 
@@ -12,6 +12,7 @@
 
 ### Editor de Mapas y Tilesets (Titan Engine)
 - **Compresion 100% Python Nativa:** Descompresion y compresion binaria sin dependencias externas de ejecutables legados de 32 bits para formatos BIOS LZ77 (0x10), Marvelous Arcano LZ (0x70) y RLE.
+- **Estructuras Dinamicas y Malla de Colision Binaria:** Ingenieria inversa 100% fiel al motor decompilado original de Harvest Moon FoMT (rutinas `ApplyMapPatch_Blitter_080A5BD8` y `func_08017180`). Blitting autentico directo desde la ROM para las capas BG1, BG2 y BG3 (cero PNGs y cero figuras simuladas), estampando la tabla LUT de 32 bits de colisiones y disparadores de puertas (`0x0154`, `0x0156`, `0x014E`) sobre las mejoras de la Casa de Campo (Lv1, Lv2, Lv3), Establo, Gallinero, Buzon y Villas del Valle, con sincronizacion automatica hacia el algoritmo de navegacion A* (`TilePathfinder`).
 - **Insercion e Importacion de Bitmaps:** Pipeline completo de importacion, exportacion y reinyeccion de mapas completos y tilesets graficos en formato PNG/BMP indexado a 16 colores.
 - **Edicion de Metatiles y Warps:** Soporte para edicion de atributos de colision, elevacion y conexiones de teletransporte entre mapas.
 
