@@ -1,7 +1,10 @@
+# ============================================================
+# FOMT Studio - Suite de Ingeniería Inversa (v4.0.0)
+# "The Greatest Show"
+# Desarrollado por: Denisovich728
+# ============================================================
 import os
 import json
-
-CONFIG_FILE = os.path.join(os.getcwd(), "fomt_config.json")
 
 DEFAULT_CONFIG = {
     "max_ram_mb": 2048,
@@ -13,29 +16,43 @@ DEFAULT_CONFIG = {
 
 class ConfigManager:
     @staticmethod
+    def get_config_path() -> str:
+        """Obtiene la ruta dinámica y persistente hacia fomt_config.json."""
+        try:
+            from Banco_de_Datos.Utilidades.rutas import get_config_file_path
+            return get_config_file_path()
+        except Exception:
+            return os.path.join(os.getcwd(), "fomt_config.json")
+
+    @staticmethod
     def load_config():
-        if not os.path.exists(CONFIG_FILE):
+        config_file = ConfigManager.get_config_path()
+        if not os.path.exists(config_file):
             ConfigManager.save_config(DEFAULT_CONFIG)
             return dict(DEFAULT_CONFIG)
             
         try:
-            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            with open(config_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 # Merge defaults for any missing keys
                 merged = dict(DEFAULT_CONFIG)
                 merged.update(data)
                 return merged
         except Exception as e:
-            print(f"Error loading config: {e}. Using defaults.")
+            print(f"Error loading config from {config_file}: {e}. Using defaults.")
             return dict(DEFAULT_CONFIG)
 
     @staticmethod
     def save_config(config_dict):
+        config_file = ConfigManager.get_config_path()
         try:
-            with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            cfg_dir = os.path.dirname(config_file)
+            if cfg_dir and not os.path.exists(cfg_dir):
+                os.makedirs(cfg_dir, exist_ok=True)
+            with open(config_file, 'w', encoding='utf-8') as f:
                 json.dump(config_dict, f, indent=4)
         except Exception as e:
-            print(f"Error saving config: {e}")
+            print(f"Error saving config to {config_file}: {e}")
 
     @staticmethod
     def get(key):

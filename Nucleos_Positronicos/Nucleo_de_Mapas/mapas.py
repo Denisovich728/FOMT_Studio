@@ -1438,6 +1438,39 @@ class MapParser:
         print(f"Mapa {map_index} guardado en {hex(free_space)}. Tamaño: {total_size} bytes.")
         return True
 
+    def save_tileset(self, map_index: int, raw_tileset_4bpp: bytes) -> bool:
+        """
+        Comprime e inyecta un nuevo tileset 4bpp en la ROM para el mapa indicado.
+        Repuntea p_gfx en el MapHeader correspondiente.
+        """
+        import struct
+        mh = self.maps[map_index]
+        compressed_gfx = compress_arcano_marvelous(raw_tileset_4bpp)
+        size = len(compressed_gfx)
+
+        rom_len = len(self.project.base_rom_data)
+        free_space = self.find_free_space(size)
+        if free_space == -1:
+            free_space = rom_len
+            if free_space % 4 != 0:
+                free_space += 4 - (free_space % 4)
+
+        offset = free_space
+        new_p_gfx = offset | 0x08000000
+
+        # Escribir gráfico comprimido en ROM
+        self.project.overwrite_rom_directly(offset, compressed_gfx)
+
+        # Actualizar puntero en la tabla de cabeceras de mapas (offset 0 del header)
+        if self._table_offset is None:
+            self._table_offset = 0x105EDC
+        header_off = self._table_offset + (map_index * 40)
+        self.project.overwrite_rom_directly(header_off, struct.pack('<I', new_p_gfx))
+
+        mh.p_gfx = new_p_gfx
+        print(f"[MapParser] Tileset del Mapa {map_index} guardado en {hex(offset)} (p_gfx: {hex(new_p_gfx)}). Tamaño: {size} bytes.")
+        return True
+
     def export_map_to_tiled(self, map_header: MapHeader, out_dir: str):
         """Exporta un mapa al formato .tmx de Tiled."""
         import os

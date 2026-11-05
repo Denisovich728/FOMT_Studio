@@ -130,17 +130,18 @@ class FoMTProject:
         """
         Crea un proyecto de sesión automático al abrir una ROM.
         Evita bloqueos de archivo y organiza las ediciones por fecha.
+        Ruta resuelta dinámicamente mediante get_sessions_dir().
         """
         import datetime
+        from Banco_de_Datos.Utilidades.rutas import get_sessions_dir
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # Carpeta de sesión en Documentos
-        docs_dir = os.path.join(os.path.expanduser("~"), "Documents", "FoMTStudio", "Sessions")
+        # Carpeta de sesión dinámica
+        docs_dir = get_sessions_dir()
         proj_name = f"Session_{timestamp}"
         proj_dir = os.path.join(docs_dir, proj_name)
         
-        if not os.path.exists(proj_dir):
-            os.makedirs(proj_dir)
+        os.makedirs(proj_dir, exist_ok=True)
             
         self.create_new(rom_path, proj_dir)
         return proj_dir
@@ -152,7 +153,7 @@ class FoMTProject:
         Cualquier cambio posterior se guarda en el .fsp (capa virtual).
         """
         if not os.path.exists(proj_dir):
-            os.makedirs(proj_dir)
+            os.makedirs(proj_dir, exist_ok=True)
             
         # 1. Volcado entero del hex (Copia de seguridad local)
         self.name = os.path.basename(proj_dir)
@@ -173,11 +174,21 @@ class FoMTProject:
         self.save()
 
     def load(self, fsp_path):
-        """Carga el proyecto desde un archivo .fsp."""
+        """Carga el proyecto desde un archivo .fsp o directorio de proyecto con resolución dinámica."""
+        from Banco_de_Datos.Utilidades.rutas import resolve_project_fsp_path
+        
+        resolved_path = resolve_project_fsp_path(fsp_path)
+        if not resolved_path or not os.path.isfile(resolved_path):
+            raise FileNotFoundError(
+                f"No se pudo localizar el archivo de proyecto (.fsp) para la ruta especificada: '{fsp_path}'. "
+                "Verifica que el archivo exista o selecciona la carpeta de sesión correspondiente."
+            )
+        
+        fsp_path = resolved_path
         with open(fsp_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
-        self.name = data.get("name", "UnknownPatch")
+        self.name = data.get("name", os.path.splitext(os.path.basename(fsp_path))[0])
         # Priorizamos la ROM local si existe
         self.project_dir = os.path.dirname(fsp_path)
         local_rom_path = os.path.join(self.project_dir, "source.gba")

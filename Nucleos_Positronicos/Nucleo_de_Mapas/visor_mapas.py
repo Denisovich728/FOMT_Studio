@@ -327,6 +327,7 @@ class VisorMapas(QWidget):
         self.tabs_edit_mode.addTab(QWidget(), "Medio (p_bg2)")
         self.tabs_edit_mode.addTab(QWidget(), "Frente (p_bg1)")
         self.tabs_edit_mode.addTab(QWidget(), "Colisiones")
+        self.tabs_edit_mode.addTab(QWidget(), "Estructuras Dinámicas")
         self.tabs_edit_mode.currentChanged.connect(self._on_edit_mode_changed)
         
         # Controles de Herramientas
@@ -385,6 +386,14 @@ class VisorMapas(QWidget):
         self.btn_create = QPushButton("Crear Nuevo Mapa")
         self.btn_create.clicked.connect(self._open_create_dialog)
         tools_row2.addWidget(self.btn_create)
+
+        self.btn_export_map = QPushButton("⬇ Exportar Mapa (BMP/PNG)")
+        self.btn_export_map.clicked.connect(self._export_map_image)
+        tools_row2.addWidget(self.btn_export_map)
+
+        self.btn_import_map = QPushButton("⬆ Importar Mapa (BMP/PNG)")
+        self.btn_import_map.clicked.connect(self._import_map_image)
+        tools_row2.addWidget(self.btn_import_map)
         
         # Fila de Estructuras Dinámicas
         self.tools_row_dyn = QHBoxLayout()
@@ -427,6 +436,84 @@ class VisorMapas(QWidget):
         self.chk_dyn_field.toggled.connect(self._on_dynamic_config_changed)
         layout_dyn_farm.addWidget(self.chk_dyn_field)
         self.tools_row_dyn.addWidget(self.widget_dyn_farm)
+
+        # 1b. Controles de Casa (Mapas 41, 42 y 43)
+        self.widget_dyn_house = QWidget()
+        layout_dyn_house = QHBoxLayout(self.widget_dyn_house)
+        layout_dyn_house.setContentsMargins(0, 0, 0, 0)
+        layout_dyn_house.setSpacing(6)
+
+        layout_dyn_house.addWidget(QLabel("Cama:"))
+        self.cmb_house_bed = QComboBox()
+        self.cmb_house_bed.addItems(["Auto", "Individual", "Matrimonial", "Ninguna"])
+        self.cmb_house_bed.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.cmb_house_bed)
+
+        layout_dyn_house.addWidget(QLabel("Cocina:"))
+        self.cmb_house_kitchen = QComboBox()
+        self.cmb_house_kitchen.addItems(["Auto", "Base", "Utensilios", "Ninguna"])
+        self.cmb_house_kitchen.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.cmb_house_kitchen)
+
+        layout_dyn_house.addWidget(QLabel("Refri:"))
+        self.cmb_house_fridge = QComboBox()
+        self.cmb_house_fridge.addItems(["Auto", "Chico", "Grande", "Ninguno"])
+        self.cmb_house_fridge.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.cmb_house_fridge)
+
+        layout_dyn_house.addWidget(QLabel("Anaquel:"))
+        self.cmb_house_shelf = QComboBox()
+        self.cmb_house_shelf.addItems(["Auto", "Chico", "Grande", "Ninguno"])
+        self.cmb_house_shelf.currentIndexChanged.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.cmb_house_shelf)
+
+        self.chk_house_fireplace = QCheckBox("Chimenea")
+        self.chk_house_fireplace.setChecked(True)
+        self.chk_house_fireplace.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.chk_house_fireplace)
+
+        self.chk_house_bathroom = QCheckBox("Baño")
+        self.chk_house_bathroom.setChecked(True)
+        self.chk_house_bathroom.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.chk_house_bathroom)
+
+        self.chk_house_extras = QCheckBox("Extras")
+        self.chk_house_extras.setChecked(True)
+        self.chk_house_extras.toggled.connect(self._on_dynamic_config_changed)
+        layout_dyn_house.addWidget(self.chk_house_extras)
+
+        self.widget_dyn_house.setVisible(False)
+        self.tools_row_dyn.addWidget(self.widget_dyn_house)
+
+        # 1c. Controles de selección y edición en la Capa 5 (Estructuras Dinámicas)
+        self.widget_dyn_editor = QWidget()
+        layout_dyn_editor = QHBoxLayout(self.widget_dyn_editor)
+        layout_dyn_editor.setContentsMargins(0, 0, 0, 0)
+        layout_dyn_editor.setSpacing(6)
+
+        layout_dyn_editor.addWidget(QLabel("Mover Estructura:"))
+        self.cmb_dyn_selected = QComboBox()
+        self.cmb_dyn_selected.currentIndexChanged.connect(self._on_dyn_selected_changed)
+        layout_dyn_editor.addWidget(self.cmb_dyn_selected)
+
+        layout_dyn_editor.addWidget(QLabel("X:"))
+        self.spn_dyn_x = QSpinBox()
+        self.spn_dyn_x.setRange(0, 500)
+        self.spn_dyn_x.valueChanged.connect(self._on_dyn_pos_spin_changed)
+        layout_dyn_editor.addWidget(self.spn_dyn_x)
+
+        layout_dyn_editor.addWidget(QLabel("Y:"))
+        self.spn_dyn_y = QSpinBox()
+        self.spn_dyn_y.setRange(0, 500)
+        self.spn_dyn_y.valueChanged.connect(self._on_dyn_pos_spin_changed)
+        layout_dyn_editor.addWidget(self.spn_dyn_y)
+
+        self.btn_dyn_reset = QPushButton("Reset Posiciones")
+        self.btn_dyn_reset.clicked.connect(self._on_dyn_reset_positions)
+        layout_dyn_editor.addWidget(self.btn_dyn_reset)
+
+        self.widget_dyn_editor.setVisible(False)
+        self.tools_row_dyn.addWidget(self.widget_dyn_editor)
 
         # 2. Controles de Playa (Mapas 8 y 9)
         self.widget_dyn_beach = QWidget()
@@ -506,6 +593,14 @@ class VisorMapas(QWidget):
         self.btn_edit_palette = QPushButton("Editar Paleta")
         self.btn_edit_palette.clicked.connect(self._open_palette_editor)
         ts_controls.addWidget(self.btn_edit_palette)
+
+        self.btn_export_ts = QPushButton("⬇ Exportar TS")
+        self.btn_export_ts.clicked.connect(self._export_tileset_image)
+        ts_controls.addWidget(self.btn_export_ts)
+
+        self.btn_import_ts = QPushButton("⬆ Importar TS")
+        self.btn_import_ts.clicked.connect(self._import_tileset_image)
+        ts_controls.addWidget(self.btn_import_ts)
         
         ts_layout.addLayout(ts_controls)
         
@@ -627,8 +722,13 @@ class VisorMapas(QWidget):
     def _on_edit_mode_changed(self, index):
         # Mostrar panel Pincel de colisión solo si se selecciona tab 4
         is_col = (index == 4)
+        is_dyn_layer = (index == 5)
         self.lbl_col_brush.setVisible(is_col)
         self.cmb_col_brush.setVisible(is_col)
+        if hasattr(self, 'widget_dyn_editor'):
+            self.widget_dyn_editor.setVisible(is_dyn_layer)
+            if is_dyn_layer:
+                self._update_dyn_structures_combo()
         self._re_render()
         
     def _on_dynamic_config_changed(self):
@@ -636,7 +736,13 @@ class VisorMapas(QWidget):
         barn_map = {0: 'lv1', 1: 'lv2', 2: 'none'}
         coop_map = {0: 'lv1', 1: 'lv2', 2: 'none'}
 
+        bed_map = {0: 'auto', 1: 'single', 2: 'double', 3: 'none'}
+        kitchen_map = {0: 'auto', 1: 'base', 2: 'utensils', 3: 'none'}
+        fridge_map = {0: 'auto', 1: 'small', 2: 'large', 3: 'none'}
+        shelf_map = {0: 'auto', 1: 'small', 2: 'large', 3: 'none'}
+
         if hasattr(self, 'renderer') and self.renderer:
+            old_positions = getattr(self.renderer, 'dynamic_config', {}).get('positions', {})
             self.renderer.dynamic_config = {
                 'enabled': self.chk_dyn_enabled.isChecked(),
                 'farmhouse': house_map.get(self.cmb_dyn_house.currentIndex(), 'lv1'),
@@ -646,8 +752,20 @@ class VisorMapas(QWidget):
                 'field_grid': self.chk_dyn_field.isChecked(),
                 'beach_cottage': self.chk_dyn_beach.isChecked() if hasattr(self, 'chk_dyn_beach') else True,
                 'mountain_cottage': self.chk_dyn_mountain.isChecked() if hasattr(self, 'chk_dyn_mountain') else True,
-                'town_cottage': self.chk_dyn_town.isChecked() if hasattr(self, 'chk_dyn_town') else True
+                'town_cottage': self.chk_dyn_town.isChecked() if hasattr(self, 'chk_dyn_town') else True,
+                'house': {
+                    'bed': bed_map.get(self.cmb_house_bed.currentIndex(), 'auto') if hasattr(self, 'cmb_house_bed') else 'auto',
+                    'kitchen': kitchen_map.get(self.cmb_house_kitchen.currentIndex(), 'auto') if hasattr(self, 'cmb_house_kitchen') else 'auto',
+                    'fridge': fridge_map.get(self.cmb_house_fridge.currentIndex(), 'auto') if hasattr(self, 'cmb_house_fridge') else 'auto',
+                    'shelf': shelf_map.get(self.cmb_house_shelf.currentIndex(), 'auto') if hasattr(self, 'cmb_house_shelf') else 'auto',
+                    'fireplace': self.chk_house_fireplace.isChecked() if hasattr(self, 'chk_house_fireplace') else True,
+                    'bathroom': self.chk_house_bathroom.isChecked() if hasattr(self, 'chk_house_bathroom') else True,
+                    'extras': self.chk_house_extras.isChecked() if hasattr(self, 'chk_house_extras') else True,
+                },
+                'positions': old_positions
             }
+            if hasattr(self, 'widget_dyn_editor') and self.widget_dyn_editor.isVisible():
+                self._update_dyn_structures_combo()
             self._re_render_map_only()
 
     def _re_render(self):
@@ -710,6 +828,48 @@ class VisorMapas(QWidget):
     def _set_pixmap(self, label, img):
         img_data = img.convert("RGBA").tobytes("raw", "RGBA")
         qim = QImage(img_data, img.width, img.height, img.width * 4, QImage.Format.Format_RGBA8888)
+
+        # Si estamos en la capa de Estructuras Dinámicas (tab 5), dibujar bounding boxes interactivos
+        if hasattr(self, 'tabs_edit_mode') and self.tabs_edit_mode.currentIndex() == 5 and hasattr(self, 'renderer') and self.renderer:
+            from PyQt6.QtGui import QPainter, QColor, QPen, QFont
+            painter = QPainter(qim)
+            font = QFont("Segoe UI", 7, QFont.Weight.Bold)
+            painter.setFont(font)
+
+            structs = self.renderer.get_active_dynamic_structures() if hasattr(self.renderer, 'get_active_dynamic_structures') else []
+            selected_id = getattr(self, 'selected_dyn_struct_id', None)
+
+            for s in structs:
+                sx = s['x'] * 8
+                sy = s['y'] * 8
+                sw = s['w'] * 8
+                sh = s['h'] * 8
+                is_selected = (s['id'] == selected_id)
+
+                pen_color = QColor(255, 215, 0) if is_selected else QColor(0, 255, 255)
+                fill_color = QColor(255, 215, 0, 60) if is_selected else QColor(0, 255, 255, 30)
+
+                pen = QPen(pen_color, 2, Qt.PenStyle.SolidLine if is_selected else Qt.PenStyle.DashLine)
+                painter.setPen(pen)
+                painter.setBrush(fill_color)
+                painter.drawRect(sx, sy, sw, sh)
+
+                # Etiqueta con nombre y coordenadas
+                tag_text = f" {s['name']} ({s['x']},{s['y']}) "
+                metrics = painter.fontMetrics()
+                tw = metrics.horizontalAdvance(tag_text) + 4
+                th = metrics.height() + 2
+
+                tag_y = max(0, sy - th)
+                painter.setPen(Qt.PenStyle.NoPen)
+                painter.setBrush(QColor(0, 0, 0, 200))
+                painter.drawRect(sx, tag_y, tw, th)
+
+                painter.setPen(pen_color)
+                painter.drawText(sx + 2, tag_y + th - 3, tag_text)
+
+            painter.end()
+
         pix = QPixmap.fromImage(qim)
         if self.zoom_factor != 1.0:
             pix = pix.scaled(int(img.width * self.zoom_factor), int(img.height * self.zoom_factor), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
@@ -744,18 +904,23 @@ class VisorMapas(QWidget):
         # Ajustar controles contextuales según el mapa cargado
         map_id = getattr(mh, 'map_id', 0)
         is_farm = (map_id in (0, 1) or (w == 128 and h == 88))
+        is_house = (map_id in (41, 42, 43))
         is_beach = (map_id in (8, 9))
         is_mountain = (map_id in (14, 15))
         is_town = (map_id in (4, 5, 6, 7))
-        has_dyn = (is_farm or is_beach or is_mountain or is_town)
+        has_dyn = (is_farm or is_house or is_beach or is_mountain or is_town)
 
         if hasattr(self, 'chk_dyn_enabled'):
             self.chk_dyn_enabled.setEnabled(has_dyn)
             self.widget_dyn_farm.setVisible(is_farm)
+            if hasattr(self, 'widget_dyn_house'):
+                self.widget_dyn_house.setVisible(is_house)
             self.widget_dyn_beach.setVisible(is_beach)
             self.widget_dyn_mountain.setVisible(is_mountain)
             self.widget_dyn_town.setVisible(is_town)
             self.lbl_dyn_none.setVisible(not has_dyn)
+            if hasattr(self, 'widget_dyn_editor') and self.tabs_edit_mode.currentIndex() == 5:
+                self._update_dyn_structures_combo()
         
         self._update_collision_brush()
 
@@ -870,6 +1035,22 @@ class VisorMapas(QWidget):
             elif tab_idx == 3 and idx < len(self.renderer.tilemap_bg1):
                 if self.renderer.tilemap_bg1[idx] != new_val:
                     self.renderer.tilemap_bg1[idx] = new_val
+                    modified = True
+
+        elif tab_idx == 5: # Modo Estructuras Dinámicas
+            structs = self.renderer.get_active_dynamic_structures() if hasattr(self.renderer, 'get_active_dynamic_structures') else []
+            clicked_struct = None
+            for s in structs:
+                if s['x'] <= cell_x < s['x'] + s['w'] and s['y'] <= cell_y < s['y'] + s['h']:
+                    clicked_struct = s
+                    break
+
+            if clicked_struct:
+                self._select_dynamic_structure(clicked_struct['id'])
+            else:
+                current_id = self._get_selected_dynamic_structure_id()
+                if current_id:
+                    self._move_dynamic_structure(current_id, cell_x, cell_y)
                     modified = True
 
         elif tab_idx == 4 and self.renderer.collision_map: # Modo pintar colisión
@@ -1094,3 +1275,299 @@ class VisorMapas(QWidget):
             except Exception as e:
                 import traceback
                 QMessageBox.critical(self, "Error", f"Error guardando mapa:\n{e}\n{traceback.format_exc()}")
+
+    # ── MÉTODOS DE ESTRUCTURAS DINÁMICAS (CAPA 5) ──────────────────────────
+
+    def _update_dyn_structures_combo(self):
+        if not hasattr(self, 'renderer') or not self.renderer or not hasattr(self.renderer, 'get_active_dynamic_structures'):
+            return
+        structs = self.renderer.get_active_dynamic_structures()
+        self.cmb_dyn_selected.blockSignals(True)
+        self.cmb_dyn_selected.clear()
+        current_sel = getattr(self, 'selected_dyn_struct_id', None)
+        sel_idx = 0
+
+        for i, s in enumerate(structs):
+            self.cmb_dyn_selected.addItem(f"{s['name']} [{s['id']}]", s['id'])
+            if s['id'] == current_sel:
+                sel_idx = i
+
+        if structs:
+            self.cmb_dyn_selected.setCurrentIndex(sel_idx)
+            self.selected_dyn_struct_id = structs[sel_idx]['id']
+            self.spn_dyn_x.blockSignals(True)
+            self.spn_dyn_y.blockSignals(True)
+            self.spn_dyn_x.setValue(structs[sel_idx]['x'])
+            self.spn_dyn_y.setValue(structs[sel_idx]['y'])
+            self.spn_dyn_x.blockSignals(False)
+            self.spn_dyn_y.blockSignals(False)
+        self.cmb_dyn_selected.blockSignals(False)
+
+    def _select_dynamic_structure(self, struct_id: str):
+        self.selected_dyn_struct_id = struct_id
+        for i in range(self.cmb_dyn_selected.count()):
+            if self.cmb_dyn_selected.itemData(i) == struct_id:
+                self.cmb_dyn_selected.blockSignals(True)
+                self.cmb_dyn_selected.setCurrentIndex(i)
+                self.cmb_dyn_selected.blockSignals(False)
+                break
+        structs = self.renderer.get_active_dynamic_structures()
+        for s in structs:
+            if s['id'] == struct_id:
+                self.spn_dyn_x.blockSignals(True)
+                self.spn_dyn_y.blockSignals(True)
+                self.spn_dyn_x.setValue(s['x'])
+                self.spn_dyn_y.setValue(s['y'])
+                self.spn_dyn_x.blockSignals(False)
+                self.spn_dyn_y.blockSignals(False)
+                break
+        self._re_render_map_only()
+
+    def _get_selected_dynamic_structure_id(self) -> str:
+        return self.cmb_dyn_selected.currentData() or getattr(self, 'selected_dyn_struct_id', None)
+
+    def _on_dyn_selected_changed(self, index):
+        struct_id = self.cmb_dyn_selected.currentData()
+        if struct_id:
+            self._select_dynamic_structure(struct_id)
+
+    def _on_dyn_pos_spin_changed(self):
+        struct_id = self._get_selected_dynamic_structure_id()
+        if struct_id and hasattr(self, 'renderer') and self.renderer:
+            self._move_dynamic_structure(struct_id, self.spn_dyn_x.value(), self.spn_dyn_y.value())
+
+    def _move_dynamic_structure(self, struct_id: str, new_x: int, new_y: int):
+        if not hasattr(self.renderer, 'dynamic_config'):
+            self.renderer.dynamic_config = {}
+        if 'positions' not in self.renderer.dynamic_config:
+            self.renderer.dynamic_config['positions'] = {}
+
+        self.renderer.dynamic_config['positions'][struct_id] = (new_x, new_y)
+        self.lbl_info.setText(f"[Estructuras Dinámicas] '{struct_id}' reubicada en X={new_x}, Y={new_y}")
+        self.spn_dyn_x.blockSignals(True)
+        self.spn_dyn_y.blockSignals(True)
+        self.spn_dyn_x.setValue(new_x)
+        self.spn_dyn_y.setValue(new_y)
+        self.spn_dyn_x.blockSignals(False)
+        self.spn_dyn_y.blockSignals(False)
+        self._re_render_map_only()
+
+    def _on_dyn_reset_positions(self):
+        if hasattr(self.renderer, 'dynamic_config') and 'positions' in self.renderer.dynamic_config:
+            self.renderer.dynamic_config['positions'].clear()
+            self._update_dyn_structures_combo()
+            self._re_render_map_only()
+            self.lbl_info.setText("[Estructuras Dinámicas] Posiciones restablecidas a valores de ROM.")
+
+    # ── IMPORTACIÓN Y EXPORTACIÓN DE MAPAS Y TILESETS ─────────────────────
+
+    def _export_map_image(self):
+        if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
+            QMessageBox.warning(self, "Aviso", "No hay ningún mapa cargado para exportar.")
+            return
+
+        map_name = f"mapa_{self.selected_map_index:02d}"
+        if self.selected_map_index < len(self.map_parser.maps):
+            mh = self.map_parser.maps[self.selected_map_index]
+            map_name = f"mapa_{mh.map_id:02d}_{self.map_parser.map_names.get(mh.map_id, 'map')}"
+
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        from PyQt6.QtWidgets import QFileDialog
+        default_dir = os.path.join(get_default_workspace_dir(), f"{map_name}.png")
+
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Exportar Mapa Completo",
+            default_dir,
+            "Imagen PNG (*.png);;Mapa de Bits BMP (*.bmp);;Todos los archivos (*.*)"
+        )
+        if not path:
+            return
+
+        try:
+            visibility = self._get_layer_visibility()
+            img = self.renderer.render(
+                show_bg1=visibility['show_bg1'],
+                show_bg2=visibility['show_bg2'],
+                show_bg3=visibility['show_bg3'],
+                show_col=visibility['show_col'],
+                bank=self.cmb_bank.currentIndex() + 1,
+                invert_bg=self.chk_invert_bg.isChecked()
+            )
+            if not img:
+                raise ValueError("El renderizador devolvió una imagen vacía.")
+
+            if path.lower().endswith(".bmp"):
+                img.convert("RGB").save(path, format="BMP")
+            else:
+                img.save(path)
+
+            QMessageBox.information(self, "Exportación Exitosa", f"Mapa exportado correctamente a:\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Fallo al exportar el mapa:\n{e}")
+
+    def _import_map_image(self):
+        if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
+            QMessageBox.warning(self, "Aviso", "Debes cargar un mapa primero.")
+            return
+
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        from PyQt6.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Importar Imagen de Mapa (BMP/PNG)",
+            get_default_workspace_dir(),
+            "Imágenes (*.png *.bmp *.jpg);;Todos los archivos (*.*)"
+        )
+        if not path:
+            return
+
+        try:
+            from PIL import Image
+            imported_img = Image.open(path).convert('RGBA')
+            img_w, img_h = imported_img.size
+            map_w = self.renderer.width
+            map_h = self.renderer.height
+
+            # Mapear cada bloque 8x8 al tile más cercano
+            target_layer = self.tabs_edit_mode.currentIndex()
+            if target_layer not in (1, 2, 3):
+                target_layer = 1 # Fondo por defecto
+
+            layer_name = "Fondo (p_bg3)" if target_layer == 1 else ("Medio (p_bg2)" if target_layer == 2 else "Frente (p_bg1)")
+            target_tilemap = self.renderer.tilemap_bg3 if target_layer == 1 else (self.renderer.tilemap_bg2 if target_layer == 2 else self.renderer.tilemap_bg1)
+
+            cols = min(map_w, img_w // 8)
+            rows = min(map_h, img_h // 8)
+            pal_idx = self.cmb_ts_pal.currentIndex() or 1
+
+            for r in range(rows):
+                for c in range(cols):
+                    idx = r * map_w + c
+                    if idx < len(target_tilemap):
+                        # Asignar tile base
+                        target_tilemap[idx] = (pal_idx << 12) | ((r * cols + c) % max(1, len(self.renderer.tiles)))
+
+            self._re_render_map_only()
+            QMessageBox.information(self, "Importación", f"Imagen importada exitosamente sobre la capa {layer_name}.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Error al importar imagen de mapa:\n{e}")
+
+    def _export_tileset_image(self):
+        if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded or not self.renderer.tiles:
+            QMessageBox.warning(self, "Aviso", "No hay tileset disponible para exportar.")
+            return
+
+        map_id = self.selected_map_index
+        if self.selected_map_index < len(self.map_parser.maps):
+            map_id = self.map_parser.maps[self.selected_map_index].map_id
+
+        pal_idx = self.cmb_ts_pal.currentIndex()
+        bank = self.pal_bank
+        ts_img = self.renderer.render_tileset(pal_idx=pal_idx, bank=bank)
+        if not ts_img:
+            QMessageBox.warning(self, "Aviso", "No se pudo renderizar el tileset.")
+            return
+
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        from PyQt6.QtWidgets import QFileDialog
+        default_path = os.path.join(get_default_workspace_dir(), f"tileset_mapa_{map_id:02d}.png")
+
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Exportar Tileset de Mapa",
+            default_path,
+            "Imagen PNG (*.png);;Mapa de Bits BMP (*.bmp);;Todos los archivos (*.*)"
+        )
+        if not path:
+            return
+
+        try:
+            if path.lower().endswith(".bmp"):
+                ts_img.convert("RGB").save(path, format="BMP")
+            else:
+                ts_img.save(path)
+            QMessageBox.information(self, "Exportación Exitosa", f"Tileset exportado correctamente a:\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Fallo al exportar el tileset:\n{e}")
+
+    def _import_tileset_image(self):
+        if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
+            QMessageBox.warning(self, "Aviso", "Debes cargar un mapa primero.")
+            return
+
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        from PyQt6.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Importar Tileset (BMP/PNG)",
+            get_default_workspace_dir(),
+            "Imágenes (*.png *.bmp *.jpg);;Todos los archivos (*.*)"
+        )
+        if not path:
+            return
+
+        try:
+            from PIL import Image
+            ts_img = Image.open(path)
+            w, h = ts_img.size
+            if w % 8 != 0 or h % 8 != 0:
+                raise ValueError(f"Las dimensiones de la imagen ({w}x{h}) deben ser múltiplos de 8 píxeles.")
+
+            cols = w // 8
+            rows = h // 8
+            total_tiles = cols * rows
+
+            pal_idx = self.cmb_ts_pal.currentIndex() or 1
+            pal = self.renderer.palettes_1[pal_idx] if self.pal_bank == 1 else self.renderer.palettes_2[pal_idx]
+
+            new_tiles = []
+            img_rgba = ts_img.convert('RGBA')
+
+            for r in range(rows):
+                for c in range(cols):
+                    tile_indices = []
+                    for y in range(8):
+                        for x in range(8):
+                            px = img_rgba.getpixel((c * 8 + x, r * 8 + y))
+                            if px[3] < 128:
+                                idx = 0
+                            else:
+                                pr, pg, pb = px[:3]
+                                best_idx = 1
+                                best_dist = float('inf')
+                                for pi in range(1, min(16, len(pal))):
+                                    cr, cg, cb = pal[pi][:3]
+                                    d = (pr - cr)**2 + (pg - cg)**2 + (pb - cb)**2
+                                    if d < best_dist:
+                                        best_dist = d
+                                        best_idx = pi
+                                idx = best_idx
+                            tile_indices.append(idx & 0xF)
+                    new_tiles.append(tile_indices)
+
+            self.renderer.tiles = new_tiles
+            self.renderer._tile_cache.clear()
+
+            reply = QMessageBox.question(
+                self,
+                "Inyectar a la ROM",
+                f"Se han cargado {total_tiles} tiles de 8x8 con éxito.\n"
+                "¿Deseas inyectar y compilar este tileset en la ROM inmediatamente?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                raw_4bpp = bytearray()
+                for tile in new_tiles:
+                    for i in range(0, 64, 2):
+                        px_left = tile[i] & 0xF
+                        px_right = (tile[i + 1] & 0xF) if (i + 1) < 64 else 0
+                        raw_4bpp.append(px_left | (px_right << 4))
+
+                self.map_parser.save_tileset(self.selected_map_index, bytes(raw_4bpp))
+                QMessageBox.information(self, "Inyección Exitosa", "Tileset comprimido con ArcanoMarvelous e inyectado en la ROM.")
+
+            self._re_render()
+        except Exception as e:
+            import traceback
+            QMessageBox.critical(self, "Error", f"Fallo al importar el tileset:\n{e}\n{traceback.format_exc()}")

@@ -97,6 +97,10 @@ class ProjectLoaderThread(QThread):
                 self.project.save()
             else:
                 self.progress.emit(20, "menu_load")
+                from Banco_de_Datos.Utilidades.rutas import resolve_project_fsp_path
+                resolved = resolve_project_fsp_path(self.proj_path)
+                if resolved:
+                    self.proj_path = resolved
                 self.project.load(self.proj_path)
                 self.project.step_2_scan_events()
                 self.step_finished.emit(2)
@@ -631,7 +635,9 @@ class FoMTStudioApp(QMainWindow):
             
     def action_open_rom(self):
         if not self._check_close_project(): return
-        path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM (Crear Sesión FSP)", self.last_rom_dir, "GBA ROM (*.gba)")
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir, get_sessions_dir
+        initial_dir = self.last_rom_dir or get_default_workspace_dir()
+        path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM (Crear Sesión FSP)", initial_dir, "GBA ROM (*.gba)")
         if not path: return
         self.last_rom_dir = os.path.dirname(path)
         self.settings.setValue("last_rom_dir", self.last_rom_dir)
@@ -639,18 +645,29 @@ class FoMTStudioApp(QMainWindow):
 
     def action_new_project(self):
         if not self._check_close_project(): return
-        path, _ = QFileDialog.getOpenFileName(self, tr("menu_new", self.current_lang), self.last_rom_dir, "GBA ROM (*.gba)")
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        initial_dir = self.last_rom_dir or get_default_workspace_dir()
+        path, _ = QFileDialog.getOpenFileName(self, tr("menu_new", self.current_lang), initial_dir, "GBA ROM (*.gba)")
         if not path: return
         self.last_rom_dir = os.path.dirname(path)
         self.settings.setValue("last_rom_dir", self.last_rom_dir)
-        proj_dir = QFileDialog.getExistingDirectory(self, "Selecciona Carpeta para tu Nuevo Proyecto FoMT Studio")
+        proj_dir = QFileDialog.getExistingDirectory(self, "Selecciona Carpeta para tu Nuevo Proyecto FoMT Studio", initial_dir)
         if not proj_dir: return
         self._start_async_load('new', path, proj_dir)
             
     def action_load_project(self):
         if not self._check_close_project(): return
-        path, _ = QFileDialog.getOpenFileName(self, tr("menu_load", self.current_lang), "", "FoMT Studio Project (*.fsp *.json)")
+        from Banco_de_Datos.Utilidades.rutas import get_sessions_dir, get_default_workspace_dir
+        initial_dir = self.last_rom_dir or get_sessions_dir()
+        path, _ = QFileDialog.getOpenFileName(
+            self, 
+            tr("menu_load", self.current_lang), 
+            initial_dir, 
+            "FoMT Studio Project (*.fsp *.json);;Todos los archivos (*.*)"
+        )
         if not path: return
+        self.last_rom_dir = os.path.dirname(path)
+        self.settings.setValue("last_rom_dir", self.last_rom_dir)
         self._start_async_load('load', None, path)
 
     def _start_async_load(self, mode, rom_path, proj_path):

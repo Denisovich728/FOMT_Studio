@@ -44,6 +44,10 @@ def _get_native_guard():
     
     dll_path = os.path.join(os.path.dirname(__file__), "INTegerGuard.dll")
     if not os.path.exists(dll_path):
+        dll_path = get_resource_path(os.path.join("Banco_de_Datos", "INTegerGuard.dll"))
+    if not os.path.exists(dll_path):
+        dll_path = get_resource_path("INTegerGuard.dll")
+    if not os.path.exists(dll_path):
         raise RomIntegrityError(
             "[CRITICAL INTEGRITY FAILURE] Archivo de autoria y firma digital 'INTegerGuard.dll' no encontrado. "
             "FOMT Studio exige obligatoriamente la presencia de este binario inmutable de autor (Denisovich728) "

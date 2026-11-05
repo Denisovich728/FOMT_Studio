@@ -279,10 +279,14 @@ class SettingsDialog(QDialog):
                 self.e_slider.setValue(min(e_val, self.e_cores))
                 
         # DIR
-        self.txt_dir.setText(self.config.get("default_project_dir", ""))
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        current_dir = self.config.get("default_project_dir", "") or get_default_workspace_dir()
+        self.txt_dir.setText(current_dir)
 
     def _browse_dir(self):
-        directory = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta por defecto", self.txt_dir.text() or os.getcwd())
+        from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+        initial = self.txt_dir.text() or get_default_workspace_dir()
+        directory = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta por defecto", initial)
         if directory:
             self.txt_dir.setText(directory)
 

@@ -4,15 +4,16 @@
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
+    binaries=[
+        ('Banco_de_Datos/INTegerGuard.dll', 'Banco_de_Datos'),
+    ],
     datas=[
-        ('Banco_de_Datos/Cilixes', 'Banco_de_Datos/Cilixes'),
-        ('Banco_de_Datos/Listas_de_Nombres', 'Banco_de_Datos/Listas_de_Nombres'),
-        ('Banco_de_Datos/assets', 'Banco_de_Datos/assets'),
+        ('Banco_de_Datos', 'Banco_de_Datos'),
         ('Consola_de_Comando', 'Consola_de_Comando'),
         ('Consola_de_Comando/Logo de Carga', 'Consola_de_Comando/Logo de Carga'),
         ('Nucleos_Positronicos/Nucleo_de_Sonido/gba-mus-ripper', 'Nucleos_Positronicos/Nucleo_de_Sonido/gba-mus-ripper'),
         ('Nucleos_Positronicos/Nucleo_de_Sonido/fluidsynth_bin', 'Nucleos_Positronicos/Nucleo_de_Sonido/fluidsynth_bin'),
+        ('fomt_config.json', '.'),
     ],
     hiddenimports=[
         'Nucleos_Positronicos.Nucleo_de_Portraits.Melody_Portrait_Engine',

@@ -375,7 +375,7 @@ if __name__ == "__main__":
     
     print("=== Negrozma Sprites Engine v2.0 (Animation Interpreter) ===")
     
-    out_dir = r"C:\Users\Denis\.gemini\antigravity-ide\brain\c5e367b5-58c5-4d66-9173-0df464e12e3b"
+    out_dir = os.path.join(os.getcwd(), "test_export_animations")
     
     # Animaciones a probar: 
     # Popuri Caminando = 0x233

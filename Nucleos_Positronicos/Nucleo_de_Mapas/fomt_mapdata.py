@@ -146,6 +146,58 @@ BUILDING_ROM_ENTRIES = {
     'mountain_cottage': {'summer': 44, 'winter': 45, 'x': 36, 'y': 2},
 }
 
+HOUSE_ROM_ENTRIES = {
+    'double_bed': {'entry': 14, 'w': 4, 'h': 6, 'name': 'Cama Matrimonial'},
+    'single_bed': {'entry': 15, 'w': 4, 'h': 6, 'name': 'Cama Individual'},
+    'large_shelf': {'entry': 16, 'w': 4, 'h': 6, 'name': 'Anaquel Grande'},
+    'small_shelf': {'entry': 17, 'w': 4, 'h': 6, 'name': 'Anaquel Chico'},
+    'large_fridge': {'entry': 18, 'w': 4, 'h': 7, 'name': 'Refrigerador Grande'},
+    'small_fridge': {'entry': 19, 'w': 4, 'h': 7, 'name': 'Refrigerador Chico'},
+    'kitchen_base': {'entry': 20, 'w': 4, 'h': 3, 'name': 'Cocina (Base)'},
+    'kitchen_cabinet': {'entry': 21, 'w': 4, 'h': 3, 'name': 'Alacena Cocina'},
+    'kitchen_utensils': {'entry': 22, 'w': 4, 'h': 3, 'name': 'Cocina (Utensilios)'},
+    'fireplace': {'entry': 23, 'w': 10, 'h': 15, 'name': 'Chimenea'},
+    'bathroom_door': {'entry': 24, 'w': 6, 'h': 8, 'name': 'Baño (Acceso)'},
+    'bathroom_tub': {'entry': 25, 'w': 6, 'h': 8, 'name': 'Baño (Tina)'},
+    'carpet_dining': {'entry': 26, 'w': 3, 'h': 4, 'name': 'Comedor / Alfombra'},
+    'clock_mirror': {'entry': 27, 'w': 2, 'h': 3, 'name': 'Reloj / Espejo'},
+    'rug_mat': {'entry': 28, 'w': 3, 'h': 4, 'name': 'Alfombra'},
+    'table_vase': {'entry': 29, 'w': 3, 'h': 6, 'name': 'Mesa / Florero'},
+}
+
+HOUSE_MAP_DEFAULTS = {
+    41: {
+        'bed': {'type': 'single_bed', 'x': 25, 'y': 15, 'name': 'Cama Individual'},
+        'kitchen': {'type': 'kitchen_base', 'x': 1, 'y': 17, 'name': 'Cocina Base'},
+        'clock_mirror': {'type': 'clock_mirror', 'x': 19, 'y': 6, 'name': 'Reloj / Espejo'},
+        'rug_mat': {'type': 'rug_mat', 'x': 8, 'y': 2, 'name': 'Alfombra'},
+    },
+    42: {
+        'bed': {'type': 'single_bed', 'x': 40, 'y': 15, 'name': 'Cama Individual'},
+        'fireplace': {'type': 'fireplace', 'x': 2, 'y': 1, 'name': 'Chimenea'},
+        'shelf': {'type': 'small_shelf', 'x': 11, 'y': 3, 'name': 'Anaquel Chico'},
+        'fridge': {'type': 'small_fridge', 'x': 15, 'y': 2, 'name': 'Refrigerador Chico'},
+        'kitchen': {'type': 'kitchen_base', 'x': 16, 'y': 17, 'name': 'Cocina Base'},
+        'carpet_dining': {'type': 'carpet_dining', 'x': 23, 'y': 10, 'name': 'Comedor'},
+        'clock_mirror': {'type': 'clock_mirror', 'x': 34, 'y': 6, 'name': 'Reloj / Espejo'},
+        'rug_mat': {'type': 'rug_mat', 'x': 23, 'y': 2, 'name': 'Alfombra'},
+        'table_vase': {'type': 'table_vase', 'x': 20, 'y': 3, 'name': 'Mesa Florero'},
+    },
+    43: {
+        'bed': {'type': 'double_bed', 'x': 54, 'y': 15, 'name': 'Cama Matrimonial'},
+        'fireplace': {'type': 'fireplace', 'x': 10, 'y': 1, 'name': 'Chimenea'},
+        'bathroom_door': {'type': 'bathroom_door', 'x': 4, 'y': 1, 'name': 'Baño (Puerta)'},
+        'bathroom_tub': {'type': 'bathroom_tub', 'x': 52, 'y': 5, 'name': 'Baño (Tina)'},
+        'shelf': {'type': 'large_shelf', 'x': 19, 'y': 3, 'name': 'Anaquel Grande'},
+        'fridge': {'type': 'large_fridge', 'x': 23, 'y': 2, 'name': 'Refrigerador Grande'},
+        'kitchen': {'type': 'kitchen_utensils', 'x': 24, 'y': 17, 'name': 'Cocina Completa'},
+        'carpet_dining': {'type': 'carpet_dining', 'x': 31, 'y': 10, 'name': 'Comedor'},
+        'clock_mirror': {'type': 'clock_mirror', 'x': 42, 'y': 6, 'name': 'Reloj / Espejo'},
+        'rug_mat': {'type': 'rug_mat', 'x': 31, 'y': 2, 'name': 'Alfombra'},
+        'table_vase': {'type': 'table_vase', 'x': 28, 'y': 3, 'name': 'Mesa Florero'},
+    }
+}
+
 class FomtMapRenderer:
     """
     Motor de renderizado de mapas FoMT basado en la arquitectura de blue-spider.
@@ -182,7 +234,17 @@ class FomtMapRenderer:
             'field_grid': False,       # Malla canónica de cultivo 43x25 plots
             'beach_cottage': True,     # Villa de la playa (Mapas 08, 09)
             'mountain_cottage': True,  # Villa de la montaña (Mapas 14, 15)
-            'town_cottage': True       # Villa de la ciudad (Mapas 04, 05, 06, 07)
+            'town_cottage': True,      # Villa de la ciudad (Mapas 04, 05, 06, 07)
+            'house': {
+                'bed': 'auto',        # 'auto', 'single', 'double', 'none'
+                'kitchen': 'auto',    # 'auto', 'base', 'utensils', 'none'
+                'fridge': 'auto',     # 'auto', 'small', 'large', 'none'
+                'shelf': 'auto',      # 'auto', 'small', 'large', 'none'
+                'fireplace': True,    # True, False
+                'bathroom': True,     # True, False
+                'extras': True,       # Espejo, Alfombra, Mesa
+            },
+            'positions': {},          # Overrides: {'bed': (x, y), 'farmhouse': (x, y), ...}
         }
 
     def load_map(self, map_header) -> bool:
@@ -448,44 +510,148 @@ class FomtMapRenderer:
         # Estampar estructuras dinamicas 100% nativas desde la tabla de la ROM
         # Orden: array_bg3 (suelo), array_bg2 (paredes/techo), array_bg1 (frente)
         if dyn_cfg.get('enabled', True):
+            positions = dyn_cfg.get('positions', {})
             if map_id in (0, 1):
                 # 1. Casa de Campo (Lv1, Lv2, Lv3)
                 h_lvl = dyn_cfg.get('farmhouse', 'lv1')
                 if h_lvl in BUILDING_ROM_ENTRIES['farmhouse']:
                     info = BUILDING_ROM_ENTRIES['farmhouse'][h_lvl]
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'], active_col, active_dict)
+                    pos_x, pos_y = positions.get('farmhouse', (info['x'], info['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], pos_x, pos_y, active_col, active_dict)
 
                 # 2. Granero (Lv1, Lv2)
                 b_lvl = dyn_cfg.get('barn', 'lv1')
                 if b_lvl in BUILDING_ROM_ENTRIES['barn']:
                     info = BUILDING_ROM_ENTRIES['barn'][b_lvl]
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'], active_col, active_dict)
+                    pos_x, pos_y = positions.get('barn', (info['x'], info['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], pos_x, pos_y, active_col, active_dict)
 
                 # 3. Gallinero (Lv1, Lv2)
                 c_lvl = dyn_cfg.get('chicken_coop', 'lv1')
                 if c_lvl in BUILDING_ROM_ENTRIES['chicken_coop']:
                     info = BUILDING_ROM_ENTRIES['chicken_coop'][c_lvl]
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], info['x'], info['y'], active_col, active_dict)
+                    pos_x, pos_y = positions.get('chicken_coop', (info['x'], info['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, info[season_key], pos_x, pos_y, active_col, active_dict)
 
                 # 4. Extras de Granja (Buzon)
                 if dyn_cfg.get('extras', True):
                     mb = BUILDING_ROM_ENTRIES['mailbox']
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mb[season_key], mb['x'], mb['y'], active_col, active_dict)
+                    pos_x, pos_y = positions.get('mailbox', (mb['x'], mb['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mb[season_key], pos_x, pos_y, active_col, active_dict)
+
+            elif map_id in (41, 42, 43):
+                # Casa del Jugador (Lv1, Lv2, Lv3) - Estructuras interiores dinámicas
+                defaults = HOUSE_MAP_DEFAULTS.get(map_id, {})
+                house_cfg = dyn_cfg.get('house', {})
+
+                # Cama (Single o Double)
+                bed_choice = house_cfg.get('bed', 'auto')
+                if bed_choice == 'auto':
+                    bed_type = 'double_bed' if map_id == 43 else 'single_bed'
+                elif bed_choice == 'double':
+                    bed_type = 'double_bed'
+                elif bed_choice == 'single':
+                    bed_type = 'single_bed'
+                else:
+                    bed_type = None
+
+                if bed_type and bed_type in HOUSE_ROM_ENTRIES:
+                    def_pos = defaults.get('bed', {'x': 25, 'y': 15})
+                    bx, by = positions.get('bed', (def_pos['x'], def_pos['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[bed_type]['entry'], bx, by, active_col, active_dict)
+
+                # Cocina
+                k_choice = house_cfg.get('kitchen', 'auto')
+                if k_choice == 'auto':
+                    k_type = 'kitchen_utensils' if map_id == 43 else 'kitchen_base'
+                elif k_choice == 'utensils':
+                    k_type = 'kitchen_utensils'
+                elif k_choice == 'base':
+                    k_type = 'kitchen_base'
+                else:
+                    k_type = None
+
+                if k_type and k_type in HOUSE_ROM_ENTRIES:
+                    def_pos = defaults.get('kitchen', {'x': 1, 'y': 17})
+                    kx, ky = positions.get('kitchen', (def_pos['x'], def_pos['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[k_type]['entry'], kx, ky, active_col, active_dict)
+
+                # Refrigerador (Mapas 42 y 43)
+                if map_id in (42, 43):
+                    f_choice = house_cfg.get('fridge', 'auto')
+                    if f_choice == 'auto':
+                        f_type = 'large_fridge' if map_id == 43 else 'small_fridge'
+                    elif f_choice == 'large':
+                        f_type = 'large_fridge'
+                    elif f_choice == 'small':
+                        f_type = 'small_fridge'
+                    else:
+                        f_type = None
+
+                    if f_type and f_type in HOUSE_ROM_ENTRIES:
+                        def_pos = defaults.get('fridge', {'x': 15, 'y': 2})
+                        fx, fy = positions.get('fridge', (def_pos['x'], def_pos['y']))
+                        self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[f_type]['entry'], fx, fy, active_col, active_dict)
+
+                # Anaquel / Estante (Mapas 42 y 43)
+                if map_id in (42, 43):
+                    s_choice = house_cfg.get('shelf', 'auto')
+                    if s_choice == 'auto':
+                        s_type = 'large_shelf' if map_id == 43 else 'small_shelf'
+                    elif s_choice == 'large':
+                        s_type = 'large_shelf'
+                    elif s_choice == 'small':
+                        s_type = 'small_shelf'
+                    else:
+                        s_type = None
+
+                    if s_type and s_type in HOUSE_ROM_ENTRIES:
+                        def_pos = defaults.get('shelf', {'x': 11, 'y': 3})
+                        sx, sy = positions.get('shelf', (def_pos['x'], def_pos['y']))
+                        self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[s_type]['entry'], sx, sy, active_col, active_dict)
+
+                # Chimenea (Mapas 42 y 43)
+                if map_id in (42, 43) and house_cfg.get('fireplace', True):
+                    def_pos = defaults.get('fireplace', {'x': 2, 'y': 1})
+                    px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['fireplace']['entry'], px, py, active_col, active_dict)
+
+                # Baño (Mapa 43)
+                if map_id == 43 and house_cfg.get('bathroom', True):
+                    def_pos_door = defaults.get('bathroom_door', {'x': 4, 'y': 1})
+                    dx, dy = positions.get('bathroom_door', (def_pos_door['x'], def_pos_door['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['bathroom_door']['entry'], dx, dy, active_col, active_dict)
+
+                    def_pos_tub = defaults.get('bathroom_tub', {'x': 52, 'y': 5})
+                    tx, ty = positions.get('bathroom_tub', (def_pos_tub['x'], def_pos_tub['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['bathroom_tub']['entry'], tx, ty, active_col, active_dict)
+
+                # Extras decorativos (Reloj/Espejo, Alfombra, Mesa/Florero, Comedor)
+                if house_cfg.get('extras', True):
+                    for extra_key in ['clock_mirror', 'rug_mat', 'table_vase', 'carpet_dining']:
+                        if extra_key in defaults:
+                            entry_type = defaults[extra_key]['type']
+                            def_pos = defaults[extra_key]
+                            ex, ey = positions.get(extra_key, (def_pos['x'], def_pos['y']))
+                            self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[entry_type]['entry'], ex, ey, active_col, active_dict)
 
             elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
                 # Villa de la Playa
                 bc = BUILDING_ROM_ENTRIES['beach_cottage']
-                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bc[season_key], bc['x'], bc['y'], active_col, active_dict)
+                pos_x, pos_y = positions.get('beach_cottage', (bc['x'], bc['y']))
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bc[season_key], pos_x, pos_y, active_col, active_dict)
 
             elif map_id in (14, 15) and dyn_cfg.get('mountain_cottage', True):
                 # Villa de la Montana
                 mc = BUILDING_ROM_ENTRIES['mountain_cottage']
-                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mc[season_key], mc['x'], mc['y'], active_col, active_dict)
+                pos_x, pos_y = positions.get('mountain_cottage', (mc['x'], mc['y']))
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, mc[season_key], pos_x, pos_y, active_col, active_dict)
 
             elif map_id in (4, 5, 6, 7) and dyn_cfg.get('town_cottage', True):
                 # Villa de la Ciudad
                 tc = BUILDING_ROM_ENTRIES['town_cottage']
-                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, tc[season_key], tc['x'], tc['y'], active_col, active_dict)
+                pos_x, pos_y = positions.get('town_cottage', (tc['x'], tc['y']))
+                self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, tc[season_key], pos_x, pos_y, active_col, active_dict)
 
         self.active_collision_map = bytes(active_col) if active_col else None
         self.active_behavior_dict = bytes(active_dict) if active_dict else None
@@ -706,3 +872,125 @@ class FomtMapRenderer:
         header_word_addr = off_obj1 + val * 4
         if addr == header_word_addr + 2:
             struct.pack_into('<H', self.rom, header_word_addr, new_flags)
+
+    def get_active_dynamic_structures(self) -> list:
+        """
+        Retorna la lista de todas las estructuras dinámicas activas en el mapa actual
+        con su identificador, nombre legible, posición (x, y) en tiles y dimensiones (w, h).
+        """
+        map_id = getattr(self._map_header, 'map_id', 0) if self._map_header else 0
+        dyn_cfg = getattr(self, 'dynamic_config', {})
+        if not dyn_cfg.get('enabled', True):
+            return []
+
+        positions = dyn_cfg.get('positions', {})
+        results = []
+
+        if map_id in (0, 1):
+            # Granja
+            h_lvl = dyn_cfg.get('farmhouse', 'lv1')
+            if h_lvl in BUILDING_ROM_ENTRIES['farmhouse']:
+                info = BUILDING_ROM_ENTRIES['farmhouse'][h_lvl]
+                px, py = positions.get('farmhouse', (info['x'], info['y']))
+                entry = info['summer']
+                w, h = self._get_structure_dimensions(entry)
+                results.append({'id': 'farmhouse', 'name': f'Casa de Campo ({h_lvl.upper()})', 'x': px, 'y': py, 'w': w, 'h': h, 'entry': entry})
+
+            b_lvl = dyn_cfg.get('barn', 'lv1')
+            if b_lvl in BUILDING_ROM_ENTRIES['barn']:
+                info = BUILDING_ROM_ENTRIES['barn'][b_lvl]
+                px, py = positions.get('barn', (info['x'], info['y']))
+                entry = info['summer']
+                w, h = self._get_structure_dimensions(entry)
+                results.append({'id': 'barn', 'name': f'Establo ({b_lvl.upper()})', 'x': px, 'y': py, 'w': w, 'h': h, 'entry': entry})
+
+            c_lvl = dyn_cfg.get('chicken_coop', 'lv1')
+            if c_lvl in BUILDING_ROM_ENTRIES['chicken_coop']:
+                info = BUILDING_ROM_ENTRIES['chicken_coop'][c_lvl]
+                px, py = positions.get('chicken_coop', (info['x'], info['y']))
+                entry = info['summer']
+                w, h = self._get_structure_dimensions(entry)
+                results.append({'id': 'chicken_coop', 'name': f'Gallinero ({c_lvl.upper()})', 'x': px, 'y': py, 'w': w, 'h': h, 'entry': entry})
+
+            if dyn_cfg.get('extras', True):
+                mb = BUILDING_ROM_ENTRIES['mailbox']
+                px, py = positions.get('mailbox', (mb['x'], mb['y']))
+                entry = mb['summer']
+                w, h = self._get_structure_dimensions(entry)
+                results.append({'id': 'mailbox', 'name': 'Buzón / Caseta', 'x': px, 'y': py, 'w': w, 'h': h, 'entry': entry})
+
+        elif map_id in (41, 42, 43):
+            # Casa del Jugador
+            defaults = HOUSE_MAP_DEFAULTS.get(map_id, {})
+            house_cfg = dyn_cfg.get('house', {})
+
+            bed_choice = house_cfg.get('bed', 'auto')
+            bed_type = ('double_bed' if map_id == 43 else 'single_bed') if bed_choice == 'auto' else ('double_bed' if bed_choice == 'double' else ('single_bed' if bed_choice == 'single' else None))
+            if bed_type and bed_type in HOUSE_ROM_ENTRIES:
+                def_pos = defaults.get('bed', {'x': 25, 'y': 15})
+                bx, by = positions.get('bed', (def_pos['x'], def_pos['y']))
+                e_info = HOUSE_ROM_ENTRIES[bed_type]
+                results.append({'id': 'bed', 'name': e_info['name'], 'x': bx, 'y': by, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+            k_choice = house_cfg.get('kitchen', 'auto')
+            k_type = ('kitchen_utensils' if map_id == 43 else 'kitchen_base') if k_choice == 'auto' else ('kitchen_utensils' if k_choice == 'utensils' else ('kitchen_base' if k_choice == 'base' else None))
+            if k_type and k_type in HOUSE_ROM_ENTRIES:
+                def_pos = defaults.get('kitchen', {'x': 1, 'y': 17})
+                kx, ky = positions.get('kitchen', (def_pos['x'], def_pos['y']))
+                e_info = HOUSE_ROM_ENTRIES[k_type]
+                results.append({'id': 'kitchen', 'name': e_info['name'], 'x': kx, 'y': ky, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+            if map_id in (42, 43):
+                f_choice = house_cfg.get('fridge', 'auto')
+                f_type = ('large_fridge' if map_id == 43 else 'small_fridge') if f_choice == 'auto' else ('large_fridge' if f_choice == 'large' else ('small_fridge' if f_choice == 'small' else None))
+                if f_type and f_type in HOUSE_ROM_ENTRIES:
+                    def_pos = defaults.get('fridge', {'x': 15, 'y': 2})
+                    fx, fy = positions.get('fridge', (def_pos['x'], def_pos['y']))
+                    e_info = HOUSE_ROM_ENTRIES[f_type]
+                    results.append({'id': 'fridge', 'name': e_info['name'], 'x': fx, 'y': fy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+                s_choice = house_cfg.get('shelf', 'auto')
+                s_type = ('large_shelf' if map_id == 43 else 'small_shelf') if s_choice == 'auto' else ('large_shelf' if s_choice == 'large' else ('small_shelf' if s_choice == 'small' else None))
+                if s_type and s_type in HOUSE_ROM_ENTRIES:
+                    def_pos = defaults.get('shelf', {'x': 11, 'y': 3})
+                    sx, sy = positions.get('shelf', (def_pos['x'], def_pos['y']))
+                    e_info = HOUSE_ROM_ENTRIES[s_type]
+                    results.append({'id': 'shelf', 'name': e_info['name'], 'x': sx, 'y': sy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+                if house_cfg.get('fireplace', True):
+                    def_pos = defaults.get('fireplace', {'x': 2, 'y': 1})
+                    px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
+                    e_info = HOUSE_ROM_ENTRIES['fireplace']
+                    results.append({'id': 'fireplace', 'name': e_info['name'], 'x': px, 'y': py, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+            if map_id == 43 and house_cfg.get('bathroom', True):
+                def_pos_door = defaults.get('bathroom_door', {'x': 4, 'y': 1})
+                dx, dy = positions.get('bathroom_door', (def_pos_door['x'], def_pos_door['y']))
+                e_info = HOUSE_ROM_ENTRIES['bathroom_door']
+                results.append({'id': 'bathroom_door', 'name': e_info['name'], 'x': dx, 'y': dy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+                def_pos_tub = defaults.get('bathroom_tub', {'x': 52, 'y': 5})
+                tx, ty = positions.get('bathroom_tub', (def_pos_tub['x'], def_pos_tub['y']))
+                e_info = HOUSE_ROM_ENTRIES['bathroom_tub']
+                results.append({'id': 'bathroom_tub', 'name': e_info['name'], 'x': tx, 'y': ty, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+            if house_cfg.get('extras', True):
+                for extra_key in ['clock_mirror', 'rug_mat', 'table_vase', 'carpet_dining']:
+                    if extra_key in defaults:
+                        def_pos = defaults[extra_key]
+                        ex, ey = positions.get(extra_key, (def_pos['x'], def_pos['y']))
+                        e_info = HOUSE_ROM_ENTRIES[def_pos['type']]
+                        results.append({'id': extra_key, 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+        return results
+
+    def _get_structure_dimensions(self, entry_index: int) -> tuple:
+        table_offset = ROM_BUILDINGS_TABLE + (entry_index * 24)
+        if table_offset + 24 <= len(self.rom):
+            import struct
+            chunk = self.rom[table_offset : table_offset + 24]
+            flags = struct.unpack_from('<H', chunk, 0)[0]
+            w = flags & 0xFF
+            h = (flags >> 8) & 0xFF
+            return (w, h)
+        return (0, 0)
