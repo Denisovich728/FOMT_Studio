@@ -187,11 +187,11 @@ HOUSE_ROM_ENTRIES = {
 }
 
 MAKER_ROM_ENTRIES = {
-    # Gallinero (Chicken Coop, Mapa 17) - Entry 29
-    'mayo_maker': {'entry': 29, 'desc_off': 0x106C2C, 'w': 3, 'h': 5, 'x': 2, 'y': 5, 'name': 'Máquina de Mayonesa'},
-    # Establo (Barn, Mapa 37) - Entries 30 y 31
-    'yarn_maker': {'entry': 30, 'desc_off': 0x106C44, 'w': 3, 'h': 5, 'x': 8, 'y': 5, 'name': 'Máquina de Lana'},
-    'cheese_maker': {'entry': 31, 'desc_off': 0x106C5C, 'w': 3, 'h': 5, 'x': 12, 'y': 5, 'name': 'Máquina de Queso'},
+    # Gallinero (Chicken Coop, Mapas 36 y 37) - Entry 39 / Desc 0x106C2C
+    'mayo_maker': {'entry': 39, 'desc_off': 0x106C2C, 'w': 3, 'h': 5, 'x': 2, 'y': 5, 'name': 'Máquina de Mayonesa'},
+    # Establo (Barn, Mapas 38 y 39) - Entries 40 y 41 / Descs 0x106C44 y 0x106C5C
+    'yarn_maker': {'entry': 40, 'desc_off': 0x106C44, 'w': 3, 'h': 5, 'x': 8, 'y': 5, 'name': 'Máquina de Lana'},
+    'cheese_maker': {'entry': 41, 'desc_off': 0x106C5C, 'w': 3, 'h': 5, 'x': 12, 'y': 5, 'name': 'Máquina de Queso'},
 }
 
 HOUSE_UTENSILS = [
@@ -230,8 +230,8 @@ HOUSE_MAP_DEFAULTS = {
         'fridge': {'type': 'fridge_closed', 'x': 19, 'y': 3, 'name': 'Refrigerador'},
         'shelf': {'type': 'shelf_closed', 'x': 23, 'y': 2, 'name': 'Anaquel'},
         'kitchen_counter': {'type': 'kitchen_counter', 'x': 10, 'y': 1, 'name': 'Mueble de Cocina'},
-        'fireplace': {'type': 'fireplace', 'x': 1, 'y': 2, 'name': 'Chimenea'},
-        'bathroom_door': {'type': 'bathroom_door_closed', 'x': 4, 'y': 1, 'name': 'Puerta del Baño'},
+        'fireplace': {'type': 'fireplace', 'x': 4, 'y': 1, 'name': 'Chimenea'},
+        'bathroom_door': {'type': 'bathroom_door_closed', 'x': 1, 'y': 2, 'name': 'Puerta del Baño'},
         'double_bed': {'type': 'double_bed', 'x': 52, 'y': 5, 'name': 'Cama Matrimonial'},
         'carpet_dining': {'type': 'carpet_dining', 'x': 31, 'y': 10, 'name': 'Comedor / Alfombra'},
         'vase': {'type': 'vase', 'x': 42, 'y': 6, 'name': 'Florero'},
@@ -457,12 +457,9 @@ class FomtMapRenderer:
             return
 
         w, h = struct.unpack_from('<BB', self.rom, desc_off)
-        p_bg1, p_bg2, p_bg3, p_lut, p_map = struct.unpack_from('<IIIII', self.rom, desc_off + 4)
+        # En FoMT hardware: +4 es BG3 (Suelo/Piso/Fondo), +8 es BG2 (Objetos/Muebles/Estructura), +12 es BG1 (Frente/Overlay)
+        p_bg3, p_bg2, p_bg1, p_lut, p_map = struct.unpack_from('<IIIII', self.rom, desc_off + 4)
 
-        # 1. Capas graficas de tiles 8x8 segun orden de hardware GBA FoMT:
-        # +0x04 (p_bg1): Frente/Detalles superiores -> bg_fore (array_bg1)
-        # +0x08 (p_bg2): Estructura, paredes y techos -> bg_overlay (array_bg2)
-        # +0x0C (p_bg3): Suelo/despeje base -> bg_ground (array_bg3)
         for ptr, tmap in [(p_bg3, bg_ground), (p_bg2, bg_overlay), (p_bg1, bg_fore)]:
             if ptr != 0 and tmap is not None:
                 off = ptr & 0x01FFFFFF
@@ -683,23 +680,23 @@ class FomtMapRenderer:
                     ex, ey = positions.get('clock', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['clock']['entry'], ex, ey, active_col, active_dict)
 
-            elif map_id == 17:
-                # Gallinero (Chicken Coop) - Maquina de Mayonesa
+            elif map_id in (36, 37):
+                # Gallinero (Chicken Coop 1 y 2) - Maquina de Mayonesa
                 if dyn_cfg.get('mayo_maker', True):
                     m_info = MAKER_ROM_ENTRIES['mayo_maker']
                     mx, my = positions.get('mayo_maker', (m_info['x'], m_info['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['desc_off'], mx, my, active_col, active_dict)
 
-            elif map_id == 37:
-                # Establo (Barn) - Maquina de Lana y Maquina de Queso
+            elif map_id in (38, 39):
+                # Establo (Barn 1 y 2) - Maquina de Lana y Maquina de Queso
                 if dyn_cfg.get('yarn_maker', True):
                     m_info = MAKER_ROM_ENTRIES['yarn_maker']
                     mx, my = positions.get('yarn_maker', (m_info['x'], m_info['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['desc_off'], mx, my, active_col, active_dict)
                 if dyn_cfg.get('cheese_maker', True):
                     m_info = MAKER_ROM_ENTRIES['cheese_maker']
                     mx, my = positions.get('cheese_maker', (m_info['x'], m_info['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['desc_off'], mx, my, active_col, active_dict)
 
             elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
                 # Villa de la Playa
@@ -802,7 +799,11 @@ class FomtMapRenderer:
 
             img.paste(overlay, (0, 0), overlay)
 
-        return img
+        # Eliminar canal alfa residual/agujeros transparentes componiendo sobre fondo negro solido
+        # (Fondo backdrop canonico de hardware GBA - elimina huecos en baul, puerta y chimenea)
+        final_bg = Image.new('RGBA', img.size, (0, 0, 0, 255))
+        final_bg.paste(img, (0, 0), img)
+        return final_bg
 
     def get_effective_collision(self) -> tuple[bytes | None, bytes | None]:
         """Devuelve (collision_map, behavior_dict) con las estructuras dinamicas estampadas."""
@@ -1091,13 +1092,13 @@ class FomtMapRenderer:
                 e_info = HOUSE_ROM_ENTRIES['clock']
                 results.append({'id': 'clock', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
 
-        elif map_id == 17:
+        elif map_id in (36, 37):
             if dyn_cfg.get('mayo_maker', True):
                 m_info = MAKER_ROM_ENTRIES['mayo_maker']
                 mx, my = positions.get('mayo_maker', (m_info['x'], m_info['y']))
                 results.append({'id': 'mayo_maker', 'name': m_info['name'], 'x': mx, 'y': my, 'w': m_info['w'], 'h': m_info['h'], 'entry': m_info['entry']})
 
-        elif map_id == 37:
+        elif map_id in (38, 39):
             if dyn_cfg.get('yarn_maker', True):
                 m_info = MAKER_ROM_ENTRIES['yarn_maker']
                 mx, my = positions.get('yarn_maker', (m_info['x'], m_info['y']))

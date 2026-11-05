@@ -656,6 +656,7 @@ class VisorMapas(QWidget):
             self._loader_thread.wait()
 
         map_obj = self.map_parser.maps[row]
+        self.current_map_header = map_obj
         self.lbl_info.setText(
             f"[Cargando mapa] [{map_obj.map_id:03X}] {map_obj.get_name()} "
             f"({map_obj.width}×{map_obj.height} celdas, {map_obj.width*8}×{map_obj.height*8} px)..."
@@ -864,6 +865,7 @@ class VisorMapas(QWidget):
         w = self.renderer.width
         palettes = self.renderer.palettes_1 if self.cmb_bank.currentIndex() == 0 else self.renderer.palettes_2
         mh = self._loader_thread.map_header
+        self.current_map_header = mh
         
         info = f"[OK] Renderizado: {w}×{h} celdas | "
         info += f"{len(palettes)} paletas | {len(self.renderer.tiles)} tiles | "
@@ -877,8 +879,8 @@ class VisorMapas(QWidget):
         is_beach = (map_id in (8, 9))
         is_mountain = (map_id in (14, 15))
         is_town = (map_id in (4, 5, 6, 7))
-        is_coop = (map_id == 17)
-        is_barn = (map_id == 37)
+        is_coop = (map_id in (36, 37))
+        is_barn = (map_id in (38, 39))
         has_dyn = (is_farm or is_house or is_beach or is_mountain or is_town or is_coop or is_barn)
 
         if hasattr(self, 'chk_dyn_enabled'):
@@ -1572,8 +1574,16 @@ class VisorMapas(QWidget):
             self._on_dynamic_config_changed()
 
     def _open_dynamic_structures_dialog(self):
-        if not self.map_header: return
-        map_id = getattr(self.map_header, 'map_id', 0)
+        map_header = getattr(self, 'current_map_header', None)
+        if not map_header and hasattr(self, 'selected_map_index') and 0 <= self.selected_map_index < len(self.map_parser.maps):
+            map_header = self.map_parser.maps[self.selected_map_index]
+            self.current_map_header = map_header
+        if not map_header and hasattr(self, '_loader_thread') and self._loader_thread:
+            map_header = getattr(self._loader_thread, 'map_header', None)
+            self.current_map_header = map_header
+        if not map_header:
+            return
+        map_id = getattr(map_header, 'map_id', 0)
         dialog = QDialog(self)
         dialog.setWindowTitle(f"Estructuras Dinámicas - Mapa {map_id}")
         dialog.setMinimumWidth(380)
@@ -1692,8 +1702,8 @@ class VisorMapas(QWidget):
 
             dlg_layout.addWidget(grp_decor)
 
-        elif map_id == 17:
-            # Gallinero (Chicken Coop)
+        elif map_id in (36, 37):
+            # Gallinero (Chicken Coop 1 y 2)
             grp_coop = QGroupBox("Maquinaria del Gallinero")
             vbox_c = QVBoxLayout(grp_coop)
             chk_mayo = QCheckBox("Máquina de Mayonesa (3x5 tiles, Canon X=2, Y=5)")
@@ -1701,8 +1711,8 @@ class VisorMapas(QWidget):
             vbox_c.addWidget(chk_mayo)
             dlg_layout.addWidget(grp_coop)
 
-        elif map_id == 37:
-            # Establo (Barn)
+        elif map_id in (38, 39):
+            # Establo (Barn 1 y 2)
             grp_barn = QGroupBox("Maquinaria del Establo")
             vbox_b = QVBoxLayout(grp_barn)
             chk_cheese = QCheckBox("Máquina de Queso (3x5 tiles, Canon X=12, Y=5)")
@@ -1739,10 +1749,10 @@ class VisorMapas(QWidget):
                 self.house_vase_choice = chk_vase.isChecked()
                 self.house_mirror_choice = chk_mirror.isChecked()
                 if chk_clock: self.house_clock_choice = chk_clock.isChecked()
-            elif map_id == 17:
-                self.maker_mayo_choice = chk_mayo.isChecked()
-            elif map_id == 37:
-                self.maker_cheese_choice = chk_cheese.isChecked()
-                self.maker_yarn_choice = chk_yarn.isChecked()
+            elif map_id in (36, 37):
+                if chk_mayo: self.maker_mayo_choice = chk_mayo.isChecked()
+            elif map_id in (38, 39):
+                if chk_cheese: self.maker_cheese_choice = chk_cheese.isChecked()
+                if chk_yarn: self.maker_yarn_choice = chk_yarn.isChecked()
 
             self._on_dynamic_config_changed()
