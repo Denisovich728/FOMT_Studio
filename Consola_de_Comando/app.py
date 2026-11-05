@@ -669,9 +669,15 @@ class FoMTStudioApp(QMainWindow):
             "FoMT Studio Project (*.fsp *.json);;Todos los archivos (*.*)"
         )
         if not path: return
-        self.last_rom_dir = os.path.dirname(path)
+        from Banco_de_Datos.Utilidades.rutas import resolve_project_fsp_path
+        resolved = resolve_project_fsp_path(path)
+        target_path = resolved or path
+        if not os.path.exists(target_path):
+            QMessageBox.warning(self, tr("err_fatal", self.current_lang), f"No se pudo encontrar el archivo o sesión especificada:\n{path}")
+            return
+        self.last_rom_dir = os.path.dirname(target_path)
         self.settings.setValue("last_rom_dir", self.last_rom_dir)
-        self._start_async_load('load', None, path)
+        self._start_async_load('load', None, target_path)
 
     def _start_async_load(self, mode, rom_path, proj_path):
         self.status.showMessage(tr("msg_bg_task_starting", self.current_lang))

@@ -148,42 +148,50 @@ BUILDING_ROM_ENTRIES = {
 
 HOUSE_ROM_ENTRIES = {
     # Caja de Herramientas (Toolbox) - 4x6 tiles
-    'tool_box_closed': {'entry': 12, 'desc_off': 0x106A94, 'w': 4, 'h': 6, 'name': 'Caja de Herramientas (Cerrada)'},
-    'tool_box_open': {'entry': 11, 'desc_off': 0x106A7C, 'w': 4, 'h': 6, 'name': 'Caja de Herramientas (Abierta)'},
-    
-    # Refrigerador (Fridge) - 4x6 tiles
-    'fridge_closed': {'entry': 14, 'desc_off': 0x106AC4, 'w': 4, 'h': 6, 'name': 'Refrigerador (Cerrado)'},
-    'fridge_open': {'entry': 13, 'desc_off': 0x106AAC, 'w': 4, 'h': 6, 'name': 'Refrigerador (Abierto)'},
-    
-    # Anaquel / Estante (Shelf) - 4x7 tiles
-    'shelf_closed': {'entry': 16, 'desc_off': 0x106AF4, 'w': 4, 'h': 7, 'name': 'Anaquel (Cerrado)'},
-    'shelf_open': {'entry': 15, 'desc_off': 0x106ADC, 'w': 4, 'h': 7, 'name': 'Anaquel (Abierto)'},
+    'tool_box_closed': {'entry': 15, 'desc_off': 0x106A94, 'w': 4, 'h': 6, 'name': 'Caja de Herramientas (Cerrada)'},
+    'tool_box_open': {'entry': 14, 'desc_off': 0x106A7C, 'w': 4, 'h': 6, 'name': 'Caja de Herramientas (Abierta)'},
     
     # Mesa Tocadiscos (Record Player) - 4x3 tiles
-    'record_player_base': {'entry': 17, 'desc_off': 0x106B0C, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Base)'},
-    'record_player_discs': {'entry': 18, 'desc_off': 0x106B24, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Con Discos)'},
-    'record_player_active': {'entry': 19, 'desc_off': 0x106B3C, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Reproduciendo)'},
+    'record_player_base': {'entry': 20, 'desc_off': 0x106B0C, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Base)'},
+    'record_player_discs': {'entry': 21, 'desc_off': 0x106B24, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Con Discos)'},
+    'record_player_active': {'entry': 22, 'desc_off': 0x106B3C, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Reproduciendo)'},
+    
+    # Refrigerador (Fridge) - 4x6 tiles
+    'fridge_closed': {'entry': 17, 'desc_off': 0x106AC4, 'w': 4, 'h': 6, 'name': 'Refrigerador (Cerrado)'},
+    'fridge_open': {'entry': 16, 'desc_off': 0x106AAC, 'w': 4, 'h': 6, 'name': 'Refrigerador (Abierto)'},
+    
+    # Anaquel / Estante (Shelf) - 4x7 tiles
+    'shelf_closed': {'entry': 19, 'desc_off': 0x106AF4, 'w': 4, 'h': 7, 'name': 'Anaquel (Cerrado)'},
+    'shelf_open': {'entry': 18, 'desc_off': 0x106ADC, 'w': 4, 'h': 7, 'name': 'Anaquel (Abierto)'},
     
     # Mueble de Cocina (Kitchen Counter) - 10x15 tiles
-    'kitchen_counter': {'entry': 20, 'desc_off': 0x106B54, 'w': 10, 'h': 15, 'name': 'Mueble de Cocina'},
+    'kitchen_counter': {'entry': 23, 'desc_off': 0x106B54, 'w': 10, 'h': 15, 'name': 'Mueble de Cocina'},
     
-    # Chimenea (Fireplace) - 6x8 tiles
-    'fireplace': {'entry': 21, 'desc_off': 0x106B6C, 'w': 6, 'h': 8, 'name': 'Chimenea'},
+    # Chimenea (Fireplace) - 6x8 tiles (Entry 24 auténtica)
+    'fireplace': {'entry': 24, 'desc_off': 0x106B6C, 'w': 6, 'h': 8, 'name': 'Chimenea'},
     
-    # Cama Matrimonial (Double Bed) - 6x8 tiles
-    'double_bed': {'entry': 22, 'desc_off': 0x106B84, 'w': 6, 'h': 8, 'name': 'Cama Matrimonial'},
-    
-    # Comedor / Alfombra Grande (Dining Carpet & Table) - 12x10 tiles
-    'carpet_dining': {'entry': 23, 'desc_off': 0x106B9C, 'w': 12, 'h': 10, 'name': 'Comedor / Alfombra Grande'},
-    
-    # Extras individuales
-    'table_vase': {'entry': 24, 'desc_off': 0x106BB4, 'w': 2, 'h': 3, 'name': 'Florero'},
-    'mirror': {'entry': 25, 'desc_off': 0x106BCC, 'w': 3, 'h': 4, 'name': 'Espejo'},
-    'clock': {'entry': 26, 'desc_off': 0x106BE4, 'w': 3, 'h': 6, 'name': 'Reloj'},
+    # Cama Matrimonial (Double Bed) - 6x8 tiles (Entry 25)
+    'double_bed': {'entry': 25, 'desc_off': 0x106B84, 'w': 6, 'h': 8, 'name': 'Cama Matrimonial'},
     
     # Puerta del Baño (Bathroom Door) - 3x5 tiles
-    'bathroom_door_open': {'entry': 27, 'desc_off': 0x106BFC, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Abierta)'},
-    'bathroom_door_closed': {'entry': 28, 'desc_off': 0x106C14, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Cerrada)'},
+    'bathroom_door_closed': {'entry': None, 'desc_off': 0x106C14, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Cerrada)'},
+    'bathroom_door_open': {'entry': None, 'desc_off': 0x106BFC, 'w': 3, 'h': 5, 'name': 'Puerta del Baño (Abierta)'},
+    
+    # Comedor / Alfombra y Mesa Grande - 12x10 tiles (Entry 26)
+    'carpet_dining': {'entry': 26, 'desc_off': 0x106B9C, 'w': 12, 'h': 10, 'name': 'Comedor / Alfombra y Mesa'},
+    
+    # Extras individuales de Casa (Entry 27, 28, 29)
+    'vase': {'entry': 27, 'desc_off': 0x106BB4, 'w': 2, 'h': 3, 'name': 'Florero'},
+    'mirror': {'entry': 28, 'desc_off': 0x106BCC, 'w': 3, 'h': 4, 'name': 'Espejo'},
+    'clock': {'entry': 29, 'desc_off': 0x106BE4, 'w': 3, 'h': 6, 'name': 'Reloj'},
+}
+
+MAKER_ROM_ENTRIES = {
+    # Gallinero (Chicken Coop, Mapa 17) - Entry 29
+    'mayo_maker': {'entry': 29, 'desc_off': 0x106C2C, 'w': 3, 'h': 5, 'x': 2, 'y': 5, 'name': 'Máquina de Mayonesa'},
+    # Establo (Barn, Mapa 37) - Entries 30 y 31
+    'yarn_maker': {'entry': 30, 'desc_off': 0x106C44, 'w': 3, 'h': 5, 'x': 8, 'y': 5, 'name': 'Máquina de Lana'},
+    'cheese_maker': {'entry': 31, 'desc_off': 0x106C5C, 'w': 3, 'h': 5, 'x': 12, 'y': 5, 'name': 'Máquina de Queso'},
 }
 
 HOUSE_UTENSILS = [
@@ -201,8 +209,8 @@ HOUSE_MAP_DEFAULTS = {
     41: {
         'tool_box': {'type': 'tool_box_closed', 'x': 25, 'y': 15, 'name': 'Caja de Herramientas'},
         'record_player': {'type': 'record_player_base', 'x': 1, 'y': 17, 'name': 'Mesa Tocadiscos'},
-        'mirror': {'type': 'mirror', 'x': 19, 'y': 6, 'name': 'Espejo'},
-        'clock': {'type': 'clock', 'x': 8, 'y': 2, 'name': 'Reloj'},
+        'vase': {'type': 'vase', 'x': 19, 'y': 6, 'name': 'Florero'},
+        'mirror': {'type': 'mirror', 'x': 8, 'y': 2, 'name': 'Espejo'},
     },
     42: {
         'tool_box': {'type': 'tool_box_closed', 'x': 40, 'y': 15, 'name': 'Caja de Herramientas'},
@@ -210,11 +218,11 @@ HOUSE_MAP_DEFAULTS = {
         'fridge': {'type': 'fridge_closed', 'x': 11, 'y': 3, 'name': 'Refrigerador'},
         'shelf': {'type': 'shelf_closed', 'x': 15, 'y': 2, 'name': 'Anaquel'},
         'kitchen_counter': {'type': 'kitchen_counter', 'x': 2, 'y': 1, 'name': 'Mueble de Cocina'},
-        'fireplace': {'type': 'fireplace', 'x': 2, 'y': 1, 'name': 'Chimenea'},
-        'carpet_dining': {'type': 'carpet_dining', 'x': 23, 'y': 10, 'name': 'Comedor'},
-        'table_vase': {'type': 'table_vase', 'x': 20, 'y': 3, 'name': 'Florero'},
-        'mirror': {'type': 'mirror', 'x': 34, 'y': 6, 'name': 'Espejo'},
-        'clock': {'type': 'clock', 'x': 23, 'y': 2, 'name': 'Reloj'},
+        'fireplace': {'type': 'fireplace', 'x': 1, 'y': 2, 'name': 'Chimenea'},
+        'carpet_dining': {'type': 'carpet_dining', 'x': 23, 'y': 10, 'name': 'Comedor / Alfombra'},
+        'vase': {'type': 'vase', 'x': 34, 'y': 6, 'name': 'Florero'},
+        'mirror': {'type': 'mirror', 'x': 23, 'y': 2, 'name': 'Espejo'},
+        'clock': {'type': 'clock', 'x': 20, 'y': 3, 'name': 'Reloj'},
     },
     43: {
         'tool_box': {'type': 'tool_box_closed', 'x': 54, 'y': 15, 'name': 'Caja de Herramientas'},
@@ -222,13 +230,13 @@ HOUSE_MAP_DEFAULTS = {
         'fridge': {'type': 'fridge_closed', 'x': 19, 'y': 3, 'name': 'Refrigerador'},
         'shelf': {'type': 'shelf_closed', 'x': 23, 'y': 2, 'name': 'Anaquel'},
         'kitchen_counter': {'type': 'kitchen_counter', 'x': 10, 'y': 1, 'name': 'Mueble de Cocina'},
-        'fireplace': {'type': 'fireplace', 'x': 4, 'y': 1, 'name': 'Chimenea'},
-        'bathroom_door': {'type': 'bathroom_door_closed', 'x': 1, 'y': 2, 'name': 'Puerta del Baño'},
+        'fireplace': {'type': 'fireplace', 'x': 1, 'y': 2, 'name': 'Chimenea'},
+        'bathroom_door': {'type': 'bathroom_door_closed', 'x': 4, 'y': 1, 'name': 'Puerta del Baño'},
         'double_bed': {'type': 'double_bed', 'x': 52, 'y': 5, 'name': 'Cama Matrimonial'},
-        'carpet_dining': {'type': 'carpet_dining', 'x': 31, 'y': 10, 'name': 'Comedor'},
-        'table_vase': {'type': 'table_vase', 'x': 28, 'y': 3, 'name': 'Florero'},
-        'mirror': {'type': 'mirror', 'x': 42, 'y': 6, 'name': 'Espejo'},
-        'clock': {'type': 'clock', 'x': 31, 'y': 2, 'name': 'Reloj'},
+        'carpet_dining': {'type': 'carpet_dining', 'x': 31, 'y': 10, 'name': 'Comedor / Alfombra'},
+        'vase': {'type': 'vase', 'x': 42, 'y': 6, 'name': 'Florero'},
+        'mirror': {'type': 'mirror', 'x': 31, 'y': 2, 'name': 'Espejo'},
+        'clock': {'type': 'clock', 'x': 28, 'y': 3, 'name': 'Reloj'},
     }
 }
 class FomtMapRenderer:
@@ -365,14 +373,6 @@ class FomtMapRenderer:
             self.palettes_1.append([(0, 0, 0)] * 16)
         while len(self.palettes_2) < 16:
             self.palettes_2.append([(0, 0, 0)] * 16)
-
-        # En casas (Mapas 42 y 43), inicializar la paleta 11 con la paleta de utensilios (Pal 10)
-        # para que los utensilios de cocina se rendericen con sus colores auténticos y no en negro.
-        if getattr(mh, 'map_id', 0) in (42, 43):
-            if len(self.palettes_1) > 11 and len(self.palettes_1) > 10:
-                self.palettes_1[11] = list(self.palettes_1[10])
-            if len(self.palettes_2) > 11 and len(self.palettes_2) > 10:
-                self.palettes_2[11] = list(self.palettes_2[10])
             
         print(f"[FomtMapRenderer] Paletas cargadas: Banco 1={len(self.palettes_1)}, Banco 2={len(self.palettes_2)}")
 
@@ -443,7 +443,7 @@ class FomtMapRenderer:
                 tgt.append(val)
             print(f"[FomtMapRenderer] {attr}: {n_cells} celdas (raw bytes: {len(raw)})")
 
-    def _stamp_rom_structure(self, bg_ground, bg_overlay, bg_fore, entry_idx_or_desc, map_x, map_y, active_col=None, active_dict=None, force_ground=False):
+    def _stamp_rom_structure(self, bg_ground, bg_overlay, bg_fore, entry_idx_or_desc, map_x, map_y, active_col=None, active_dict=None):
         if not self.rom or entry_idx_or_desc is None:
             return
         if isinstance(entry_idx_or_desc, int) and entry_idx_or_desc < 100:
@@ -463,8 +463,7 @@ class FomtMapRenderer:
         # +0x04 (p_bg1): Frente/Detalles superiores -> bg_fore (array_bg1)
         # +0x08 (p_bg2): Estructura, paredes y techos -> bg_overlay (array_bg2)
         # +0x0C (p_bg3): Suelo/despeje base -> bg_ground (array_bg3)
-        layers_to_stamp = [(p_bg3, bg_ground), (p_bg2, bg_ground), (p_bg1, bg_ground)] if force_ground else [(p_bg3, bg_ground), (p_bg2, bg_overlay), (p_bg1, bg_fore)]
-        for ptr, tmap in layers_to_stamp:
+        for ptr, tmap in [(p_bg3, bg_ground), (p_bg2, bg_overlay), (p_bg1, bg_fore)]:
             if ptr != 0 and tmap is not None:
                 off = ptr & 0x01FFFFFF
                 if off + w * h * 2 <= len(self.rom):
@@ -614,7 +613,7 @@ class FomtMapRenderer:
                     f_choice = house_cfg.get('fridge', 'closed') # 'closed', 'open', 'none'
                     if f_choice in ('closed', 'open'):
                         f_type = f'fridge_{f_choice}'
-                        def_pos = defaults.get('fridge', {'x': 11 if map_id == 42 else 19, 'y': 3})
+                        def_pos = defaults.get('fridge', {'x': 11, 'y': 3})
                         fx, fy = positions.get('fridge', (def_pos['x'], def_pos['y']))
                         self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[f_type]['entry'], fx, fy, active_col, active_dict)
 
@@ -623,13 +622,13 @@ class FomtMapRenderer:
                     s_choice = house_cfg.get('shelf', 'closed') # 'closed', 'open', 'none'
                     if s_choice in ('closed', 'open'):
                         s_type = f'shelf_{s_choice}'
-                        def_pos = defaults.get('shelf', {'x': 15 if map_id == 42 else 23, 'y': 2})
+                        def_pos = defaults.get('shelf', {'x': 15, 'y': 2})
                         sx, sy = positions.get('shelf', (def_pos['x'], def_pos['y']))
                         self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[s_type]['entry'], sx, sy, active_col, active_dict)
 
                 # 5. Mueble de Cocina (Mapas 42 y 43)
                 if map_id in (42, 43) and house_cfg.get('kitchen_counter', True):
-                    def_pos = defaults.get('kitchen_counter', {'x': 2 if map_id == 42 else 10, 'y': 1})
+                    def_pos = defaults.get('kitchen_counter', {'x': 2, 'y': 1})
                     kx, ky = positions.get('kitchen_counter', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['kitchen_counter']['entry'], kx, ky, active_col, active_dict)
 
@@ -641,51 +640,66 @@ class FomtMapRenderer:
                             ux, uy = positions.get(u_info['id'], (kx + u_info['rel_x'], ky + u_info['rel_y']))
                             self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, u_info['desc_off'], ux, uy, active_col, active_dict)
 
-                # 6. Chimenea (Mapas 42 y 43)
+                # 6. Chimenea (Mapas 42 y 43) - Entry 24 autentica
                 if map_id in (42, 43) and house_cfg.get('fireplace', True):
-                    def_pos = defaults.get('fireplace', {'x': 2 if map_id == 42 else 4, 'y': 1})
+                    def_pos = defaults.get('fireplace', {'x': 1, 'y': 2})
                     px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['fireplace']['entry'], px, py, active_col, active_dict)
 
-                # 7. Puerta del Baño (Mapa 43)
-                if map_id == 43:
-                    bd_choice = house_cfg.get('bathroom_door', 'closed') # 'closed', 'open', 'none'
-                    if bd_choice in ('closed', 'open'):
-                        bd_type = f'bathroom_door_{bd_choice}'
-                        def_pos = defaults.get('bathroom_door', {'x': 1, 'y': 2})
-                        dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
-                        self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[bd_type]['entry'], dx, dy, active_col, active_dict)
-
-                # 8. Cama Matrimonial (Mapa 43)
+                # 7. Cama Matrimonial (Mapa 43)
                 if map_id == 43 and house_cfg.get('double_bed', True):
                     def_pos = defaults.get('double_bed', {'x': 52, 'y': 5})
                     bx, by = positions.get('double_bed', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['double_bed']['entry'], bx, by, active_col, active_dict)
 
-                # 9. Comedor / Mesa Grande (Mapas 42 y 43)
+                # 8. Puerta del Baño (Mapa 43) - Cerrada / Abierta
+                if map_id == 43:
+                    bd_choice = house_cfg.get('bathroom_door', 'closed') # 'closed', 'open', 'none'
+                    if bd_choice in ('closed', 'open'):
+                        bd_desc = 0x106C14 if bd_choice == 'closed' else 0x106BFC
+                        def_pos = defaults.get('bathroom_door', {'x': 4, 'y': 1})
+                        dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
+                        self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bd_desc, dx, dy, active_col, active_dict)
+
+                # 9. Comedor / Alfombra (Mapas 42 y 43) - Estampado en array_bg3 (suelo) para que la mesa no se tape
                 if map_id in (42, 43) and house_cfg.get('carpet_dining', True):
                     def_pos = defaults.get('carpet_dining', {'x': 23 if map_id == 42 else 31, 'y': 10})
                     cx, cy = positions.get('carpet_dining', (def_pos['x'], def_pos['y']))
-                    # Force to floor (array_bg3) so it renders under the dining table without wiping it out
-                    self._stamp_rom_structure(array_bg3, None, None, HOUSE_ROM_ENTRIES['carpet_dining']['entry'], cx, cy, active_col, active_dict, force_ground=True)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg3, HOUSE_ROM_ENTRIES['carpet_dining']['entry'], cx, cy, active_col, active_dict)
 
-                # 10. Florero (Mapas 42 y 43)
-                if map_id in (42, 43) and house_cfg.get('table_vase', True) and 'table_vase' in defaults:
-                    def_pos = defaults['table_vase']
-                    vx, vy = positions.get('table_vase', (def_pos['x'], def_pos['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['table_vase']['entry'], vx, vy, active_col, active_dict)
+                # 10. Extras Individuales (Florero, Espejo, Reloj)
+                if house_cfg.get('vase', True) and 'vase' in defaults:
+                    def_pos = defaults['vase']
+                    ex, ey = positions.get('vase', (def_pos['x'], def_pos['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['vase']['entry'], ex, ey, active_col, active_dict)
 
-                # 11. Espejo (Mapas 41, 42, 43)
                 if house_cfg.get('mirror', True) and 'mirror' in defaults:
                     def_pos = defaults['mirror']
-                    mx, my = positions.get('mirror', (def_pos['x'], def_pos['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['mirror']['entry'], mx, my, active_col, active_dict)
+                    ex, ey = positions.get('mirror', (def_pos['x'], def_pos['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['mirror']['entry'], ex, ey, active_col, active_dict)
 
-                # 12. Reloj (Mapas 41, 42, 43)
                 if house_cfg.get('clock', True) and 'clock' in defaults:
                     def_pos = defaults['clock']
-                    cx, cy = positions.get('clock', (def_pos['x'], def_pos['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['clock']['entry'], cx, cy, active_col, active_dict)
+                    ex, ey = positions.get('clock', (def_pos['x'], def_pos['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['clock']['entry'], ex, ey, active_col, active_dict)
+
+            elif map_id == 17:
+                # Gallinero (Chicken Coop) - Maquina de Mayonesa
+                if dyn_cfg.get('mayo_maker', True):
+                    m_info = MAKER_ROM_ENTRIES['mayo_maker']
+                    mx, my = positions.get('mayo_maker', (m_info['x'], m_info['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
+
+            elif map_id == 37:
+                # Establo (Barn) - Maquina de Lana y Maquina de Queso
+                if dyn_cfg.get('yarn_maker', True):
+                    m_info = MAKER_ROM_ENTRIES['yarn_maker']
+                    mx, my = positions.get('yarn_maker', (m_info['x'], m_info['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
+                if dyn_cfg.get('cheese_maker', True):
+                    m_info = MAKER_ROM_ENTRIES['cheese_maker']
+                    mx, my = positions.get('cheese_maker', (m_info['x'], m_info['y']))
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
 
             elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
                 # Villa de la Playa
@@ -999,7 +1013,7 @@ class FomtMapRenderer:
                 f_choice = house_cfg.get('fridge', 'closed')
                 if f_choice in ('closed', 'open'):
                     f_type = f'fridge_{f_choice}'
-                    def_pos = defaults.get('fridge', {'x': 11 if map_id == 42 else 19, 'y': 3})
+                    def_pos = defaults.get('fridge', {'x': 11, 'y': 3})
                     fx, fy = positions.get('fridge', (def_pos['x'], def_pos['y']))
                     e_info = HOUSE_ROM_ENTRIES[f_type]
                     results.append({'id': 'fridge', 'name': e_info['name'], 'x': fx, 'y': fy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
@@ -1009,14 +1023,14 @@ class FomtMapRenderer:
                 s_choice = house_cfg.get('shelf', 'closed')
                 if s_choice in ('closed', 'open'):
                     s_type = f'shelf_{s_choice}'
-                    def_pos = defaults.get('shelf', {'x': 15 if map_id == 42 else 23, 'y': 2})
+                    def_pos = defaults.get('shelf', {'x': 15, 'y': 2})
                     sx, sy = positions.get('shelf', (def_pos['x'], def_pos['y']))
                     e_info = HOUSE_ROM_ENTRIES[s_type]
                     results.append({'id': 'shelf', 'name': e_info['name'], 'x': sx, 'y': sy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
 
             # 5. Mueble de Cocina y Utensilios
             if map_id in (42, 43) and house_cfg.get('kitchen_counter', True):
-                def_pos = defaults.get('kitchen_counter', {'x': 2 if map_id == 42 else 10, 'y': 1})
+                def_pos = defaults.get('kitchen_counter', {'x': 2, 'y': 1})
                 kx, ky = positions.get('kitchen_counter', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['kitchen_counter']
                 results.append({'id': 'kitchen_counter', 'name': e_info['name'], 'x': kx, 'y': ky, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
@@ -1027,29 +1041,29 @@ class FomtMapRenderer:
                         ux, uy = positions.get(u_info['id'], (kx + u_info['rel_x'], ky + u_info['rel_y']))
                         results.append({'id': u_info['id'], 'name': f"Utensilio: {u_info['name']}", 'x': ux, 'y': uy, 'w': u_info['w'], 'h': u_info['h'], 'entry': u_info['desc_off']})
 
-            # 6. Chimenea
+            # 6. Chimenea - Entry 24 autentica
             if map_id in (42, 43) and house_cfg.get('fireplace', True):
-                def_pos = defaults.get('fireplace', {'x': 2 if map_id == 42 else 4, 'y': 1})
+                def_pos = defaults.get('fireplace', {'x': 1, 'y': 2})
                 px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['fireplace']
                 results.append({'id': 'fireplace', 'name': e_info['name'], 'x': px, 'y': py, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
 
-            # 7. Puerta del Baño
-            if map_id == 43:
-                bd_choice = house_cfg.get('bathroom_door', 'closed')
-                if bd_choice in ('closed', 'open'):
-                    bd_type = f'bathroom_door_{bd_choice}'
-                    def_pos = defaults.get('bathroom_door', {'x': 1, 'y': 2})
-                    dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
-                    e_info = HOUSE_ROM_ENTRIES[bd_type]
-                    results.append({'id': 'bathroom_door', 'name': e_info['name'], 'x': dx, 'y': dy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
-
-            # 8. Cama Matrimonial
+            # 7. Cama Matrimonial
             if map_id == 43 and house_cfg.get('double_bed', True):
                 def_pos = defaults.get('double_bed', {'x': 52, 'y': 5})
                 bx, by = positions.get('double_bed', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['double_bed']
                 results.append({'id': 'double_bed', 'name': e_info['name'], 'x': bx, 'y': by, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+            # 8. Puerta del Baño
+            if map_id == 43:
+                bd_choice = house_cfg.get('bathroom_door', 'closed')
+                if bd_choice in ('closed', 'open'):
+                    bd_type = f'bathroom_door_{bd_choice}'
+                    def_pos = defaults.get('bathroom_door', {'x': 4, 'y': 1})
+                    dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
+                    e_info = HOUSE_ROM_ENTRIES[bd_type]
+                    results.append({'id': 'bathroom_door', 'name': e_info['name'], 'x': dx, 'y': dy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['desc_off']})
 
             # 9. Comedor / Mesa Grande
             if map_id in (42, 43) and house_cfg.get('carpet_dining', True):
@@ -1058,26 +1072,40 @@ class FomtMapRenderer:
                 e_info = HOUSE_ROM_ENTRIES['carpet_dining']
                 results.append({'id': 'carpet_dining', 'name': e_info['name'], 'x': cx, 'y': cy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
 
-            # 10. Florero
-            if map_id in (42, 43) and house_cfg.get('table_vase', True) and 'table_vase' in defaults:
-                def_pos = defaults['table_vase']
-                ex, ey = positions.get('table_vase', (def_pos['x'], def_pos['y']))
-                e_info = HOUSE_ROM_ENTRIES['table_vase']
-                results.append({'id': 'table_vase', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+            # 10. Extras Individuales (Florero, Espejo, Reloj)
+            if house_cfg.get('vase', True) and 'vase' in defaults:
+                def_pos = defaults['vase']
+                ex, ey = positions.get('vase', (def_pos['x'], def_pos['y']))
+                e_info = HOUSE_ROM_ENTRIES['vase']
+                results.append({'id': 'vase', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
 
-            # 11. Espejo
             if house_cfg.get('mirror', True) and 'mirror' in defaults:
                 def_pos = defaults['mirror']
                 ex, ey = positions.get('mirror', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['mirror']
                 results.append({'id': 'mirror', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
 
-            # 12. Reloj
             if house_cfg.get('clock', True) and 'clock' in defaults:
                 def_pos = defaults['clock']
                 ex, ey = positions.get('clock', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['clock']
                 results.append({'id': 'clock', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+
+        elif map_id == 17:
+            if dyn_cfg.get('mayo_maker', True):
+                m_info = MAKER_ROM_ENTRIES['mayo_maker']
+                mx, my = positions.get('mayo_maker', (m_info['x'], m_info['y']))
+                results.append({'id': 'mayo_maker', 'name': m_info['name'], 'x': mx, 'y': my, 'w': m_info['w'], 'h': m_info['h'], 'entry': m_info['entry']})
+
+        elif map_id == 37:
+            if dyn_cfg.get('yarn_maker', True):
+                m_info = MAKER_ROM_ENTRIES['yarn_maker']
+                mx, my = positions.get('yarn_maker', (m_info['x'], m_info['y']))
+                results.append({'id': 'yarn_maker', 'name': m_info['name'], 'x': mx, 'y': my, 'w': m_info['w'], 'h': m_info['h'], 'entry': m_info['entry']})
+            if dyn_cfg.get('cheese_maker', True):
+                m_info = MAKER_ROM_ENTRIES['cheese_maker']
+                mx, my = positions.get('cheese_maker', (m_info['x'], m_info['y']))
+                results.append({'id': 'cheese_maker', 'name': m_info['name'], 'x': mx, 'y': my, 'w': m_info['w'], 'h': m_info['h'], 'entry': m_info['entry']})
 
         return results
 
