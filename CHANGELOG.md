@@ -1,5 +1,45 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
+## Version 4.0.0 "The Mineral Valley Expansion"
+**Fecha:** 2026-11-04
+**Estado:** Lanzamiento Mayor / Suite Integral de ROM Hacking
+
+### Editor de Rutinas Diarias y Orquestador de Movimiento (NPC AI Engine)
+- **Topologia y Grafo Mundial:** Implementacion del macromapa interactivo del valle con navegacion espacial bidireccional sobre 41 nodos de mapas y 39 conexiones canonicas.
+- **Mapeo Canonico de 42 NPCs:** Correccion de desfaces en mapas canonicos (Mina Lago 0x2B, Entrada Mina 0x33, Piso 1 0x34, mapas de tutorial y pisos procedurales).
+- **Normalizacion de Flags de Limbo:** Resolucion de discrepancia de mascaras de bits (0x3FF vs 0xFF) que impedia la visualizacion y edicion de waypoints inactivos o de despawn con flag 0x200 (0x234).
+- **Centrado Dinamico de Camara:** Navegacion y enfoque automatico al seleccionar waypoints o nodos del macromapa.
+
+### Editor de Mapas y Tilesets (Titan Engine)
+- **Compresion 100% Python Nativa:** Descompresion y compresion binaria sin dependencias externas de ejecutables legados de 32 bits para formatos BIOS LZ77 (0x10), Marvelous Arcano LZ (0x70) y RLE.
+- **Insercion e Importacion de Bitmaps:** Pipeline completo de importacion, exportacion y reinyeccion de mapas completos y tilesets graficos en formato PNG/BMP indexado a 16 colores.
+- **Edicion de Metatiles y Warps:** Soporte para edicion de atributos de colision, elevacion y conexiones de teletransporte entre mapas.
+
+### Base de Datos Maestra de Items y NPCs
+- **Edicion Masiva de Items (Bulk Edit Mode):** Edicion rapida de nombres, descripciones y valores de compra/venta para herramientas, comidas y articulos generales.
+- **Base de Datos de NPCs en Toolbar:** Acceso directo en la barra de herramientas principal con sincronizacion hacia el editor de metasprites y retratos.
+
+### Editor de Retratos y Metasprites (Melody & Symphony)
+- **Seleccion Automatica por Hex ID:** Redireccion directa desde el detalle del aldeano hacia el editor de metasprites seleccionando instantaneamente el portrait correspondiente en el lienzo.
+- **Correccion de Bugs Graficos:** Reconstruccion de la decodificacion dinamica en RAM y resolucion de paletas maestras de 16 colores.
+- **Lienzo de Pixel Art:** Suite de herramientas de dibujo (pincel, borrador, gotero, cubeta de relleno, selector de paleta, deshacer/rehacer).
+
+### Motor de Scripts SlipSpace v4
+- **Optimizacion de Bytecode:** Consolidacion de saltos de linea (\r\n), pausas (\w para WAIT_CLICK) y saltos (\b para BREAK).
+- **Resolucion de Bifurcaciones:** Optimizacion de secuencias goto/lbl actuando como retorno estructurado a funciones padre sin desbordamiento de bytecode.
+- **Especificacion Formal:** Documentacion integral de la sintaxis C-like de alto nivel para desarrolladores y modelos LLM.
+
+### Rendimiento y Carga de Proyecto
+- **Aceleracion Masiva:** Reduccion del tiempo de escaneo grafico inicial de 10.783 ms a 28,5 ms mediante cache persistente indexado por hash SHA-256.
+- **Explorador Fluido:** Insercion por lotes (appendRows) con supresion de repintado y debounce de 150 ms en el filtrado de busqueda.
+- **Tiempo de Carga de ROM:** Reducido de mas de 13 segundos a 1,7 segundos.
+
+### Internacionalizacion (i18n) en JSON Puro
+- **Desacoplamiento a i18n.json:** Extraccion de cadenas a JSON modular con 308 claves simetricas por idioma en 8 idiomas (es, en, jp, ru, de, zh, hi, pt).
+- **Jerga Tecnica Formal:** Eliminacion del 100% de emojis, signos informales y sobrenombres de modulos internos en la interfaz.
+
+---
+
 ## Versión 3.7.1 "Listen The World"
 **Fecha:** 2026-05-15
 **Estado:** Lanzamiento Estable / Ingeniería Inversa Avanzada
