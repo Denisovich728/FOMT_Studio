@@ -756,7 +756,9 @@ class FoMTStudioApp(QMainWindow):
             
     def action_compile_rom(self):
         if not self.project: return
-        dest, _ = QFileDialog.getSaveFileName(self, "Exportar ROM Compilada", "Modded_FoMT.gba", "GBA ROM (*.gba)")
+        initial_dir = self.last_rom_dir or getattr(self.project, 'project_dir', "")
+        default_file = os.path.join(initial_dir, f"{getattr(self.project, 'name', 'Modded')}.gba") if initial_dir else "Modded_FoMT.gba"
+        dest, _ = QFileDialog.getSaveFileName(self, "Exportar ROM Compilada", default_file, "GBA ROM (*.gba)")
         if dest:
             try:
                 if hasattr(self, 'magic_circle'):

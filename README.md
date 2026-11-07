@@ -134,7 +134,7 @@ python main.py
 
 Compilacion de ejecutable autonomo (PyInstaller):
 ```bash
-pyinstaller FoMT_Studio_v4.0.0_PreRelease.spec
+pyinstaller FoMT_Studio_v4.0.0_FinalRelease.spec
 ```
 
 ------------------------------------------------------------

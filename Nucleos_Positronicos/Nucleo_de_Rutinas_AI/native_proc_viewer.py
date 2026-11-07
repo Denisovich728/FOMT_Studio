@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingenieria Inversa (v3.7.0)
-# "Actualizacion La Imposibilidad"
+# FOMT Studio - Suite de Ingeniería Inversa (v4.0.0)
+# "The Greatest Show - Final Release"
 # Desarrollado por: Denisovich728
 # ============================================================
 # native_proc_viewer.py

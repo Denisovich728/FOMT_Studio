@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.7.0)
-# "Actualización La Imposibilidad"
+# FOMT Studio - Suite de Ingeniería Inversa (v4.0.0)
+# "The Greatest Show - Final Release"
 # Desarrollado por: Denisovich728
 # ============================================================
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWidgetItem, QHeaderView

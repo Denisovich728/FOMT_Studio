@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.8.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v4.0.0)
 # Núcleo de Rutinas AI: Navegación & Pathfinding por Tiles Caminables
 # ============================================================
 """

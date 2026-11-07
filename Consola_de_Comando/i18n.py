@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingenieria Inversa (v3.7.0)
+# FOMT Studio - Suite de Ingeniería Inversa (v4.0.0)
 # Sistema Internacionalizacion (i18n) - Formato JSON Utilitario
 # Desarrollado por: Denisovich728
 # ============================================================

@@ -1,6 +1,6 @@
 # ============================================================
-# FOMT Studio - Suite de Ingeniería Inversa (v3.7.0)
-# "Actualización La Imposibilidad"
+# FOMT Studio - Suite de Ingeniería Inversa (v4.0.0)
+# "The Greatest Show - Final Release"
 # Desarrollado por: Denisovich728
 # ============================================================
 import os
@@ -105,7 +105,7 @@ def extract_all_resources(rom_path: str, output_dir: str, library_path: str = No
     import concurrent.futures
     import multiprocessing
     
-    # Detección adaptativa de hilos (v3.7.0)
+    # Detección adaptativa de hilos (v4.0.0)
     logical_cores = multiprocessing.cpu_count() or 1
     max_workers = max(1, logical_cores // 2) # Limitar al 50% de hilos lógicos
     
