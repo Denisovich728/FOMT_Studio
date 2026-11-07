@@ -1,8 +1,15 @@
 # FOMT Studio - Registro de Cambios (Changelog)
 
-## Version 4.0.0 "The Greatest Show"
-**Fecha:** 2026-11-04
-**Estado:** Lanzamiento Mayor / Suite Integral de ROM Hacking
+## Version 4.0.0 "The Greatest Show"-Final Release
+**Fecha:** 2026-11-07
+**Estado:** Lanzamiento Final Oficial / Suite Integral de ROM Hacking
+
+### Estructuras Dinamicas y Utensilios de Cocina (Titan Engine Final)
+- **Persistencia Binaria de Coordenadas en ROM:** Inyeccion directa y parcheo de coordenadas (X, Y) en las rutinas de desensamblado del motor GBA (`0x08017180` y `0x080A5BD8`) para Granja (Casa Lv1/Lv2/Lv3, Granero Lv1/Lv2, Gallinero Lv1/Lv2, Buzon), Establo (Maquinas de Queso y Lana), Gallinero (Maquina de Mayonesa) y Casa (Mueble de Cocina), evitando que las estructuras se quemen de forma destructiva sobre los tilemaps base en la ROM.
+- **Sincronizacion de Capas Base Limpias:** Separacion estricta entre capas editables (`tilemap_bg*`) y capas de renderizado activo (`active_tilemap_bg*`), garantizando que guardar el mapa en ROM no corrompa el terreno base ni duplique edificios fantasma al entrar al mapa en la GBA.
+- **Panel de Ajustes No Modal y Reactivo en Tiempo Real:** Conversion del dialogo de Estructuras Dinamicas y del selector de Utensilios a ventanas no modales (`NonModal`), permitiendo interactuar con el visor del mapa (zoom, paneo, edicion de capas) mientras los cambios en botones, checkboxes y selectores se reflejan instantaneamente en el lienzo sin bloquear la UI ni requerir confirmacion manual.
+- **Prioridad de Dibujado de Cuadro Selector:** Prioridad visual absoluta en el renderizado para los recuadros de seleccion, resaltado interactivo y etiquetas de coordenadas de estructuras dinamicas sobre todas las capas graficas.
+- **Alineacion y Banco Grafico de Utensilios:** Correccion del batidor frances/globo al ID grafico autentico (`graphic_id: 87`) del banco de iconos de items (`0x676DD0`), resolviendo la botella amarilla errogenea. Disposicion ergonomica pixel-perfect de los 8 utensilios sobre las superficies de trabajo de los muebles de cocina (tabla de picar, barra, quemadores, encimera y repisa superior).
 
 ### Editor de Rutinas Diarias y Orquestador de Movimiento (NPC AI Engine)
 - **Topologia y Grafo Mundial:** Implementacion del macromapa interactivo del valle con navegacion espacial bidireccional sobre 41 nodos de mapas y 39 conexiones canonicas.

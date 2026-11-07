@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT STUDIO - Suite de Ingenieria Inversa (v4.0.0)
+# FOMT STUDIO - Suite de Ingenieria Inversa (v4.0.0 "The Greatest Show"-Final Release)
 # ============================================================
 
 FOMT Studio es un entorno integral de desarrollo, desensamblado, analisis semantico y modificacion profunda (ROM Hacking) para el ecosistema "Harvest Moon: Friends of Mineral Town" (FoMT) y "More Friends of Mineral Town" (MFoMT) de Game Boy Advance (GBA).
@@ -7,7 +7,7 @@ FOMT Studio es un entorno integral de desarrollo, desensamblado, analisis semant
 Desarrollado con una arquitectura modular desacoplada en Python 3 y PyQt6, la suite proporciona herramientas especializadas de bajo nivel para editar codigo, graficos, mapas, rutinas de inteligencia artificial, secuencias de audio y datos internos de la ROM sin requerir dependencias externas de 32 bits.
 
 ------------------------------------------------------------
-NOVEDADES PRINCIPALES DE LA VERSION 4.0.0
+NOVEDADES PRINCIPALES DE LA VERSION 4.0.0 "The Greatest Show"-Final Release
 ------------------------------------------------------------
 
 1. EDITOR DE RUTINAS DIARIAS Y ORQUESTADOR DE MOVIMIENTO (NPC AI ENGINE):

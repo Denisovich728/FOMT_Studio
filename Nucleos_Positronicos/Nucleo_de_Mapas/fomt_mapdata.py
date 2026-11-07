@@ -195,14 +195,14 @@ MAKER_ROM_ENTRIES = {
 }
 
 HOUSE_UTENSILS = [
-    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 1, 'rel_y': 6, 'rel_px': 8, 'rel_py': 48, 'w': 2, 'h': 2},
-    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 6, 'rel_px': 28, 'rel_py': 50, 'w': 2, 'h': 2},
-    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 6, 'rel_px': 46, 'rel_py': 48, 'w': 2, 'h': 2},
-    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 1, 'rel_y': 9, 'rel_px': 8, 'rel_py': 70, 'w': 2, 'h': 2},
-    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 294, 'rel_x': 3, 'rel_y': 9, 'rel_px': 26, 'rel_py': 70, 'w': 2, 'h': 2},
-    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 5, 'rel_y': 9, 'rel_px': 40, 'rel_py': 70, 'w': 2, 'h': 2},
-    {'id': 'utensil_oven', 'name': 'Horno', 'graphic_id': 327, 'rel_x': 7, 'rel_y': 9, 'rel_px': 56, 'rel_py': 70, 'w': 2, 'h': 2},
-    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 290, 'rel_x': 4, 'rel_y': 2, 'rel_px': 36, 'rel_py': 20, 'w': 2, 'h': 2},
+    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 0, 'rel_y': 6, 'rel_px': 4, 'rel_py': 46, 'w': 2, 'h': 2},
+    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 6, 'rel_px': 26, 'rel_py': 46, 'w': 2, 'h': 2},
+    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 6, 'rel_px': 44, 'rel_py': 46, 'w': 2, 'h': 2},
+    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 0, 'rel_y': 11, 'rel_px': 4, 'rel_py': 86, 'w': 2, 'h': 2},
+    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 87, 'rel_x': 7, 'rel_y': 10, 'rel_px': 58, 'rel_py': 80, 'w': 2, 'h': 2},
+    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 0, 'rel_y': 8, 'rel_px': 4, 'rel_py': 66, 'w': 2, 'h': 2},
+    {'id': 'utensil_oven', 'name': 'Horno', 'graphic_id': 327, 'rel_x': 7, 'rel_y': 7, 'rel_px': 58, 'rel_py': 60, 'w': 2, 'h': 2},
+    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 290, 'rel_x': 4, 'rel_y': 2, 'rel_px': 36, 'rel_py': 18, 'w': 2, 'h': 2},
 ]
 
 HOUSE_MAP_DEFAULTS = {
@@ -295,6 +295,50 @@ class FomtMapRenderer:
             },
             'positions': {},          # Overrides: {'fridge': (x, y), 'mayo_maker': (x, y), ...}
         }
+        self._sync_dynamic_positions_from_rom()
+
+    def _sync_dynamic_positions_from_rom(self):
+        """Lee las coordenadas canonicas reales grabadas en la ROM para reflejar cambios persistidos."""
+        if not self.rom or len(self.rom) < 0x0B0000:
+            return
+        try:
+            if 'farmhouse' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['farmhouse']['lv1']['x'] = self.rom[0x0172EE]
+                BUILDING_ROM_ENTRIES['farmhouse']['lv1']['y'] = self.rom[0x0172E6]
+                BUILDING_ROM_ENTRIES['farmhouse']['lv2']['x'] = self.rom[0x017312]
+                BUILDING_ROM_ENTRIES['farmhouse']['lv2']['y'] = self.rom[0x01730A]
+                BUILDING_ROM_ENTRIES['farmhouse']['lv3']['x'] = self.rom[0x017334]
+                BUILDING_ROM_ENTRIES['farmhouse']['lv3']['y'] = self.rom[0x01732E]
+            if 'barn' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['barn']['lv1']['x'] = self.rom[0x01736E]
+                BUILDING_ROM_ENTRIES['barn']['lv1']['y'] = self.rom[0x017366]
+                BUILDING_ROM_ENTRIES['barn']['lv2']['x'] = self.rom[0x017392]
+                BUILDING_ROM_ENTRIES['barn']['lv2']['y'] = self.rom[0x01738A]
+            if 'chicken_coop' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['chicken_coop']['lv1']['x'] = self.rom[0x0173CA]
+                BUILDING_ROM_ENTRIES['chicken_coop']['lv1']['y'] = self.rom[0x0173C2]
+                BUILDING_ROM_ENTRIES['chicken_coop']['lv2']['x'] = self.rom[0x0173EE]
+                BUILDING_ROM_ENTRIES['chicken_coop']['lv2']['y'] = self.rom[0x0173E6]
+            if 'mailbox' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['mailbox']['x'] = self.rom[0x0A6B48]
+                BUILDING_ROM_ENTRIES['mailbox']['y'] = self.rom[0x0A6B4A]
+            if 'cheese_maker' in MAKER_ROM_ENTRIES:
+                MAKER_ROM_ENTRIES['cheese_maker']['x'] = self.rom[0x0A73FE]
+                MAKER_ROM_ENTRIES['cheese_maker']['y'] = self.rom[0x0A7400]
+            if 'yarn_maker' in MAKER_ROM_ENTRIES:
+                MAKER_ROM_ENTRIES['yarn_maker']['x'] = self.rom[0x0A7416]
+                MAKER_ROM_ENTRIES['yarn_maker']['y'] = self.rom[0x0A7418]
+            if 'mayo_maker' in MAKER_ROM_ENTRIES:
+                MAKER_ROM_ENTRIES['mayo_maker']['x'] = self.rom[0x0A63E8]
+                MAKER_ROM_ENTRIES['mayo_maker']['y'] = self.rom[0x0A63EA]
+            if 42 in HOUSE_MAP_DEFAULTS and 'kitchen_counter' in HOUSE_MAP_DEFAULTS[42]:
+                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['x'] = self.rom[0x0A7034]
+                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['y'] = self.rom[0x0A7036]
+            if 43 in HOUSE_MAP_DEFAULTS and 'kitchen_counter' in HOUSE_MAP_DEFAULTS[43]:
+                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['x'] = self.rom[0x0A7170]
+                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['y'] = self.rom[0x0A7172]
+        except Exception:
+            pass
 
     def load_map(self, map_header) -> bool:
         """

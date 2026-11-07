@@ -1380,10 +1380,11 @@ class MapParser:
         mh = self.maps[map_index]
         
         # 1. Empaquetar tilemaps (16-bit array -> bytes)
-        # Si hay capas activas con estructuras dinámicas y spawn personalizado, se empaquetan esas
-        t_bg3 = getattr(renderer, 'active_tilemap_bg3', None) or renderer.tilemap_bg3
-        t_bg2 = getattr(renderer, 'active_tilemap_bg2', None) or renderer.tilemap_bg2
-        t_bg1 = getattr(renderer, 'active_tilemap_bg1', None) or renderer.tilemap_bg1
+        # Para evitar quemar duplicadas las estructuras dinámicas en la ROM base,
+        # guardamos las capas base (tilemap_bg*) ya que el motor FoMT las estampa en tiempo real.
+        t_bg3 = renderer.tilemap_bg3
+        t_bg2 = renderer.tilemap_bg2
+        t_bg1 = renderer.tilemap_bg1
         bg3_raw = struct.pack(f'<{len(t_bg3)}H', *t_bg3)
         bg2_raw = struct.pack(f'<{len(t_bg2)}H', *t_bg2)
         bg1_raw = struct.pack(f'<{len(t_bg1)}H', *t_bg1)
@@ -1421,9 +1422,9 @@ class MapParser:
         self.project.overwrite_rom_directly(offset, bg1_comp)
         offset += len(bg1_comp)
         
-        # 6. Guardar Collision Map
+        # 6. Guardar Collision Map base
         obj2_off = mh.p_obj2 & 0x01FFFFFF
-        col_to_save = getattr(renderer, 'active_collision_map', None) or renderer.collision_map
+        col_to_save = renderer.collision_map
         if obj2_off > 0 and col_to_save and len(col_to_save) == mh.width * mh.height:
             self.project.overwrite_rom_directly(obj2_off, bytes(col_to_save))
             renderer.collision_map = bytes(col_to_save)
@@ -1432,8 +1433,11 @@ class MapParser:
         renderer.tilemap_bg3 = list(t_bg3)
         renderer.tilemap_bg2 = list(t_bg2)
         renderer.tilemap_bg1 = list(t_bg1)
+
+        # 7. Inyectar posiciones reubicadas de estructuras dinámicas en la ROM
+        self.save_dynamic_structure_positions_to_rom(mh.map_id, renderer)
             
-        # 7. Actualizar Map Header
+        # 8. Actualizar Map Header
         if self._table_offset is None:
             self._table_offset = 0x105EDC
         header_off = self._table_offset + (map_index * 40)
@@ -1448,6 +1452,117 @@ class MapParser:
         
         print(f"Mapa {map_index} guardado en {hex(free_space)}. Tamaño: {total_size} bytes.")
         return True
+
+    def save_dynamic_structure_positions_to_rom(self, map_id: int, renderer) -> bool:
+        """
+        Inyecta permanentemente en la ROM las nuevas coordenadas (X, Y) de estructuras dinamicas
+        reubicadas en el visor de mapas (granja, establo, gallinero, buzon, maquinas, etc.).
+        """
+        dyn_cfg = getattr(renderer, 'dynamic_config', {})
+        positions = dyn_cfg.get('positions', {})
+        if not positions or not self.project:
+            return False
+
+        rom_overwrites = {}
+
+        if map_id in (0, 1):
+            # 1. Granja: Farmhouse
+            if 'farmhouse' in positions:
+                fx, fy = positions['farmhouse']
+                h_lvl = dyn_cfg.get('farmhouse', 'lv1')
+                if h_lvl == 'lv1':
+                    rom_overwrites[0x0172EE] = bytes([fx]) # GFX X
+                    rom_overwrites[0x0172E6] = bytes([fy]) # GFX Y
+                    rom_overwrites[0x0A6CE8] = bytes([fx]) # Col X
+                    rom_overwrites[0x0A6CF6] = bytes([fy]) # Col Y
+                elif h_lvl == 'lv2':
+                    rom_overwrites[0x017312] = bytes([fx]) # GFX X
+                    rom_overwrites[0x01730A] = bytes([fy]) # GFX Y
+                    rom_overwrites[0x0A6CF4] = bytes([fx]) # Col X
+                    rom_overwrites[0x0A6CF6] = bytes([fy]) # Col Y
+                elif h_lvl == 'lv3':
+                    rom_overwrites[0x017334] = bytes([fx]) # GFX X
+                    rom_overwrites[0x01732E] = bytes([fy]) # GFX Y
+                    rom_overwrites[0x0A6D08] = bytes([fx]) # Col X
+                    rom_overwrites[0x0A6D0A] = bytes([fy]) # Col Y
+
+            # 2. Granja: Barn
+            if 'barn' in positions:
+                bx, by = positions['barn']
+                b_lvl = dyn_cfg.get('barn', 'lv1')
+                if b_lvl == 'lv1':
+                    rom_overwrites[0x01736E] = bytes([bx]) # GFX X
+                    rom_overwrites[0x017366] = bytes([by]) # GFX Y
+                    rom_overwrites[0x0A6D30] = bytes([bx]) # Col X
+                    rom_overwrites[0x0A6D32] = bytes([by]) # Col Y
+                elif b_lvl == 'lv2':
+                    rom_overwrites[0x017392] = bytes([bx]) # GFX X
+                    rom_overwrites[0x01738A] = bytes([by]) # GFX Y
+                    rom_overwrites[0x0A6D44] = bytes([bx]) # Col X
+                    rom_overwrites[0x0A6D46] = bytes([by]) # Col Y
+
+            # 3. Granja: Chicken Coop
+            if 'chicken_coop' in positions:
+                cx, cy = positions['chicken_coop']
+                rom_overwrites[0x0173CA] = bytes([cx]) # Lv1 GFX X
+                rom_overwrites[0x0173C2] = bytes([cy]) # Lv1 GFX Y
+                rom_overwrites[0x0173EE] = bytes([cx]) # Lv2 GFX X
+                rom_overwrites[0x0173E6] = bytes([cy]) # Lv2 GFX Y
+                rom_overwrites[0x0A6ED4] = bytes([cx]) # Col X
+                rom_overwrites[0x0A6ED6] = bytes([cy]) # Col Y
+
+            # 4. Granja: Mailbox
+            if 'mailbox' in positions:
+                mx, my = positions['mailbox']
+                rom_overwrites[0x0A6B48] = bytes([mx]) # GFX X
+                rom_overwrites[0x0A6B4A] = bytes([my]) # GFX Y
+                rom_overwrites[0x0A6EE8] = bytes([mx]) # Col X
+                rom_overwrites[0x0A6EEA] = bytes([my]) # Col Y
+
+        elif map_id in (38, 39):
+            # Establo: Maquinas
+            if 'cheese_maker' in positions:
+                cx, cy = positions['cheese_maker']
+                rom_overwrites[0x0A73FE] = bytes([cx])
+                rom_overwrites[0x0A7400] = bytes([cy])
+            if 'yarn_maker' in positions:
+                yx, yy = positions['yarn_maker']
+                rom_overwrites[0x0A7416] = bytes([yx])
+                rom_overwrites[0x0A7418] = bytes([yy])
+
+        elif map_id in (36, 37):
+            # Gallinero: Maquina de Mayonesa
+            if 'mayo_maker' in positions:
+                mx, my = positions['mayo_maker']
+                if map_id == 36:
+                    rom_overwrites[0x0A63E8] = bytes([mx])
+                    rom_overwrites[0x0A63EA] = bytes([my])
+                else:
+                    rom_overwrites[0x0A6406] = bytes([mx])
+                    rom_overwrites[0x0A6400] = bytes([my])
+
+        elif map_id in (42, 43):
+            # Casa: Mueble de Cocina
+            if 'kitchen_counter' in positions:
+                kx, ky = positions['kitchen_counter']
+                if map_id == 42:
+                    rom_overwrites[0x0A7034] = bytes([kx])
+                    rom_overwrites[0x0A7036] = bytes([ky])
+                elif map_id == 43:
+                    rom_overwrites[0x0A7170] = bytes([kx])
+                    rom_overwrites[0x0A7172] = bytes([ky])
+
+        for off, val in rom_overwrites.items():
+            self.project.overwrite_rom_directly(off, val)
+
+        if hasattr(renderer, 'rom') and renderer.rom:
+            for off, val in rom_overwrites.items():
+                if off < len(renderer.rom):
+                    renderer.rom[off:off+len(val)] = val
+            if hasattr(renderer, '_sync_dynamic_positions_from_rom'):
+                renderer._sync_dynamic_positions_from_rom()
+
+        return len(rom_overwrites) > 0
 
     def save_tileset(self, map_index: int, raw_tileset_4bpp: bytes) -> bool:
         """

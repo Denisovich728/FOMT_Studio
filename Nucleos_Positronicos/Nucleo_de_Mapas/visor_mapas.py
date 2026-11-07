@@ -801,8 +801,10 @@ class VisorMapas(QWidget):
         img_data = img.convert("RGBA").tobytes("raw", "RGBA")
         qim = QImage(img_data, img.width, img.height, img.width * 4, QImage.Format.Format_RGBA8888)
 
-        # Si estamos en la capa de Estructuras Dinámicas (tab 5), dibujar bounding boxes interactivos
-        if hasattr(self, 'tabs_edit_mode') and self.tabs_edit_mode.currentIndex() == 5 and hasattr(self, 'renderer') and self.renderer:
+        # Prioridad de dibujado de Estructuras Dinámicas: activa en Tab 5 o con el diálogo de ajustes abierto
+        is_dyn_mode = hasattr(self, 'tabs_edit_mode') and self.tabs_edit_mode.currentIndex() == 5
+        is_dlg_open = getattr(self, '_dynamic_structs_dialog', None) is not None and self._dynamic_structs_dialog.isVisible()
+        if (is_dyn_mode or is_dlg_open) and hasattr(self, 'renderer') and self.renderer:
             from PyQt6.QtGui import QPainter, QColor, QPen, QFont
             painter = QPainter(qim)
             font = QFont("Segoe UI", 7, QFont.Weight.Bold)
@@ -1012,7 +1014,8 @@ class VisorMapas(QWidget):
                     self.renderer.tilemap_bg1[idx] = new_val
                     modified = True
 
-        elif tab_idx == 5: # Modo Estructuras Dinámicas
+        is_dlg_open = getattr(self, '_dynamic_structs_dialog', None) is not None and self._dynamic_structs_dialog.isVisible()
+        if tab_idx == 5 or is_dlg_open: # Modo Estructuras Dinámicas
             structs = self.renderer.get_active_dynamic_structures() if hasattr(self.renderer, 'get_active_dynamic_structures') else []
             clicked_struct = None
             for s in structs:
@@ -1084,7 +1087,8 @@ class VisorMapas(QWidget):
 
         self.selected_cell = (cell_x, cell_y)
 
-        if self.tabs_edit_mode.currentIndex() == 5:
+        is_dlg_open = getattr(self, '_dynamic_structs_dialog', None) is not None and self._dynamic_structs_dialog.isVisible()
+        if self.tabs_edit_mode.currentIndex() == 5 or is_dlg_open:
             self._last_drag_cell = (cell_x, cell_y)
             if self._apply_paint_at_cell(cell_x, cell_y):
                 self._re_render_map_only()
@@ -1570,7 +1574,14 @@ class VisorMapas(QWidget):
 
     def _open_utensils_dialog(self):
         from PyQt6.QtWidgets import QDialog, QVBoxLayout, QCheckBox, QDialogButtonBox, QLabel
+        from PyQt6.QtCore import Qt
+
+        if hasattr(self, '_utensils_dialog') and self._utensils_dialog:
+            self._utensils_dialog.close()
+
         dialog = QDialog(self)
+        self._utensils_dialog = dialog
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
         dialog.setWindowTitle("Utensilios de Cocina")
         layout = QVBoxLayout(dialog)
         layout.addWidget(QLabel("Selecciona los utensilios visibles en la cocina:"))
@@ -1581,22 +1592,25 @@ class VisorMapas(QWidget):
         ]
         curr_state = getattr(self, 'house_utensils_state', [True]*8)
         checkboxes = []
-        for i, name in enumerate(utensil_names):
-            chk = QCheckBox(name)
-            chk.setChecked(curr_state[i] if i < len(curr_state) else True)
-            layout.addWidget(chk)
-            checkboxes.append(chk)
 
-        bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        bbox.accepted.connect(dialog.accept)
-        bbox.rejected.connect(dialog.reject)
-        layout.addWidget(bbox)
-
-        if dialog.exec() == QDialog.DialogCode.Accepted:
+        def sync_utensils():
             self.house_utensils_state = [chk.isChecked() for chk in checkboxes]
             self._on_dynamic_config_changed()
 
+        for i, name in enumerate(utensil_names):
+            chk = QCheckBox(name)
+            chk.setChecked(curr_state[i] if i < len(curr_state) else True)
+            chk.toggled.connect(sync_utensils)
+            layout.addWidget(chk)
+            checkboxes.append(chk)
+
+        bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        bbox.rejected.connect(dialog.close)
+        layout.addWidget(bbox)
+        dialog.show()
+
     def _open_dynamic_structures_dialog(self):
+        from PyQt6.QtCore import Qt
         map_header = getattr(self, 'current_map_header', None)
         if not map_header and hasattr(self, 'selected_map_index') and 0 <= self.selected_map_index < len(self.map_parser.maps):
             map_header = self.map_parser.maps[self.selected_map_index]
@@ -1607,7 +1621,13 @@ class VisorMapas(QWidget):
         if not map_header:
             return
         map_id = getattr(map_header, 'map_id', 0)
+
+        if hasattr(self, '_dynamic_structs_dialog') and self._dynamic_structs_dialog:
+            self._dynamic_structs_dialog.close()
+
         dialog = QDialog(self)
+        self._dynamic_structs_dialog = dialog
+        dialog.setWindowModality(Qt.WindowModality.NonModal)
         dialog.setWindowTitle(f"Estructuras Dinámicas - Mapa {map_id}")
         dialog.setMinimumWidth(380)
         dlg_layout = QVBoxLayout(dialog)
@@ -1629,6 +1649,34 @@ class VisorMapas(QWidget):
         chk_cheese = None
         chk_yarn = None
 
+        def sync_live_config():
+            if map_id in (41, 42, 43):
+                tb_map = {0: 'closed', 1: 'open', 2: 'none'}
+                rp_map = {0: 'base', 1: 'discs', 2: 'active', 3: 'none'}
+                f_map = {0: 'closed', 1: 'open', 2: 'none'}
+                s_map = {0: 'closed', 1: 'open', 2: 'none'}
+                bd_map = {0: 'closed', 1: 'open', 2: 'none'}
+
+                if cmb_tb: self.house_toolbox_choice = tb_map.get(cmb_tb.currentIndex(), 'closed')
+                if cmb_rp: self.house_record_player_choice = rp_map.get(cmb_rp.currentIndex(), 'base')
+                if cmb_fridge: self.house_fridge_choice = f_map.get(cmb_fridge.currentIndex(), 'closed')
+                if cmb_shelf: self.house_shelf_choice = s_map.get(cmb_shelf.currentIndex(), 'closed')
+                if chk_kitchen: self.house_kitchen_choice = chk_kitchen.isChecked()
+                if chk_fireplace: self.house_fireplace_choice = chk_fireplace.isChecked()
+                if chk_dining: self.house_dining_choice = chk_dining.isChecked()
+                if cmb_bath_door: self.house_bathroom_door_choice = bd_map.get(cmb_bath_door.currentIndex(), 'closed')
+                if chk_bed: self.house_double_bed_choice = chk_bed.isChecked()
+                if chk_vase: self.house_vase_choice = chk_vase.isChecked()
+                if chk_mirror: self.house_mirror_choice = chk_mirror.isChecked()
+                if chk_clock: self.house_clock_choice = chk_clock.isChecked()
+            elif map_id in (36, 37):
+                if chk_mayo: self.maker_mayo_choice = chk_mayo.isChecked()
+            elif map_id in (38, 39):
+                if chk_cheese: self.maker_cheese_choice = chk_cheese.isChecked()
+                if chk_yarn: self.maker_yarn_choice = chk_yarn.isChecked()
+
+            self._on_dynamic_config_changed()
+
         if map_id in (41, 42, 43):
             # 1. Almacenamiento y Sonido
             grp_storage = QGroupBox("Almacenamiento y Sonido")
@@ -1639,6 +1687,7 @@ class VisorMapas(QWidget):
             cmb_tb.addItems(["Cerrada", "Abierta", "Ocultar"])
             tb_val = getattr(self, 'house_toolbox_choice', 'closed')
             cmb_tb.setCurrentIndex(0 if tb_val == 'closed' else (1 if tb_val == 'open' else 2))
+            cmb_tb.currentIndexChanged.connect(sync_live_config)
             grid_s.addWidget(cmb_tb, 0, 1)
 
             grid_s.addWidget(QLabel("Tocadiscos:"), 1, 0)
@@ -1646,6 +1695,7 @@ class VisorMapas(QWidget):
             cmb_rp.addItems(["Base", "Con Discos", "Activo", "Ocultar"])
             rp_val = getattr(self, 'house_record_player_choice', 'base')
             cmb_rp.setCurrentIndex(0 if rp_val == 'base' else (1 if rp_val == 'discs' else (2 if rp_val == 'active' else 3)))
+            cmb_rp.currentIndexChanged.connect(sync_live_config)
             grid_s.addWidget(cmb_rp, 1, 1)
             dlg_layout.addWidget(grp_storage)
 
@@ -1659,6 +1709,7 @@ class VisorMapas(QWidget):
                 cmb_fridge.addItems(["Cerrado", "Abierto", "Ocultar"])
                 f_val = getattr(self, 'house_fridge_choice', 'closed')
                 cmb_fridge.setCurrentIndex(0 if f_val == 'closed' else (1 if f_val == 'open' else 2))
+                cmb_fridge.currentIndexChanged.connect(sync_live_config)
                 grid_k.addWidget(cmb_fridge, 0, 1)
 
                 grid_k.addWidget(QLabel("Anaquel:"), 1, 0)
@@ -1666,10 +1717,12 @@ class VisorMapas(QWidget):
                 cmb_shelf.addItems(["Cerrado", "Abierto", "Ocultar"])
                 s_val = getattr(self, 'house_shelf_choice', 'closed')
                 cmb_shelf.setCurrentIndex(0 if s_val == 'closed' else (1 if s_val == 'open' else 2))
+                cmb_shelf.currentIndexChanged.connect(sync_live_config)
                 grid_k.addWidget(cmb_shelf, 1, 1)
 
                 chk_kitchen = QCheckBox("Mueble de Cocina")
                 chk_kitchen.setChecked(getattr(self, 'house_kitchen_choice', True))
+                chk_kitchen.toggled.connect(sync_live_config)
                 grid_k.addWidget(chk_kitchen, 2, 0)
 
                 btn_u = QPushButton("Utensilios (8)...")
@@ -1684,11 +1737,13 @@ class VisorMapas(QWidget):
             if map_id in (42, 43):
                 chk_dining = QCheckBox("Comedor / Mesa Grande (con Alfombra)")
                 chk_dining.setChecked(getattr(self, 'house_dining_choice', True))
+                chk_dining.toggled.connect(sync_live_config)
                 vbox_r.addWidget(chk_dining)
 
             if map_id == 43:
                 chk_fireplace = QCheckBox("Chimenea (6x8 tiles)")
                 chk_fireplace.setChecked(getattr(self, 'house_fireplace_choice', True))
+                chk_fireplace.toggled.connect(sync_live_config)
                 vbox_r.addWidget(chk_fireplace)
 
                 row_bd = QHBoxLayout()
@@ -1697,11 +1752,13 @@ class VisorMapas(QWidget):
                 cmb_bath_door.addItems(["Cerrada", "Abierta", "Ocultar"])
                 bd_val = getattr(self, 'house_bathroom_door_choice', 'closed')
                 cmb_bath_door.setCurrentIndex(0 if bd_val == 'closed' else (1 if bd_val == 'open' else 2))
+                cmb_bath_door.currentIndexChanged.connect(sync_live_config)
                 row_bd.addWidget(cmb_bath_door)
                 vbox_r.addLayout(row_bd)
 
                 chk_bed = QCheckBox("Cama Matrimonial (6x8 tiles)")
                 chk_bed.setChecked(getattr(self, 'house_double_bed_choice', True))
+                chk_bed.toggled.connect(sync_live_config)
                 vbox_r.addWidget(chk_bed)
 
             dlg_layout.addWidget(grp_rooms)
@@ -1712,70 +1769,47 @@ class VisorMapas(QWidget):
 
             chk_vase = QCheckBox("Florero")
             chk_vase.setChecked(getattr(self, 'house_vase_choice', True))
+            chk_vase.toggled.connect(sync_live_config)
             vbox_d.addWidget(chk_vase)
 
             chk_mirror = QCheckBox("Espejo")
             chk_mirror.setChecked(getattr(self, 'house_mirror_choice', True))
+            chk_mirror.toggled.connect(sync_live_config)
             vbox_d.addWidget(chk_mirror)
 
             if map_id in (42, 43):
                 chk_clock = QCheckBox("Reloj")
                 chk_clock.setChecked(getattr(self, 'house_clock_choice', True))
+                chk_clock.toggled.connect(sync_live_config)
                 vbox_d.addWidget(chk_clock)
 
             dlg_layout.addWidget(grp_decor)
 
         elif map_id in (36, 37):
-            # Gallinero (Chicken Coop 1 y 2)
             grp_coop = QGroupBox("Maquinaria del Gallinero")
             vbox_c = QVBoxLayout(grp_coop)
             chk_mayo = QCheckBox("Máquina de Mayonesa (3x5 tiles, Canon X=2, Y=5)")
             chk_mayo.setChecked(getattr(self, 'maker_mayo_choice', True))
+            chk_mayo.toggled.connect(sync_live_config)
             vbox_c.addWidget(chk_mayo)
             dlg_layout.addWidget(grp_coop)
 
         elif map_id in (38, 39):
-            # Establo (Barn 1 y 2)
             grp_barn = QGroupBox("Maquinaria del Establo")
             vbox_b = QVBoxLayout(grp_barn)
             chk_cheese = QCheckBox("Máquina de Queso (3x5 tiles, Canon X=12, Y=5)")
             chk_cheese.setChecked(getattr(self, 'maker_cheese_choice', True))
+            chk_cheese.toggled.connect(sync_live_config)
             vbox_b.addWidget(chk_cheese)
 
             chk_yarn = QCheckBox("Máquina de Lana (3x5 tiles, Canon X=8, Y=5)")
             chk_yarn.setChecked(getattr(self, 'maker_yarn_choice', True))
+            chk_yarn.toggled.connect(sync_live_config)
             vbox_b.addWidget(chk_yarn)
             dlg_layout.addWidget(grp_barn)
 
-        bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        bbox.accepted.connect(dialog.accept)
-        bbox.rejected.connect(dialog.reject)
+        bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        bbox.rejected.connect(dialog.close)
         dlg_layout.addWidget(bbox)
 
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            if map_id in (41, 42, 43):
-                tb_map = {0: 'closed', 1: 'open', 2: 'none'}
-                rp_map = {0: 'base', 1: 'discs', 2: 'active', 3: 'none'}
-                f_map = {0: 'closed', 1: 'open', 2: 'none'}
-                s_map = {0: 'closed', 1: 'open', 2: 'none'}
-                bd_map = {0: 'closed', 1: 'open', 2: 'none'}
-
-                self.house_toolbox_choice = tb_map.get(cmb_tb.currentIndex(), 'closed')
-                self.house_record_player_choice = rp_map.get(cmb_rp.currentIndex(), 'base')
-                if cmb_fridge: self.house_fridge_choice = f_map.get(cmb_fridge.currentIndex(), 'closed')
-                if cmb_shelf: self.house_shelf_choice = s_map.get(cmb_shelf.currentIndex(), 'closed')
-                if chk_kitchen: self.house_kitchen_choice = chk_kitchen.isChecked()
-                if chk_fireplace: self.house_fireplace_choice = chk_fireplace.isChecked()
-                if chk_dining: self.house_dining_choice = chk_dining.isChecked()
-                if cmb_bath_door: self.house_bathroom_door_choice = bd_map.get(cmb_bath_door.currentIndex(), 'closed')
-                if chk_bed: self.house_double_bed_choice = chk_bed.isChecked()
-                self.house_vase_choice = chk_vase.isChecked()
-                self.house_mirror_choice = chk_mirror.isChecked()
-                if chk_clock: self.house_clock_choice = chk_clock.isChecked()
-            elif map_id in (36, 37):
-                if chk_mayo: self.maker_mayo_choice = chk_mayo.isChecked()
-            elif map_id in (38, 39):
-                if chk_cheese: self.maker_cheese_choice = chk_cheese.isChecked()
-                if chk_yarn: self.maker_yarn_choice = chk_yarn.isChecked()
-
-            self._on_dynamic_config_changed()
+        dialog.show()
