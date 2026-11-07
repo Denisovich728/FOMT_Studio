@@ -195,14 +195,14 @@ MAKER_ROM_ENTRIES = {
 }
 
 HOUSE_UTENSILS = [
-    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 1, 'rel_y': 6, 'rel_px': 6, 'rel_py': 48, 'w': 2, 'h': 2},
-    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 3, 'rel_px': 24, 'rel_py': 28, 'w': 2, 'h': 2},
-    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 3, 'rel_px': 40, 'rel_py': 26, 'w': 2, 'h': 2},
-    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 1, 'rel_y': 11, 'rel_px': 6, 'rel_py': 88, 'w': 2, 'h': 2},
-    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 472, 'rel_x': 7, 'rel_y': 10, 'rel_px': 58, 'rel_py': 82, 'w': 2, 'h': 2},
-    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 1, 'rel_y': 8, 'rel_px': 6, 'rel_py': 68, 'w': 2, 'h': 2},
-    {'id': 'utensil_oven', 'name': 'Horno', 'graphic_id': 327, 'rel_x': 7, 'rel_y': 7, 'rel_px': 58, 'rel_py': 60, 'w': 2, 'h': 2},
-    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 400, 'rel_x': 4, 'rel_y': 1, 'rel_px': 32, 'rel_py': 12, 'w': 2, 'h': 2},
+    {'id': 'utensil_oven', 'name': 'Horno', 'graphic_id': 327, 'rel_x': 1, 'rel_y': 4, 'rel_px': 8, 'rel_py': 32, 'w': 2, 'h': 2},
+    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 4, 'rel_px': 24, 'rel_py': 32, 'w': 2, 'h': 2},
+    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 4, 'rel_px': 40, 'rel_py': 32, 'w': 2, 'h': 2},
+    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 1, 'rel_y': 6, 'rel_px': 8, 'rel_py': 48, 'w': 2, 'h': 2},
+    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 1, 'rel_y': 8, 'rel_px': 8, 'rel_py': 64, 'w': 2, 'h': 2},
+    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 7, 'rel_y': 8, 'rel_px': 56, 'rel_py': 64, 'w': 2, 'h': 2},
+    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 400, 'rel_x': 1, 'rel_y': 10, 'rel_px': 8, 'rel_py': 80, 'w': 2, 'h': 2},
+    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 472, 'rel_x': 7, 'rel_y': 10, 'rel_px': 56, 'rel_py': 80, 'w': 2, 'h': 2},
 ]
 
 HOUSE_MAP_DEFAULTS = {
@@ -692,6 +692,13 @@ class FomtMapRenderer:
                 if map_id == 43 and house_cfg.get('fireplace', True):
                     def_pos = defaults.get('fireplace', {'x': 4, 'y': 1})
                     px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
+                    # Fondo opaco canónico de ladrillos y ceniza para el hueco interior de la chimenea (Cols 2 y 3 centradas bajo el tiro)
+                    hearth_interior = [0x41AC, 0x41AD]
+                    for r_i in (5, 6):
+                        for c_i, t_val in enumerate(hearth_interior):
+                            idx = (py + r_i) * w + (px + 2 + c_i)
+                            if idx < len(array_bg3):
+                                array_bg3[idx] = t_val
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['fireplace']['entry'], px, py, active_col, active_dict)
 
                 # 7. Cama Matrimonial (Mapa 43)
@@ -705,7 +712,7 @@ class FomtMapRenderer:
                     bd_choice = house_cfg.get('bathroom_door', 'closed') # 'closed', 'open', 'none'
                     if bd_choice in ('closed', 'open'):
                         bd_desc = 0x106C14 if bd_choice == 'closed' else 0x106BFC
-                        def_pos = defaults.get('bathroom_door', {'x': 4, 'y': 1})
+                        def_pos = defaults.get('bathroom_door', {'x': 1, 'y': 2})
                         dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
                         self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bd_desc, dx, dy, active_col, active_dict)
 

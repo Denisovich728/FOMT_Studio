@@ -47,6 +47,8 @@ NOVEDADES PRINCIPALES DE LA VERSION 4.0.0 "The Greatest Show"-Final Release
 6. MOTOR DE SCRIPTS DE EVENTOS (SLIPSPACE SCRIPT ENGINE v4):
    - Soporte para los 1.328 eventos de la ROM mediante lenguaje estructurado de alto nivel (C-like).
    - Optimizacion de secuencias de escape: consolidacion de retornos de carro (\r\n), pausas (\w) y saltos de linea (\b).
+   - Poda de saltos redundantes y eliminacion de etiquetas huerfanas LBL en bucles do-while y bifurcaciones condicionales.
+   - Puente de compilacion nativa agbcc 2.9.x (GNU C 2.9 thumb-elf) y GNU Binutils para compilar e inyectar codigo maquina THUMB en la tabla de dispatch (0x03F900).
    - Resolucion optimizada de bifurcaciones de control (goto / lbl) para retornos de funciones padre sin colapso de bytecode.
    - Entorno de desarrollo integrado (IDE) con resaltado de sintaxis dinamico, autocompletado y validacion sintactica.
 

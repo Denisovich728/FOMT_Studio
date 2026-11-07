@@ -57,3 +57,4 @@ coll = COLLECT(
     upx_exclude=[],
     name='FoMT_Studio_v4.0.0_FinalRelease',
 )
+

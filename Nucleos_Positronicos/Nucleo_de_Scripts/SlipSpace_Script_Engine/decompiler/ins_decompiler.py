@@ -72,8 +72,7 @@ class ASTOptimizer:
         # 4. Resolver breaks implícitos (goto al final del switch)
         stmts = self._resolve_breaks(stmts)
         # 5. Eliminar saltos redundantes (Phantom Jumps)
-        # NOTA: Desactivado a petición del usuario para mantener 1:1 exacto con el engine de GBA.
-        # stmts = self._remove_phantom_jumps(stmts)
+        stmts = self._remove_phantom_jumps(stmts)
         # 6. Eliminar etiquetas inútiles y huérfanas
         return self._cleanup(stmts)
 

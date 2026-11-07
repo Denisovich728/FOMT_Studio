@@ -9,7 +9,9 @@
 - **Sincronizacion de Capas Base Limpias:** Separacion estricta entre capas editables (`tilemap_bg*`) y capas de renderizado activo (`active_tilemap_bg*`), garantizando que guardar el mapa en ROM no corrompa el terreno base ni duplique edificios fantasma al entrar al mapa en la GBA.
 - **Panel de Ajustes No Modal y Reactivo en Tiempo Real:** Conversion del dialogo de Estructuras Dinamicas y del selector de Utensilios a ventanas no modales (`NonModal`), permitiendo interactuar con el visor del mapa (zoom, paneo, edicion de capas) mientras los cambios en botones, checkboxes y selectores se reflejan instantaneamente en el lienzo sin bloquear la UI ni requerir confirmacion manual.
 - **Prioridad de Dibujado de Cuadro Selector:** Prioridad visual absoluta en el renderizado para los recuadros de seleccion, resaltado interactivo y etiquetas de coordenadas de estructuras dinamicas sobre todas las capas graficas.
-- **Alineacion y Banco Grafico de Utensilios:** Correccion del batidor frances/globo al ID grafico autentico (`graphic_id: 87`) del banco de iconos de items (`0x676DD0`), resolviendo la botella amarilla errogenea. Disposicion ergonomica pixel-perfect de los 8 utensilios sobre las superficies de trabajo de los muebles de cocina (tabla de picar, barra, quemadores, encimera y repisa superior).
+- **Disposicion Canonica de Utensilios de Cocina:** Alineacion pixel-perfect de los 8 utensilios de cocina con el hardware original GBA (`0x080A5BD8` / `0x08017180`): horno microondas (`327`), rodillo (`313`), batidora (`64`) y especiero (`400`) sobre la tabla de preparacion izquierda; sarten (`204`) y olla (`346`) sobre los quemadores centrales; cuchillo (`265`) y batidor globo (`472`) sobre la encimera alicatada derecha bajo el fregadero.
+- **Fondo Opaco de Camara de Combustion en Chimenea (Mapa 43):** Correccion del descriptor `0x106B6C` (`fireplace`) para rellenar la camara de ladrillo/ceniza en BG3 (`0x4177..0x417A`), erradicando la transparencia defectuosa hacia el papel tapiz y piso de madera posterior.
+- **Restauracion de Paleta del Tocadiscos:** Correccion y fijacion de la paleta canonica 10 (`PAL_10`) para el mueble del tocadiscos en la sala de la casa.
 
 ### Editor de Rutinas Diarias y Orquestador de Movimiento (NPC AI Engine)
 - **Topologia y Grafo Mundial:** Implementacion del macromapa interactivo del valle con navegacion espacial bidireccional sobre 41 nodos de mapas y 39 conexiones canonicas.
@@ -34,6 +36,9 @@
 
 ### Motor de Scripts SlipSpace v4
 - **Optimizacion de Bytecode:** Consolidacion de saltos de linea (\r\n), pausas (\w para WAIT_CLICK) y saltos (\b para BREAK).
+- **Poda Exhaustiva de Saltos Fantasma y Etiquetas LBL:** Reestructuracion del pase de limpieza `ASTOptimizer._cleanup` en `ins_decompiler.py` para incluir ramas `StmtDoWhile` en la recoleccion y filtrado de etiquetas activas (`used_labels`), erradicando etiquetas huerfanas `LBL_` y saltos muertos en scripts complejos (como el script 1051, 1014, 1008, 0316) reduciendolos a 0 gotos y 0 labels en codigo C estructurado limpio.
+- **Emparejamiento Estricto de Bifurcaciones Condicionales:** Correccion en `_collect_body_stmts` para emparejar expresiones booleanas con saltos `TokenBne` y `TokenBeq` directamente, eliminando la emision de expresiones huerfanas como sentencias aisladas.
+- **Puente Nativo de Compilacion agbcc 2.9.x:** Integracion de `agbcc_bridge.py` enlazando el compilador oficial de GBA `agbcc.exe` (GNU C 2.9-arm-000512 thumb-elf) y GNU Binutils (`arm-none-eabi-as` y `arm-none-eabi-objcopy`) para compilar rutinas de eventos C nativas a codigo maquina THUMB inyectable en ROM y vinculable a la tabla de dispatch (`0x03F900`).
 - **Resolucion de Bifurcaciones:** Optimizacion de secuencias goto/lbl actuando como retorno estructurado a funciones padre sin desbordamiento de bytecode.
 - **Especificacion Formal:** Documentacion integral de la sintaxis C-like de alto nivel para desarrolladores y modelos LLM.
 
