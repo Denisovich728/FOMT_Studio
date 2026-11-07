@@ -151,9 +151,16 @@ def resolve_project_fsp_path(target_path: str) -> str:
 
     target = os.path.normpath(target_path.strip('"\''))
 
-    # Caso 1: Archivo directo existente
+    # Caso 1: Archivo directo existente (.fsp o .json)
     if os.path.isfile(target):
-        return os.path.abspath(target)
+        if target.lower().endswith((".fsp", ".json")):
+            return os.path.abspath(target)
+        if target.lower().endswith(".gba"):
+            # Si el usuario seleccionó source.gba dentro de la sesión, resolver el .fsp hermano
+            parent_dir = os.path.dirname(target)
+            sub_res = resolve_project_fsp_path(parent_dir)
+            if sub_res:
+                return sub_res
 
     # Caso 2: Es un directorio existente
     if os.path.isdir(target):

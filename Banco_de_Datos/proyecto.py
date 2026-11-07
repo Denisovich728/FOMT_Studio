@@ -155,13 +155,39 @@ class FoMTProject:
         if not os.path.exists(proj_dir):
             os.makedirs(proj_dir, exist_ok=True)
             
-        # 1. Volcado entero del hex (Copia de seguridad local)
         self.name = os.path.basename(proj_dir)
         local_rom_name = "source.gba"
         local_rom_path = os.path.join(proj_dir, local_rom_name)
         
-        # IMPORTANTE: Cerrar cualquier handle si existiera (aunque aquí es nuevo)
-        shutil.copy2(rom_path, local_rom_path)
+        # Resolver rom_path de forma robusta si es un directorio o ruta incompleta
+        resolved_src = rom_path
+        if os.path.isdir(resolved_src):
+            for fname in ["source.gba", f"{self.name}.gba"]:
+                c = os.path.join(resolved_src, fname)
+                if os.path.isfile(c):
+                    resolved_src = c
+                    break
+            else:
+                try:
+                    for f in os.listdir(resolved_src):
+                        if f.lower().endswith(".gba"):
+                            resolved_src = os.path.join(resolved_src, f)
+                            break
+                except Exception:
+                    pass
+
+        if not os.path.isfile(resolved_src):
+            resolved_alt = self._resolve_base_rom_path()
+            if resolved_alt and os.path.isfile(resolved_alt):
+                resolved_src = resolved_alt
+            else:
+                raise FileNotFoundError(f"No se pudo localizar el binario ROM base: '{rom_path}'")
+        
+        # Copia binaria segura con streams sin depender de bloqueos o permisos de shutil
+        with open(resolved_src, "rb") as f_in:
+            rom_data = f_in.read()
+        with open(local_rom_path, "wb") as f_out:
+            f_out.write(rom_data)
         
         # 2. Configurar el proyecto para usar esta copia local
         self.project_dir = proj_dir
@@ -174,27 +200,68 @@ class FoMTProject:
         self.save()
 
     def _resolve_base_rom_path(self):
-        """Resuelve dinámicamente la ruta a la ROM base sin fallar por rutas absolutas obsoletas."""
+        """Resuelve dinámicamente la ruta a la ROM base sin fallar por rutas absolutas obsoletas o sesiones borradas."""
         candidates = []
         if getattr(self, 'base_rom_path', None):
             candidates.append(self.base_rom_path)
             if os.path.isdir(self.base_rom_path):
                 candidates.append(os.path.join(self.base_rom_path, "source.gba"))
+                try:
+                    for f in os.listdir(self.base_rom_path):
+                        if f.lower().endswith(".gba"):
+                            candidates.append(os.path.join(self.base_rom_path, f))
+                except Exception:
+                    pass
+
         if getattr(self, 'project_dir', None):
             candidates.append(os.path.join(self.project_dir, "source.gba"))
             if getattr(self, 'name', None):
                 candidates.append(os.path.join(self.project_dir, f"{self.name}.gba"))
+            try:
+                if os.path.isdir(self.project_dir):
+                    for f in os.listdir(self.project_dir):
+                        if f.lower().endswith(".gba"):
+                            candidates.append(os.path.join(self.project_dir, f))
+            except Exception:
+                pass
 
         try:
             from Banco_de_Datos.Utilidades.rutas import get_sessions_dir, get_default_workspace_dir
+            sess_dir = get_sessions_dir()
+            ws_dir = get_default_workspace_dir()
+            
             if getattr(self, 'name', None):
-                candidates.append(os.path.join(get_sessions_dir(), self.name, "source.gba"))
-                candidates.append(os.path.join(get_default_workspace_dir(), self.name, "source.gba"))
+                candidates.append(os.path.join(sess_dir, self.name, "source.gba"))
+                candidates.append(os.path.join(ws_dir, self.name, "source.gba"))
+            
+            candidates.append(os.path.join(ws_dir, "source.gba"))
+            candidates.append(os.path.join(ws_dir, "fomt.gba"))
+            candidates.append(os.path.join(ws_dir, "mfomt.gba"))
+            
+            # Buscar en sesiones recientes (de más nueva a más vieja) que tengan una source.gba válida
+            if os.path.isdir(sess_dir):
+                subdirs = sorted(
+                    [os.path.join(sess_dir, d) for d in os.listdir(sess_dir) if d.startswith("Session_")],
+                    key=lambda p: os.path.getmtime(p) if os.path.exists(p) else 0,
+                    reverse=True
+                )
+                for s in subdirs[:15]:
+                    cand = os.path.join(s, "source.gba")
+                    if os.path.isfile(cand):
+                        candidates.append(cand)
         except Exception:
             pass
 
+        # Buscar en entorno local y directorios de laboratorio
+        for root in [os.getcwd(), r"J:\Laboratorio", r"J:\Laboratorio\FOMT_Studio", r"J:\Laboratorio\FOMT-MATCH-ENGINE"]:
+            if os.path.isdir(root):
+                candidates.append(os.path.join(root, "source.gba"))
+                candidates.append(os.path.join(root, "fomt virgen.gba"))
+                candidates.append(os.path.join(root, "MFOMT VIRGEN.gba"))
+                candidates.append(os.path.join(root, "fomt.gba"))
+
         for c in candidates:
-            if c and os.path.isfile(c):
+            if c and os.path.isfile(c) and os.path.getsize(c) >= 0x400000:
                 return os.path.abspath(c)
         return getattr(self, 'base_rom_path', "")
 
@@ -214,11 +281,17 @@ class FoMTProject:
             data = json.load(f)
             
         self.name = data.get("name", os.path.splitext(os.path.basename(fsp_path))[0])
-        # Priorizamos la ROM local si existe
         self.project_dir = os.path.dirname(fsp_path)
-        local_rom_path = os.path.join(self.project_dir, "source.gba")
         
-        if os.path.exists(local_rom_path):
+        # 1. Priorizamos la ROM local del proyecto si existe
+        local_rom_path = os.path.join(self.project_dir, "source.gba")
+        rel_rom = data.get("relative_rom", "")
+        if rel_rom:
+            cand_rel = os.path.join(self.project_dir, rel_rom)
+            if os.path.isfile(cand_rel):
+                local_rom_path = cand_rel
+
+        if os.path.isfile(local_rom_path):
             self.base_rom_path = local_rom_path
         else:
             raw_base = data.get("base_rom", "")
@@ -229,6 +302,14 @@ class FoMTProject:
                 resolved = self._resolve_base_rom_path()
                 if resolved and os.path.isfile(resolved):
                     self.base_rom_path = resolved
+                    try:
+                        with open(resolved, "rb") as f_src:
+                            b_data = f_src.read()
+                        with open(local_rom_path, "wb") as f_dst:
+                            f_dst.write(b_data)
+                        self.base_rom_path = local_rom_path
+                    except Exception:
+                        pass
             
         self.game_version = data.get("version", "Unknown")
         self.is_mfomt = data.get("is_mfomt", False)
@@ -241,8 +322,19 @@ class FoMTProject:
             resolved = self._resolve_base_rom_path()
             if resolved and os.path.isfile(resolved):
                 self.base_rom_path = resolved
+                try:
+                    with open(resolved, "rb") as f_src:
+                        b_data = f_src.read()
+                    with open(local_rom_path, "wb") as f_dst:
+                        f_dst.write(b_data)
+                    self.base_rom_path = local_rom_path
+                except Exception:
+                    pass
             else:
-                raise FileNotFoundError(f"No se encontró la ROM base del proyecto: {self.base_rom_path}")
+                raise FileNotFoundError(
+                    f"No se pudo localizar ninguna ROM base para el proyecto '{self.name}'. "
+                    f"Ruta registrada en el proyecto: '{self.base_rom_path}'"
+                )
             
         return self.step_1_detect_rom(self.base_rom_path, self.project_dir)
 
@@ -328,10 +420,13 @@ class FoMTProject:
         assert_rom_signed(self, 'compile_to_rom')
         """Aplica todos los parches virtuales a la ROM base y exporta un archivo GBA."""
         export_path = os.path.abspath(export_path)
-        # Si export_path es una carpeta, agregar nombre de archivo canónico
+        # Normalizar si export_path es una carpeta o carece de extensión .gba
         if os.path.isdir(export_path) or export_path.endswith(("\\", "/")):
             os.makedirs(export_path, exist_ok=True)
-            export_path = os.path.join(export_path, f"{self.name}.gba")
+            export_path = os.path.join(export_path, f"{getattr(self, 'name', 'Modded')}.gba")
+        elif not os.path.splitext(export_path)[1]:
+            export_path = export_path + ".gba"
+            os.makedirs(os.path.dirname(export_path), exist_ok=True)
         else:
             os.makedirs(os.path.dirname(export_path), exist_ok=True)
 
@@ -347,14 +442,17 @@ class FoMTProject:
                 self.virtual_rom[offset : offset + len(patch_data)] = patch_data
             with open(export_path, "wb") as f:
                 f.write(self.virtual_rom)
+            return export_path
         else:
             if not resolved_base or not os.path.isfile(resolved_base):
-                raise FileNotFoundError(f"No se pudo localizar la ROM base para compilar: {self.base_rom_path}")
-            shutil.copy2(resolved_base, export_path)
-            with open(export_path, "r+b") as f:
-                for offset, patch_data in self.patches.items():
-                    f.seek(offset)
-                    f.write(patch_data)
+                raise FileNotFoundError(f"No se pudo localizar ninguna ROM base para compilar: {self.base_rom_path}")
+            with open(resolved_base, "rb") as f_in:
+                rom_bytes = bytearray(f_in.read())
+            for offset, patch_data in self.patches.items():
+                rom_bytes[offset : offset + len(patch_data)] = patch_data
+            with open(export_path, "wb") as f_out:
+                f_out.write(rom_bytes)
+            return export_path
 
     def export_ips(self, export_path):
         from Banco_de_Datos.parche_splash import is_rom_signed, inyectar_splash_y_firmar, assert_rom_signed

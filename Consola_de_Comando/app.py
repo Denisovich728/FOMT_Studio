@@ -638,7 +638,9 @@ class FoMTStudioApp(QMainWindow):
     def action_open_rom(self):
         if not self._check_close_project(): return
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir, get_sessions_dir
-        initial_dir = self.last_rom_dir or get_default_workspace_dir()
+        initial_dir = self.last_rom_dir
+        if not initial_dir or not os.path.isdir(initial_dir):
+            initial_dir = get_default_workspace_dir()
         path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM (Crear Sesión FSP)", initial_dir, "GBA ROM (*.gba)")
         if not path: return
         self.last_rom_dir = os.path.dirname(path)
@@ -648,7 +650,9 @@ class FoMTStudioApp(QMainWindow):
     def action_new_project(self):
         if not self._check_close_project(): return
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
-        initial_dir = self.last_rom_dir or get_default_workspace_dir()
+        initial_dir = self.last_rom_dir
+        if not initial_dir or not os.path.isdir(initial_dir):
+            initial_dir = get_default_workspace_dir()
         path, _ = QFileDialog.getOpenFileName(self, tr("menu_new", self.current_lang), initial_dir, "GBA ROM (*.gba)")
         if not path: return
         self.last_rom_dir = os.path.dirname(path)
@@ -660,7 +664,9 @@ class FoMTStudioApp(QMainWindow):
     def action_load_project(self):
         if not self._check_close_project(): return
         from Banco_de_Datos.Utilidades.rutas import get_sessions_dir, get_default_workspace_dir
-        initial_dir = self.last_rom_dir or get_sessions_dir()
+        initial_dir = self.last_rom_dir
+        if not initial_dir or not os.path.isdir(initial_dir):
+            initial_dir = get_sessions_dir()
         path, _ = QFileDialog.getOpenFileName(
             self, 
             tr("menu_load", self.current_lang), 
@@ -674,7 +680,10 @@ class FoMTStudioApp(QMainWindow):
         if not os.path.exists(target_path):
             QMessageBox.warning(self, tr("err_fatal", self.current_lang), f"No se pudo encontrar el archivo o sesión especificada:\n{path}")
             return
-        self.last_rom_dir = os.path.dirname(target_path)
+        if os.path.isfile(target_path):
+            self.last_rom_dir = os.path.dirname(target_path)
+        else:
+            self.last_rom_dir = target_path
         self.settings.setValue("last_rom_dir", self.last_rom_dir)
         self._start_async_load('load', None, target_path)
 
@@ -756,17 +765,28 @@ class FoMTStudioApp(QMainWindow):
             
     def action_compile_rom(self):
         if not self.project: return
-        initial_dir = self.last_rom_dir or getattr(self.project, 'project_dir', "")
-        default_file = os.path.join(initial_dir, f"{getattr(self.project, 'name', 'Modded')}.gba") if initial_dir else "Modded_FoMT.gba"
+        initial_dir = self.last_rom_dir
+        if not initial_dir or not os.path.isdir(initial_dir):
+            initial_dir = getattr(self.project, 'project_dir', "")
+        if not initial_dir or not os.path.isdir(initial_dir):
+            from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
+            initial_dir = get_default_workspace_dir()
+            
+        default_file = os.path.join(initial_dir, f"{getattr(self.project, 'name', 'Modded')}.gba")
         dest, _ = QFileDialog.getSaveFileName(self, "Exportar ROM Compilada", default_file, "GBA ROM (*.gba)")
         if dest:
+            if not dest.lower().endswith(".gba"):
+                dest += ".gba"
             try:
                 if hasattr(self, 'magic_circle'):
                     self.magic_circle.start_animation()
                 from PyQt6.QtWidgets import QApplication
                 QApplication.processEvents()
-                self.project.compile_to_rom(dest)
-                self.status.showMessage(f"ROM parcheada y exportada a {dest}!")
+                actual_dest = self.project.compile_to_rom(dest)
+                final_path = actual_dest or dest
+                self.last_rom_dir = os.path.dirname(final_path)
+                self.settings.setValue("last_rom_dir", self.last_rom_dir)
+                self.status.showMessage(f"ROM parcheada y exportada a {final_path}!")
                 if hasattr(self, 'magic_circle'):
                     self.magic_circle.stop_animation()
             except Exception as e:
