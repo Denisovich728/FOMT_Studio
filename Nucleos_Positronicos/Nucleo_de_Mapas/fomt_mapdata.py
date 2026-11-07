@@ -195,14 +195,14 @@ MAKER_ROM_ENTRIES = {
 }
 
 HOUSE_UTENSILS = [
-    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 0, 'rel_y': 6, 'rel_px': 4, 'rel_py': 46, 'w': 2, 'h': 2},
-    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 6, 'rel_px': 26, 'rel_py': 46, 'w': 2, 'h': 2},
-    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 6, 'rel_px': 44, 'rel_py': 46, 'w': 2, 'h': 2},
-    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 0, 'rel_y': 11, 'rel_px': 4, 'rel_py': 86, 'w': 2, 'h': 2},
-    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 87, 'rel_x': 7, 'rel_y': 10, 'rel_px': 58, 'rel_py': 80, 'w': 2, 'h': 2},
-    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 0, 'rel_y': 8, 'rel_px': 4, 'rel_py': 66, 'w': 2, 'h': 2},
+    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 1, 'rel_y': 6, 'rel_px': 6, 'rel_py': 48, 'w': 2, 'h': 2},
+    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 3, 'rel_px': 24, 'rel_py': 28, 'w': 2, 'h': 2},
+    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 3, 'rel_px': 40, 'rel_py': 26, 'w': 2, 'h': 2},
+    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 1, 'rel_y': 11, 'rel_px': 6, 'rel_py': 88, 'w': 2, 'h': 2},
+    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 472, 'rel_x': 7, 'rel_y': 10, 'rel_px': 58, 'rel_py': 82, 'w': 2, 'h': 2},
+    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 1, 'rel_y': 8, 'rel_px': 6, 'rel_py': 68, 'w': 2, 'h': 2},
     {'id': 'utensil_oven', 'name': 'Horno', 'graphic_id': 327, 'rel_x': 7, 'rel_y': 7, 'rel_px': 58, 'rel_py': 60, 'w': 2, 'h': 2},
-    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 290, 'rel_x': 4, 'rel_y': 2, 'rel_px': 36, 'rel_py': 18, 'w': 2, 'h': 2},
+    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 400, 'rel_x': 4, 'rel_y': 1, 'rel_px': 32, 'rel_py': 12, 'w': 2, 'h': 2},
 ]
 
 HOUSE_MAP_DEFAULTS = {
@@ -332,11 +332,11 @@ class FomtMapRenderer:
                 MAKER_ROM_ENTRIES['mayo_maker']['x'] = self.rom[0x0A63E8]
                 MAKER_ROM_ENTRIES['mayo_maker']['y'] = self.rom[0x0A63EA]
             if 42 in HOUSE_MAP_DEFAULTS and 'kitchen_counter' in HOUSE_MAP_DEFAULTS[42]:
-                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['x'] = self.rom[0x0A7034]
-                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['y'] = self.rom[0x0A7036]
+                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['x'] = self.rom[0x0A6FC4]
+                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['y'] = self.rom[0x0A6FC6]
             if 43 in HOUSE_MAP_DEFAULTS and 'kitchen_counter' in HOUSE_MAP_DEFAULTS[43]:
-                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['x'] = self.rom[0x0A7170]
-                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['y'] = self.rom[0x0A7172]
+                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['x'] = self.rom[0x0A7100]
+                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['y'] = self.rom[0x0A7102]
         except Exception:
             pass
 
@@ -426,18 +426,6 @@ class FomtMapRenderer:
         while len(self.palettes_2) < 16:
             self.palettes_2.append([(0, 0, 0)] * 16)
 
-        # En casas de campo (mapas 41, 42, 43), el hardware GBA carga las paletas de items
-        # desde 0x676DD0 (ARR5_OFF) en las ranuras 10 a 15 de BG palette RAM.
-        if getattr(mh, 'map_id', 0) in (41, 42, 43):
-            arr5 = 0x676DD0
-            if arr5 + 16 * 32 <= len(rom):
-                item_pals = _parse_palette(rom[arr5 : arr5 + 16 * 32])
-                for p_i in range(10, min(16, len(item_pals))):
-                    if p_i < len(self.palettes_1):
-                        self.palettes_1[p_i] = item_pals[p_i]
-                    if p_i < len(self.palettes_2):
-                        self.palettes_2[p_i] = item_pals[p_i]
-            
         print(f"[FomtMapRenderer] Paletas cargadas: Banco 1={len(self.palettes_1)}, Banco 2={len(self.palettes_2)}")
 
 

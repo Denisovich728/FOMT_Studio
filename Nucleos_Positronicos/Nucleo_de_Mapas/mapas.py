@@ -1546,11 +1546,11 @@ class MapParser:
             if 'kitchen_counter' in positions:
                 kx, ky = positions['kitchen_counter']
                 if map_id == 42:
-                    rom_overwrites[0x0A7034] = bytes([kx])
-                    rom_overwrites[0x0A7036] = bytes([ky])
+                    rom_overwrites[0x0A6FC4] = bytes([kx])
+                    rom_overwrites[0x0A6FC6] = bytes([ky])
                 elif map_id == 43:
-                    rom_overwrites[0x0A7170] = bytes([kx])
-                    rom_overwrites[0x0A7172] = bytes([ky])
+                    rom_overwrites[0x0A7100] = bytes([kx])
+                    rom_overwrites[0x0A7102] = bytes([ky])
 
         for off, val in rom_overwrites.items():
             self.project.overwrite_rom_directly(off, val)
