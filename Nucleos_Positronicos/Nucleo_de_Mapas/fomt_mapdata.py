@@ -195,14 +195,14 @@ MAKER_ROM_ENTRIES = {
 }
 
 HOUSE_UTENSILS = [
-    {'id': 'utensil_knife', 'name': 'Cuchillo', 'desc_off': 0x106E24, 'w': 3, 'h': 5, 'rel_x': 2, 'rel_y': 6},
-    {'id': 'utensil_pan', 'name': 'Sartén', 'desc_off': 0x106E54, 'w': 3, 'h': 5, 'rel_x': 4, 'rel_y': 6},
-    {'id': 'utensil_pot', 'name': 'Olla', 'desc_off': 0x106E84, 'w': 3, 'h': 5, 'rel_x': 6, 'rel_y': 6},
-    {'id': 'utensil_mixer', 'name': 'Batidora', 'desc_off': 0x106EB4, 'w': 3, 'h': 5, 'rel_x': 1, 'rel_y': 9},
-    {'id': 'utensil_whisk', 'name': 'Batidor', 'desc_off': 0x106EE4, 'w': 3, 'h': 5, 'rel_x': 3, 'rel_y': 9},
-    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'desc_off': 0x106F14, 'w': 3, 'h': 5, 'rel_x': 5, 'rel_y': 9},
-    {'id': 'utensil_oven', 'name': 'Horno', 'desc_off': 0x106F44, 'w': 3, 'h': 5, 'rel_x': 7, 'rel_y': 9},
-    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'desc_off': 0x106F74, 'w': 3, 'h': 5, 'rel_x': 4, 'rel_y': 3},
+    {'id': 'utensil_knife', 'name': 'Cuchillo', 'graphic_id': 265, 'rel_x': 1, 'rel_y': 6, 'rel_px': 8, 'rel_py': 48, 'w': 2, 'h': 2},
+    {'id': 'utensil_pan', 'name': 'Sartén', 'graphic_id': 204, 'rel_x': 3, 'rel_y': 6, 'rel_px': 28, 'rel_py': 50, 'w': 2, 'h': 2},
+    {'id': 'utensil_pot', 'name': 'Olla', 'graphic_id': 346, 'rel_x': 5, 'rel_y': 6, 'rel_px': 46, 'rel_py': 48, 'w': 2, 'h': 2},
+    {'id': 'utensil_mixer', 'name': 'Batidora', 'graphic_id': 64, 'rel_x': 1, 'rel_y': 9, 'rel_px': 8, 'rel_py': 70, 'w': 2, 'h': 2},
+    {'id': 'utensil_whisk', 'name': 'Batidor', 'graphic_id': 294, 'rel_x': 3, 'rel_y': 9, 'rel_px': 26, 'rel_py': 70, 'w': 2, 'h': 2},
+    {'id': 'utensil_rolling_pin', 'name': 'Rodillo', 'graphic_id': 313, 'rel_x': 5, 'rel_y': 9, 'rel_px': 40, 'rel_py': 70, 'w': 2, 'h': 2},
+    {'id': 'utensil_oven', 'name': 'Horno', 'graphic_id': 327, 'rel_x': 7, 'rel_y': 9, 'rel_px': 56, 'rel_py': 70, 'w': 2, 'h': 2},
+    {'id': 'utensil_seasoning', 'name': 'Juego de Condimentos', 'graphic_id': 290, 'rel_x': 4, 'rel_y': 2, 'rel_px': 36, 'rel_py': 20, 'w': 2, 'h': 2},
 ]
 
 HOUSE_MAP_DEFAULTS = {
@@ -218,7 +218,6 @@ HOUSE_MAP_DEFAULTS = {
         'fridge': {'type': 'fridge_closed', 'x': 11, 'y': 3, 'name': 'Refrigerador'},
         'shelf': {'type': 'shelf_closed', 'x': 15, 'y': 2, 'name': 'Anaquel'},
         'kitchen_counter': {'type': 'kitchen_counter', 'x': 2, 'y': 1, 'name': 'Mueble de Cocina'},
-        'fireplace': {'type': 'fireplace', 'x': 1, 'y': 2, 'name': 'Chimenea'},
         'carpet_dining': {'type': 'carpet_dining', 'x': 23, 'y': 10, 'name': 'Comedor / Alfombra'},
         'vase': {'type': 'vase', 'x': 34, 'y': 6, 'name': 'Florero'},
         'mirror': {'type': 'mirror', 'x': 23, 'y': 2, 'name': 'Espejo'},
@@ -382,6 +381,18 @@ class FomtMapRenderer:
             self.palettes_1.append([(0, 0, 0)] * 16)
         while len(self.palettes_2) < 16:
             self.palettes_2.append([(0, 0, 0)] * 16)
+
+        # En casas de campo (mapas 41, 42, 43), el hardware GBA carga las paletas de items
+        # desde 0x676DD0 (ARR5_OFF) en las ranuras 10 a 15 de BG palette RAM.
+        if getattr(mh, 'map_id', 0) in (41, 42, 43):
+            arr5 = 0x676DD0
+            if arr5 + 16 * 32 <= len(rom):
+                item_pals = _parse_palette(rom[arr5 : arr5 + 16 * 32])
+                for p_i in range(10, min(16, len(item_pals))):
+                    if p_i < len(self.palettes_1):
+                        self.palettes_1[p_i] = item_pals[p_i]
+                    if p_i < len(self.palettes_2):
+                        self.palettes_2[p_i] = item_pals[p_i]
             
         print(f"[FomtMapRenderer] Paletas cargadas: Banco 1={len(self.palettes_1)}, Banco 2={len(self.palettes_2)}")
 
@@ -479,9 +490,9 @@ class FomtMapRenderer:
                             # 0x03FF y 0xFFFF corresponden a tiles transparentes en GBA FoMT
                             if t_val != 0x03FF and t_val != 0xFFFF:
                                 p_idx = (t_val >> 12) & 0xF
-                                # En mapas de casa (41, 42, 43), las paletas 11-14 no están inicializadas para tiles.
-                                # Evitamos estamparlas sobre bg_overlay para que el mueble de cocina no cree un vacío negro.
-                                if self._map_header and getattr(self._map_header, 'map_id', 0) in (41, 42, 43) and p_idx >= 11:
+                                # Para el mueble de cocina (0x106B54), omitir en BG2 los tiles vacios (0x235..0x24C)
+                                # que corresponden a ranuras no inicializadas en el overlay sin sobreescribir la base.
+                                if desc_off == 0x106B54 and ptr == p_bg2 and (t_val & 0x3FF) in range(0x235, 0x24D):
                                     continue
                                 dst_idx = (map_y + y) * self.width + (map_x + x)
                                 if dst_idx < len(tmap):
@@ -645,17 +656,9 @@ class FomtMapRenderer:
                     kx, ky = positions.get('kitchen_counter', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['kitchen_counter']['entry'], kx, ky, active_col, active_dict)
 
-                    # 8 Utensilios de Cocina individuales
-                    active_utensils = house_cfg.get('utensils', [True]*8)
-                    for u_idx, u_info in enumerate(HOUSE_UTENSILS):
-                        is_active = active_utensils[u_idx] if u_idx < len(active_utensils) else False
-                        if is_active:
-                            ux, uy = positions.get(u_info['id'], (kx + u_info['rel_x'], ky + u_info['rel_y']))
-                            self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, u_info['desc_off'], ux, uy, active_col, active_dict)
-
-                # 6. Chimenea (Mapas 42 y 43) - Entry 24 autentica
-                if map_id in (42, 43) and house_cfg.get('fireplace', True):
-                    def_pos = defaults.get('fireplace', {'x': 1, 'y': 2})
+                # 6. Chimenea (Exclusiva de Casa Lv3 / Mapa 43) - Entry 24 autentica
+                if map_id == 43 and house_cfg.get('fireplace', True):
+                    def_pos = defaults.get('fireplace', {'x': 4, 'y': 1})
                     px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES['fireplace']['entry'], px, py, active_col, active_dict)
 
@@ -763,6 +766,36 @@ class FomtMapRenderer:
         # Capa superior (Normalmente BG1, paredes altas, copas de arboles, superposiciones)
         if show_top and array_top:
             img = draw_layer(array_top, img, is_overlay=True)
+
+        # Superposicion canonica de Utensilios de Cocina (Iconos del banco de items 0x676DD0)
+        if dyn_cfg.get('enabled', True) and map_id in (42, 43):
+            house_cfg = dyn_cfg.get('house', {})
+            if house_cfg.get('kitchen_counter', True):
+                active_utensils = house_cfg.get('utensils', [True]*8)
+                defaults = HOUSE_MAP_DEFAULTS.get(map_id, {})
+                def_kpos = defaults.get('kitchen_counter', {'x': 2, 'y': 1})
+                positions = dyn_cfg.get('positions', {})
+                kx, ky = positions.get('kitchen_counter', (def_kpos['x'], def_kpos['y']))
+                if not hasattr(self, '_icon_engine') or self._icon_engine is None:
+                    try:
+                        from Nucleos_Positronicos.Nucleo_de_Items.objetos import ItemIconEngine
+                        self._icon_engine = ItemIconEngine(self.rom)
+                    except Exception:
+                        self._icon_engine = None
+
+                if self._icon_engine is not None:
+                    for u_idx, u_info in enumerate(HOUSE_UTENSILS):
+                        is_active = active_utensils[u_idx] if u_idx < len(active_utensils) else False
+                        if is_active:
+                            if u_info['id'] in positions:
+                                ux, uy = positions[u_info['id']]
+                                px, py = ux * 8, uy * 8
+                            else:
+                                px = kx * 8 + u_info.get('rel_px', u_info['rel_x'] * 8)
+                                py = ky * 8 + u_info.get('rel_py', u_info['rel_y'] * 8)
+                            icon = self._icon_engine.extract_icon_pil(u_info['graphic_id'])
+                            if icon:
+                                img.paste(icon, (px, py), icon)
 
         # Malla visual de cultivo (Canonico FoMT: 43x25 plots de 16x16 px = 2x2 tiles, X=272, Y=176)
         if dyn_cfg.get('enabled', True) and map_id in (0, 1) and dyn_cfg.get('field_grid', False):
@@ -1061,11 +1094,11 @@ class FomtMapRenderer:
                 for u_idx, u_info in enumerate(HOUSE_UTENSILS):
                     if u_idx < len(active_utensils) and active_utensils[u_idx]:
                         ux, uy = positions.get(u_info['id'], (kx + u_info['rel_x'], ky + u_info['rel_y']))
-                        results.append({'id': u_info['id'], 'name': f"Utensilio: {u_info['name']}", 'x': ux, 'y': uy, 'w': u_info['w'], 'h': u_info['h'], 'entry': u_info['desc_off']})
+                        results.append({'id': u_info['id'], 'name': f"Utensilio: {u_info['name']}", 'x': ux, 'y': uy, 'w': u_info['w'], 'h': u_info['h'], 'entry': u_info.get('graphic_id', 0)})
 
-            # 6. Chimenea - Entry 24 autentica
-            if map_id in (42, 43) and house_cfg.get('fireplace', True):
-                def_pos = defaults.get('fireplace', {'x': 1, 'y': 2})
+            # 6. Chimenea (Exclusiva de Casa Lv3 / Mapa 43) - Entry 24 autentica
+            if map_id == 43 and house_cfg.get('fireplace', True):
+                def_pos = defaults.get('fireplace', {'x': 4, 'y': 1})
                 px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['fireplace']
                 results.append({'id': 'fireplace', 'name': e_info['name'], 'x': px, 'y': py, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})

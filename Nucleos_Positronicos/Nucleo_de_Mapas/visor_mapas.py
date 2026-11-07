@@ -1682,15 +1682,15 @@ class VisorMapas(QWidget):
             vbox_r = QVBoxLayout(grp_rooms)
 
             if map_id in (42, 43):
-                chk_fireplace = QCheckBox("Chimenea (6x8 tiles)")
-                chk_fireplace.setChecked(getattr(self, 'house_fireplace_choice', True))
-                vbox_r.addWidget(chk_fireplace)
-
                 chk_dining = QCheckBox("Comedor / Mesa Grande (con Alfombra)")
                 chk_dining.setChecked(getattr(self, 'house_dining_choice', True))
                 vbox_r.addWidget(chk_dining)
 
             if map_id == 43:
+                chk_fireplace = QCheckBox("Chimenea (6x8 tiles)")
+                chk_fireplace.setChecked(getattr(self, 'house_fireplace_choice', True))
+                vbox_r.addWidget(chk_fireplace)
+
                 row_bd = QHBoxLayout()
                 row_bd.addWidget(QLabel("Puerta del Baño:"))
                 cmb_bath_door = QComboBox()
