@@ -142,6 +142,12 @@ class FoMTStudioApp(QMainWindow):
         self.current_lang = self.settings.value("language", "es")
         self.current_theme = self.settings.value("theme", "forerunner")
         self.last_rom_dir = self.settings.value("last_rom_dir", "")
+        # Sanitizar last_rom_dir: si apunta a Documents o no existe, limpiar para forzar inicio en carpeta local
+        if self.last_rom_dir:
+            normalized_last = os.path.normpath(str(self.last_rom_dir))
+            if ("Documents" in normalized_last or "Documentos" in normalized_last or "Session_" in normalized_last or not os.path.isdir(normalized_last)):
+                self.last_rom_dir = ""
+                self.settings.setValue("last_rom_dir", "")
         self.ai_copilot_active = self.settings.value("ai_copilot_active", False, type=bool)
         
         self._setup_ui()
@@ -639,8 +645,8 @@ class FoMTStudioApp(QMainWindow):
         if not self._check_close_project(): return
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir, get_sessions_dir
         initial_dir = self.last_rom_dir
-        if not initial_dir or not os.path.isdir(initial_dir):
-            initial_dir = get_default_workspace_dir()
+        if not initial_dir or not os.path.isdir(initial_dir) or "Documents" in initial_dir or "Documentos" in initial_dir or "Session_" in initial_dir:
+            initial_dir = get_sessions_dir()
         path, _ = QFileDialog.getOpenFileName(self, "Abrir ROM (Crear Sesión FSP)", initial_dir, "GBA ROM (*.gba)")
         if not path: return
         self.last_rom_dir = os.path.dirname(path)
@@ -651,7 +657,7 @@ class FoMTStudioApp(QMainWindow):
         if not self._check_close_project(): return
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
         initial_dir = self.last_rom_dir
-        if not initial_dir or not os.path.isdir(initial_dir):
+        if not initial_dir or not os.path.isdir(initial_dir) or "Documents" in initial_dir or "Documentos" in initial_dir:
             initial_dir = get_default_workspace_dir()
         path, _ = QFileDialog.getOpenFileName(self, tr("menu_new", self.current_lang), initial_dir, "GBA ROM (*.gba)")
         if not path: return
@@ -665,7 +671,7 @@ class FoMTStudioApp(QMainWindow):
         if not self._check_close_project(): return
         from Banco_de_Datos.Utilidades.rutas import get_sessions_dir, get_default_workspace_dir
         initial_dir = self.last_rom_dir
-        if not initial_dir or not os.path.isdir(initial_dir):
+        if not initial_dir or not os.path.isdir(initial_dir) or "Documents" in initial_dir or "Documentos" in initial_dir:
             initial_dir = get_sessions_dir()
         path, _ = QFileDialog.getOpenFileName(
             self, 
@@ -766,9 +772,9 @@ class FoMTStudioApp(QMainWindow):
     def action_compile_rom(self):
         if not self.project: return
         initial_dir = self.last_rom_dir
-        if not initial_dir or not os.path.isdir(initial_dir):
+        if not initial_dir or not os.path.isdir(initial_dir) or "Documents" in initial_dir or "Documentos" in initial_dir:
             initial_dir = getattr(self.project, 'project_dir', "")
-        if not initial_dir or not os.path.isdir(initial_dir):
+        if not initial_dir or not os.path.isdir(initial_dir) or "Documents" in initial_dir or "Documentos" in initial_dir:
             from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
             initial_dir = get_default_workspace_dir()
             
