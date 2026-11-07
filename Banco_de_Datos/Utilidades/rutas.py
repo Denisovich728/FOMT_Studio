@@ -43,6 +43,21 @@ def get_data_path(game_mode, filename):
     subfolder = "Mfomt" if game_mode.lower() == "mfomt" else "fomt"
     return get_resource_path(os.path.join("Banco_de_Datos", "Cilixes", subfolder, filename))
 
+def get_app_root_dir() -> str:
+    """
+    Obtiene el directorio raíz de la aplicación de forma dinámica y 100% portable.
+    - Si la aplicación está congelada (PyInstaller onedir o onefile), retorna la carpeta
+      donde reside el ejecutable principal (.exe).
+    - En entorno de desarrollo, retorna la raíz del repositorio.
+    Alojar sesiones y proyectos en subdirectorios locales de la aplicación previene de raíz
+    los bloqueos de 'Acceso controlado a carpetas' (Controlled Folder Access) de Windows Defender
+    en la carpeta Mis Documentos.
+    """
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(os.path.abspath(sys.executable))
+    # En desarrollo: 3 niveles arriba de Banco_de_Datos/Utilidades/rutas.py
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 def get_documents_dir() -> str:
     """
     Obtiene de forma dinámica la ruta real al directorio de Documentos del usuario
@@ -85,57 +100,58 @@ def get_documents_dir() -> str:
 def get_default_workspace_dir() -> str:
     """
     Determina el directorio de trabajo por defecto para FoMT Studio de forma dinámica.
-    Respeta la preferencia configurada por el usuario (default_project_dir) o recurre
-    a <Documentos>/FoMTStudio.
+    Ubica el espacio de trabajo en un subdirectorio 'Workspace' dentro de la carpeta
+    de la aplicación para máxima portabilidad y evitar bloqueos de Windows Defender
+    en Mis Documentos.
     """
-    # Revisar si hay un default_project_dir en fomt_config.json
+    # 1. Revisar si hay un default_project_dir configurado manualmente (que no sea Documentos)
     try:
         from Nucleo_Herramientas.config_manager import ConfigManager
         custom_dir = ConfigManager.get("default_project_dir")
-        if custom_dir and os.path.isdir(custom_dir):
+        if custom_dir and os.path.isdir(custom_dir) and "Documents" not in custom_dir and "Documentos" not in custom_dir:
             return os.path.normpath(custom_dir)
     except Exception:
         pass
 
-    docs = get_documents_dir()
-    workspace = os.path.join(docs, "FoMTStudio")
+    # 2. Workspace local dentro del directorio de la aplicación
+    workspace = os.path.join(get_app_root_dir(), "Workspace")
     os.makedirs(workspace, exist_ok=True)
     return os.path.normpath(workspace)
 
 def get_sessions_dir() -> str:
     """
-    Retorna la ruta dinámica hacia el directorio de sesiones de trabajo automáticas.
-    Garantiza su creación previa.
+    Retorna la ruta dinámica hacia el directorio de sesiones de trabajo automáticas,
+    alojado en un subdirectorio 'Sessions' directamente dentro de la carpeta de la
+    aplicación. Esto elimina dependencias externas y bloqueos por permisos en Documents.
     """
-    workspace = get_default_workspace_dir()
-    sessions = os.path.join(workspace, "Sessions")
+    app_root = get_app_root_dir()
+    sessions = os.path.join(app_root, "Sessions")
     os.makedirs(sessions, exist_ok=True)
     return os.path.normpath(sessions)
 
 def get_config_file_path() -> str:
     """
     Retorna la ruta dinámica del archivo de configuración general fomt_config.json.
-    Busca primero en el workspace del usuario, luego junto al ejecutable/código.
+    Prioriza la raíz de la aplicación para evitar bloqueos por permisos.
     """
-    # 1. En el workspace de FoMTStudio del usuario
-    user_workspace = os.path.join(get_documents_dir(), "FoMTStudio")
-    user_cfg = os.path.join(user_workspace, "fomt_config.json")
-    if os.path.exists(user_cfg):
-        return user_cfg
+    # 1. En el directorio raíz de la aplicación
+    app_root = get_app_root_dir()
+    app_cfg = os.path.join(app_root, "fomt_config.json")
+    if os.path.exists(app_cfg):
+        return app_cfg
 
-    # 2. En el directorio raíz de la aplicación
-    root_cfg = get_resource_path("fomt_config.json")
-    if os.path.exists(root_cfg):
-        return root_cfg
+    # 2. En el workspace local
+    ws_cfg = os.path.join(get_default_workspace_dir(), "fomt_config.json")
+    if os.path.exists(ws_cfg):
+        return ws_cfg
 
     # 3. En el directorio de trabajo actual
     cwd_cfg = os.path.join(os.getcwd(), "fomt_config.json")
     if os.path.exists(cwd_cfg):
         return cwd_cfg
 
-    # Por defecto, ubicarlo en el workspace de usuario para persistencia
-    os.makedirs(user_workspace, exist_ok=True)
-    return user_cfg
+    # Por defecto escribir junto al ejecutable/raíz
+    return app_cfg
 
 def resolve_project_fsp_path(target_path: str) -> str:
     """
@@ -193,7 +209,7 @@ def resolve_project_fsp_path(target_path: str) -> str:
     if os.path.isfile(target + ".fsp"):
         return os.path.abspath(target + ".fsp")
 
-    # Caso 4: Nombre de sesión relativo dentro del directorio de sesiones
+    # Caso 4: Nombre de sesión relativo dentro del directorio de sesiones local
     sessions_dir = get_sessions_dir()
     rel_path = os.path.join(sessions_dir, target)
     if os.path.isfile(rel_path):
@@ -204,5 +220,20 @@ def resolve_project_fsp_path(target_path: str) -> str:
             return sub_resolve
     if os.path.isfile(rel_path + ".fsp"):
         return os.path.abspath(rel_path + ".fsp")
+
+    # Caso 5: Fallback secundario de compatibilidad en Documentos previo
+    try:
+        docs = get_documents_dir()
+        old_sessions = os.path.join(docs, "FoMTStudio", "Sessions", target)
+        if os.path.isfile(old_sessions):
+            return os.path.abspath(old_sessions)
+        if os.path.isdir(old_sessions):
+            sub_res = resolve_project_fsp_path(old_sessions)
+            if sub_res:
+                return sub_res
+        if os.path.isfile(old_sessions + ".fsp"):
+            return os.path.abspath(old_sessions + ".fsp")
+    except Exception:
+        pass
 
     return None
