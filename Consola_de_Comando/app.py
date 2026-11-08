@@ -255,10 +255,10 @@ class FoMTStudioApp(QMainWindow):
             "pointers": tr("tab_pointers", lang),
             "menu_editor": tr("tab_menu_editor", lang),
             "tile_editor": tr("tab_tile_editor", lang),
-            "sprites": "Sprites & Portraits",
+            "sprites": tr("tab_sprites", lang),
             "audio": tr("tab_audio", lang),
-            "metasprites": "Metasprites",
-            "animaciones": "Animaciones",
+            "metasprites": tr("tab_metasprites", lang),
+            "animaciones": tr("menu_anim_viewer", lang),
         }
         target_title = tab_name_map.get(tab_key, tab_key)
         for i in range(self.tabs.count()):
@@ -416,11 +416,11 @@ class FoMTStudioApp(QMainWindow):
             QPushButton {
                 background-color: #E74C3C;
                 color: white;
-                font-size: 28px;
+                font-size: 13px;
                 font-weight: bold;
-                border-radius: 8px;
-                padding: 15px;
-                margin-bottom: 10px;
+                border-radius: 6px;
+                padding: 6px 10px;
+                margin-bottom: 6px;
             }
             QPushButton:hover {
                 background-color: #C0392B;
@@ -839,7 +839,7 @@ class FoMTStudioApp(QMainWindow):
             self.visor_animaciones = VisorAnimaciones(self)
             self.visor_animaciones.set_project(self.project)
             self.visor_animaciones.openEditorRequested.connect(self._open_anim_editor)
-            self.tabs.addTab(self.visor_animaciones, "Animaciones")
+            self.tabs.addTab(self.visor_animaciones, tr("menu_anim_viewer", self.current_lang))
         
         # Focus tab
         for i in range(self.tabs.count()):
@@ -966,7 +966,7 @@ class FoMTStudioApp(QMainWindow):
             engine.batch_export_all_animations(csv_path, out_dir)
             
             self.status.showMessage(tr("msg_extract_complete", self.current_lang))
-            QMessageBox.information(self, "Extractor de Animaciones", f"¡Las animaciones se han exportado correctamente a:\n{out_dir}")
+            QMessageBox.information(self, tr("menu_anim_extractor", self.current_lang), tr("msg_anims_exported", self.current_lang).format(path=out_dir))
             
         except Exception as e:
             QMessageBox.critical(self, "Error en Extractor", f"Fallo en la extracción:\n{e}")
@@ -1226,13 +1226,13 @@ class FoMTStudioApp(QMainWindow):
 
     def _open_visor_metasprites(self):
         for i in range(self.tabs.count()):
-            if self.tabs.tabText(i) == "Metasprites":
+            if self.tabs.widget(i) is self.metasprite_viewer:
                 self.tabs.setCurrentIndex(i)
                 return self.tabs.widget(i)
         if not self.metasprite_viewer:
             self.metasprite_viewer = VisorMetasprites(self)
             self.metasprite_viewer.set_project(self.project)
-        self.tabs.addTab(self.metasprite_viewer, "Metasprites")
+        self.tabs.addTab(self.metasprite_viewer, tr("tab_metasprites", self.current_lang))
         self.tabs.setCurrentWidget(self.metasprite_viewer)
         return self.metasprite_viewer
 

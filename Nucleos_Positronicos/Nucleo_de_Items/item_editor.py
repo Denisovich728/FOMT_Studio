@@ -588,6 +588,7 @@ class ItemEditorWidget(QWidget):
         table.setColumnWidth(1, 55)
         table.setColumnWidth(2, 170)
         table.setColumnWidth(3, 80)
+        table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
 
     def _apply_filter(self, text: str):
         self._populate_category_tables()

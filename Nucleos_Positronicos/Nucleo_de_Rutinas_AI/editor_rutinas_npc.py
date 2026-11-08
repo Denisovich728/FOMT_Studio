@@ -283,10 +283,11 @@ class EditorRutinasNPCWidget(QWidget):
         self.table_segments.setHorizontalHeaderLabels([
             _t("rut_col_step"), _t("rut_col_map"), "NPC", _t("rut_col_point_a"), _t("rut_col_point_b"), _t("rut_col_distance"), _t("rut_col_speed"), _t("rut_col_wait"), _t("rut_col_time")
         ])
-        self.table_segments.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.table_segments.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        self.table_segments.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        self.table_segments.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.table_segments.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        self.table_segments.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Interactive)
+        self.table_segments.setColumnWidth(1, 190)
+        self.table_segments.setTextElideMode(Qt.TextElideMode.ElideRight)
+        self.table_segments.setColumnHidden(2, True)  # NPC: redundante en el modo por aldeano
         self.table_segments.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table_segments.itemSelectionChanged.connect(self._on_segment_selected)
         tbl_layout.addWidget(self.table_segments)
@@ -504,7 +505,7 @@ class EditorRutinasNPCWidget(QWidget):
         right_layout.addWidget(self.status_bar)
 
         splitter.addWidget(right_widget)
-        splitter.setSizes([380, 1000])
+        splitter.setSizes([520, 980])
         main_layout.addWidget(splitter)
 
     def _load_rom_routines(self):
@@ -567,6 +568,7 @@ class EditorRutinasNPCWidget(QWidget):
         """Alterna entre ver por NPC y ver por Mapa."""
         if self.rb_by_npc.isChecked():
             self.current_mode = "BY_NPC"
+            self.table_segments.setColumnHidden(2, True)
             self.lbl_npc_row.show()
             self.combo_npc.show()
             self.lbl_sched_row.show()
@@ -578,6 +580,7 @@ class EditorRutinasNPCWidget(QWidget):
             self._refresh_npc_segments()
         else:
             self.current_mode = "BY_MAP"
+            self.table_segments.setColumnHidden(2, False)
             self.lbl_npc_row.hide()
             self.combo_npc.hide()
             self.lbl_sched_row.hide()
@@ -817,6 +820,7 @@ class EditorRutinasNPCWidget(QWidget):
             loop_badge = " " if is_loop else ""
             item_lbl = QTableWidgetItem(f"#{row+1}{loop_badge}")
             item_map = QTableWidgetItem(s.get("map_name", f"Mapa {s.get('map_id', 0)}"))
+            item_map.setToolTip(item_map.text())
             item_npc = QTableWidgetItem(s["npc_name"])
             item_pt_a = QTableWidgetItem(f"({s['ax']}, {s['ay']})")
             if is_loop:
