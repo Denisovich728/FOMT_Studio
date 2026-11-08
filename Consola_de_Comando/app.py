@@ -814,11 +814,11 @@ class FoMTStudioApp(QMainWindow):
     def _open_map_viewer(self):
         if not self.project:
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Visor de Mapas", "Debes cargar una ROM o Proyecto primero.")
+            QMessageBox.warning(self, tr("tab_map_editor", self.current_lang), tr("msg_must_load_rom", self.current_lang))
             return
         from Nucleos_Positronicos.Nucleo_de_Mapas.visor_mapas import VisorMapas
         viewer = VisorMapas(self.project)
-        win = FloatingWindow(viewer, "Visor de Mapas", self)
+        win = FloatingWindow(viewer, tr("tab_map_editor", self.current_lang), self)
         self.floating_windows.append(win)
         win.show()
         self.apply_theme(self.current_theme)
@@ -925,7 +925,7 @@ class FoMTStudioApp(QMainWindow):
 
     def _open_anim_extractor(self):
         if not self.project or not self.project.base_rom_path:
-            QMessageBox.warning(self, "Extractor de Animaciones", "Debes cargar una ROM o Proyecto primero.")
+            QMessageBox.warning(self, tr("menu_anim_extractor", self.current_lang), tr("msg_must_load_rom", self.current_lang))
             return
             
         out_dir = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta para exportar animaciones")
