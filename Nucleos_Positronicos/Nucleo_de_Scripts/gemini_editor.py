@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QSettings
 from PyQt6.QtGui import QTextCursor
+from Consola_de_Comando.i18n import t as _t
 
 class GeminiAIThread(QThread):
     finished = pyqtSignal(str)
@@ -131,7 +132,7 @@ class GeminiEditorWidget(QWidget):
         layout.setSpacing(10)
         
         # --- Grupo de Configuración ---
-        config_group = QGroupBox("CONFIGURACIÓN DEL NEXO")
+        config_group = QGroupBox(_t("gem_grp_config"))
         config_layout = QVBoxLayout(config_group)
         
         self.model_combo = QComboBox()
@@ -141,18 +142,18 @@ class GeminiEditorWidget(QWidget):
             "gemini-1.5-pro",
             "gemini-2.0-flash-exp"
         ])
-        config_layout.addWidget(QLabel("Modelo:"))
+        config_layout.addWidget(QLabel(_t("gem_model")))
         config_layout.addWidget(self.model_combo)
         
         self.api_key_edit = QLineEdit()
         self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self.api_key_edit.setPlaceholderText("API KEY")
-        config_layout.addWidget(QLabel("API Key:"))
+        config_layout.addWidget(QLabel(_t("gem_api_key")))
         config_layout.addWidget(self.api_key_edit)
         
         self.lang_combo = QComboBox()
         self.lang_combo.addItems(["Español", "English", "Português", "Français", "Deutsch", "Italiano"])
-        config_layout.addWidget(QLabel("Idioma Destino:"))
+        config_layout.addWidget(QLabel(_t("gem_target_lang")))
         config_layout.addWidget(self.lang_combo)
         
         layout.addWidget(config_group)
@@ -168,7 +169,7 @@ class GeminiEditorWidget(QWidget):
         layout.addWidget(console_group)
         
         # --- Controles ---
-        self.btn_translate = QPushButton("INICIAR OMNISCIENCIA")
+        self.btn_translate = QPushButton(_t("gem_btn_translate"))
         self.btn_translate.clicked.connect(self.start_translation_flow)
         self.btn_translate.setStyleSheet("height: 40px; font-weight: bold; background-color: #004d40; color: white;")
         layout.addWidget(self.btn_translate)
@@ -177,16 +178,16 @@ class GeminiEditorWidget(QWidget):
         self.progress.setFixedHeight(10)
         layout.addWidget(self.progress)
         
-        self.lbl_context = QLabel("Contexto detectado: Ninguno")
+        self.lbl_context = QLabel(_t("gem_context_none"))
         self.lbl_context.setStyleSheet("color: #00ffff; font-weight: bold;")
         layout.addWidget(self.lbl_context)
         
-        self.btn_refresh = QPushButton("REFRESCAR CONTEXTO")
+        self.btn_refresh = QPushButton(_t("gem_btn_refresh"))
         self.btn_refresh.clicked.connect(self.refresh_context)
         layout.addWidget(self.btn_refresh)
 
         # --- MEGA BATCH CONTROLS ---
-        mega_group = QGroupBox("MODO OMNISCIENCIA MASIVA (BETA)")
+        mega_group = QGroupBox(_t("gem_grp_mass"))
         mega_layout = QVBoxLayout(mega_group)
         
         range_layout = QHBoxLayout()
@@ -199,27 +200,27 @@ class GeminiEditorWidget(QWidget):
         self.spin_batch = QSpinBox()
         self.spin_batch.setRange(1, 50)
         self.spin_batch.setValue(10)
-        self.spin_batch.setToolTip("Tamaño del lote (Items por cada envío a la IA)")
+        self.spin_batch.setToolTip(_t("gem_batch_tip"))
         
-        range_layout.addWidget(QLabel("Desde:"))
+        range_layout.addWidget(QLabel(_t("gem_from")))
         range_layout.addWidget(self.spin_start)
-        range_layout.addWidget(QLabel("Hasta:"))
+        range_layout.addWidget(QLabel(_t("gem_to")))
         range_layout.addWidget(self.spin_end)
-        range_layout.addWidget(QLabel("Lote:"))
+        range_layout.addWidget(QLabel(_t("gem_batch")))
         range_layout.addWidget(self.spin_batch)
         mega_layout.addLayout(range_layout)
         
-        self.btn_mega_events = QPushButton("AUTO-TRADUCIR RANGO DE EVENTOS")
+        self.btn_mega_events = QPushButton(_t("gem_btn_mass_events"))
         self.btn_mega_events.clicked.connect(self.start_mega_event_batch)
         self.btn_mega_events.setStyleSheet("background-color: #311b92; color: white; font-weight: bold;")
         mega_layout.addWidget(self.btn_mega_events)
         
-        self.btn_mega_items = QPushButton("AUTO-TRADUCIR TODOS LOS ÍTEMS")
+        self.btn_mega_items = QPushButton(_t("gem_btn_mass_items"))
         self.btn_mega_items.clicked.connect(self.start_mega_item_batch)
         self.btn_mega_items.setStyleSheet("background-color: #1a237e; color: white; font-weight: bold;")
         mega_layout.addWidget(self.btn_mega_items)
 
-        self.btn_stop_mega = QPushButton("DETENER OMNISCIENCIA")
+        self.btn_stop_mega = QPushButton(_t("gem_btn_stop"))
         self.btn_stop_mega.clicked.connect(self.stop_mega_batch)
         self.btn_stop_mega.setStyleSheet("background-color: #b71c1c; color: white; font-weight: bold;")
         self.btn_stop_mega.setEnabled(False)
@@ -244,16 +245,16 @@ class GeminiEditorWidget(QWidget):
         from Nucleos_Positronicos.Nucleo_de_Aldeanos.npc_editor import NpcEditorWidget
         
         if isinstance(w, ScriptIDEWidget):
-            self.lbl_context.setText("Contexto detectado: Script (SlipSpace IDE)")
+            self.lbl_context.setText(_t("gem_ctx_script"))
             self.current_context = "script"
         elif isinstance(w, ItemEditorWidget):
-            self.lbl_context.setText("Contexto detectado: Editor de Ítems")
+            self.lbl_context.setText(_t("gem_ctx_items"))
             self.current_context = "item"
         elif isinstance(w, NpcEditorWidget):
-            self.lbl_context.setText("Contexto detectado: Editor de Personajes")
+            self.lbl_context.setText(_t("gem_ctx_chars"))
             self.current_context = "npc"
         else:
-            self.lbl_context.setText("Contexto detectado: General (Omnisciencia activada)")
+            self.lbl_context.setText(_t("gem_ctx_general"))
             self.current_context = "bulk"
 
     def load_settings(self):
@@ -469,7 +470,7 @@ class GeminiEditorWidget(QWidget):
     def start_translation_flow(self):
         api_key = self.api_key_edit.text()
         if not api_key:
-            QMessageBox.warning(self, "Error", "Se requiere una API Key de Gemini.")
+            QMessageBox.warning(self, _t("msg_error"), _t("gem_need_key"))
             return
             
         self.save_settings()
@@ -530,7 +531,7 @@ class GeminiEditorWidget(QWidget):
         self.thread = GeminiAIThread(api_key, self.model_combo.currentText(), system_prompt, matches)
         self.thread.finished.connect(lambda r: self.on_translation_success(r, self.target_widget))
         self.thread.status.connect(self.log)
-        self.thread.error.connect(lambda e: QMessageBox.critical(self, "Error IA", e))
+        self.thread.error.connect(lambda e: QMessageBox.critical(self, _t("gem_ai_error"), e))
         self.thread.start()
 
     def on_translation_success(self, result_json, target):

@@ -42,6 +42,22 @@ def tr(key: str, lang: str = "es") -> str:
     es_dict = TRANSLATIONS.get("es", {})
     return es_dict.get(key, key)
 
+def active_lang(fallback: str = "es") -> str:
+    """Idioma activo de la aplicacion, tal como lo guarda la ventana principal."""
+    try:
+        from PyQt6.QtCore import QSettings
+        return QSettings("FoMTStudio", "ModdingSuite").value("language", fallback)
+    except Exception:
+        return fallback
+
+def t(key: str, **kwargs) -> str:
+    """
+    Traduce una clave con el idioma activo y rellena los huecos {nombre}.
+    Util en widgets creados sin ventana padre, donde no hay current_lang.
+    """
+    text = tr(key, active_lang())
+    return text.format(**kwargs) if kwargs else text
+
 def get_lang_from_widget(widget, fallback="es") -> str:
     """Obtiene el codigo de idioma actual inspeccionando la jerarquia de widgets Qt."""
     p = widget
