@@ -1,0 +1,7 @@
+PyQt6>=6.5
+Pillow>=10.0
+numpy>=1.24
+mido>=1.3
+psutil>=5.9
+# Opcional: solo para el editor asistido por Gemini
+# google-generativeai

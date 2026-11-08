@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Guía de colaboración
+    url: https://github.com/Denisovich728/FOMT_Studio/blob/main/CONTRIBUTING.md
+    about: Reglas de idiomas, temas, commits y pull requests.
