@@ -18,7 +18,7 @@ from PyQt6.QtCore import Qt
 from Consola_de_Comando.utils import NameEditDelegate
 from Consola_de_Comando.i18n import tr
 from Consola_de_Comando.i18n import t as _t
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 
 class NpcEditorWidget(QWidget):
     def __init__(self, project, parent=None):
@@ -176,7 +176,7 @@ class NpcDetailDialog(QDialog):
         
         self.lbl_portrait = QLabel()
         self.lbl_portrait.setFixedSize(128, 128)
-        self.lbl_portrait.setStyleSheet(f"background-color: {color('surface_alt')}; border: 2px solid {color('border')}; border-radius: 8px;")
+        style(self.lbl_portrait, "background-color: {surface_alt}; border: 2px solid {border}; border-radius: 8px;")
         self.lbl_portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.side_graphics.addWidget(self.lbl_portrait)
         
@@ -208,7 +208,7 @@ class NpcDetailDialog(QDialog):
         # Separador estilizado
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setStyleSheet(f"color: {color('border')};")
+        style(sep, "color: {border};")
         layout.addWidget(sep)
         
         # Enlace Interactivo al Script de Personalidad

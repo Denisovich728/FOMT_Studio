@@ -33,7 +33,7 @@ from PyQt6.QtGui import QImage, QPixmap, QPainter, QColor, QPen
 from Banco_de_Datos.Utilidades.rutas import get_data_path
 from Consola_de_Comando.i18n import tr, get_lang_from_widget
 from Consola_de_Comando.i18n import t as _t
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 
 # Categorias que asigna SymphonySpriteEngine -> clave de texto en i18n.json
 SPRITE_CATEGORY_KEYS = {
@@ -305,7 +305,7 @@ class CheckerboardLabel(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setStyleSheet(f"background: {color('surface_alt')}; border: 1px solid {color('border')}; border-radius: 4px;")
+        style(self, "background: {surface_alt}; border: 1px solid {border}; border-radius: 4px;")
         self._pixmap = None
         self._checker_pattern = self._create_checker_pixmap()
 
@@ -346,10 +346,10 @@ class SpriteInfoPanel(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedWidth(280)
-        self.setStyleSheet(f"""
+        style(self, """
             SpriteInfoPanel {{
-                background: {color('surface')};
-                border: 1px solid {color('border')};
+                background: {surface};
+                border: 1px solid {border};
                 border-radius: 6px;
             }}
             SpriteInfoPanel QLabel {{ background: transparent; }}
@@ -362,13 +362,13 @@ class SpriteInfoPanel(QFrame):
         layout.setSpacing(6)
 
         title = QLabel(_t("spr_telemetry"))
-        title.setStyleSheet(f"color: {color('muted')}; font-size: 12px; font-weight: bold; letter-spacing: 2px;")
+        style(title, "color: {muted}; font-size: 12px; font-weight: bold; letter-spacing: 2px;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setStyleSheet(f"color: {color('border')};")
+        style(sep, "color: {border};")
         layout.addWidget(sep)
 
         self.lbl_name = self._field(_t("spr_f_anim") + ":")
@@ -388,11 +388,11 @@ class SpriteInfoPanel(QFrame):
 
         sep2 = QFrame()
         sep2.setFrameShape(QFrame.Shape.HLine)
-        sep2.setStyleSheet(f"color: {color('border')};")
+        style(sep2, "color: {border};")
         layout.addWidget(sep2)
 
         lbl_pal = QLabel(_t("spr_active_pal"))
-        lbl_pal.setStyleSheet(f"color: {color('muted')}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
+        style(lbl_pal, "color: {muted}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
         layout.addWidget(lbl_pal)
 
         self.pal_preview = PaletteStrip()
@@ -402,7 +402,7 @@ class SpriteInfoPanel(QFrame):
 
     def _field(self, text: str) -> QLabel:
         lbl = QLabel(f"{text} --")
-        lbl.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
+        style(lbl, "color: {text}; font-size: 11px; font-family: 'Consolas';")
         return lbl
 
     def update_info(self, name: str, anim_id: int, category: str, anim_data: Dict[str, Any]):
@@ -410,7 +410,7 @@ class SpriteInfoPanel(QFrame):
         self.lbl_id.setText(f"ID: 0x{anim_id:04X} ({anim_id})")
 
         self.lbl_category.setText(f"{_t('spr_f_category')}: {sprite_category_label(category)}")
-        self.lbl_category.setStyleSheet(f"color: {color('accent')}; font-size: 11px; font-family: 'Consolas'; font-weight: bold;")
+        style(self.lbl_category, "color: {accent}; font-size: 11px; font-family: 'Consolas'; font-weight: bold;")
 
         self.lbl_rom_addr.setText(f"Script ROM: 0x{anim_data['script_rom_addr']:08X}")
         self.lbl_frames.setText(f"Frames: {len(anim_data['frames'])}")
@@ -463,7 +463,7 @@ class LiveAnimationPlayer(QWidget):
 
         # Timeline y Controles
         ctrl_box = QFrame()
-        ctrl_box.setStyleSheet(f"QFrame {{ background: {color('surface')}; border: 1px solid {color('border')}; border-radius: 4px; }} QLabel {{ border: none; background: transparent; }}")
+        style(ctrl_box, "QFrame {{ background: {surface}; border: 1px solid {border}; border-radius: 4px; }} QLabel {{ border: none; background: transparent; }}")
         ctrl_layout = QVBoxLayout(ctrl_box)
         ctrl_layout.setContentsMargins(6, 4, 6, 4)
         ctrl_layout.setSpacing(4)
@@ -471,20 +471,20 @@ class LiveAnimationPlayer(QWidget):
         # Slider de Timeline
         t_row = QHBoxLayout()
         self.lbl_frame_counter = QLabel("Frame: 0 / 0")
-        self.lbl_frame_counter.setStyleSheet(f"color: {color('accent')}; font-family: 'Consolas'; font-size: 11px;")
+        style(self.lbl_frame_counter, "color: {accent}; font-family: 'Consolas'; font-size: 11px;")
         t_row.addWidget(self.lbl_frame_counter)
 
         self.slider = QSlider(Qt.Orientation.Horizontal)
-        self.slider.setStyleSheet(f"""
-            QSlider::groove:horizontal {{ height: 4px; background: {color('surface_alt')}; border-radius: 2px; }}
-            QSlider::sub-page:horizontal {{ background: {color('accent')}; border-radius: 2px; }}
-            QSlider::handle:horizontal {{ background: {color('accent')}; width: 12px; margin-top: -4px; margin-bottom: -4px; border-radius: 6px; }}
+        style(self.slider, """
+            QSlider::groove:horizontal {{ height: 4px; background: {surface_alt}; border-radius: 2px; }}
+            QSlider::sub-page:horizontal {{ background: {accent}; border-radius: 2px; }}
+            QSlider::handle:horizontal {{ background: {accent}; width: 12px; margin-top: -4px; margin-bottom: -4px; border-radius: 6px; }}
         """)
         self.slider.sliderMoved.connect(self._on_slider_moved)
         t_row.addWidget(self.slider)
 
         self.lbl_duration = QLabel("0 ms")
-        self.lbl_duration.setStyleSheet(f"color: {color('muted')}; font-family: 'Consolas'; font-size: 11px;")
+        style(self.lbl_duration, "color: {muted}; font-family: 'Consolas'; font-size: 11px;")
         t_row.addWidget(self.lbl_duration)
         ctrl_layout.addLayout(t_row)
 
@@ -511,7 +511,7 @@ class LiveAnimationPlayer(QWidget):
         btn_row.addSpacing(10)
 
         # Selector de Velocidad
-        btn_row.addWidget(QLabel(_t("spr_speed"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        btn_row.addWidget(style(QLabel(_t("spr_speed")), "color: {muted}; font-size: 11px;"))
         self.combo_speed = QComboBox()
         self.combo_speed.addItems(["0.25x", "0.5x", "1.0x", "2.0x"])
         self.combo_speed.setCurrentText("1.0x")
@@ -521,7 +521,7 @@ class LiveAnimationPlayer(QWidget):
         btn_row.addSpacing(10)
 
         # Zoom
-        btn_row.addWidget(QLabel("Zoom:", styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        btn_row.addWidget(style(QLabel("Zoom:"), "color: {muted}; font-size: 11px;"))
         self.spn_zoom = QSpinBox()
         self.spn_zoom.setRange(1, 8)
         self.spn_zoom.setValue(4)
@@ -669,7 +669,7 @@ class SheetViewer(QWidget):
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet(f"background: {color('surface_alt')}; border: 1px solid {color('border')}; border-radius: 4px;")
+        style(scroll, "background: {surface_alt}; border: 1px solid {border}; border-radius: 4px;")
 
         self.display = CheckerboardLabel()
         scroll.setWidget(self.display)
@@ -679,7 +679,7 @@ class SheetViewer(QWidget):
         bar = QHBoxLayout()
         bar.setSpacing(8)
 
-        bar.addWidget(QLabel(_t("spr_sheet_mode"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        bar.addWidget(style(QLabel(_t("spr_sheet_mode")), "color: {muted}; font-size: 11px;"))
         self.combo_mode = QComboBox()
         self.combo_mode.addItems([_t("spr_mode_grid"), _t("spr_mode_strip")])
         self.combo_mode.currentIndexChanged.connect(self._on_mode_changed)
@@ -687,7 +687,7 @@ class SheetViewer(QWidget):
 
         bar.addSpacing(10)
 
-        bar.addWidget(QLabel(_t("spr_sheet_zoom"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        bar.addWidget(style(QLabel(_t("spr_sheet_zoom")), "color: {muted}; font-size: 11px;"))
         self.spn_zoom = QSpinBox()
         self.spn_zoom.setRange(1, 8)
         self.spn_zoom.setValue(2)
@@ -695,7 +695,7 @@ class SheetViewer(QWidget):
         bar.addWidget(self.spn_zoom)
 
         self.lbl_dims = QLabel("-- x -- px")
-        self.lbl_dims.setStyleSheet(f"color: {color('muted')}; font-family: 'Consolas'; font-size: 11px;")
+        style(self.lbl_dims, "color: {muted}; font-family: 'Consolas'; font-size: 11px;")
         bar.addWidget(self.lbl_dims)
 
         bar.addStretch()
@@ -759,12 +759,12 @@ class VisorSprites(QWidget):
         # Header principal
         header_layout = QHBoxLayout()
         header = QLabel(_t("spr_title"))
-        header.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {color('text')};")
+        style(header, "font-size: 16px; font-weight: bold; color: {text};")
         header_layout.addWidget(header)
         header_layout.addStretch()
 
         self.lbl_status = QLabel(_t("spr_ready_wait"))
-        self.lbl_status.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
+        style(self.lbl_status, "color: {muted}; font-size: 12px;")
         header_layout.addWidget(self.lbl_status)
         layout.addLayout(header_layout)
 
@@ -788,7 +788,7 @@ class VisorSprites(QWidget):
             self.filter_buttons[cat_key] = btn
 
         self.lbl_count = QLabel("0 / 0")
-        self.lbl_count.setStyleSheet(f"color: {color('muted')}; font-family: 'Consolas'; font-size: 12px;")
+        style(self.lbl_count, "color: {muted}; font-family: 'Consolas'; font-size: 12px;")
         filter_box.addWidget(self.lbl_count)
 
         layout.addLayout(filter_box)
@@ -804,10 +804,10 @@ class VisorSprites(QWidget):
 
         self.anim_list = QListWidget()
         self.anim_list.setFixedWidth(280)
-        self.anim_list.setStyleSheet(f"""
+        style(self.anim_list, """
             QListWidget {{ font-family: 'Consolas'; font-size: 12px; }}
-            QListWidget::item {{ padding: 4px 6px; border-bottom: 1px solid {color('surface_alt')}; }}
-            QListWidget::item:selected {{ background: {color('surface_alt')}; color: {color('text')}; border-left: 3px solid {color('accent')}; }}
+            QListWidget::item {{ padding: 4px 6px; border-bottom: 1px solid {surface_alt}; }}
+            QListWidget::item:selected {{ background: {surface_alt}; color: {text}; border-left: 3px solid {accent}; }}
         """)
         self.anim_list.currentRowChanged.connect(self._on_item_selected)
         list_layout.addWidget(self.anim_list)
