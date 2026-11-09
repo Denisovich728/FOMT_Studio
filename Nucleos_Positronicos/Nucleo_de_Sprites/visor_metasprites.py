@@ -14,6 +14,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QPointF, QRectF
 from PyQt6.QtGui import QPixmap, QColor, QBrush, QPen, QImage, QPainter, QShortcut, QKeySequence
+from Consola_de_Comando.i18n import t as _t
+from Consola_de_Comando.themes import color
 
 from Nucleos_Positronicos.Nucleo_de_Sprites.metasprites import PortraitCompiler
 from Banco_de_Datos.Utilidades.rutas import get_data_path, get_resource_path
@@ -34,7 +36,7 @@ class PixelCanvas(QGraphicsView):
         super().__init__(parent)
         self.scene = QGraphicsScene()
         self.setScene(self.scene)
-        self.setBackgroundBrush(QBrush(QColor("#1A1A2E")))
+        self.setBackgroundBrush(QBrush(QColor(color('surface_alt'))))
         self.setDragMode(QGraphicsView.DragMode.NoDrag)
         
         self.image = QImage(256, 256, QImage.Format.Format_Indexed8)
@@ -184,21 +186,14 @@ class VisorMetasprites(QWidget):
         # --- Panel Izquierdo: Lista de Retratos ---
         left_panel = QVBoxLayout()
         
-        self.lbl_title = QLabel(" Tile Editor Extreme (Portraits)")
-        self.lbl_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #00BFFF;")
+        self.lbl_title = QLabel(_t("msp_title"))
+        self.lbl_title.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {color('text')};")
         left_panel.addWidget(self.lbl_title)
         
         self.list_portraits = QListWidget()
-        self.list_portraits.setStyleSheet("""
-            QListWidget {
-                background: #0D0D12; color: white;
-                border: 1px solid #2A2A35;
-            }
-            QListWidget::item:selected { background: #00BFFF; color: black; }
-        """)
         self.list_portraits.itemSelectionChanged.connect(self._on_portrait_selected)
         
-        left_panel.addWidget(QLabel("Selecciona un Retrato:"))
+        left_panel.addWidget(QLabel(_t("msp_select_portrait")))
         left_panel.addWidget(self.list_portraits)
         
         layout.addLayout(left_panel, 1)
@@ -212,39 +207,41 @@ class VisorMetasprites(QWidget):
         self.canvas = PixelCanvas()
         self.canvas.parent_visor = self
         
-        self.btn_brush = QPushButton(" Pincel")
+        self.btn_brush = QPushButton(_t("msp_brush"))
         self.btn_brush.setCheckable(True)
         self.btn_brush.setChecked(True)
         self.btn_brush.clicked.connect(lambda: self._set_tool("brush"))
         
-        self.btn_eraser = QPushButton(" Borrador")
+        self.btn_eraser = QPushButton(_t("msp_eraser"))
         self.btn_eraser.setCheckable(True)
         self.btn_eraser.clicked.connect(lambda: self._set_tool("eraser"))
         
-        self.btn_eyedropper = QPushButton(" Gotero")
+        self.btn_eyedropper = QPushButton(_t("msp_eyedropper"))
         self.btn_eyedropper.setCheckable(True)
         self.btn_eyedropper.clicked.connect(lambda: self._set_tool("eyedropper"))
         
-        self.btn_fill = QPushButton(" Cubeta")
+        self.btn_fill = QPushButton(_t("msp_fill"))
         self.btn_fill.setCheckable(True)
         self.btn_fill.clicked.connect(lambda: self._set_tool("fill"))
         
-        lbl_size = QLabel("Grosor:")
+        lbl_size = QLabel(_t("msp_size"))
         self.spin_size = QSpinBox()
         self.spin_size.setRange(1, 16)
         self.spin_size.setValue(1)
         self.spin_size.valueChanged.connect(self._set_brush_size)
         
-        self.btn_undo = QPushButton("↩ Deshacer")
+        self.btn_undo = QPushButton(_t("msp_undo"))
         self.btn_undo.clicked.connect(self.canvas.undo)
         
-        self.btn_redo = QPushButton("↪ Rehacer")
+        self.btn_redo = QPushButton(_t("msp_redo"))
         self.btn_redo.clicked.connect(self.canvas.redo)
         
         self.btn_zoom_in = QPushButton("+")
+        self.btn_zoom_in.setToolTip(_t("msp_zoom_in"))
         self.btn_zoom_in.clicked.connect(lambda: self.canvas.scale(1.25, 1.25))
         
-        self.btn_zoom_out = QPushButton("-")
+        self.btn_zoom_out = QPushButton("−")
+        self.btn_zoom_out.setToolTip(_t("msp_zoom_out"))
         self.btn_zoom_out.clicked.connect(lambda: self.canvas.scale(0.8, 0.8))
         
         tools_layout.addWidget(self.btn_brush)
@@ -273,17 +270,17 @@ class VisorMetasprites(QWidget):
         # Botones de Acción
         action_layout = QHBoxLayout()
         
-        self.btn_import = QPushButton(" Importar PNG")
+        self.btn_import = QPushButton(_t("msp_import_png"))
         self.btn_import.clicked.connect(self._import_png)
         
-        self.btn_export = QPushButton(" Dumpear PNG actual")
+        self.btn_export = QPushButton(_t("msp_export_png"))
         self.btn_export.clicked.connect(self._export_png)
 
-        self.btn_dump_all = QPushButton(" Extraer Todos los Retratos")
+        self.btn_dump_all = QPushButton(_t("msp_dump_all"))
         self.btn_dump_all.setProperty("variant", "secondary")
         self.btn_dump_all.clicked.connect(self._dump_all_portraits)
         
-        self.btn_inject = QPushButton(" Inyectar (Melody Engine)")
+        self.btn_inject = QPushButton(_t("msp_inject"))
         self.btn_inject.setProperty("variant", "primary")
         self.btn_inject.clicked.connect(self._inject_to_rom)
         
@@ -298,7 +295,7 @@ class VisorMetasprites(QWidget):
         # --- Panel Derecho: Paleta de 16 Colores ---
         right_panel = QVBoxLayout()
         
-        lbl_pal = QLabel("<b>Paleta de Colores ROM</b>")
+        lbl_pal = QLabel("<b>" + _t("msp_rom_palette") + "</b>")
         lbl_pal.setAlignment(Qt.AlignmentFlag.AlignCenter)
         right_panel.addWidget(lbl_pal)
         
@@ -308,22 +305,22 @@ class VisorMetasprites(QWidget):
         for i in range(16):
             btn = QPushButton()
             btn.setFixedSize(32, 32)
-            btn.setStyleSheet("background-color: #000000; border: 1px solid #555;")
+            btn.setStyleSheet(f"background-color: #000000; border: 1px solid {color('border')};")
             btn.clicked.connect(lambda checked, idx=i: self._select_palette_color(idx))
             self.pal_buttons.append(btn)
             self.pal_grid.addWidget(btn, i // 4, i % 4)
             
         right_panel.addLayout(self.pal_grid)
         
-        self.btn_edit_pal = QPushButton(" Editar Paleta")
+        self.btn_edit_pal = QPushButton(_t("msp_edit_palette"))
         self.btn_edit_pal.setProperty("variant", "secondary")
         self.btn_edit_pal.clicked.connect(self._open_palette_editor)
         right_panel.addWidget(self.btn_edit_pal)
         
         self.lbl_color_preview = QLabel()
         self.lbl_color_preview.setFixedSize(64, 64)
-        self.lbl_color_preview.setStyleSheet("background-color: #FFFFFF; border: 2px solid white;")
-        right_panel.addWidget(QLabel("Color Actual:"))
+        self.lbl_color_preview.setStyleSheet(f"background-color: #FFFFFF; border: 2px solid {color('border')};")
+        right_panel.addWidget(QLabel(_t("msp_current_color")))
         right_panel.addWidget(self.lbl_color_preview)
         
         right_panel.addStretch()
@@ -440,7 +437,7 @@ class VisorMetasprites(QWidget):
                         # Actualizar botón UI
                         btn = self.pal_buttons[i]
                         r, g, b = qcolor.red(), qcolor.green(), qcolor.blue()
-                        btn.setStyleSheet(f"background-color: rgb({r},{g},{b}); border: 1px solid #555;")
+                        btn.setStyleSheet(f"background-color: rgb({r},{g},{b}); border: 1px solid {color('border')};")
                         
                 # Enforce Canvas Color Table
                 c0 = QColor(self.palette_colors[0])
@@ -458,7 +455,7 @@ class VisorMetasprites(QWidget):
                 
         # Reset (if completely failed or no ROM)
         for btn in self.pal_buttons:
-            btn.setStyleSheet("background-color: #000; border: 1px solid #555;")
+            btn.setStyleSheet(f"background-color: #000; border: 1px solid {color('border')};")
 
     def _select_palette_color(self, idx):
         if idx < len(self.palette_colors):
@@ -469,10 +466,10 @@ class VisorMetasprites(QWidget):
 
     def update_current_color_preview(self):
         c = self.canvas.current_color
-        self.lbl_color_preview.setStyleSheet(f"background-color: rgb({c.red()},{c.green()},{c.blue()}); border: 2px solid white;")
+        self.lbl_color_preview.setStyleSheet(f"background-color: rgb({c.red()},{c.green()},{c.blue()}); border: 2px solid {color('border')};")
 
     def _import_png(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Importar PNG", "", "Images (*.png)")
+        file_path, _ = QFileDialog.getOpenFileName(self, _t("msp_import_png"), "", _t("msp_filter_png"))
         if file_path:
             self.canvas.load_image(file_path)
             self._extract_palette_from_image()
@@ -496,8 +493,8 @@ class VisorMetasprites(QWidget):
                         unique_colors.append(qc)
                         
         if len(unique_colors) > 15:
-            QMessageBox.warning(self, "Demasiados Colores", 
-                                f"El PNG tiene {len(unique_colors)} colores detectados.\n\nLa GBA solo soporta 15 colores opacos + 1 transparente. La paleta se truncará, lo que causará pérdida de color al inyectar.")
+            QMessageBox.warning(self, _t("msp_too_many_colors_title"),
+                                _t("msp_too_many_colors", n=len(unique_colors)))
             unique_colors = unique_colors[:15]
             
         new_pal = [QColor(0, 255, 0)] # Transparente default
@@ -514,7 +511,7 @@ class VisorMetasprites(QWidget):
         
         for i, qc in enumerate(self.palette_colors):
             btn = self.pal_buttons[i]
-            btn.setStyleSheet(f"background-color: rgb({qc.red()},{qc.green()},{qc.blue()}); border: 1px solid #555;")
+            btn.setStyleSheet(f"background-color: rgb({qc.red()},{qc.green()},{qc.blue()}); border: 1px solid {color('border')};")
             
         # Re-map the imported image to our strict 16-color table indices
         new_image = QImage(w, h, QImage.Format.Format_Indexed8)
@@ -550,18 +547,18 @@ class VisorMetasprites(QWidget):
         self._select_palette_color(1)
 
     def _export_png(self):
-        save_path, _ = QFileDialog.getSaveFileName(self, "Exportar PNG", f"dump_{self.current_hex_id:02X}.png", "Images (*.png)")
+        save_path, _ = QFileDialog.getSaveFileName(self, _t("msp_export_png"), f"dump_{self.current_hex_id:02X}.png", _t("msp_filter_png"))
         if save_path:
             self.canvas.image.save(save_path)
-            QMessageBox.information(self, "Éxito", "PNG guardado correctamente.")
+            QMessageBox.information(self, _t("msg_success"), _t("msp_png_saved"))
 
     def _dump_all_portraits(self):
         if not self.project or (not hasattr(self.project, 'virtual_rom') and not self.project.base_rom_data):
-            QMessageBox.warning(self, "Error", "Debes tener un ROM cargado en el proyecto.")
+            QMessageBox.warning(self, _t("msg_error"), _t("msp_need_rom"))
             return
             
-        reply = QMessageBox.question(self, "Extraer Retratos", 
-            "Esto extraerá los 184 retratos del ROM a la carpeta 'portraits_dump'.\n\n¿Deseas continuar?",
+        reply = QMessageBox.question(self, _t("msp_dump_title"),
+            _t("msp_dump_confirm"),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             
         if reply == QMessageBox.StandardButton.Yes:
@@ -581,29 +578,27 @@ class VisorMetasprites(QWidget):
                 
                 dp.dump_all(rom_path, csv_path, out_dir)
                 
-                QMessageBox.information(self, "Éxito", f"¡Retratos extraídos en la carpeta:\n{out_dir}")
+                QMessageBox.information(self, _t("msg_success"), _t("msp_dump_done", path=out_dir))
                 
                 # Refrescar portrait actual si hay uno
                 if self.current_hex_id is not None:
                     self._on_portrait_selected()
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Fallo al extraer retratos:\n{e}")
+                QMessageBox.critical(self, _t("msg_error"), _t("msp_dump_error", err=e))
 
     def _inject_to_rom(self):
         if self.current_hex_id is None:
-            QMessageBox.warning(self, "Error", "Selecciona un retrato primero.")
+            QMessageBox.warning(self, _t("msg_error"), _t("msp_select_first"))
             return
             
         fork_palette = False
         if getattr(self, 'edited_palette', None):
             msg = QMessageBox(self)
-            msg.setWindowTitle("Modo de Paleta")
-            msg.setText("Has editado la paleta. ¿Cómo deseas guardarla?\n\n"
-                        "• Global: Afectará a este retrato y a todos los que compartan esta paleta (ej. otras expresiones del personaje).\n"
-                        "• Desvincular: Creará una paleta única exclusiva para este retrato.")
-            btn_global = msg.addButton("Aplicar a TODOS (Global)", QMessageBox.ButtonRole.AcceptRole)
-            btn_unique = msg.addButton("Solo a ESTE (Desvincular)", QMessageBox.ButtonRole.AcceptRole)
-            btn_cancel = msg.addButton("Cancelar", QMessageBox.ButtonRole.RejectRole)
+            msg.setWindowTitle(_t("msp_palette_mode_title"))
+            msg.setText(_t("msp_palette_mode"))
+            btn_global = msg.addButton(_t("msp_palette_global"), QMessageBox.ButtonRole.AcceptRole)
+            btn_unique = msg.addButton(_t("msp_palette_unique"), QMessageBox.ButtonRole.AcceptRole)
+            btn_cancel = msg.addButton(_t("btn_cancel"), QMessageBox.ButtonRole.RejectRole)
             
             msg.exec()
             
@@ -614,9 +609,8 @@ class VisorMetasprites(QWidget):
                 
             reply = QMessageBox.StandardButton.Yes
         else:
-            reply = QMessageBox.question(self, "Inyectar Portrait", 
-                "Melody Engine va a compilar los tiles 4bpp, generar sus atributos OAM "
-                "y empujar las tablas (Shifting) para inyectar este Portrait en la ROM.\n\n¿Deseas continuar?",
+            reply = QMessageBox.question(self, _t("msp_inject_title"),
+                _t("msp_inject_confirm"),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             
         if reply == QMessageBox.StandardButton.Yes:
@@ -680,18 +674,18 @@ class VisorMetasprites(QWidget):
                                 pass
                                 
                     self.project.unsaved_changes = True
-                    QMessageBox.information(self, "Éxito", "¡Retrato reinyectado!\n\nLos cambios se han guardado permanentemente en la ROM del proyecto.")
+                    QMessageBox.information(self, _t("msg_success"), _t("msp_injected_saved"))
                     
                     # Recargar el retrato actual desde la ROM fresca
                     self._on_portrait_selected()
                 else:
-                    QMessageBox.information(self, "Éxito", "¡Retrato reinyectado correctamente usando empuje dinámico!\nRecarga la ROM para ver los cambios.")
+                    QMessageBox.information(self, _t("msg_success"), _t("msp_injected_reload"))
             except Exception as e:
-                QMessageBox.critical(self, "Error Fatal", f"Falló la inyección:\n{e}")
+                QMessageBox.critical(self, _t("msp_inject_error_title"), _t("msp_inject_error", err=e))
 
     def _open_palette_editor(self):
         if self.current_hex_id is None:
-            QMessageBox.warning(self, "Error", "Selecciona un retrato primero.")
+            QMessageBox.warning(self, _t("msg_error"), _t("msp_select_first"))
             return
             
         if hasattr(self, '_pal_dlg') and self._pal_dlg.isVisible():
@@ -730,7 +724,7 @@ class VisorMetasprites(QWidget):
             self.palette_colors = new_qcolors
             for i, qc in enumerate(self.palette_colors):
                 btn = self.pal_buttons[i]
-                btn.setStyleSheet(f"background-color: rgb({qc.red()},{qc.green()},{qc.blue()}); border: 1px solid #555;")
+                btn.setStyleSheet(f"background-color: rgb({qc.red()},{qc.green()},{qc.blue()}); border: 1px solid {color('border')};")
             
             # Actualizar el color actual del pincel para que coincida con la nueva paleta
             idx = self.canvas.current_color_idx
