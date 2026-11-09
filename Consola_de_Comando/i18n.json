@@ -266,7 +266,7 @@
     "status_scanning_events": "Paso 2/4: Analizando Lógica y Eventos...",
     "status_scanning_graphics": "Paso 3/4: Mapeando Graficos...",
     "success": "Éxito",
-    "tab_audio": "Audio && Songs",
+    "tab_audio": "Audio y Canciones",
     "tab_audio_sappy": "Motor de Audio (Driver de Sonido)",
     "tab_block_puzzle": "Teatro de Eventos",
     "tab_help": "Ayuda / Atajos",
@@ -275,13 +275,13 @@
     "tab_items": "Editor de Objetos",
     "tab_map_editor": "Editor de Mapas",
     "tab_maps": "Map && Warp Editor",
-    "tab_menu_editor": "System && Menu Editor",
+    "tab_menu_editor": "Editor de Sistema y Menús",
     "tab_metasprites": "Editor de Metasprites / Portraits",
     "tab_npc_raw": "Base de Datos de NPCs",
     "tab_npc_visual": "Editor de NPCs (Visual)",
     "tab_npcs": "Editor de NPCs y Personalidad",
     "tab_pointer_editor": "Editor de Punteros",
-    "tab_pointers": "Master Pointer Table",
+    "tab_pointers": "Tabla Maestra de Punteros",
     "tab_sprites": "Visor de Sprites",
     "tab_tile_editor": "D Tile Editor",
     "tab_visual": "RPG Event Maker",
@@ -728,7 +728,10 @@
     "rut_st_connected": "Conexión establecida: {id}",
     "rut_st_topo_reloaded": "Topología recargada desde el archivo.",
     "search_placeholder": "Buscar en el proyecto...",
-    "msg_n_installed": "Soporte de caracteres extendidos instalado correctamente."
+    "msg_n_installed": "Soporte de caracteres extendidos instalado correctamente.",
+    "vmap_zoom_out": "Alejar",
+    "vmap_zoom_in": "Acercar",
+    "msg_anims_exported": "Las animaciones se exportaron correctamente a:\n{path}"
   },
   "en": {
     "tb_explorer": "Explorer",
@@ -1459,7 +1462,10 @@
     "rut_st_connected": "Connection created: {id}",
     "rut_st_topo_reloaded": "Topology reloaded from file.",
     "search_placeholder": "Search the project...",
-    "msg_n_installed": "Extended character support installed successfully."
+    "msg_n_installed": "Extended character support installed successfully.",
+    "vmap_zoom_out": "Zoom out",
+    "vmap_zoom_in": "Zoom in",
+    "msg_anims_exported": "Animations exported successfully to:\n{path}"
   },
   "jp": {
     "tb_explorer": "エクスプローラー",
@@ -2190,7 +2196,10 @@
     "rut_st_connected": "接続しました: {id}",
     "rut_st_topo_reloaded": "ファイルからトポロジーを再読み込みしました。",
     "search_placeholder": "プロジェクト内を検索...",
-    "msg_n_installed": "拡張文字サポートを導入しました。"
+    "msg_n_installed": "拡張文字サポートを導入しました。",
+    "vmap_zoom_out": "縮小",
+    "vmap_zoom_in": "拡大",
+    "msg_anims_exported": "アニメーションを次へエクスポートしました:\n{path}"
   },
   "ru": {
     "tb_explorer": "Проводник",
@@ -2921,7 +2930,10 @@
     "rut_st_connected": "Соединение создано: {id}",
     "rut_st_topo_reloaded": "Топология загружена из файла заново.",
     "search_placeholder": "Поиск по проекту...",
-    "msg_n_installed": "Поддержка расширенных символов установлена."
+    "msg_n_installed": "Поддержка расширенных символов установлена.",
+    "vmap_zoom_out": "Отдалить",
+    "vmap_zoom_in": "Приблизить",
+    "msg_anims_exported": "Анимации экспортированы в:\n{path}"
   },
   "de": {
     "tb_explorer": "Explorer",
@@ -3652,7 +3664,10 @@
     "rut_st_connected": "Verbindung hergestellt: {id}",
     "rut_st_topo_reloaded": "Topologie aus Datei neu geladen.",
     "search_placeholder": "Projekt durchsuchen...",
-    "msg_n_installed": "Unterstützung für erweiterte Zeichen erfolgreich installiert."
+    "msg_n_installed": "Unterstützung für erweiterte Zeichen erfolgreich installiert.",
+    "vmap_zoom_out": "Verkleinern",
+    "vmap_zoom_in": "Vergrößern",
+    "msg_anims_exported": "Animationen erfolgreich exportiert nach:\n{path}"
   },
   "zh": {
     "tb_explorer": "资源管理器",
@@ -4383,7 +4398,10 @@
     "rut_st_connected": "已建立连接: {id}",
     "rut_st_topo_reloaded": "已从文件重新加载拓扑。",
     "search_placeholder": "搜索项目...",
-    "msg_n_installed": "扩展字符支持已成功安装。"
+    "msg_n_installed": "扩展字符支持已成功安装。",
+    "vmap_zoom_out": "缩小",
+    "vmap_zoom_in": "放大",
+    "msg_anims_exported": "动画已成功导出到:\n{path}"
   },
   "hi": {
     "tb_explorer": "एक्सप्लोरर",
@@ -5114,7 +5132,10 @@
     "rut_st_connected": "कनेक्शन बना: {id}",
     "rut_st_topo_reloaded": "फ़ाइल से टोपोलॉजी फिर से लोड हुई।",
     "search_placeholder": "प्रोजेक्ट में खोजें...",
-    "msg_n_installed": "विस्तारित वर्ण समर्थन सफलतापूर्वक स्थापित हुआ।"
+    "msg_n_installed": "विस्तारित वर्ण समर्थन सफलतापूर्वक स्थापित हुआ।",
+    "vmap_zoom_out": "ज़ूम आउट",
+    "vmap_zoom_in": "ज़ूम इन",
+    "msg_anims_exported": "एनिमेशन सफलतापूर्वक यहाँ निर्यात हुए:\n{path}"
   },
   "pt": {
     "tb_explorer": "Explorador",
@@ -5845,6 +5866,9 @@
     "rut_st_connected": "Conexão estabelecida: {id}",
     "rut_st_topo_reloaded": "Topologia recarregada do arquivo.",
     "search_placeholder": "Pesquisar no projeto...",
-    "msg_n_installed": "Suporte a caracteres estendidos instalado com sucesso."
+    "msg_n_installed": "Suporte a caracteres estendidos instalado com sucesso.",
+    "vmap_zoom_out": "Afastar",
+    "vmap_zoom_in": "Aproximar",
+    "msg_anims_exported": "As animações foram exportadas com sucesso para:\n{path}"
   }
 }

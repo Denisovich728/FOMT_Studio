@@ -369,10 +369,12 @@ class VisorMapas(QWidget):
         
         # Zoom controls
         zoom_layout = QHBoxLayout()
-        self.btn_zoom_out = QPushButton("- Zoom")
-        self.btn_zoom_in = QPushButton("+ Zoom")
-        self.btn_zoom_out.setMaximumWidth(40)
-        self.btn_zoom_in.setMaximumWidth(40)
+        self.btn_zoom_out = QPushButton("−")
+        self.btn_zoom_out.setToolTip(_t("vmap_zoom_out"))
+        self.btn_zoom_in = QPushButton("+")
+        self.btn_zoom_in.setToolTip(_t("vmap_zoom_in"))
+        self.btn_zoom_out.setFixedWidth(32)
+        self.btn_zoom_in.setFixedWidth(32)
         self.lbl_zoom = QLabel(f"Zoom: {int(self.zoom_factor * 100)}%")
         
         self.btn_zoom_out.clicked.connect(self._zoom_out)
