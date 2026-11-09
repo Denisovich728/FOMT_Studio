@@ -12,11 +12,13 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QMessageBox, QHeaderView,
     QDialog, QTextEdit, QGridLayout, QFrame
 )
-from PyQt6.QtGui import QStandardItemModel, QStandardItem
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt6.QtCore import Qt
 
 from Consola_de_Comando.utils import NameEditDelegate
 from Consola_de_Comando.i18n import tr
+from Consola_de_Comando.i18n import t as _t
+from Consola_de_Comando.themes import color
 
 class NpcEditorWidget(QWidget):
     def __init__(self, project, parent=None):
@@ -43,9 +45,9 @@ class NpcEditorWidget(QWidget):
         self.btn_save.setProperty("variant", "primary")
         self.btn_save.clicked.connect(self.save_data)
         
-        self.btn_expand = QPushButton("Portrait Expand (Experimental)")
+        self.btn_expand = QPushButton(_t("npcx_expand"))
         self.btn_expand.setProperty("variant", "danger")
-        self.btn_expand.setToolTip("Aumentar el límite de tamaño e IDs de retratos en la ROM.")
+        self.btn_expand.setToolTip(_t("npcx_expand_tip"))
         self.btn_expand.clicked.connect(self.expand_portraits)
         
         toolbar.addWidget(self.lbl_title)
@@ -74,13 +76,13 @@ class NpcEditorWidget(QWidget):
         
     def expand_portraits(self):
         lang = getattr(self.window(), 'current_lang', 'es')
-        reply = QMessageBox.warning(self, "Portrait Expand", 
-            "¿Quieres instalar el Assembly Hook para aumentar el límite de tamaño de portraits y permitir agregar más IDs a la ROM?\n\nEsta es una función EXPERIMENTAL. Úsalo bajo tu propio riesgo. Requiere una copia de seguridad de la ROM.",
+        reply = QMessageBox.warning(self, _t("npcx_expand_title"),
+            _t("npcx_expand_confirm"),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             
         if reply == QMessageBox.StandardButton.Yes:
             # Aquí irá la lógica de inyección del Assembly Hook del Repacker
-            QMessageBox.information(self, "Portrait Expand", "Hook de Expansión de Retratos preparado. La inyección se realizará durante el repacking.")
+            QMessageBox.information(self, _t("npcx_expand_title"), _t("npcx_expand_ready"))
         
     def load_data(self):
         if not self.project: return
@@ -116,7 +118,7 @@ class NpcEditorWidget(QWidget):
             
             c_ptr = QStandardItem(stats.get('Ptr_Personalidad', '0x00000000'))
             c_ptr.setEditable(False)
-            c_ptr.setForeground(Qt.GlobalColor.blue)
+            c_ptr.setForeground(QColor(color('accent')))
             font = c_ptr.font()
             font.setUnderline(True)
             c_ptr.setFont(font)
@@ -163,27 +165,6 @@ class NpcDetailDialog(QDialog):
         lang = getattr(app, 'current_lang', 'es') if app else 'es'
         self.setWindowTitle(tr('npc_profile', lang).format(name=name))
         self.resize(540, 320)
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #0D1117;
-                color: #C9D1D9;
-            }
-            QLabel {
-                color: #C9D1D9;
-            }
-            QPushButton {
-                background-color: #21262D;
-                color: #C9D1D9;
-                border: 1px solid #30363D;
-                border-radius: 4px;
-                padding: 6px 12px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #30363D;
-                border-color: #8B949E;
-            }
-        """)
         
         self.layout_main = QHBoxLayout(self)
         self.layout_main.setContentsMargins(16, 16, 16, 16)
@@ -195,7 +176,7 @@ class NpcDetailDialog(QDialog):
         
         self.lbl_portrait = QLabel()
         self.lbl_portrait.setFixedSize(128, 128)
-        self.lbl_portrait.setStyleSheet("background-color: #090D16; border: 2px solid #1F6FEB; border-radius: 8px;")
+        self.lbl_portrait.setStyleSheet(f"background-color: {color('surface_alt')}; border: 2px solid {color('border')}; border-radius: 8px;")
         self.lbl_portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.side_graphics.addWidget(self.lbl_portrait)
         
@@ -216,18 +197,18 @@ class NpcDetailDialog(QDialog):
         
         # Cabecera
         role_label = npc.get_translated_role(lang)
-        header = QLabel(f"<h2 style='margin:0; color:#58A6FF;'>{name}</h2><b style='color:#7EE787;'>{role_label}</b><br><span style='color:#8B949E;'>{tr('engine_id', lang).format(id=f'{npc.index + 1:02X}')}</span>")
+        header = QLabel(f"<h2 style='margin:0; color:{color('text')};'>{name}</h2><b style='color:{color('accent')};'>{role_label}</b><br><span style='color:{color('muted')};'>{tr('engine_id', lang).format(id=f'{npc.index + 1:02X}')}</span>")
         layout.addWidget(header)
         
         ptr_str = f"0x{getattr(npc, 'personality_ptr', 0):08X}"
-        lbl_ptr = QLabel(f"<b>{tr('ptr_rom', lang)}</b> <span style='color:#79C0FF; font-family:Consolas;'>{ptr_str}</span>")
+        lbl_ptr = QLabel(f"<b>{tr('ptr_rom', lang)}</b> <span style='color:{color('accent')}; font-family:Consolas;'>{ptr_str}</span>")
         lbl_ptr.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         layout.addWidget(lbl_ptr)
         
         # Separador estilizado
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setStyleSheet("color: #30363D;")
+        sep.setStyleSheet(f"color: {color('border')};")
         layout.addWidget(sep)
         
         # Enlace Interactivo al Script de Personalidad
@@ -236,11 +217,11 @@ class NpcDetailDialog(QDialog):
         self._resolve_script_personality(name, parent)
 
         script_layout = QHBoxLayout()
-        lbl_script = QLabel("<b>Script:</b>")
+        lbl_script = QLabel("<b>" + _t("npcx_script") + "</b>")
         self.btn_script = QPushButton(f"{self.script_target_name}")
         self.btn_script.setProperty("variant", "ghost")
         self.btn_script.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_script.setToolTip("Abrir script de personalidad en el Script IDE")
+        self.btn_script.setToolTip(_t("npcx_open_script_tip"))
         self.btn_script.clicked.connect(self.abrir_script)
         script_layout.addWidget(lbl_script)
         script_layout.addWidget(self.btn_script)
@@ -250,15 +231,15 @@ class NpcDetailDialog(QDialog):
         # Enlace Interactivo al Editor de Rutinas Diarias
         self.routine_target_id = self._resolve_routine_id(name)
         routine_layout = QHBoxLayout()
-        lbl_routine = QLabel("<b>Rutina AI:</b>")
+        lbl_routine = QLabel("<b>" + _t("npcx_routine") + "</b>")
         if self.routine_target_id is not None:
-            self.btn_routine = QPushButton(f"Orquestador #{self.routine_target_id:02d}")
+            self.btn_routine = QPushButton(_t("npcx_routine_link", n=f"{self.routine_target_id:02d}"))
             self.btn_routine.setProperty("variant", "ghost")
             self.btn_routine.setCursor(Qt.CursorShape.PointingHandCursor)
-            self.btn_routine.setToolTip("Abrir orquestador de rutina diaria")
+            self.btn_routine.setToolTip(_t("npcx_open_routine_tip"))
             self.btn_routine.clicked.connect(self.abrir_rutina)
         else:
-            self.btn_routine = QLabel("<span style='color: #6E7681;'>Sin rutina de movimiento dedicada</span>")
+            self.btn_routine = QLabel(f"<span style='color: {color('muted')};'>{_t('npcx_no_routine')}</span>")
         routine_layout.addWidget(lbl_routine)
         routine_layout.addWidget(self.btn_routine)
         routine_layout.addStretch()
@@ -343,7 +324,7 @@ class NpcDetailDialog(QDialog):
 
         ptr = getattr(self.npc, 'personality_ptr', 0)
         if ptr == 0:
-            QMessageBox.warning(self, "Error", "Este NPC no tiene un script de personalidad válido ni evento asociado.")
+            QMessageBox.warning(self, _t("msg_error"), _t("npcx_no_script"))
             return
 
         if hasattr(app, 'tabs'):
@@ -358,7 +339,7 @@ class NpcDetailDialog(QDialog):
             from Nucleos_Positronicos.Nucleo_de_Scripts.script_ide import ScriptIDEWidget
             ide = ScriptIDEWidget(app.project, app)
             ide.load_rom_script(ptr)
-            app.tabs.addTab(ide, f"Script: {self.script_target_name}")
+            app.tabs.addTab(ide, _t("npcx_script_tab", name=self.script_target_name))
             app.tabs.setCurrentWidget(ide)
             self.close()
 
