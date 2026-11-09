@@ -6,73 +6,37 @@ from PyQt6.QtWidgets import (
     QSlider, QSpinBox, QGroupBox, QFileDialog, QLineEdit, QMessageBox
 )
 from PyQt6.QtCore import Qt
+from Consola_de_Comando.i18n import t as _t
+from Consola_de_Comando.themes import color
 from Nucleo_Herramientas.config_manager import ConfigManager
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Configuraciones de Sistema y Hardware")
+        self.setWindowTitle(_t("set_title"))
         self.setMinimumWidth(500)
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #1E1E2E;
-                color: #CDD6F4;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-            QGroupBox {
-                border: 1px solid #45475A;
-                border-radius: 8px;
-                margin-top: 15px;
-                font-weight: bold;
-                color: #89B4FA;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px 0 3px;
-            }
-            QLabel {
-                color: #CDD6F4;
-            }
-            QPushButton {
-                background-color: #313244;
-                color: #CDD6F4;
-                border: 1px solid #45475A;
-                border-radius: 4px;
-                padding: 6px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #45475A;
-                border-color: #89B4FA;
-            }
-            QLineEdit, QSpinBox {
-                background-color: #11111B;
-                color: #CDD6F4;
-                border: 1px solid #45475A;
-                border-radius: 4px;
-                padding: 4px;
-            }
-            QSlider::groove:horizontal {
-                border: 1px solid #45475A;
+        # El dialogo hereda el tema activo; solo los deslizadores necesitan estilo propio.
+        self.setStyleSheet(f"""
+            QSlider::groove:horizontal {{
+                border: 1px solid {color('border')};
                 height: 8px;
-                background: #11111B;
+                background: {color('surface_alt')};
                 margin: 2px 0;
                 border-radius: 4px;
-            }
-            QSlider::handle:horizontal {
-                background: #89B4FA;
-                border: 1px solid #89B4FA;
+            }}
+            QSlider::handle:horizontal {{
+                background: {color('accent')};
+                border: 1px solid {color('accent')};
                 width: 14px;
                 margin: -4px 0;
                 border-radius: 7px;
-            }
-            QSlider::sub-page:horizontal {
-                background: #CBA6F7;
-                border: 1px solid #CBA6F7;
+            }}
+            QSlider::sub-page:horizontal {{
+                background: {color('accent')};
+                border: 1px solid {color('accent')};
                 height: 8px;
                 border-radius: 4px;
-            }
+            }}
         """)
         
         self.config = ConfigManager.load_config()
@@ -121,11 +85,11 @@ class SettingsDialog(QDialog):
         layout.setSpacing(15)
         
         # --- RAM Group ---
-        ram_group = QGroupBox("Asignación de Memoria RAM")
+        ram_group = QGroupBox(_t("set_ram_group"))
         ram_layout = QVBoxLayout()
         
         ram_info_layout = QHBoxLayout()
-        ram_info_layout.addWidget(QLabel(f"Total disponible en el sistema: {self.total_ram_mb} MB"))
+        ram_info_layout.addWidget(QLabel(_t("set_ram_total", mb=self.total_ram_mb)))
         ram_layout.addLayout(ram_info_layout)
         
         ram_slider_layout = QHBoxLayout()
@@ -143,7 +107,7 @@ class SettingsDialog(QDialog):
         self.ram_slider.valueChanged.connect(self.ram_spin.setValue)
         self.ram_spin.valueChanged.connect(self.ram_slider.setValue)
         
-        ram_slider_layout.addWidget(QLabel("Asignar:"))
+        ram_slider_layout.addWidget(QLabel(_t("set_assign")))
         ram_slider_layout.addWidget(self.ram_slider)
         ram_slider_layout.addWidget(self.ram_spin)
         
@@ -152,12 +116,12 @@ class SettingsDialog(QDialog):
         layout.addWidget(ram_group)
         
         # --- CPU Group ---
-        cpu_group = QGroupBox("Asignación de Procesamiento (CPU)")
+        cpu_group = QGroupBox(_t("set_cpu_group"))
         cpu_layout = QVBoxLayout()
         
         if self.is_amd or not self.is_intel:
             # AMD or unknown: just base threads
-            cpu_info = QLabel(f"Procesador: {self.processor_name}\nHilos totales: {self.logical_cores}")
+            cpu_info = QLabel(_t("set_cpu_info", cpu=self.processor_name, threads=self.logical_cores))
             cpu_layout.addWidget(cpu_info)
             
             thread_layout = QHBoxLayout()
@@ -173,14 +137,14 @@ class SettingsDialog(QDialog):
             self.thread_slider.valueChanged.connect(self.thread_spin.setValue)
             self.thread_spin.valueChanged.connect(self.thread_slider.setValue)
             
-            thread_layout.addWidget(QLabel("Hilos a usar:"))
+            thread_layout.addWidget(QLabel(_t("set_threads")))
             thread_layout.addWidget(self.thread_slider)
             thread_layout.addWidget(self.thread_spin)
             cpu_layout.addLayout(thread_layout)
             
         else:
             # Intel: P-Cores and E-Cores
-            cpu_info = QLabel(f"Procesador: {self.processor_name}\n{self.p_cores} P-Cores, {self.e_cores} E-Cores\nHilos lógicos totales: {self.logical_cores}")
+            cpu_info = QLabel(_t("set_cpu_info_hybrid", cpu=self.processor_name, p=self.p_cores, e=self.e_cores, threads=self.logical_cores))
             cpu_layout.addWidget(cpu_info)
             
             # P-Cores
@@ -197,7 +161,7 @@ class SettingsDialog(QDialog):
             self.p_slider.valueChanged.connect(self.p_spin.setValue)
             self.p_spin.valueChanged.connect(self.p_slider.setValue)
             
-            p_layout.addWidget(QLabel(f"P-Cores (Rendimiento):"))
+            p_layout.addWidget(QLabel(_t("set_pcores")))
             p_layout.addWidget(self.p_slider)
             p_layout.addWidget(self.p_spin)
             cpu_layout.addLayout(p_layout)
@@ -217,7 +181,7 @@ class SettingsDialog(QDialog):
                 self.e_slider.valueChanged.connect(self.e_spin.setValue)
                 self.e_spin.valueChanged.connect(self.e_slider.setValue)
                 
-                e_layout.addWidget(QLabel(f"E-Cores (Eficiencia):"))
+                e_layout.addWidget(QLabel(_t("set_ecores")))
                 e_layout.addWidget(self.e_slider)
                 e_layout.addWidget(self.e_spin)
                 cpu_layout.addLayout(e_layout)
@@ -226,20 +190,20 @@ class SettingsDialog(QDialog):
         layout.addWidget(cpu_group)
         
         # --- Rutas Group ---
-        path_group = QGroupBox("Rutas y Directorios")
+        path_group = QGroupBox(_t("set_paths_group"))
         path_layout = QVBoxLayout()
         
         dir_layout = QHBoxLayout()
         self.txt_dir = QLineEdit()
-        self.txt_dir.setPlaceholderText("Directorio de proyectos por defecto...")
+        self.txt_dir.setPlaceholderText(_t("set_dir_placeholder"))
         
-        btn_browse = QPushButton("📁 Explorar")
+        btn_browse = QPushButton(_t("set_browse"))
         btn_browse.clicked.connect(self._browse_dir)
         
         dir_layout.addWidget(self.txt_dir)
         dir_layout.addWidget(btn_browse)
         
-        path_layout.addWidget(QLabel("Carpeta de Proyectos por Defecto:"))
+        path_layout.addWidget(QLabel(_t("set_dir_label")))
         path_layout.addLayout(dir_layout)
         path_group.setLayout(path_layout)
         layout.addWidget(path_group)
@@ -248,11 +212,11 @@ class SettingsDialog(QDialog):
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
         
-        btn_cancel = QPushButton("Cancelar")
+        btn_cancel = QPushButton(_t("btn_cancel"))
         btn_cancel.setProperty("variant", "secondary")
         btn_cancel.clicked.connect(self.reject)
         
-        btn_save = QPushButton("💾 Guardar Cambios")
+        btn_save = QPushButton(_t("set_save"))
         btn_save.setProperty("variant", "primary")
         btn_save.clicked.connect(self._save_settings)
         
@@ -286,7 +250,7 @@ class SettingsDialog(QDialog):
     def _browse_dir(self):
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
         initial = self.txt_dir.text() or get_default_workspace_dir()
-        directory = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta por defecto", initial)
+        directory = QFileDialog.getExistingDirectory(self, _t("set_dlg_dir"), initial)
         if directory:
             self.txt_dir.setText(directory)
 
@@ -303,5 +267,5 @@ class SettingsDialog(QDialog):
         self.config["default_project_dir"] = self.txt_dir.text()
         
         ConfigManager.save_config(self.config)
-        QMessageBox.information(self, "Guardado", "Las configuraciones se han guardado correctamente.")
+        QMessageBox.information(self, _t("set_saved_title"), _t("set_saved"))
         self.accept()

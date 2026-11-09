@@ -14,6 +14,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QPixmap, QFont, QColor
 from PyQt6.QtCore import Qt
+from Consola_de_Comando.i18n import t as _t
+from Consola_de_Comando.themes import color
 
 # ─── Palette Editor ──────────────────────────────────────────────────────────
 from Nucleos_Positronicos.Nucleo_de_Sprites.palette_editor import PaletteEditorDialog, gba_to_rgb888
@@ -129,56 +131,11 @@ class PortraitEditorDialog(QDialog):
     - La paleta editada se inyecta junto con el PNG en la misma operación de repacking.
     """
 
-    # ── Stylesheet ────────────────────────────────────────────────────────────
-    _SS = """
-    QDialog {
-        background-color: #1E1E2E;
-        color: #CDD6F4;
-        font-family: 'Segoe UI', sans-serif;
-    }
-    QLabel { color: #CDD6F4; }
-    QFrame#visor {
-        background-color: #11111B;
-        border: 2px solid #45475A;
-        border-radius: 8px;
-    }
-    QPushButton {
-        background-color: #313244;
-        color: #CDD6F4;
-        border: 1px solid #45475A;
-        border-radius: 6px;
-        padding: 7px 16px;
-        font-weight: bold;
-    }
-    QPushButton:hover { background-color: #7C5CFC; color: white; }
-    QPushButton#btn_import {
-        background-color: #A31515;
-        color: white;
-        border-color: #FF3333;
-    }
-    QPushButton#btn_import:hover { background-color: #CC1C1C; }
-    QPushButton#btn_palette {
-        background-color: #1F3A5F;
-        color: #89B4FA;
-        border-color: #4A90D9;
-    }
-    QPushButton#btn_palette:hover { background-color: #2B5280; color: white; }
-    QPushButton#btn_close {
-        background-color: #45475A;
-        color: #BAC2DE;
-    }
-    QCheckBox { color: #CDD6F4; spacing: 6px; }
-    QCheckBox::indicator {
-        width: 16px; height: 16px;
-        border: 1px solid #45475A;
-        border-radius: 3px;
-        background: #313244;
-    }
-    QCheckBox::indicator:checked {
-        background: #7C5CFC;
-        border-color: #7C5CFC;
-    }
-    """
+    # El dialogo hereda la hoja de estilo del tema activo; solo el visor tiene marco propio.
+    @staticmethod
+    def _stylesheet():
+        return (f"QFrame#visor {{ background-color: {color('surface_alt')}; "
+                f"border: 1px solid {color('border')}; border-radius: 8px; }}")
 
     def __init__(self, npc_name: str, hex_id: int, base_name: str, parent=None):
         super().__init__(parent)
@@ -227,12 +184,10 @@ class PortraitEditorDialog(QDialog):
         # ROM más reciente inyectada — prioridad máxima en el render
         self._injected_rom: bytes | None = None
 
-        self.setWindowTitle(
-            f"Melody Portrait Engine  ·  {npc_name}  (ID: {hex_id:02X})"
-        )
+        self.setWindowTitle(_t("pte_window_title", name=npc_name, id=f"{hex_id:02X}"))
         self.setMinimumSize(540, 460)
         self.resize(560, 480)
-        self.setStyleSheet(self._SS)
+        self.setStyleSheet(self._stylesheet())
 
         self._build_ui()
 
@@ -245,11 +200,11 @@ class PortraitEditorDialog(QDialog):
 
         # ── Header ────────────────────────────────────────────────────────────
         hdr = QLabel(
-            f"<span style='font-size:15px; font-weight:bold; color:#CBA6F7;'>"
+            f"<span style='font-size:15px; font-weight:bold; color:{color('text')};'>"
             f"Melody Portrait Engine</span>"
-            f"<br><span style='color:#89DCEB;'>Editando: </span>"
-            f"<span style='font-weight:bold;'>{self.npc_name}</span>"
-            f"  <span style='color:#6C7086;'>ID: {self.hex_id:02X}h</span>"
+            f"<br><span style='color:{color('muted')};'>{_t('pte_editing')} </span>"
+            f"<span style='font-weight:bold; color:{color('accent')};'>{self.npc_name}</span>"
+            f"  <span style='color:{color('muted')};'>ID: {self.hex_id:02X}h</span>"
         )
         hdr.setAlignment(Qt.AlignmentFlag.AlignCenter)
         root.addWidget(hdr)
@@ -277,18 +232,8 @@ class PortraitEditorDialog(QDialog):
         # Sólo desactiva esto si el PNG es un retoque menor al MISMO portrait
         # (mismo tamaño, mismo layout de tiles) y quieres que sea rápido.
         chk_row = QHBoxLayout()
-        self.chk_vanilla = QCheckBox(
-            "Modo Vainilla (retoque rápido)  —  únicamente para el mismo portrait con cambios mínimos de píxel"
-        )
-        self.chk_vanilla.setToolTip(
-            "DESACTIVADO por defecto = Modo Expansión (el correcto para portraits nuevos).\n\n"
-            "Activa esto SOLO si:\n"
-            "  • El PNG tiene exactamente el mismo tamaño que el portrait original.\n"
-            "  • Solo cambió el color de alguno píxel (retoque fino).\n"
-            "  • Quieres una inyección más rápida sin regenerar los OAMs.\n\n"
-            "Si el portrait es nuevo o más grande, déjalo DESACTIVADO.\n"
-            "El engine regenerará los OAMs automáticamente y actualizará la metadata."
-        )
+        self.chk_vanilla = QCheckBox(_t("pte_vanilla"))
+        self.chk_vanilla.setToolTip(_t("pte_vanilla_tip"))
         self.chk_vanilla.setChecked(False)   # Expansión por defecto — siempre correcto
         chk_row.addWidget(self.chk_vanilla)
         chk_row.addStretch()
@@ -298,24 +243,17 @@ class PortraitEditorDialog(QDialog):
         grid = QGridLayout()
         grid.setSpacing(8)
 
-        btn_dump = QPushButton("⬇  Extraer a PNG")
-        btn_dump.setToolTip("Exporta el PNG extraído del volcado a una carpeta de tu elección.")
+        btn_dump = QPushButton(_t("pte_btn_export"))
+        btn_dump.setToolTip(_t("pte_btn_export_tip"))
         btn_dump.clicked.connect(self._export_png)
 
-        btn_import = QPushButton("⬆  Cargar y Reinyectar")
-        btn_import.setObjectName("btn_import")
-        btn_import.setToolTip(
-            "Carga un PNG, lo compila a 4bpp GBA y lo reinyecta en la ROM\n"
-            "usando el Shifting Engine (Modo Expansión)."
-        )
+        btn_import = QPushButton(_t("pte_btn_import"))
+        btn_import.setProperty("variant", "primary")
+        btn_import.setToolTip(_t("pte_btn_import_tip"))
         btn_import.clicked.connect(self._import_png)
 
-        btn_palette = QPushButton("  Editar Paleta")
-        btn_palette.setObjectName("btn_palette")
-        btn_palette.setToolTip(
-            "Abre el editor de paleta GBA completo (HSV picker, RGB, HEX).\n"
-            "Los cambios se aplican en la siguiente inyección."
-        )
+        btn_palette = QPushButton(_t("pte_btn_palette"))
+        btn_palette.setToolTip(_t("pte_btn_palette_tip"))
         btn_palette.clicked.connect(self._open_palette_editor)
 
         grid.addWidget(btn_dump,    0, 0)
@@ -325,13 +263,12 @@ class PortraitEditorDialog(QDialog):
         root.addLayout(grid)
 
         # ── Palette status label ───────────────────────────────────────────────
-        self.lbl_pal_status = QLabel("Paleta: usando original de la ROM")
-        self.lbl_pal_status.setStyleSheet("color: #6C7086; font-size: 10px;")
+        self.lbl_pal_status = QLabel(_t("pte_pal_original"))
+        self.lbl_pal_status.setStyleSheet(f"color: {color('muted')}; font-size: 11px;")
         root.addWidget(self.lbl_pal_status)
 
         # ── Close ─────────────────────────────────────────────────────────────
-        btn_close = QPushButton("✖  Cerrar")
-        btn_close.setObjectName("btn_close")
+        btn_close = QPushButton(_t("pte_btn_close"))
         btn_close.clicked.connect(self.close)
         root.addWidget(btn_close)
 
@@ -357,8 +294,7 @@ class PortraitEditorDialog(QDialog):
                 )
             else:
                 self.lbl_image.setText(
-                    "<span style='color:#F38BA8;'>No hay retrato disponible en el volcado.<br>"
-                    "Usa <b>Extraer a PNG</b> primero.</span>"
+                    f"<span style='color:{color('danger')};'>{_t('pte_no_portrait')}</span>"
                 )
 
     def _render_hex_portrait(self):
@@ -465,7 +401,7 @@ class PortraitEditorDialog(QDialog):
         self.pal_strip.set_palette(self._edited_palette if self._edited_palette else self._palette)
         self._refresh_preview()
         self.lbl_pal_status.setText(
-            "Paleta: <b style='color:#FAB387;'>EDICIÓN CANCELADA</b> — se restauró la paleta previa."
+            _t("pte_pal_label") + f" <b style='color:{color('warning')};'>" + _t("pte_pal_cancelled") + "</b> — " + _t("pte_pal_cancelled_note")
         )
         self.lbl_pal_status.setTextFormat(Qt.TextFormat.RichText)
 
@@ -474,7 +410,7 @@ class PortraitEditorDialog(QDialog):
         self.pal_strip.set_palette(palette)
         self._refresh_preview()
         self.lbl_pal_status.setText(
-            "Paleta: <b style='color:#A6E3A1;'>EDICIÓN EN TIEMPO REAL</b> — click en Guardar para conservar."
+            _t("pte_pal_label") + f" <b style='color:{color('success')};'>" + _t("pte_pal_live") + "</b> — " + _t("pte_pal_live_note")
         )
         self.lbl_pal_status.setTextFormat(Qt.TextFormat.RichText)
 
@@ -483,7 +419,7 @@ class PortraitEditorDialog(QDialog):
         self.pal_strip.set_palette(palette)
         self._refresh_preview()
         self.lbl_pal_status.setText(
-            "Paleta: <b style='color:#A6E3A1;'>MODIFICADA</b> — se aplicará en la próxima inyección."
+            _t("pte_pal_label") + f" <b style='color:{color('success')};'>" + _t("pte_pal_modified") + "</b> — " + _t("pte_pal_modified_note")
         )
         self.lbl_pal_status.setTextFormat(Qt.TextFormat.RichText)
 
@@ -492,25 +428,25 @@ class PortraitEditorDialog(QDialog):
     def _export_png(self):
         pixmap = self.lbl_image.pixmap()
         if not pixmap or pixmap.isNull():
-            QMessageBox.warning(self, "Error", "No hay imagen en el visor para exportar.")
+            QMessageBox.warning(self, _t("msg_error"), _t("pte_no_image"))
             return
             
         save_path, _ = QFileDialog.getSaveFileName(
-            self, "Guardar PNG", f"{self.npc_name}_Portrait.png", "Images (*.png)"
+            self, _t("pte_dlg_save"), f"{self.npc_name}_Portrait.png", _t("pte_filter_png")
         )
         if save_path:
             try:
                 pixmap.toImage().save(save_path, "PNG")
-                QMessageBox.information(self, "Éxito", f"Retrato actual exportado a:\n{save_path}")
+                QMessageBox.information(self, _t("msg_success"), _t("pte_exported", path=save_path))
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"No se pudo guardar:\n{e}")
+                QMessageBox.critical(self, _t("msg_error"), _t("pte_save_error", err=e))
 
     # ── Import PNG → Repack ───────────────────────────────────────────────────
 
     def _import_png(self):
         from PIL import Image as _PilImage
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Seleccionar PNG Modificado", "", "Images (*.png)"
+            self, _t("pte_dlg_open"), "", _t("pte_filter_png")
         )
         if not file_path:
             return
@@ -527,22 +463,22 @@ class PortraitEditorDialog(QDialog):
         except Exception:
             png_w, png_h = 0, 0
 
-        modo_txt = (
-            "<b style='color:#FAB387;'>Vainilla</b> — retoque rápido, OAMs intactos"
-            if use_vanilla else
-            "<b style='color:#A6E3A1;'>Expansión</b> — recalcula OAMs y actualiza metadata"
-        )
+        if use_vanilla:
+            modo_txt = f"<b style='color:{color('warning')};'>{_t('pte_mode_vanilla')}</b> — {_t('pte_mode_vanilla_note')}"
+        else:
+            modo_txt = f"<b style='color:{color('success')};'>{_t('pte_mode_expansion')}</b> — {_t('pte_mode_expansion_note')}"
+        pal_txt = (f"<b style='color:{color('accent')};'>{_t('pte_pal_custom')}</b>"
+                   if has_custom_pal else _t("pte_pal_rom"))
 
         msg = (
-            f"<b>Melody Engine</b> va a compilar el PNG a <b>GBA 4bpp</b>,"
-            f" generar los atributos OAM y relocalizar las tablas maestras.<br><br>"
-            f"<b>Modo:</b> {modo_txt}<br>"
+            f"{_t('pte_confirm_intro')}<br><br>"
+            f"<b>{_t('pte_mode')}</b> {modo_txt}<br>"
             f"<b>PNG:</b> {png_w}×{png_h} px<br>"
-            f"<b>Paleta:</b> {'<b style=\'color:#CBA6F7;\'>PERSONALIZADA</b>' if has_custom_pal else 'Original de la ROM'}<br><br>"
-            "¿Continuar?"
+            f"<b>{_t('pte_pal_label')}</b> {pal_txt}<br><br>"
+            f"{_t('pte_continue')}"
         )
         reply = QMessageBox.question(
-            self, "Confirmar Inyección", msg,
+            self, _t("pte_confirm_title"), msg,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply != QMessageBox.StandardButton.Yes:
@@ -610,8 +546,8 @@ class PortraitEditorDialog(QDialog):
             self._palette = _read_rom_portrait_palette_from_bytes(new_rom, self.hex_id)
             self._edited_palette = None          # ya quedó grabada en la ROM
             self.pal_strip.set_palette(self._palette)
-            self.lbl_pal_status.setText("Paleta: usando original de la ROM")
-            self.lbl_pal_status.setStyleSheet("color: #6C7086; font-size: 10px;")
+            self.lbl_pal_status.setText(_t("pte_pal_original"))
+            self.lbl_pal_status.setStyleSheet(f"color: {color('muted')}; font-size: 11px;")
 
             # Forzar render ANTES de mostrar el QMessageBox.
             # Qt no procesa repaints mientras un QDialog/QMessageBox está bloqueando el
@@ -620,20 +556,18 @@ class PortraitEditorDialog(QDialog):
             from PyQt6.QtWidgets import QApplication
             QApplication.processEvents()          # ← garantiza que el pixmap se pinte
 
-            modo_ok = "Vainilla (in-place)" if use_vanilla else "Expansión (metadata actualizada)"
+            modo_ok = _t("pte_ok_vanilla") if use_vanilla else _t("pte_ok_expansion")
             QMessageBox.information(
-                self, "Inyección Exitosa",
-                f"¡Portrait reinyectado correctamente! [{modo_ok}]\n\n"
-                "• OAMs y metadata actualizados.\n"
-                "• Tablas relocalizadas al espacio libre.\n"
-                + ("• Paleta personalizada aplicada." if has_custom_pal else "")
+                self, _t("pte_ok_title"),
+                _t("pte_ok", mode=modo_ok)
+                + ("\n" + _t("pte_ok_palette") if has_custom_pal else "")
             )
 
         except Exception as e:
             import traceback
             QMessageBox.critical(
-                self, "Error de Inyección",
-                f"Error crítico durante la recompresión:\n{e}\n\n{traceback.format_exc()}"
+                self, _t("pte_error_title"),
+                _t("pte_error", err=e) + "\n\n" + traceback.format_exc()
             )
 
 
@@ -651,7 +585,7 @@ class _PaletteStrip(QLabel):
         self._palette = list(palette)
         self.setFixedHeight(self.SZ + 4)
         self.setMinimumWidth(self.SZ * 16 + 4)
-        self.setToolTip("Paleta actual del portrait (16 colores GBA)\nSlot 0 = transparente")
+        self.setToolTip(_t("pte_strip_tip"))
         self._draw()
 
     def set_palette(self, palette):
@@ -664,7 +598,7 @@ class _PaletteStrip(QLabel):
         w = self.SZ * 16 + 4
         h = self.SZ + 4
         pix = QPixmap(w, h)
-        pix.fill(QColor(17, 17, 27))
+        pix.fill(QColor(color('surface_alt')))
         p = QPainter(pix)
         for i, (r, g, b) in enumerate(self._palette[:16]):
             x = 2 + i * self.SZ
