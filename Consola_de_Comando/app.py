@@ -321,6 +321,9 @@ class FoMTStudioApp(QMainWindow):
         act_save = QAction(tr("tb_save_rom", self.current_lang), self)
         act_save.triggered.connect(self.action_save_project)
         self.toolbar.addAction(act_save)
+        save_btn = self.toolbar.widgetForAction(act_save)
+        if save_btn is not None:
+            save_btn.setProperty("variant", "primary")
 
         act_compile = QAction(tr("tb_compile_rom", self.current_lang), self)
         act_compile.triggered.connect(self.action_compile_rom)
@@ -392,6 +395,31 @@ class FoMTStudioApp(QMainWindow):
         btn_more.setMenu(menu_more)
         self.toolbar.addWidget(btn_more)
 
+        # 5. Aviso compacto del soporte de la N (a la derecha de la barra)
+        from PyQt6.QtWidgets import QSizePolicy
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.toolbar.addWidget(spacer)
+        self.btn_n = QPushButton()
+        self.btn_n.setObjectName("chipN")
+        self.btn_n.clicked.connect(self._apply_n_patch)
+        self.toolbar.addWidget(self.btn_n)
+        self._refresh_n_chip()
+
+    def _set_n_state(self, state):
+        """Estado del soporte de la N: 'sin_rom', 'pendiente' o 'activo'."""
+        self._n_state = state
+        self._refresh_n_chip()
+
+    def _refresh_n_chip(self):
+        state = getattr(self, "_n_state", "sin_rom")
+        self.btn_n.setText(tr("btn_n_active" if state == "activo" else "btn_install_n", self.current_lang))
+        self.btn_n.setToolTip(tr("patch_n", self.current_lang))
+        self.btn_n.setEnabled(state == "pendiente")
+        self.btn_n.setProperty("estado", state)
+        self.btn_n.style().unpolish(self.btn_n)
+        self.btn_n.style().polish(self.btn_n)
+
     def _setup_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -411,28 +439,6 @@ class FoMTStudioApp(QMainWindow):
         
         left_panel = QVBoxLayout()
         
-        self.btn_n = QPushButton(tr('btn_install_n', self.current_lang))
-        self.btn_n.setStyleSheet("""
-            QPushButton {
-                background-color: #E74C3C;
-                color: white;
-                font-size: 13px;
-                font-weight: bold;
-                border-radius: 6px;
-                padding: 6px 10px;
-                margin-bottom: 6px;
-            }
-            QPushButton:hover {
-                background-color: #C0392B;
-            }
-            QPushButton:disabled {
-                background-color: #27AE60;
-                color: white;
-            }
-        """)
-        self.btn_n.clicked.connect(self._apply_n_patch)
-        self.btn_n.setEnabled(False)
-        left_panel.addWidget(self.btn_n)
         
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText(tr("search_placeholder", self.current_lang))
@@ -630,7 +636,6 @@ class FoMTStudioApp(QMainWindow):
         self._setup_menu()
         self._build_toolbar()
         self.search_bar.setPlaceholderText(tr("search_placeholder", lang_code))
-        self.btn_n.setText(tr("btn_n_active" if getattr(self, "_n_active", False) else "btn_install_n", lang_code))
         title_hint = tr('explorer_title', lang_code)
         self.setWindowTitle(f"FoMT Studio - {title_hint}")
         self.status.showMessage(tr("status_ready", lang_code))
@@ -983,18 +988,11 @@ class FoMTStudioApp(QMainWindow):
                         
         if self.project:
             self.ai_terminal.project = self.project # Actualizar nexo de IA
-            self.btn_n.setEnabled(True)
+            self._set_n_state("pendiente")
             try:
                 # La firma N_MODE se encuentra en el espacio libre del sistema (0x13AA24)
                 flag = self.project.read_rom(0x0013AA24, 6)
-                if flag == b'N_MODE':
-                    self._n_active = True
-                    self.btn_n.setText(tr("btn_n_active", self.current_lang))
-                    self.btn_n.setEnabled(False)
-                else:
-                    self._n_active = False
-                    self.btn_n.setText(tr("btn_install_n", self.current_lang))
-                    self.btn_n.setEnabled(True)
+                self._set_n_state("activo" if flag == b'N_MODE' else "pendiente")
             except:
                 pass
                 
@@ -1063,7 +1061,7 @@ class FoMTStudioApp(QMainWindow):
                 from PyQt6.QtWidgets import QApplication
                 QApplication.processEvents()
                 aplicar_parche_n(self.project)
-                self.btn_n.setEnabled(False)
+                self._set_n_state("activo")
                 if hasattr(self, 'magic_circle'):
                     self.magic_circle.stop_animation()
                 QMessageBox.information(self, tr("title_info", self.current_lang), tr("msg_n_installed", self.current_lang))
