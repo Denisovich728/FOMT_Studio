@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from Consola_de_Comando.i18n import t as _t
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 from Nucleo_Herramientas.config_manager import ConfigManager
 
 class SettingsDialog(QDialog):
@@ -16,24 +16,24 @@ class SettingsDialog(QDialog):
         self.setWindowTitle(_t("set_title"))
         self.setMinimumWidth(500)
         # El dialogo hereda el tema activo; solo los deslizadores necesitan estilo propio.
-        self.setStyleSheet(f"""
+        style(self, """
             QSlider::groove:horizontal {{
-                border: 1px solid {color('border')};
+                border: 1px solid {border};
                 height: 8px;
-                background: {color('surface_alt')};
+                background: {surface_alt};
                 margin: 2px 0;
                 border-radius: 4px;
             }}
             QSlider::handle:horizontal {{
-                background: {color('accent')};
-                border: 1px solid {color('accent')};
+                background: {accent};
+                border: 1px solid {accent};
                 width: 14px;
                 margin: -4px 0;
                 border-radius: 7px;
             }}
             QSlider::sub-page:horizontal {{
-                background: {color('accent')};
-                border: 1px solid {color('accent')};
+                background: {accent};
+                border: 1px solid {accent};
                 height: 8px;
                 border-radius: 4px;
             }}

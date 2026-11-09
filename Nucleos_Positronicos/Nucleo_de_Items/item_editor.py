@@ -26,7 +26,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtCore import Qt, QSize
 
 from Consola_de_Comando.i18n import tr
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 from Consola_de_Comando.i18n import t as _t
 from Consola_de_Comando.utils import NameEditDelegate
 from Nucleos_Positronicos.Nucleo_de_Items.objetos import BaseItem, ToolItem, FoodItem, MiscItem
@@ -41,7 +41,7 @@ class CheckerboardIconLabel(QLabel):
         super().__init__(parent)
         self.setFixedSize(64, 64)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setStyleSheet(f"background: {color('surface_alt')}; border: 1px solid {color('border')}; border-radius: 4px;")
+        style(self, "background: {surface_alt}; border: 1px solid {border}; border-radius: 4px;")
         self._pixmap = None
         self._pattern = self._create_pattern()
 
@@ -85,10 +85,10 @@ class ItemInspectorPanel(QFrame):
         super().__init__(parent)
         self.current_item: Optional[BaseItem] = None
         self.setFixedWidth(360)
-        self.setStyleSheet(f"""
+        style(self, """
             ItemInspectorPanel {{
-                background: {color('surface')};
-                border: 1px solid {color('border')};
+                background: {surface};
+                border: 1px solid {border};
                 border-radius: 6px;
             }}
             ItemInspectorPanel QLabel, ItemInspectorPanel QCheckBox, ItemInspectorPanel QFrame {{ background: transparent; }}
@@ -101,11 +101,11 @@ class ItemInspectorPanel(QFrame):
         layout.setSpacing(6)
 
         title = QLabel(_t("itm_inspector"))
-        title.setStyleSheet(f"color: {color('muted')}; font-size: 12px; font-weight: bold; letter-spacing: 2px;")
+        style(title, "color: {muted}; font-size: 12px; font-weight: bold; letter-spacing: 2px;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
-        sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine); sep.setStyleSheet(f"color: {color('border')};")
+        sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine); style(sep, "color: {border};")
         layout.addWidget(sep)
 
         # Cabecera con Icono y datos basicos
@@ -115,15 +115,15 @@ class ItemInspectorPanel(QFrame):
 
         v_info = QVBoxLayout()
         self.lbl_header_name = QLabel(_t("itm_select"))
-        self.lbl_header_name.setStyleSheet(f"color: {color('text')}; font-weight: bold; font-size: 13px;")
+        style(self.lbl_header_name, "color: {text}; font-weight: bold; font-size: 13px;")
         v_info.addWidget(self.lbl_header_name)
 
         self.lbl_header_id = QLabel(_t("itm_id_empty"))
-        self.lbl_header_id.setStyleSheet(f"color: {color('muted')}; font-family: 'Consolas'; font-size: 11px;")
+        style(self.lbl_header_id, "color: {muted}; font-family: 'Consolas'; font-size: 11px;")
         v_info.addWidget(self.lbl_header_id)
 
         self.lbl_category = QLabel(_t("itm_category_empty"))
-        self.lbl_category.setStyleSheet(f"color: {color('accent')}; font-size: 11px;")
+        style(self.lbl_category, "color: {accent}; font-size: 11px;")
         v_info.addWidget(self.lbl_category)
 
         header_row.addLayout(v_info)
@@ -149,13 +149,13 @@ class ItemInspectorPanel(QFrame):
         form_layout.setSpacing(6)
 
         # 1. Nombre
-        form_layout.addWidget(QLabel(_t("itm_name_rom"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        form_layout.addWidget(style(QLabel(_t("itm_name_rom")), "color: {muted}; font-size: 11px;"))
         self.txt_name = QLineEdit()
         form_layout.addWidget(self.txt_name)
 
         # 2. Graphic ID
         gid_row = QHBoxLayout()
-        gid_row.addWidget(QLabel(_t("itm_graphic_id"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        gid_row.addWidget(style(QLabel(_t("itm_graphic_id")), "color: {muted}; font-size: 11px;"))
         self.spn_gid = QSpinBox()
         self.spn_gid.setRange(0, 600)
         self.spn_gid.valueChanged.connect(self._on_gid_changed)
@@ -166,16 +166,16 @@ class ItemInspectorPanel(QFrame):
         self.food_group = QGroupBox(_t("itm_grp_food"))
         fg_layout = QHBoxLayout(self.food_group)
 
-        fg_layout.addWidget(QLabel(_t("itm_stamina"), styleSheet=f"color: {color('text')}; font-size: 11px;"))
+        fg_layout.addWidget(style(QLabel(_t("itm_stamina")), "color: {text}; font-size: 11px;"))
         self.spn_stamina = QSpinBox()
         self.spn_stamina.setRange(-128, 127)
-        self.spn_stamina.setStyleSheet(f"color: {color('success')};")
+        style(self.spn_stamina, "color: {success};")
         fg_layout.addWidget(self.spn_stamina)
 
-        fg_layout.addWidget(QLabel(_t("itm_fatigue"), styleSheet=f"color: {color('text')}; font-size: 11px;"))
+        fg_layout.addWidget(style(QLabel(_t("itm_fatigue")), "color: {text}; font-size: 11px;"))
         self.spn_fatigue = QSpinBox()
         self.spn_fatigue.setRange(-128, 127)
-        self.spn_fatigue.setStyleSheet(f"color: {color('danger')};")
+        style(self.spn_fatigue, "color: {danger};")
         fg_layout.addWidget(self.spn_fatigue)
 
         self.chk_drink = QCheckBox(_t("itm_drink"))
@@ -186,7 +186,7 @@ class ItemInspectorPanel(QFrame):
         # 4. Parametros Herramienta (Tier / Nivel)
         self.tool_group = QGroupBox(_t("itm_grp_tool"))
         tg_layout = QHBoxLayout(self.tool_group)
-        tg_layout.addWidget(QLabel(_t("itm_tier"), styleSheet=f"color: {color('text')}; font-size: 11px;"))
+        tg_layout.addWidget(style(QLabel(_t("itm_tier")), "color: {text}; font-size: 11px;"))
         self.combo_tier = QComboBox()
         self.combo_tier.addItems([_t("itm_tier_iron_normal"), _t("itm_tier_copper"), _t("itm_tier_silver"), _t("itm_tier_gold"), "Mystrile", _t("itm_tier_cursed"), _t("itm_tier_blessed"), _t("itm_tier_mythic")])
         tg_layout.addWidget(self.combo_tier)
@@ -194,19 +194,19 @@ class ItemInspectorPanel(QFrame):
 
         # 5. Precios
         price_row = QHBoxLayout()
-        price_row.addWidget(QLabel(_t("itm_sell"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        price_row.addWidget(style(QLabel(_t("itm_sell")), "color: {muted}; font-size: 11px;"))
         self.spn_sell = QSpinBox()
         self.spn_sell.setRange(0, 999999)
         price_row.addWidget(self.spn_sell)
 
-        price_row.addWidget(QLabel(_t("itm_buy"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        price_row.addWidget(style(QLabel(_t("itm_buy")), "color: {muted}; font-size: 11px;"))
         self.spn_buy = QSpinBox()
         self.spn_buy.setRange(0, 999999)
         price_row.addWidget(self.spn_buy)
         form_layout.addLayout(price_row)
 
         # 6. Descripcion multilineal
-        form_layout.addWidget(QLabel(_t("itm_desc_rom"), styleSheet=f"color: {color('muted')}; font-size: 11px;"))
+        form_layout.addWidget(style(QLabel(_t("itm_desc_rom")), "color: {muted}; font-size: 11px;"))
         self.txt_desc = QTextEdit()
         self.txt_desc.setFixedHeight(70)
         self.txt_desc.setStyleSheet("font-family: 'Consolas'; font-size: 11px;")
@@ -215,7 +215,7 @@ class ItemInspectorPanel(QFrame):
         layout.addWidget(form_frame)
 
         self.lbl_feedback = QLabel("")
-        self.lbl_feedback.setStyleSheet(f"color: {color('success')}; font-size: 11px; font-weight: bold;")
+        style(self.lbl_feedback, "color: {success}; font-size: 11px; font-weight: bold;")
         self.lbl_feedback.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.lbl_feedback)
 
@@ -403,7 +403,7 @@ class ItemEditorWidget(QWidget):
         # Toolbar superior
         toolbar = QHBoxLayout()
         title = QLabel(_t("itm_editor_title"))
-        title.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {color('text')};")
+        style(title, "font-size: 16px; font-weight: bold; color: {text};")
         toolbar.addWidget(title)
         toolbar.addStretch()
 

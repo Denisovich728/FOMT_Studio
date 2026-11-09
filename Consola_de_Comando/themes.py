@@ -198,6 +198,39 @@ def color(token, theme_name=None):
     return colors(theme_name)[token]
 
 
+# ── Estilos que siguen al tema en caliente ───────────────────────────────────
+# style(widget, plantilla) aplica una hoja de estilo cuyos huecos {token}
+# se rellenan con los colores del tema activo, y la recuerda. Al cambiar de
+# tema, refresh_styles() vuelve a aplicar todas las plantillas registradas,
+# asi los paneles abiertos cambian de colores sin cerrarlos.
+#   style(lbl, "color: {muted}; font-size: 11px;")
+# Las llaves literales de QSS se escriben dobles: "QLabel {{ color: {text}; }}".
+
+_STYLED = {}  # id(widget) -> (weakref al widget, ultima plantilla aplicada)
+
+
+def style(widget, template):
+    """Aplica una plantilla de estilo con tokens y la registra. Devuelve el widget."""
+    import weakref
+    widget.setStyleSheet(template.format(**colors()))
+    _STYLED[id(widget)] = (weakref.ref(widget), template)
+    return widget
+
+
+def refresh_styles():
+    """Vuelve a aplicar las plantillas registradas con los colores del tema activo."""
+    tokens = colors()
+    for key, (ref, template) in list(_STYLED.items()):
+        widget = ref()
+        if widget is None:
+            del _STYLED[key]
+            continue
+        try:
+            widget.setStyleSheet(template.format(**tokens))
+        except RuntimeError:
+            del _STYLED[key]  # el objeto Qt ya se destruyo
+
+
 def get_forerunner_theme():
     return build_stylesheet("forerunner")
 

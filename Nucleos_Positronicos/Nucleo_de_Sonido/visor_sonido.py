@@ -16,7 +16,7 @@ from PyQt6.QtGui import QPainter, QColor, QLinearGradient, QPen, QFont
 # Removed QMediaPlayer imports to rely on native winsound
 from Consola_de_Comando.i18n import tr
 from Consola_de_Comando.i18n import t as _t
-from Consola_de_Comando.themes import color, colors
+from Consola_de_Comando.themes import color, colors, style
 
 # Categorias de cancion que entrega SappyEngine -> clave de texto en i18n.json
 CATEGORY_KEYS = {
@@ -35,14 +35,14 @@ def category_label(category):
 
 def _section_title(text):
     lbl = QLabel(text.upper())
-    lbl.setStyleSheet(f"color: {color('muted')}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
+    style(lbl, "color: {muted}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
     return lbl
 
 
 def _separator():
     sep = QFrame()
     sep.setFrameShape(QFrame.Shape.HLine)
-    sep.setStyleSheet(f"color: {color('border')};")
+    style(sep, "color: {border};")
     return sep
 
 
@@ -124,10 +124,10 @@ class SongInfoPanel(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedWidth(280)
-        self.setStyleSheet(f"""
+        style(self, """
             SongInfoPanel {{
-                background: {color('surface')};
-                border: 1px solid {color('border')};
+                background: {surface};
+                border: 1px solid {border};
                 border-radius: 6px;
             }}
             SongInfoPanel QLabel {{ background: transparent; }}
@@ -159,7 +159,7 @@ class SongInfoPanel(QFrame):
         layout.addWidget(_section_title(_t("aud_used_by")))
         self.used_by_list = QLabel("—")
         self.used_by_list.setWordWrap(True)
-        self.used_by_list.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
+        style(self.used_by_list, "color: {text}; font-size: 11px; font-family: 'Consolas';")
         layout.addWidget(self.used_by_list)
 
         layout.addWidget(_separator())
@@ -168,7 +168,7 @@ class SongInfoPanel(QFrame):
         layout.addWidget(_section_title(_t("aud_arm_offsets")))
         self.arm_offsets_label = QLabel("—")
         self.arm_offsets_label.setWordWrap(True)
-        self.arm_offsets_label.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
+        style(self.arm_offsets_label, "color: {text}; font-size: 11px; font-family: 'Consolas';")
         layout.addWidget(self.arm_offsets_label)
 
         layout.addStretch()
@@ -176,7 +176,7 @@ class SongInfoPanel(QFrame):
 
     def _make_field(self):
         lbl = QLabel()
-        lbl.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
+        style(lbl, "color: {text}; font-size: 11px; font-family: 'Consolas';")
         return lbl
 
     @staticmethod
@@ -196,10 +196,10 @@ class SongInfoPanel(QFrame):
 
         if song.get("is_unused"):
             self.lbl_unused.setText(self._field("aud_f_status", _t("aud_status_unused")))
-            self.lbl_unused.setStyleSheet(f"color: {color('warning')}; font-size: 11px; font-weight: bold;")
+            style(self.lbl_unused, "color: {warning}; font-size: 11px; font-weight: bold;")
         else:
             self.lbl_unused.setText(self._field("aud_f_status", _t("aud_status_in_use")))
-            self.lbl_unused.setStyleSheet(f"color: {color('success')}; font-size: 11px;")
+            style(self.lbl_unused, "color: {success}; font-size: 11px;")
 
         # Used by
         used = song.get("used_by", [])
@@ -226,7 +226,7 @@ class SongInfoPanel(QFrame):
                          (self.lbl_offset, "aud_f_offset"), (self.lbl_tracks, "aud_f_tracks"),
                          (self.lbl_voicegroup, "aud_f_voicegroup"), (self.lbl_unused, "aud_f_status")):
             lbl.setText(self._field(key, "—"))
-        self.lbl_unused.setStyleSheet(f"color: {color('text')}; font-size: 11px;")
+        style(self.lbl_unused, "color: {text}; font-size: 11px;")
         self.used_by_list.setText("—")
         self.arm_offsets_label.setText("—")
 
@@ -240,10 +240,10 @@ class BGMAssignmentsPanel(QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet(f"""
+        style(self, """
             BGMAssignmentsPanel {{
-                background: {color('surface')};
-                border: 1px solid {color('border')};
+                background: {surface};
+                border: 1px solid {border};
                 border-radius: 4px;
             }}
             BGMAssignmentsPanel QFrame, BGMAssignmentsPanel QLabel {{ background: transparent; }}
@@ -287,11 +287,11 @@ class BGMAssignmentsPanel(QFrame):
             sid = a["current_song_id"]
             s_name = sound_names.get(str(sid), _t("aud_song_fallback", id=sid))
             mod_tag = f" ({_t('aud_modified')})" if a["is_modified"] else ""
-            fg = color("warning") if a["is_modified"] else color("muted")
+            fg = "warning" if a["is_modified"] else "muted"
 
             text = f"0x{a['rom_offset'] + 0x08000000:08X}  {a['location']:<22s}  -> [{sid:02X}] {s_name}{mod_tag}"
             lbl = QLabel(text)
-            lbl.setStyleSheet(f"color: {fg}; font-size: 11px; font-family: 'Consolas';")
+            style(lbl, "color: {" + fg + "}; font-size: 11px; font-family: 'Consolas';")
             self.content_layout.addWidget(lbl)
 
 
@@ -351,18 +351,18 @@ class SappyAudioViewer(QWidget):
         # ── Título y Cabecera ──
         header_row = QHBoxLayout()
         header = QLabel(_t("aud_title"))
-        header.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {color('text')};")
+        style(header, "font-size: 18px; font-weight: bold; color: {text};")
         header_row.addWidget(header)
         header_row.addStretch()
         engine_lbl = QLabel(_t("aud_engine"))
-        engine_lbl.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
+        style(engine_lbl, "color: {muted}; font-size: 12px;")
         header_row.addWidget(engine_lbl)
         layout.addLayout(header_row)
 
         # ── Filtros por categoría ──
         filter_layout = QHBoxLayout()
         filter_label = QLabel(_t("aud_filter"))
-        filter_label.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
+        style(filter_label, "color: {muted}; font-size: 12px;")
         filter_layout.addWidget(filter_label)
 
         self.filter_buttons = {}
@@ -387,7 +387,7 @@ class SappyAudioViewer(QWidget):
 
         # Song count
         self.count_label = QLabel("")
-        self.count_label.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
+        style(self.count_label, "color: {muted}; font-size: 12px;")
         filter_layout.addWidget(self.count_label)
 
         layout.addLayout(filter_layout)
@@ -398,10 +398,10 @@ class SappyAudioViewer(QWidget):
         # 1. Lista de Canciones
         self.song_list = QListWidget()
         self.song_list.setFixedWidth(300)
-        self.song_list.setStyleSheet(f"""
+        style(self.song_list, """
             QListWidget {{ font-family: 'Consolas'; font-size: 12px; }}
-            QListWidget::item {{ padding: 4px 6px; border-bottom: 1px solid {color('surface_alt')}; }}
-            QListWidget::item:selected {{ background: {color('surface_alt')}; color: {color('text')}; border-left: 3px solid {color('accent')}; }}
+            QListWidget::item {{ padding: 4px 6px; border-bottom: 1px solid {surface_alt}; }}
+            QListWidget::item:selected {{ background: {surface_alt}; color: {text}; border-left: 3px solid {accent}; }}
         """)
         self.populate_songs()
         main_h.addWidget(self.song_list)
@@ -413,13 +413,13 @@ class SappyAudioViewer(QWidget):
 
         # Waveform label
         self.waveform_label = QLabel(_t("aud_waveform"))
-        self.waveform_label.setStyleSheet(f"color: {color('muted')}; font-size: 11px;")
+        style(self.waveform_label, "color: {muted}; font-size: 11px;")
         vis_panel.addWidget(self.waveform_label)
 
         # Info Pista (Now Playing)
         self.track_info_label = QLabel(_t("aud_no_track"))
         self.track_info_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.track_info_label.setStyleSheet(f"color: {color('muted')}; font-family: 'Consolas'; font-size: 12px;")
+        style(self.track_info_label, "color: {muted}; font-family: 'Consolas'; font-size: 12px;")
         vis_panel.addWidget(self.track_info_label)
 
         # Controles de reproducción
@@ -441,7 +441,7 @@ class SappyAudioViewer(QWidget):
         # Speed control
         speed_layout = QHBoxLayout()
         speed_label = QLabel(_t("aud_speed"))
-        speed_label.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
+        style(speed_label, "color: {muted}; font-size: 12px;")
         self.speed_combo = QComboBox()
         self.speed_combo.addItems([f"{x:.2f}x" for x in np.arange(0.25, 4.25, 0.25)])
         self.speed_combo.setCurrentText("1.00x")
@@ -454,13 +454,13 @@ class SappyAudioViewer(QWidget):
         # Seek bar
         self.seek_bar = QSlider(Qt.Orientation.Horizontal)
         self.seek_bar.setRange(0, 1000)
-        self.seek_bar.setStyleSheet(f"""
-            QSlider::groove:horizontal {{ background: {color('surface_alt')}; height: 6px; border-radius: 3px; }}
+        style(self.seek_bar, """
+            QSlider::groove:horizontal {{ background: {surface_alt}; height: 6px; border-radius: 3px; }}
             QSlider::handle:horizontal {{
-                background: {color('accent')}; width: 14px; height: 14px;
+                background: {accent}; width: 14px; height: 14px;
                 margin: -4px 0; border-radius: 7px;
             }}
-            QSlider::sub-page:horizontal {{ background: {color('accent')}; border-radius: 3px; }}
+            QSlider::sub-page:horizontal {{ background: {accent}; border-radius: 3px; }}
         """)
         self.seek_bar.sliderMoved.connect(self.on_seek)
         vis_panel.addWidget(self.seek_bar)
@@ -563,7 +563,7 @@ class SappyAudioViewer(QWidget):
             return
         self.track_info_label.setText(f"{self._track_base} ({_t(status_key)})")
         weight = "font-weight: bold; " if bold else ""
-        self.track_info_label.setStyleSheet(f"color: {color(fg_token)}; {weight}font-family: 'Consolas'; font-size: 12px;")
+        style(self.track_info_label, "color: {" + fg_token + "}; " + weight + "font-family: 'Consolas'; font-size: 12px;")
 
     def on_song_selected(self, index):
         if index < 0:

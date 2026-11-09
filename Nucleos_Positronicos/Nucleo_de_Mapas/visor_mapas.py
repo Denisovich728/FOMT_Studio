@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal, QSettings
 from Nucleos_Positronicos.Nucleo_de_Mapas.mapas import MapParser
 from Nucleos_Positronicos.Nucleo_de_Mapas.fomt_mapdata import FomtMapRenderer
 from Consola_de_Comando.i18n import tr
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 
 
 def _t(key, **kwargs):
@@ -147,7 +147,7 @@ class MapResizeDialog(QDialog):
         layout.addLayout(btn_layout)
         
         self.lbl_warning = QLabel(_t("vmap_resize_warning"))
-        self.lbl_warning.setStyleSheet(f"color: {color('warning')}; font-size: 10px;")
+        style(self.lbl_warning, "color: {warning}; font-size: 10px;")
         layout.addWidget(self.lbl_warning)
         
     def get_size(self):
@@ -284,11 +284,11 @@ class VisorMapas(QWidget):
         # Barra Superior
         top_bar_layout = QHBoxLayout()
         lbl_titulo = QLabel(_t("vmap_title"))
-        lbl_titulo.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {color('accent')}; padding: 4px;")
+        style(lbl_titulo, "font-size: 16px; font-weight: bold; color: {accent}; padding: 4px;")
         top_bar_layout.addWidget(lbl_titulo)
         
         self.lbl_info = QLabel(_t("vmap_select_map"))
-        self.lbl_info.setStyleSheet(f"color: {color('muted')}; font-size: 11px; padding-left: 20px;")
+        style(self.lbl_info, "color: {muted}; font-size: 11px; padding-left: 20px;")
         top_bar_layout.addWidget(self.lbl_info)
         
         top_bar_layout.addStretch()
@@ -523,7 +523,7 @@ class VisorMapas(QWidget):
 
         # Label para mapas sin estructuras dinámicas
         self.lbl_dyn_none = QLabel(_t("vmap_no_dyn"))
-        self.lbl_dyn_none.setStyleSheet(f"color: {color('muted')}; font-style: italic;")
+        style(self.lbl_dyn_none, "color: {muted}; font-style: italic;")
         self.lbl_dyn_none.setVisible(False)
         self.tools_row_dyn.addWidget(self.lbl_dyn_none)
 
@@ -550,7 +550,7 @@ class VisorMapas(QWidget):
         self.lbl_image.mouseReleased.connect(self._on_map_mouse_released)
         self.lbl_image.rightClicked.connect(self._on_map_right_clicked)
         self.lbl_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_image.setStyleSheet(f"background-color: {color('surface_alt')}; border: 1px solid {color('border')};")
+        style(self.lbl_image, "background-color: {surface_alt}; border: 1px solid {border};")
         self.scroll_area.setWidget(self.lbl_image)
         viewers_layout.addWidget(self.scroll_area, stretch=3)
         
@@ -590,7 +590,7 @@ class VisorMapas(QWidget):
         self.lbl_ts.clicked.connect(self._on_tileset_clicked)
         self.lbl_ts.wheelScrolled.connect(self._on_ts_wheel_scrolled)
         self.lbl_ts.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        self.lbl_ts.setStyleSheet(f"background-color: {color('surface_alt')}; border: 1px solid {color('border')};")
+        style(self.lbl_ts, "background-color: {surface_alt}; border: 1px solid {border};")
         self.ts_scroll.setWidget(self.lbl_ts)
         ts_layout.addWidget(self.ts_scroll)
         

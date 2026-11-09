@@ -618,6 +618,10 @@ class FoMTStudioApp(QMainWindow):
             self.setStyleSheet(get_forerunner_theme())
         else:
             self.setStyleSheet(get_light_theme())
+
+        # Paneles ya abiertos: volver a aplicar sus estilos con los colores del tema nuevo
+        from Consola_de_Comando.themes import refresh_styles
+        refresh_styles()
         
         for i in range(self.tabs.count()):
             widget = self.tabs.widget(i)

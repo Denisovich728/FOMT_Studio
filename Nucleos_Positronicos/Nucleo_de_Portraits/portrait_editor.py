@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QPixmap, QFont, QColor
 from PyQt6.QtCore import Qt
 from Consola_de_Comando.i18n import t as _t
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 
 # ─── Palette Editor ──────────────────────────────────────────────────────────
 from Nucleos_Positronicos.Nucleo_de_Sprites.palette_editor import PaletteEditorDialog, gba_to_rgb888
@@ -134,8 +134,8 @@ class PortraitEditorDialog(QDialog):
     # El dialogo hereda la hoja de estilo del tema activo; solo el visor tiene marco propio.
     @staticmethod
     def _stylesheet():
-        return (f"QFrame#visor {{ background-color: {color('surface_alt')}; "
-                f"border: 1px solid {color('border')}; border-radius: 8px; }}")
+        return ("QFrame#visor {{ background-color: {surface_alt}; "
+                "border: 1px solid {border}; border-radius: 8px; }}")
 
     def __init__(self, npc_name: str, hex_id: int, base_name: str, parent=None):
         super().__init__(parent)
@@ -187,7 +187,7 @@ class PortraitEditorDialog(QDialog):
         self.setWindowTitle(_t("pte_window_title", name=npc_name, id=f"{hex_id:02X}"))
         self.setMinimumSize(540, 460)
         self.resize(560, 480)
-        self.setStyleSheet(self._stylesheet())
+        style(self, self._stylesheet())
 
         self._build_ui()
 
@@ -264,7 +264,7 @@ class PortraitEditorDialog(QDialog):
 
         # ── Palette status label ───────────────────────────────────────────────
         self.lbl_pal_status = QLabel(_t("pte_pal_original"))
-        self.lbl_pal_status.setStyleSheet(f"color: {color('muted')}; font-size: 11px;")
+        style(self.lbl_pal_status, "color: {muted}; font-size: 11px;")
         root.addWidget(self.lbl_pal_status)
 
         # ── Close ─────────────────────────────────────────────────────────────
@@ -547,7 +547,7 @@ class PortraitEditorDialog(QDialog):
             self._edited_palette = None          # ya quedó grabada en la ROM
             self.pal_strip.set_palette(self._palette)
             self.lbl_pal_status.setText(_t("pte_pal_original"))
-            self.lbl_pal_status.setStyleSheet(f"color: {color('muted')}; font-size: 11px;")
+            style(self.lbl_pal_status, "color: {muted}; font-size: 11px;")
 
             # Forzar render ANTES de mostrar el QMessageBox.
             # Qt no procesa repaints mientras un QDialog/QMessageBox está bloqueando el

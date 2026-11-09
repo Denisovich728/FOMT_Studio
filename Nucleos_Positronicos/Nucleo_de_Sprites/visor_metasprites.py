@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QPointF, QRectF
 from PyQt6.QtGui import QPixmap, QColor, QBrush, QPen, QImage, QPainter, QShortcut, QKeySequence
 from Consola_de_Comando.i18n import t as _t
-from Consola_de_Comando.themes import color
+from Consola_de_Comando.themes import color, style
 
 from Nucleos_Positronicos.Nucleo_de_Sprites.metasprites import PortraitCompiler
 from Banco_de_Datos.Utilidades.rutas import get_data_path, get_resource_path
@@ -187,7 +187,7 @@ class VisorMetasprites(QWidget):
         left_panel = QVBoxLayout()
         
         self.lbl_title = QLabel(_t("msp_title"))
-        self.lbl_title.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {color('text')};")
+        style(self.lbl_title, "font-size: 16px; font-weight: bold; color: {text};")
         left_panel.addWidget(self.lbl_title)
         
         self.list_portraits = QListWidget()
@@ -305,7 +305,7 @@ class VisorMetasprites(QWidget):
         for i in range(16):
             btn = QPushButton()
             btn.setFixedSize(32, 32)
-            btn.setStyleSheet(f"background-color: #000000; border: 1px solid {color('border')};")
+            style(btn, "background-color: #000000; border: 1px solid {border};")
             btn.clicked.connect(lambda checked, idx=i: self._select_palette_color(idx))
             self.pal_buttons.append(btn)
             self.pal_grid.addWidget(btn, i // 4, i % 4)
@@ -319,7 +319,7 @@ class VisorMetasprites(QWidget):
         
         self.lbl_color_preview = QLabel()
         self.lbl_color_preview.setFixedSize(64, 64)
-        self.lbl_color_preview.setStyleSheet(f"background-color: #FFFFFF; border: 2px solid {color('border')};")
+        style(self.lbl_color_preview, "background-color: #FFFFFF; border: 2px solid {border};")
         right_panel.addWidget(QLabel(_t("msp_current_color")))
         right_panel.addWidget(self.lbl_color_preview)
         
@@ -455,7 +455,7 @@ class VisorMetasprites(QWidget):
                 
         # Reset (if completely failed or no ROM)
         for btn in self.pal_buttons:
-            btn.setStyleSheet(f"background-color: #000; border: 1px solid {color('border')};")
+            style(btn, "background-color: #000; border: 1px solid {border};")
 
     def _select_palette_color(self, idx):
         if idx < len(self.palette_colors):
