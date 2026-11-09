@@ -1,0 +1,91 @@
+name: Reporte de error
+description: Algo no funciona como debería
+title: "[Error] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar. Con estos datos el error se puede reproducir y corregir antes.
+        **No adjuntes ROMs** (`.gba`) ni partidas (`.sav`).
+  - type: input
+    id: version
+    attributes:
+      label: Versión de FOMT Studio
+      description: Aparece en el título de la ventana.
+      placeholder: v4.0.0 The Greatest Show
+    validations:
+      required: true
+  - type: dropdown
+    id: juego
+    attributes:
+      label: Juego
+      options:
+        - Friends of Mineral Town (FoMT)
+        - More Friends of Mineral Town (MFoMT)
+    validations:
+      required: true
+  - type: dropdown
+    id: region
+    attributes:
+      label: Región de la ROM
+      options:
+        - USA
+        - EUR
+        - JPN
+        - Otra / traducción
+    validations:
+      required: true
+  - type: dropdown
+    id: modulo
+    attributes:
+      label: Módulo afectado
+      options:
+        - Visor / editor de mapas
+        - Editor de eventos (scripts)
+        - NPC y rutinas
+        - Sprites y retratos
+        - Items
+        - Sonido
+        - Ventana principal / configuración
+        - Otro
+    validations:
+      required: true
+  - type: dropdown
+    id: ejecucion
+    attributes:
+      label: Cómo lo ejecutas
+      options:
+        - Ejecutable (.exe)
+        - python main.py
+    validations:
+      required: true
+  - type: input
+    id: so
+    attributes:
+      label: Sistema operativo
+      placeholder: Windows 11 64-bit
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducirlo
+      placeholder: |
+        1. Cargar la ROM
+        2. Abrir el Visor de Mapas
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Qué esperabas y qué pasó
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Registro de errores
+      description: Contenido de `fomt_studio_error.log` (en la carpeta del programa), si existe.
+      render: text

@@ -1,0 +1,21 @@
+name: Comprobar i18n
+
+on:
+  pull_request:
+    paths:
+      - "Consola_de_Comando/i18n.json"
+      - ".github/scripts/check_i18n.py"
+  push:
+    branches: [main]
+    paths:
+      - "Consola_de_Comando/i18n.json"
+
+jobs:
+  i18n:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python .github/scripts/check_i18n.py

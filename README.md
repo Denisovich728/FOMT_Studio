@@ -120,11 +120,11 @@ REQUISITOS DEL SISTEMA Y EJECUCION
 Requisitos minimos:
 - Sistema Operativo: Windows 10/11 (64-bit), Ubuntu Linux 20.04+, o macOS 12+
 - Python: Version 3.10 o superior
-- Dependencias de Python: PyQt6, Pillow
+- Dependencias de Python: PyQt6, Pillow, numpy, mido, psutil (ver requirements.txt)
 
 Instalacion de dependencias:
 ```bash
-pip install PyQt6 Pillow
+pip install -r requirements.txt
 ```
 
 Ejecucion en entorno de desarrollo:
@@ -136,6 +136,13 @@ Compilacion de ejecutable autonomo (PyInstaller):
 ```bash
 pyinstaller FoMT_Studio_v4.0.0_FinalRelease.spec
 ```
+
+------------------------------------------------------------
+COMO COLABORAR
+------------------------------------------------------------
+
+Las reglas de idiomas, temas, commits y pull requests estan en CONTRIBUTING.md.
+Para reportar un error o proponer una mejora, usa las plantillas al abrir un issue.
 
 ------------------------------------------------------------
 CREDITOS Y AGRADECIMIENTOS
