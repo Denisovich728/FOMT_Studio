@@ -27,6 +27,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint
 from PyQt6.QtGui import QFont, QColor, QIcon, QAction, QMouseEvent
+from Consola_de_Comando.i18n import t as _t
 
 from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.world_graph import (
     WorldGraph, MapNode, WarpPoint, WarpConnection,
@@ -57,7 +58,7 @@ class FloatingInspector(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent, Qt.WindowType.Tool | Qt.WindowType.WindowCloseButtonHint)
         self.setObjectName("floating_inspector")
-        self.setWindowTitle(" Inspector de Nodos & Rutas AWSD")
+        self.setWindowTitle(_t("rut_inspector_title"))
         self.setFixedWidth(340)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self._user_moved = False
@@ -149,7 +150,7 @@ class EditorRutinasNPCWidget(QWidget):
     def __init__(self, project=None, parent=None):
         super().__init__(parent)
         self.project = project
-        self.setWindowTitle(" Editor de Rutinas Diarias de NPCs & Orquestador de Rutas")
+        self.setWindowTitle(_t("rut_window_title"))
         self.resize(1380, 880)
 
         # Rutas de persistencia de topología
@@ -188,10 +189,10 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.setSpacing(8)
 
         # 1. Selector de Modo: Por NPC vs Por Mapa
-        mode_group = QGroupBox("Modo de Exploración y Orquestación")
+        mode_group = QGroupBox(_t("rut_grp_mode"))
         mode_layout = QHBoxLayout(mode_group)
-        self.rb_by_npc = QRadioButton(" Ver por Aldeano (NPC)")
-        self.rb_by_map = QRadioButton(" Ver por Mapa (Orquestador Global)")
+        self.rb_by_npc = QRadioButton(_t("rut_by_npc"))
+        self.rb_by_map = QRadioButton(_t("rut_by_map"))
         self.rb_by_npc.setChecked(True)
 
         self.btn_group_mode = QButtonGroup(self)
@@ -204,7 +205,7 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.addWidget(mode_group)
 
         # 2. Contenedor de Selectores (NPC / Mapa según el modo)
-        self.sel_group = QGroupBox("Filtro Activo")
+        self.sel_group = QGroupBox(_t("rut_grp_filter"))
         self.sel_form = QFormLayout(self.sel_group)
 
         # Fila NPC
@@ -213,19 +214,19 @@ class EditorRutinasNPCWidget(QWidget):
             name = NPC_NAMES.get(nid, f"NPC #{nid}")
             self.combo_npc.addItem(f"[{nid:02d}] {name}", nid)
         self.combo_npc.currentIndexChanged.connect(self._on_npc_changed)
-        self.lbl_npc_row = QLabel("Aldeano:")
+        self.lbl_npc_row = QLabel(_t("rut_villager"))
         self.sel_form.addRow(self.lbl_npc_row, self.combo_npc)
 
         # Fila Horario
         self.combo_schedule = QComboBox()
         self.combo_schedule.currentIndexChanged.connect(self._on_schedule_changed)
-        self.lbl_sched_row = QLabel("Horario:")
+        self.lbl_sched_row = QLabel(_t("rut_schedule"))
         self.sel_form.addRow(self.lbl_sched_row, self.combo_schedule)
 
         # Fila Mapa (para modo "Por Mapa")
         self.combo_filter_map = QComboBox()
         self.combo_filter_map.currentIndexChanged.connect(self._on_filter_map_changed)
-        self.lbl_map_row = QLabel("Mapa:")
+        self.lbl_map_row = QLabel(_t("rut_map"))
         self.sel_form.addRow(self.lbl_map_row, self.combo_filter_map)
         self.lbl_map_row.hide()
         self.combo_filter_map.hide()
@@ -233,7 +234,7 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.addWidget(self.sel_group)
 
         # 2.1 Tarjeta Informativa de Condiciones de Activación
-        self.cond_group = QGroupBox("Condición de Activación del Horario")
+        self.cond_group = QGroupBox(_t("rut_grp_cond"))
         self.cond_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -254,17 +255,17 @@ class EditorRutinasNPCWidget(QWidget):
         cond_layout.setContentsMargins(10, 6, 10, 8)
         cond_layout.setSpacing(3)
 
-        self.lbl_cond_badge = QLabel(" Clima: Soleado |  Días: Lunes a Sábado")
+        self.lbl_cond_badge = QLabel(_t("rut_cond_badge_default"))
         self.lbl_cond_badge.setStyleSheet("font-weight: bold; color: #58A6FF; font-size: 11px;")
 
-        self.lbl_cond_name = QLabel("Horario Principal")
+        self.lbl_cond_name = QLabel(_t("rut_main_schedule"))
         self.lbl_cond_name.setStyleSheet("font-size: 12px; font-weight: bold; color: #FFFFFF;")
 
-        self.lbl_cond_desc = QLabel("Condición de evaluación en ROM.")
+        self.lbl_cond_desc = QLabel(_t("rut_cond_desc_default"))
         self.lbl_cond_desc.setWordWrap(True)
         self.lbl_cond_desc.setStyleSheet("color: #8B949E; font-size: 10px;")
 
-        self.lbl_cond_loc = QLabel(" Zona: Desconocida")
+        self.lbl_cond_loc = QLabel(_t("rut_zone_unknown"))
         self.lbl_cond_loc.setStyleSheet("color: #3FB950; font-size: 10px; font-weight: bold;")
 
         cond_layout.addWidget(self.lbl_cond_badge)
@@ -274,13 +275,13 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.addWidget(self.cond_group)
 
         # 3. Tabla Orquestadora de Tramos A  B (Delays, Velocidades y Coordenadas)
-        self.tbl_group = QGroupBox("Orquestador de Coordenadas (Puntos A  B, Delays y Velocidades)")
+        self.tbl_group = QGroupBox(_t("rut_grp_table"))
         tbl_layout = QVBoxLayout(self.tbl_group)
 
         self.table_segments = QTableWidget()
         self.table_segments.setColumnCount(9)
         self.table_segments.setHorizontalHeaderLabels([
-            "Hito", "Mapa", "NPC", "Punto A", "Punto B", "Distancia", "Velocidad", "Espera", "Hora"
+            _t("rut_col_step"), _t("rut_col_map"), "NPC", _t("rut_col_point_a"), _t("rut_col_point_b"), _t("rut_col_distance"), _t("rut_col_speed"), _t("rut_col_wait"), _t("rut_col_time")
         ])
         self.table_segments.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table_segments.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
@@ -292,11 +293,11 @@ class EditorRutinasNPCWidget(QWidget):
 
         # Botones de gestión de tramos
         btn_seg_layout = QHBoxLayout()
-        self.btn_add_step = QPushButton(" Añadir Hito")
+        self.btn_add_step = QPushButton(_t("rut_btn_add_step"))
         self.btn_add_step.clicked.connect(self._on_add_waypoint)
-        self.btn_del_step = QPushButton(" Eliminar")
+        self.btn_del_step = QPushButton(_t("rut_btn_delete"))
         self.btn_del_step.clicked.connect(self._on_delete_waypoint)
-        self.btn_edit_step = QPushButton(" Editar Hito en Mapa")
+        self.btn_edit_step = QPushButton(_t("rut_btn_edit_step"))
         self.btn_edit_step.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold;")
         self.btn_edit_step.clicked.connect(self._on_edit_step_clicked)
 
@@ -308,11 +309,11 @@ class EditorRutinasNPCWidget(QWidget):
 
         # 4. Botones de Inyección en ROM y Guardado
         rom_actions = QHBoxLayout()
-        self.btn_inject_rom = QPushButton(" Inyectar Rutina en ROM")
+        self.btn_inject_rom = QPushButton(_t("rut_btn_inject"))
         self.btn_inject_rom.setStyleSheet("background-color: #238636; color: white; font-weight: bold; padding: 7px;")
         self.btn_inject_rom.clicked.connect(self._on_inject_rom_clicked)
 
-        self.btn_export_json = QPushButton(" Exportar JSON")
+        self.btn_export_json = QPushButton(_t("rut_btn_export_json"))
         self.btn_export_json.clicked.connect(self._on_export_json)
 
         rom_actions.addWidget(self.btn_inject_rom, 2)
@@ -369,12 +370,12 @@ class EditorRutinasNPCWidget(QWidget):
         route_toolbar = QToolBar("Herramientas de Visor de Rutas")
         route_toolbar.setStyleSheet("background-color: #161B22; border-bottom: 1px solid #30363D; padding: 4px;")
 
-        self.lbl_canvas_map_name = QLabel(" Mapa: Sin Cargar")
+        self.lbl_canvas_map_name = QLabel(_t("rut_map_not_loaded"))
         self.lbl_canvas_map_name.setStyleSheet("font-weight: bold; color: #58A6FF; padding: 2px 8px; font-size: 11px;")
         route_toolbar.addWidget(self.lbl_canvas_map_name)
 
-        self.act_open_in_map_editor = QAction(" Abrir en Map Editor", self)
-        self.act_open_in_map_editor.setToolTip("Abre este mapa en su propia pestaña dedicada del Editor de Mapas de FOMT Studio.")
+        self.act_open_in_map_editor = QAction(_t("rut_open_map_editor"), self)
+        self.act_open_in_map_editor.setToolTip(_t("rut_open_map_editor_tip"))
         self.act_open_in_map_editor.triggered.connect(self._on_open_in_map_editor_clicked)
         route_toolbar.addAction(self.act_open_in_map_editor)
 
@@ -388,7 +389,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.act_rc_zoom_out.triggered.connect(lambda: self.route_canvas.zoom_out())
         route_toolbar.addAction(self.act_rc_zoom_out)
 
-        self.act_rc_zoom_fit = QAction(" Ajustar", self)
+        self.act_rc_zoom_fit = QAction(_t("rut_fit"), self)
         self.act_rc_zoom_fit.triggered.connect(lambda: self.route_canvas.zoom_fit())
         route_toolbar.addAction(self.act_rc_zoom_fit)
 
@@ -398,19 +399,19 @@ class EditorRutinasNPCWidget(QWidget):
 
         route_toolbar.addSeparator()
 
-        self.act_rc_vectors = QAction("〰 Vectores", self)
+        self.act_rc_vectors = QAction(_t("rut_vectors"), self)
         self.act_rc_vectors.setCheckable(True)
         self.act_rc_vectors.setChecked(True)
         self.act_rc_vectors.toggled.connect(lambda chk: self.route_canvas.toggle_vectors(chk))
         route_toolbar.addAction(self.act_rc_vectors)
 
-        self.act_rc_labels = QAction(" Etiquetas", self)
+        self.act_rc_labels = QAction(_t("rut_labels"), self)
         self.act_rc_labels.setCheckable(True)
         self.act_rc_labels.setChecked(True)
         self.act_rc_labels.toggled.connect(lambda chk: self.route_canvas.toggle_labels(chk))
         route_toolbar.addAction(self.act_rc_labels)
 
-        self.act_rc_walkable = QAction(" Malla Caminable", self)
+        self.act_rc_walkable = QAction(_t("rut_walkable"), self)
         self.act_rc_walkable.setCheckable(True)
         self.act_rc_walkable.setChecked(False)
         self.act_rc_walkable.toggled.connect(lambda chk: self.route_canvas.toggle_walkable_grid(chk))
@@ -418,10 +419,10 @@ class EditorRutinasNPCWidget(QWidget):
 
         route_toolbar.addSeparator()
 
-        self.act_rc_inspector = QAction(" Inspector Flotante", self)
+        self.act_rc_inspector = QAction(_t("rut_floating_inspector"), self)
         self.act_rc_inspector.setCheckable(True)
         self.act_rc_inspector.setChecked(True)
-        self.act_rc_inspector.setToolTip("Muestra u oculta la tarjeta flotante de edición de coordenadas y parámetros.")
+        self.act_rc_inspector.setToolTip(_t("rut_floating_inspector_tip"))
         self.act_rc_inspector.toggled.connect(self._toggle_floating_inspector)
         route_toolbar.addAction(self.act_rc_inspector)
 
@@ -443,7 +444,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.route_canvas.on_view_resized = self._reposition_floating_inspector
         self._reposition_floating_inspector()
 
-        self.right_tabs.addTab(tab_route, " Editor de Rutas y Nodos")
+        self.right_tabs.addTab(tab_route, _t("rut_tab_route"))
 
         # -------------------------------------------------------------
         # TAB 2: Macromapa Global de Mineral Town (Red A*)
@@ -457,16 +458,16 @@ class EditorRutinasNPCWidget(QWidget):
         map_toolbar = QToolBar("Herramientas del Macromapa")
         map_toolbar.setStyleSheet("background-color: #161B22; border-bottom: 1px solid #30363D; padding: 4px;")
 
-        self.act_connect = QAction(" Conectar Warps", self)
+        self.act_connect = QAction(_t("rut_connect_warps"), self)
         self.act_connect.setCheckable(True)
         self.act_connect.triggered.connect(self._on_toggle_connect_mode)
         map_toolbar.addAction(self.act_connect)
 
-        self.act_save_topo = QAction(" Guardar Topología", self)
+        self.act_save_topo = QAction(_t("rut_save_topo"), self)
         self.act_save_topo.triggered.connect(self._on_save_topology)
         map_toolbar.addAction(self.act_save_topo)
 
-        self.act_reload_topo = QAction(" Recargar", self)
+        self.act_reload_topo = QAction(_t("rut_reload"), self)
         self.act_reload_topo.triggered.connect(self._on_reload_topology)
         map_toolbar.addAction(self.act_reload_topo)
 
@@ -492,14 +493,14 @@ class EditorRutinasNPCWidget(QWidget):
         self.macro_view.map_selected.connect(self._on_macro_map_selected)
         tab_macro_layout.addWidget(self.macro_view)
 
-        self.right_tabs.addTab(tab_macro, " Macromapa Global de Mineral Town (Red A*)")
+        self.right_tabs.addTab(tab_macro, _t("rut_tab_macro"))
 
         right_layout.addWidget(self.right_tabs)
 
         # Barra de estado
         self.status_bar = QStatusBar()
         self.status_bar.setStyleSheet("background-color: #0D1117; color: #8B949E; font-size: 11px;")
-        self.status_bar.showMessage(" Rueda=Zoom | Clic Derecho=Pan | Clic en Mapa=Fijar Coordenada A/B | Malla AWSD Auto-Ajustable")
+        self.status_bar.showMessage(_t("rut_status_help"))
         right_layout.addWidget(self.status_bar)
 
         splitter.addWidget(right_widget)
@@ -573,7 +574,7 @@ class EditorRutinasNPCWidget(QWidget):
             self.lbl_map_row.hide()
             self.combo_filter_map.hide()
             self.cond_group.show()
-            self.status_bar.showMessage(" Modo: Por Aldeano (NPC) activo.")
+            self.status_bar.showMessage(_t("rut_status_mode_npc"))
             self._refresh_npc_segments()
         else:
             self.current_mode = "BY_MAP"
@@ -584,7 +585,7 @@ class EditorRutinasNPCWidget(QWidget):
             self.lbl_map_row.show()
             self.combo_filter_map.show()
             self.cond_group.hide()
-            self.status_bar.showMessage(" Modo: Por Mapa (Orquestador Global) activo.")
+            self.status_bar.showMessage(_t("rut_status_mode_map"))
             self._refresh_map_segments()
 
     def _on_npc_changed(self, index: int):
@@ -603,7 +604,7 @@ class EditorRutinasNPCWidget(QWidget):
                 label = f"#{idx}: {icon} {cond.name} [{cond.location_badge}] ({len(sched.waypoints)} hitos)"
                 self.combo_schedule.addItem(label, idx)
             else:
-                self.combo_schedule.addItem(f"Horario #{idx} [NULL / Sin Datos]", idx)
+                self.combo_schedule.addItem(_t("rut_schedule_empty", idx=idx), idx)
         self.combo_schedule.blockSignals(False)
 
         if self.combo_schedule.count() > 0:
@@ -636,10 +637,10 @@ class EditorRutinasNPCWidget(QWidget):
     def _update_condition_banner(self, cond: Optional[ScheduleCondition]):
         """Actualiza la tarjeta visual informativa de condiciones de activación."""
         if not cond:
-            self.lbl_cond_badge.setText(" Sin Horario Seleccionado")
-            self.lbl_cond_name.setText("Horario no disponible")
-            self.lbl_cond_desc.setText("Seleccione un aldeano y un horario válido para inspeccionar sus condiciones.")
-            self.lbl_cond_loc.setText(" Ubicación: N/A")
+            self.lbl_cond_badge.setText(_t("rut_no_schedule"))
+            self.lbl_cond_name.setText(_t("rut_schedule_unavailable"))
+            self.lbl_cond_desc.setText(_t("rut_select_hint"))
+            self.lbl_cond_loc.setText(_t("rut_location_na"))
             return
 
         icon = getattr(cond, "icon", "") or ""
@@ -652,7 +653,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.lbl_cond_badge.setText(badge_text)
         self.lbl_cond_name.setText(cond.name)
         self.lbl_cond_desc.setText(cond.condition_desc)
-        self.lbl_cond_loc.setText(f" Zona Principal: {cond.location_badge}")
+        self.lbl_cond_loc.setText(_t("rut_main_zone", zone=cond.location_badge))
 
     def _on_filter_map_changed(self, index: int):
         if self.current_mode == "BY_MAP":
@@ -821,7 +822,7 @@ class EditorRutinasNPCWidget(QWidget):
             if is_loop:
                 num_legs = max(1, len(s.get("path_nodes", [])) - 1)
                 item_pt_b = QTableWidgetItem(f" ({s['bx']}, {s['by']})")
-                item_pt_b.setToolTip(f"Movimiento en bucle continuo de {num_legs} tramos que regresa al inicio")
+                item_pt_b.setToolTip(_t("rut_loop_tip", n=num_legs))
                 item_pt_b.setForeground(QColor("#A371F7"))
             else:
                 item_pt_b = QTableWidgetItem(f"({s['bx']}, {s['by']})")
@@ -862,9 +863,9 @@ class EditorRutinasNPCWidget(QWidget):
 
         # 1. Cabecera con título, badge de hito y botón de cierre
         header_layout = QHBoxLayout()
-        lbl_insp_title = QLabel(" Inspector de Nodos")
+        lbl_insp_title = QLabel(_t("rut_node_inspector"))
         lbl_insp_title.setStyleSheet("font-weight: bold; color: #58A6FF; font-size: 12px;")
-        self.lbl_insp_badge = QLabel("Hito #1")
+        self.lbl_insp_badge = QLabel(_t("rut_step_1"))
         self.lbl_insp_badge.setStyleSheet("background-color: #21262D; color: #79C0FF; border-radius: 3px; padding: 2px 6px; font-size: 10px; font-weight: bold;")
         btn_close_insp = QPushButton("")
         btn_close_insp.setFixedSize(20, 20)
@@ -880,7 +881,7 @@ class EditorRutinasNPCWidget(QWidget):
 
         # 1.1 Selector de Mapa del Hito
         row_map = QHBoxLayout()
-        lbl_map_tag = QLabel("Mapa:")
+        lbl_map_tag = QLabel(_t("rut_map"))
         lbl_map_tag.setStyleSheet("color: #58A6FF; font-weight: bold; font-size: 11px;")
         self.combo_seg_map = QComboBox()
         self.combo_seg_map.setStyleSheet("font-size: 11px; padding: 2px;")
@@ -892,14 +893,14 @@ class EditorRutinasNPCWidget(QWidget):
         insp_layout.addLayout(row_map)
 
         # 2. Selector de asignación de clics en el lienzo
-        click_target_box = QGroupBox(" Clic en Mapa Asigna a:")
+        click_target_box = QGroupBox(_t("rut_grp_click_target"))
         click_target_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         click_tgt_lay = QHBoxLayout(click_target_box)
         click_tgt_lay.setContentsMargins(8, 4, 8, 4)
-        self.rb_target_b = QRadioButton("Destino (B)")
-        self.rb_target_a = QRadioButton("Inicio (A)")
-        self.rb_target_inflection = QRadioButton("Inflexión (C)")
-        self.rb_target_inflection.setToolTip("Al hacer clic en el mapa, añade un punto de inflexión intermedio")
+        self.rb_target_b = QRadioButton(_t("rut_target_b"))
+        self.rb_target_a = QRadioButton(_t("rut_target_a"))
+        self.rb_target_inflection = QRadioButton(_t("rut_target_c"))
+        self.rb_target_inflection.setToolTip(_t("rut_target_c_tip"))
         self.rb_target_b.setChecked(True)
         click_tgt_lay.addWidget(self.rb_target_b)
         click_tgt_lay.addWidget(self.rb_target_a)
@@ -907,7 +908,7 @@ class EditorRutinasNPCWidget(QWidget):
         insp_layout.addWidget(click_target_box)
 
         # 3. Coordenadas de Inicio (A) y Fin (B)
-        pts_box = QGroupBox(" Coordenadas de Ruta (AWSD)")
+        pts_box = QGroupBox(_t("rut_grp_coords"))
         pts_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         pts_lay = QVBoxLayout(pts_box)
         pts_lay.setContentsMargins(8, 6, 8, 6)
@@ -945,20 +946,20 @@ class EditorRutinasNPCWidget(QWidget):
         row_b.addWidget(self.spin_by, 1)
         pts_lay.addLayout(row_b)
 
-        self.lbl_auto_status = QLabel(" Malla AWSD: Auto-Ajuste Activo")
+        self.lbl_auto_status = QLabel(_t("rut_auto_adjust"))
         self.lbl_auto_status.setStyleSheet("color: #3FB950; font-size: 10px; font-weight: bold; padding-top: 2px;")
         pts_lay.addWidget(self.lbl_auto_status)
         insp_layout.addWidget(pts_box)
 
         # 3.1 Puntos de Inflexión Intermedios (Giro en Calles AWSD)
-        inflection_box = QGroupBox(" Puntos de Inflexión (Giro en Calles AWSD)")
+        inflection_box = QGroupBox(_t("rut_grp_inflection"))
         inflection_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         infl_lay = QVBoxLayout(inflection_box)
         infl_lay.setContentsMargins(8, 6, 8, 6)
         infl_lay.setSpacing(4)
 
         row_infl_sel = QHBoxLayout()
-        row_infl_sel.addWidget(QLabel("Punto:"))
+        row_infl_sel.addWidget(QLabel(_t("rut_point")))
         self.combo_inflection_nodes = QComboBox()
         self.combo_inflection_nodes.currentIndexChanged.connect(self._on_inflection_combo_changed)
         row_infl_sel.addWidget(self.combo_inflection_nodes, 1)
@@ -982,16 +983,16 @@ class EditorRutinasNPCWidget(QWidget):
         infl_lay.addLayout(row_infl_coord)
 
         row_infl_btns = QHBoxLayout()
-        self.btn_add_inflection = QPushButton(" Añadir")
-        self.btn_add_inflection.setToolTip("Inserta un nuevo punto de inflexión en el tramo")
+        self.btn_add_inflection = QPushButton(_t("rut_btn_add"))
+        self.btn_add_inflection.setToolTip(_t("rut_btn_add_tip"))
         self.btn_add_inflection.clicked.connect(self._on_add_inflection_clicked)
 
-        self.btn_del_inflection = QPushButton(" Quitar")
-        self.btn_del_inflection.setToolTip("Elimina el punto de inflexión seleccionado")
+        self.btn_del_inflection = QPushButton(_t("rut_btn_remove"))
+        self.btn_del_inflection.setToolTip(_t("rut_btn_remove_tip"))
         self.btn_del_inflection.clicked.connect(self._on_del_inflection_clicked)
 
-        self.btn_snap_node = QPushButton(" Centrar Calle")
-        self.btn_snap_node.setToolTip("Alinea este punto al centro del tile caminable más cercano")
+        self.btn_snap_node = QPushButton(_t("rut_btn_snap_node"))
+        self.btn_snap_node.setToolTip(_t("rut_btn_snap_node_tip"))
         self.btn_snap_node.clicked.connect(self._on_snap_node_clicked)
 
         row_infl_btns.addWidget(self.btn_add_inflection)
@@ -1002,14 +1003,14 @@ class EditorRutinasNPCWidget(QWidget):
         insp_layout.addWidget(inflection_box)
 
         # 4. Dinámica y Tiempo
-        time_box = QGroupBox("⏱ Tiempo, Espera & Vista")
+        time_box = QGroupBox(_t("rut_grp_time"))
         time_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         time_lay = QVBoxLayout(time_box)
         time_lay.setContentsMargins(8, 6, 8, 6)
         time_lay.setSpacing(4)
 
         row_t = QHBoxLayout()
-        row_t.addWidget(QLabel("Hora:"))
+        row_t.addWidget(QLabel(_t("rut_time")))
         self.spin_hour = QSpinBox()
         self.spin_hour.setRange(0, 23)
         self.spin_hour.setSuffix("h")
@@ -1019,7 +1020,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.spin_minute.setSuffix("m")
         row_t.addWidget(self.spin_hour)
         row_t.addWidget(self.spin_minute)
-        row_t.addWidget(QLabel("Espera:"))
+        row_t.addWidget(QLabel(_t("rut_wait")))
         self.spin_delay = QSpinBox()
         self.spin_delay.setRange(0, 720)
         self.spin_delay.setSingleStep(5)
@@ -1028,37 +1029,37 @@ class EditorRutinasNPCWidget(QWidget):
         time_lay.addLayout(row_t)
 
         row_v = QHBoxLayout()
-        row_v.addWidget(QLabel("Vista:"))
+        row_v.addWidget(QLabel(_t("rut_view")))
         self.combo_dir = QComboBox()
-        self.combo_dir.addItem("Abajo", DIR_DOWN)
-        self.combo_dir.addItem("Arriba", DIR_UP)
-        self.combo_dir.addItem("Izquierda", DIR_LEFT)
-        self.combo_dir.addItem("Derecha", DIR_RIGHT)
-        self.combo_dir.addItem("Frente", DIR_FACE)
+        self.combo_dir.addItem(_t("rut_dir_down"), DIR_DOWN)
+        self.combo_dir.addItem(_t("rut_dir_up"), DIR_UP)
+        self.combo_dir.addItem(_t("rut_dir_left"), DIR_LEFT)
+        self.combo_dir.addItem(_t("rut_dir_right"), DIR_RIGHT)
+        self.combo_dir.addItem(_t("rut_dir_face"), DIR_FACE)
         row_v.addWidget(self.combo_dir, 1)
 
-        row_v.addWidget(QLabel("Vel:"))
+        row_v.addWidget(QLabel(_t("rut_speed")))
         self.combo_speed = QComboBox()
-        self.combo_speed.addItem("1.0x Normal", 1.0)
-        self.combo_speed.addItem("0.5x Lento", 0.5)
-        self.combo_speed.addItem("1.5x Ligero", 1.5)
-        self.combo_speed.addItem("2.0x Prisa", 2.0)
+        self.combo_speed.addItem(_t("rut_speed_normal"), 1.0)
+        self.combo_speed.addItem(_t("rut_speed_slow"), 0.5)
+        self.combo_speed.addItem(_t("rut_speed_light"), 1.5)
+        self.combo_speed.addItem(_t("rut_speed_rush"), 2.0)
         row_v.addWidget(self.combo_speed, 1)
         time_lay.addLayout(row_v)
         insp_layout.addWidget(time_box)
 
         # 5. Botones de acción rápida
         insp_btn_lay = QHBoxLayout()
-        self.btn_snap_tiles = QPushButton(" Centrar en Tiles")
-        self.btn_snap_tiles.setToolTip("Ajusta las coordenadas A y B directamente a los tiles transitables de la ROM.")
+        self.btn_snap_tiles = QPushButton(_t("rut_btn_snap_tiles"))
+        self.btn_snap_tiles.setToolTip(_t("rut_btn_snap_tiles_tip"))
         self.btn_snap_tiles.clicked.connect(self._on_snap_to_walkable_clicked)
 
-        self.btn_recalc_path = QPushButton(" Recalcular A*")
+        self.btn_recalc_path = QPushButton(_t("rut_btn_recalc"))
         self.btn_recalc_path.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold;")
         self.btn_recalc_path.clicked.connect(self._on_recalc_a_star_clicked)
 
-        self.btn_toggle_loop = QPushButton(" Modo Bucle")
-        self.btn_toggle_loop.setToolTip("Alterna el movimiento entre recorrido lineal A  B o bucle continuo cerrado (B = A).")
+        self.btn_toggle_loop = QPushButton(_t("rut_btn_loop_mode"))
+        self.btn_toggle_loop.setToolTip(_t("rut_btn_loop_tip"))
         self.btn_toggle_loop.clicked.connect(self._on_toggle_loop_clicked)
 
         insp_btn_lay.addWidget(self.btn_snap_tiles)
@@ -1176,25 +1177,25 @@ class EditorRutinasNPCWidget(QWidget):
                 self.combo_speed.setCurrentIndex(idx_spd)
 
             is_loop = seg.get("is_loop", False) or (len(seg.get("path_nodes", [])) > 1 and seg["path_nodes"][0] == seg["path_nodes"][-1])
-            loop_badge = "  Bucle" if is_loop else ""
-            self.lbl_insp_badge.setText(f"Hito #{row + 1}{loop_badge} ({seg['time_str']})")
+            loop_badge = " - " + _t("rut_loop") if is_loop else ""
+            self.lbl_insp_badge.setText(_t("rut_step_badge", n=row + 1, loop=loop_badge, time=seg['time_str']))
             if is_loop:
                 num_legs = max(1, len(seg.get("path_nodes", [])) - 1)
-                self.lbl_auto_status.setText(f" Bucle Activo ({num_legs} tramos)")
+                self.lbl_auto_status.setText(_t("rut_loop_active", n=num_legs))
                 self.lbl_auto_status.setStyleSheet("color: #A371F7; font-size: 10px; font-weight: bold; padding-top: 2px;")
-                self.btn_toggle_loop.setText(" Abrir Bucle")
+                self.btn_toggle_loop.setText(_t("rut_open_loop"))
                 self.spin_bx.setEnabled(False)
                 self.spin_by.setEnabled(False)
-                self.spin_bx.setToolTip("En rutas en bucle, Destino (B) coincide siempre con Inicio (A).")
-                self.spin_by.setToolTip("En rutas en bucle, Destino (B) coincide siempre con Inicio (A).")
+                self.spin_bx.setToolTip(_t("rut_b_locked_tip"))
+                self.spin_by.setToolTip(_t("rut_b_locked_tip"))
                 self.rb_target_b.setEnabled(False)
-                self.rb_target_b.setToolTip("Destino (B) está bloqueado en bucles (equivale a Inicio A).")
+                self.rb_target_b.setToolTip(_t("rut_b_locked_rb_tip"))
                 if self.rb_target_b.isChecked():
                     self.rb_target_inflection.setChecked(True)
             else:
-                self.lbl_auto_status.setText(" Malla AWSD: Auto-Ajuste Activo")
+                self.lbl_auto_status.setText(_t("rut_auto_adjust"))
                 self.lbl_auto_status.setStyleSheet("color: #3FB950; font-size: 10px; font-weight: bold; padding-top: 2px;")
-                self.btn_toggle_loop.setText(" Cerrar en Bucle")
+                self.btn_toggle_loop.setText(_t("rut_close_loop"))
                 self.spin_bx.setEnabled(True)
                 self.spin_by.setEnabled(True)
                 self.spin_bx.setToolTip("")
@@ -1288,7 +1289,7 @@ class EditorRutinasNPCWidget(QWidget):
         if mid_nodes:
             sel_idx = 0
             for list_i, (node_idx, (nx, ny)) in enumerate(mid_nodes):
-                self.combo_inflection_nodes.addItem(f"Punto #{node_idx}: ({nx}, {ny})", node_idx)
+                self.combo_inflection_nodes.addItem(_t("rut_point_item", n=node_idx, x=nx, y=ny), node_idx)
                 if active_node_idx is not None and node_idx == active_node_idx:
                     sel_idx = list_i
             self.combo_inflection_nodes.setCurrentIndex(sel_idx)
@@ -1305,7 +1306,7 @@ class EditorRutinasNPCWidget(QWidget):
             self.spin_node_x.blockSignals(False)
             self.spin_node_y.blockSignals(False)
         else:
-            self.combo_inflection_nodes.addItem("(Sin puntos de inflexión)", -1)
+            self.combo_inflection_nodes.addItem(_t("rut_no_points"), -1)
             self.spin_node_x.setEnabled(False)
             self.spin_node_y.setEnabled(False)
             self.btn_del_inflection.setEnabled(False)
@@ -1503,7 +1504,7 @@ class EditorRutinasNPCWidget(QWidget):
 
         self._populate_inflection_combo(wp, insert_idx)
         self._on_auto_path_change(force_recalc=False)
-        self.status_bar.showMessage(f" Punto de Inflexión #{insert_idx} insertado en ({x}, {y}).", 3000)
+        self.status_bar.showMessage(_t("rut_st_point_inserted", n=insert_idx, x=x, y=y), 3000)
 
     def _on_canvas_node_deleted(self, node_idx: int):
         rows = self.table_segments.selectionModel().selectedRows()
@@ -1530,7 +1531,7 @@ class EditorRutinasNPCWidget(QWidget):
 
             self._populate_inflection_combo(wp)
             self._on_auto_path_change(force_recalc=False)
-            self.status_bar.showMessage(f" Punto de Inflexión #{node_idx} eliminado.", 3000)
+            self.status_bar.showMessage(_t("rut_st_point_removed", n=node_idx), 3000)
 
     def _on_add_inflection_clicked(self):
         rows = self.table_segments.selectionModel().selectedRows()
@@ -1586,7 +1587,7 @@ class EditorRutinasNPCWidget(QWidget):
                         seg["bx"], seg["by"] = wp.path_nodes[0]
                     self._populate_inflection_combo(wp, node_idx)
                     self._on_auto_path_change(force_recalc=False)
-                    self.status_bar.showMessage(f" Punto #{node_idx} centrado en tile caminable ({snapped_x}, {snapped_y}).", 3000)
+                    self.status_bar.showMessage(_t("rut_st_point_snapped", n=node_idx, x=snapped_x, y=snapped_y), 3000)
 
     def _on_toggle_loop_clicked(self):
         """Alterna el tramo actual entre recorrido lineal A  B o circuito cerrado en bucle (B = A)."""
@@ -1626,7 +1627,7 @@ class EditorRutinasNPCWidget(QWidget):
             self.rb_target_b.setEnabled(False)
             if self.rb_target_b.isChecked():
                 self.rb_target_inflection.setChecked(True)
-            self.status_bar.showMessage(" Tramo convertido en bucle continuo (B = A).", 3000)
+            self.status_bar.showMessage(_t("rut_st_to_loop"), 3000)
         else:
             # Abrir bucle: separar B eliminando el último nodo de retorno
             if len(wp.path_nodes) >= 2:
@@ -1642,7 +1643,7 @@ class EditorRutinasNPCWidget(QWidget):
                 self.spin_bx.setEnabled(True)
                 self.spin_by.setEnabled(True)
                 self.rb_target_b.setEnabled(True)
-                self.status_bar.showMessage(" Bucle abierto hacia destino final independiente.", 3000)
+                self.status_bar.showMessage(_t("rut_st_loop_opened"), 3000)
 
         if self.current_mode == "BY_NPC":
             self._refresh_npc_segments()
@@ -1695,7 +1696,7 @@ class EditorRutinasNPCWidget(QWidget):
                 seg["is_loop"] = True
                 self._populate_inflection_combo(wp)
                 self._on_auto_path_change(force_recalc=False)
-                self.status_bar.showMessage(f" Circuito en bucle trasladado a ({x}, {y}).", 3500)
+                self.status_bar.showMessage(_t("rut_st_loop_moved", x=x, y=y), 3500)
                 return
             else:
                 # Inflexión (C) en bucle: insertar antes del cierre del bucle
@@ -1711,7 +1712,7 @@ class EditorRutinasNPCWidget(QWidget):
                 seg["is_loop"] = True
                 self._populate_inflection_combo(wp, insert_idx)
                 self._on_auto_path_change(force_recalc=False)
-                self.status_bar.showMessage(f" Punto de Inflexión añadido al bucle en ({x}, {y}).", 3500)
+                self.status_bar.showMessage(_t("rut_st_loop_point_added", x=x, y=y), 3500)
                 return
 
         # Ruta lineal normal (no bucle)
@@ -1861,7 +1862,7 @@ class EditorRutinasNPCWidget(QWidget):
             if is_loop:
                 num_legs = max(1, len(nodes) - 1)
                 it_b.setText(f" ({bx}, {by})")
-                it_b.setToolTip(f"Movimiento en bucle continuo de {num_legs} tramos que regresa al inicio")
+                it_b.setToolTip(_t("rut_loop_tip", n=num_legs))
                 it_b.setForeground(QColor("#A371F7"))
             else:
                 it_b.setText(f"({bx}, {by})")
@@ -1882,13 +1883,13 @@ class EditorRutinasNPCWidget(QWidget):
 
         if is_loop:
             num_legs = max(1, len(nodes) - 1)
-            self.lbl_auto_status.setText(f" Bucle Activo ({num_legs} tramos)")
+            self.lbl_auto_status.setText(_t("rut_loop_active", n=num_legs))
             self.lbl_auto_status.setStyleSheet("color: #A371F7; font-size: 10px; font-weight: bold; padding-top: 2px;")
-            self.btn_toggle_loop.setText(" Abrir Bucle")
+            self.btn_toggle_loop.setText(_t("rut_open_loop"))
         else:
-            self.lbl_auto_status.setText(f" AWSD: {len(nodes)} nodos sincronizados")
+            self.lbl_auto_status.setText(_t("rut_nodes_synced", n=len(nodes)))
             self.lbl_auto_status.setStyleSheet("color: #3FB950; font-size: 10px; font-weight: bold; padding-top: 2px;")
-            self.btn_toggle_loop.setText(" Cerrar en Bucle")
+            self.btn_toggle_loop.setText(_t("rut_close_loop"))
 
     def _on_snap_to_walkable_clicked(self):
         """Ajusta las coordenadas A y B directamente a los tiles transitables de la ROM."""
@@ -1927,7 +1928,7 @@ class EditorRutinasNPCWidget(QWidget):
                     seg["is_loop"] = True
                     self._populate_inflection_combo(wp)
                     self._on_auto_path_change(force_recalc=False)
-                    self.status_bar.showMessage(" Circuito en bucle centrado en tile caminable de la ROM.", 3000)
+                    self.status_bar.showMessage(_t("rut_st_loop_snapped"), 3000)
                     return
 
                 tax, tay = self.route_canvas.pathfinder.snap_to_walkable(grid, self.spin_ax.value(), self.spin_ay.value())
@@ -1936,7 +1937,7 @@ class EditorRutinasNPCWidget(QWidget):
                 self.spin_ay.setValue(tay * 8 + 4)
                 self.spin_bx.setValue(tbx * 8 + 4)
                 self.spin_by.setValue(tby * 8 + 4)
-                self.status_bar.showMessage(" Coordenadas A y B centradas en tiles caminables de la ROM.", 3000)
+                self.status_bar.showMessage(_t("rut_st_ab_snapped"), 3000)
 
     def _on_apply_segment_vars(self):
         """Compatibilidad: invoca el auto-ajuste de ruta en tiempo real."""
@@ -1948,7 +1949,7 @@ class EditorRutinasNPCWidget(QWidget):
 
     def _on_add_waypoint(self):
         if not self.current_schedule:
-            QMessageBox.warning(self, "Aviso", "Seleccione un horario activo.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("rut_select_schedule"))
             return
 
         last_wp = self.current_schedule.waypoints[-1] if self.current_schedule.waypoints else None
@@ -1988,9 +1989,8 @@ class EditorRutinasNPCWidget(QWidget):
             return
 
         reply = QMessageBox.question(
-            self, "Confirmar Inyección",
-            f"¿Desea inyectar y compilar las rutinas de {self.current_npc.name} en la ROM?\n"
-            f"Se actualizará el puntero maestro en 0x3D9A4.",
+            self, _t("rut_confirm_inject_title"),
+            _t("rut_confirm_inject", name=self.current_npc.name),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply != QMessageBox.StandardButton.Yes:
@@ -1998,33 +1998,33 @@ class EditorRutinasNPCWidget(QWidget):
 
         ok, msg = RoutineCodec.reinject_npc_to_project(self.project, self.current_npc.npc_id, self.current_npc)
         if ok:
-            QMessageBox.information(self, "Éxito", msg)
+            QMessageBox.information(self, _t("msg_success"), msg)
         else:
-            QMessageBox.critical(self, "Error", msg)
+            QMessageBox.critical(self, _t("msg_error"), msg)
 
     def _on_export_json(self):
         if not self.current_npc:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, f"Exportar Rutinas de {self.current_npc.name}",
-            f"{self.current_npc.name}_schedules.json", "Archivos JSON (*.json)"
+            self, _t("rut_dlg_export", name=self.current_npc.name),
+            f"{self.current_npc.name}_schedules.json", _t("rut_filter_json")
         )
         if path:
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(self.current_npc.to_dict(), f, indent=2, ensure_ascii=False)
-            QMessageBox.information(self, "Guardado", f"Exportado en {path}")
+            QMessageBox.information(self, _t("rut_saved_title"), _t("rut_exported_to", path=path))
 
     def _on_toggle_connect_mode(self, checked: bool):
         self.macro_view.set_connect_mode(checked)
         if checked:
-            self.status_bar.showMessage(" MODO CONECTAR ACTIVO: Haz clic en la Puerta Origen y luego en la Puerta Destino.")
+            self.status_bar.showMessage(_t("rut_st_connect_mode"))
         else:
-            self.status_bar.showMessage(" Modo navegación activo.")
+            self.status_bar.showMessage(_t("rut_st_nav_mode"))
 
     def _on_connection_created_signal(self, cid, f_m, f_w, t_m, t_w):
         self.act_connect.setChecked(False)
         self.macro_view.set_connect_mode(False)
-        self.status_bar.showMessage(f" Conexión establecida: {cid}")
+        self.status_bar.showMessage(_t("rut_st_connected", id=cid))
 
     def _on_save_topology(self):
         self.world_graph.save_to_json(self.default_graph_path)
@@ -2043,4 +2043,4 @@ class EditorRutinasNPCWidget(QWidget):
             self._refresh_npc_segments()
         else:
             self._refresh_map_segments()
-        self.status_bar.showMessage(" Topología recargada desde el archivo.")
+        self.status_bar.showMessage(_t("rut_st_topo_reloaded"))

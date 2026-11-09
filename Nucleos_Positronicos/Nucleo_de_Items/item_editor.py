@@ -26,6 +26,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtCore import Qt, QSize
 
 from Consola_de_Comando.i18n import tr
+from Consola_de_Comando.i18n import t as _t
 from Consola_de_Comando.utils import NameEditDelegate
 from Nucleos_Positronicos.Nucleo_de_Items.objetos import BaseItem, ToolItem, FoodItem, MiscItem
 
@@ -97,7 +98,7 @@ class ItemInspectorPanel(QFrame):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(6)
 
-        title = QLabel("INSPECTOR DE ITEM")
+        title = QLabel(_t("itm_inspector"))
         title.setStyleSheet("color: #00FF96; font-size: 12px; font-weight: bold; letter-spacing: 2px;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
@@ -111,15 +112,15 @@ class ItemInspectorPanel(QFrame):
         header_row.addWidget(self.lbl_icon)
 
         v_info = QVBoxLayout()
-        self.lbl_header_name = QLabel("Seleccione un item")
+        self.lbl_header_name = QLabel(_t("itm_select"))
         self.lbl_header_name.setStyleSheet("color: #FFFFFF; font-weight: bold; font-size: 13px;")
         v_info.addWidget(self.lbl_header_name)
 
-        self.lbl_header_id = QLabel("ID: -- | Global: --")
+        self.lbl_header_id = QLabel(_t("itm_id_empty"))
         self.lbl_header_id.setStyleSheet("color: #777788; font-family: 'Consolas'; font-size: 11px;")
         v_info.addWidget(self.lbl_header_id)
 
-        self.lbl_category = QLabel("Categoria: --")
+        self.lbl_category = QLabel(_t("itm_category_empty"))
         self.lbl_category.setStyleSheet("color: #00BFFF; font-size: 11px;")
         v_info.addWidget(self.lbl_category)
 
@@ -128,12 +129,12 @@ class ItemInspectorPanel(QFrame):
 
         # Botones de Modding Gráfico (Importar / Exportar Icono)
         icon_btn_row = QHBoxLayout()
-        self.btn_export_icon = QPushButton("Exportar PNG")
+        self.btn_export_icon = QPushButton(_t("itm_btn_export_png"))
         self.btn_export_icon.setStyleSheet("background: #1F3A5F; color: #89B4FA; font-weight: bold; font-size: 10px; padding: 4px;")
         self.btn_export_icon.clicked.connect(self._on_export_icon_clicked)
         icon_btn_row.addWidget(self.btn_export_icon)
 
-        self.btn_import_icon = QPushButton("Re-inyectar PNG")
+        self.btn_import_icon = QPushButton(_t("itm_btn_reinject_png"))
         self.btn_import_icon.setStyleSheet("background: #5F1F3A; color: #FF89B4; font-weight: bold; font-size: 10px; padding: 4px;")
         self.btn_import_icon.clicked.connect(self._on_import_icon_clicked)
         icon_btn_row.addWidget(self.btn_import_icon)
@@ -146,14 +147,14 @@ class ItemInspectorPanel(QFrame):
         form_layout.setSpacing(6)
 
         # 1. Nombre
-        form_layout.addWidget(QLabel("Nombre en ROM:", styleSheet="color: #888899; font-size: 10px;"))
+        form_layout.addWidget(QLabel(_t("itm_name_rom"), styleSheet="color: #888899; font-size: 10px;"))
         self.txt_name = QLineEdit()
         self.txt_name.setStyleSheet("background: #14141E; color: white; border: 1px solid #2A2A38; padding: 4px; border-radius: 3px;")
         form_layout.addWidget(self.txt_name)
 
         # 2. Graphic ID
         gid_row = QHBoxLayout()
-        gid_row.addWidget(QLabel("Graphic ID:", styleSheet="color: #888899; font-size: 10px;"))
+        gid_row.addWidget(QLabel(_t("itm_graphic_id"), styleSheet="color: #888899; font-size: 10px;"))
         self.spn_gid = QSpinBox()
         self.spn_gid.setRange(0, 600)
         self.spn_gid.setStyleSheet("background: #14141E; color: #FFD700; border: 1px solid #2A2A38; padding: 2px;")
@@ -162,48 +163,48 @@ class ItemInspectorPanel(QFrame):
         form_layout.addLayout(gid_row)
 
         # 3. Parametros Comida (Stamina y Fatiga)
-        self.food_group = QGroupBox("Metabolismo (Consumibles)")
+        self.food_group = QGroupBox(_t("itm_grp_food"))
         self.food_group.setStyleSheet("QGroupBox { color: #00FF96; font-size: 10px; font-weight: bold; border: 1px solid #1F1F2C; margin-top: 6px; padding-top: 8px; }")
         fg_layout = QHBoxLayout(self.food_group)
 
-        fg_layout.addWidget(QLabel("Stamina:", styleSheet="color: #CCCCCC; font-size: 10px;"))
+        fg_layout.addWidget(QLabel(_t("itm_stamina"), styleSheet="color: #CCCCCC; font-size: 10px;"))
         self.spn_stamina = QSpinBox()
         self.spn_stamina.setRange(-128, 127)
         self.spn_stamina.setStyleSheet("background: #14141E; color: #00FF96; border: 1px solid #2A2A38; padding: 2px;")
         fg_layout.addWidget(self.spn_stamina)
 
-        fg_layout.addWidget(QLabel("Fatiga:", styleSheet="color: #CCCCCC; font-size: 10px;"))
+        fg_layout.addWidget(QLabel(_t("itm_fatigue"), styleSheet="color: #CCCCCC; font-size: 10px;"))
         self.spn_fatigue = QSpinBox()
         self.spn_fatigue.setRange(-128, 127)
         self.spn_fatigue.setStyleSheet("background: #14141E; color: #FF7777; border: 1px solid #2A2A38; padding: 2px;")
         fg_layout.addWidget(self.spn_fatigue)
 
-        self.chk_drink = QCheckBox("Bebida")
+        self.chk_drink = QCheckBox(_t("itm_drink"))
         self.chk_drink.setStyleSheet("color: #00BFFF; font-size: 10px;")
         fg_layout.addWidget(self.chk_drink)
 
         form_layout.addWidget(self.food_group)
 
         # 4. Parametros Herramienta (Tier / Nivel)
-        self.tool_group = QGroupBox("Rango de Herramienta")
+        self.tool_group = QGroupBox(_t("itm_grp_tool"))
         self.tool_group.setStyleSheet("QGroupBox { color: #00BFFF; font-size: 10px; font-weight: bold; border: 1px solid #1F1F2C; margin-top: 6px; padding-top: 8px; }")
         tg_layout = QHBoxLayout(self.tool_group)
-        tg_layout.addWidget(QLabel("Nivel / Tier:", styleSheet="color: #CCCCCC; font-size: 10px;"))
+        tg_layout.addWidget(QLabel(_t("itm_tier"), styleSheet="color: #CCCCCC; font-size: 10px;"))
         self.combo_tier = QComboBox()
-        self.combo_tier.addItems(["Hierro (Normal)", "Cobre", "Plata", "Oro", "Mystrile", "Maldita", "Bendita", "Mitica"])
+        self.combo_tier.addItems([_t("itm_tier_iron_normal"), _t("itm_tier_copper"), _t("itm_tier_silver"), _t("itm_tier_gold"), "Mystrile", _t("itm_tier_cursed"), _t("itm_tier_blessed"), _t("itm_tier_mythic")])
         self.combo_tier.setStyleSheet("background: #14141E; color: white; padding: 2px 6px; font-size: 10px;")
         tg_layout.addWidget(self.combo_tier)
         form_layout.addWidget(self.tool_group)
 
         # 5. Precios
         price_row = QHBoxLayout()
-        price_row.addWidget(QLabel("Venta (G):", styleSheet="color: #888899; font-size: 10px;"))
+        price_row.addWidget(QLabel(_t("itm_sell"), styleSheet="color: #888899; font-size: 10px;"))
         self.spn_sell = QSpinBox()
         self.spn_sell.setRange(0, 999999)
         self.spn_sell.setStyleSheet("background: #14141E; color: white; border: 1px solid #2A2A38; padding: 2px;")
         price_row.addWidget(self.spn_sell)
 
-        price_row.addWidget(QLabel("Compra (G):", styleSheet="color: #888899; font-size: 10px;"))
+        price_row.addWidget(QLabel(_t("itm_buy"), styleSheet="color: #888899; font-size: 10px;"))
         self.spn_buy = QSpinBox()
         self.spn_buy.setRange(0, 999999)
         self.spn_buy.setStyleSheet("background: #14141E; color: white; border: 1px solid #2A2A38; padding: 2px;")
@@ -211,7 +212,7 @@ class ItemInspectorPanel(QFrame):
         form_layout.addLayout(price_row)
 
         # 6. Descripcion multilineal
-        form_layout.addWidget(QLabel("Descripcion (ROM):", styleSheet="color: #888899; font-size: 10px;"))
+        form_layout.addWidget(QLabel(_t("itm_desc_rom"), styleSheet="color: #888899; font-size: 10px;"))
         self.txt_desc = QTextEdit()
         self.txt_desc.setFixedHeight(70)
         self.txt_desc.setStyleSheet("background: #14141E; color: white; border: 1px solid #2A2A38; font-family: 'Consolas'; font-size: 11px;")
@@ -225,7 +226,7 @@ class ItemInspectorPanel(QFrame):
         layout.addWidget(self.lbl_feedback)
 
         # Boton Aplicar Cambios
-        self.btn_apply = QPushButton("APLICAR AL ITEM")
+        self.btn_apply = QPushButton(_t("itm_btn_apply"))
         self.btn_apply.setStyleSheet("""
             QPushButton { background: #00FF96; color: black; font-weight: bold; padding: 8px; border-radius: 4px; font-size: 11px; }
             QPushButton:hover { background: #33FFB0; }
@@ -238,9 +239,9 @@ class ItemInspectorPanel(QFrame):
     def load_item(self, item: Optional[BaseItem]):
         self.current_item = item
         if not item:
-            self.lbl_header_name.setText("Seleccione un item")
-            self.lbl_header_id.setText("ID: -- | Global: --")
-            self.lbl_category.setText("Categoria: --")
+            self.lbl_header_name.setText(_t("itm_select"))
+            self.lbl_header_id.setText(_t("itm_id_empty"))
+            self.lbl_category.setText(_t("itm_category_empty"))
             self.lbl_icon.set_pixmap(QPixmap())
             self.txt_name.clear()
             self.spn_gid.setValue(0)
@@ -253,8 +254,8 @@ class ItemInspectorPanel(QFrame):
             return
 
         self.lbl_header_name.setText(item.name_str)
-        self.lbl_header_id.setText(f"ID: 0x{item.index:02X} ({item.index}) | Global: #{item.global_id}")
-        self.lbl_category.setText(f"Categoria: {item.category}")
+        self.lbl_header_id.setText(_t("itm_id", id=f"0x{item.index:02X}", idx=item.index, gid=item.global_id))
+        self.lbl_category.setText(_t("itm_category", cat=item.category))
 
         pix = item.get_icon_pixmap(scale=3)
         self.lbl_icon.set_pixmap(pix)
@@ -329,38 +330,38 @@ class ItemInspectorPanel(QFrame):
 
         # Refrescar cabecera
         self.load_item(item)
-        self.lbl_feedback.setText(f"Cambios de '{item.name_str}' guardados en ROM.")
+        self.lbl_feedback.setText(_t("itm_saved_feedback", name=item.name_str))
         if self.isVisible():
-            QMessageBox.information(self, "Item Actualizado", f"Los cambios de '{item.name_str}' se han aplicado a la ROM.")
+            QMessageBox.information(self, _t("itm_updated_title"), _t("itm_updated", name=item.name_str))
 
     def _on_export_icon_clicked(self):
         if not self.current_item or not self.current_item.parser or not self.current_item.parser.icon_engine:
-            QMessageBox.warning(self, "Exportar Icono", "Seleccione un item válido con motor de iconos activo.")
+            QMessageBox.warning(self, _t("itm_export_icon_title"), _t("itm_need_icon_item"))
             return
 
         eng = self.current_item.parser.icon_engine
         pil_img = eng.extract_icon_pil(self.current_item.graphic_id)
         if not pil_img:
-            QMessageBox.warning(self, "Exportar Icono", f"No se pudo extraer el icono para Graphic ID {self.current_item.graphic_id}.")
+            QMessageBox.warning(self, _t("itm_export_icon_title"), _t("itm_icon_extract_failed", gid=self.current_item.graphic_id))
             return
 
         default_name = f"Item_{self.current_item.index:03d}_{self.current_item.name_str.replace(' ', '_')}_GID{self.current_item.graphic_id}.png"
-        path, _ = QFileDialog.getSaveFileName(self, "Exportar Icono de Item (PNG)", default_name, "PNG Image (*.png)")
+        path, _ = QFileDialog.getSaveFileName(self, _t("itm_dlg_export_icon"), default_name, _t("itm_filter_png"))
         if not path:
             return
 
         try:
             pil_img.save(path)
-            QMessageBox.information(self, "Exportación Exitosa", f"Icono guardado en:\n{path}")
+            QMessageBox.information(self, _t("itm_export_ok_title"), _t("itm_icon_saved", path=path))
         except Exception as e:
-            QMessageBox.critical(self, "Error al Exportar", f"No se pudo guardar la imagen:\n{e}")
+            QMessageBox.critical(self, _t("itm_export_error_title"), _t("itm_image_save_error", err=e))
 
     def _on_import_icon_clicked(self):
         if not self.current_item or not self.current_item.parser or not self.current_item.parser.icon_engine:
-            QMessageBox.warning(self, "Re-inyectar Icono", "Seleccione un item válido con motor de iconos activo.")
+            QMessageBox.warning(self, _t("itm_reinject_title"), _t("itm_need_icon_item"))
             return
 
-        path, _ = QFileDialog.getOpenFileName(self, "Seleccionar PNG de Icono (16x16 recomendado)", "", "PNG Image (*.png);;All Images (*.*)")
+        path, _ = QFileDialog.getOpenFileName(self, _t("itm_dlg_select_icon"), "", _t("itm_filter_png_all"))
         if not path:
             return
 
@@ -381,12 +382,12 @@ class ItemInspectorPanel(QFrame):
                 if parent_widget and hasattr(parent_widget, 'filter_data'):
                     parent_widget.filter_data()
 
-                QMessageBox.information(self, "Re-inyección Exitosa", 
-                    f"El nuevo icono ha sido cuantizado a 16 colores BGR555, convertido a tiles 4bpp e inyectado en ROM para el Graphic ID {self.current_item.graphic_id} ({self.current_item.name_str}).")
+                QMessageBox.information(self, _t("itm_reinject_ok_title"),
+                    _t("itm_reinject_ok", gid=self.current_item.graphic_id, name=self.current_item.name_str))
             else:
-                QMessageBox.warning(self, "Error de Inyección", "No se pudo inyectar el icono en la ROM. Verifique los offsets del Graphic ID.")
+                QMessageBox.warning(self, _t("itm_inject_error_title"), _t("itm_inject_failed"))
         except Exception as e:
-            QMessageBox.critical(self, "Fallo al Inyectar", f"Error procesando la imagen:\n{e}")
+            QMessageBox.critical(self, _t("itm_inject_fail_title"), _t("itm_image_process_error", err=e))
 
 
 # ============================================================
@@ -410,13 +411,13 @@ class ItemEditorWidget(QWidget):
 
         # Toolbar superior
         toolbar = QHBoxLayout()
-        title = QLabel("EDITOR CANONICO DE ITEMS Y OBJETOS (344 ITEMS)")
+        title = QLabel(_t("itm_editor_title"))
         title.setStyleSheet("font-size: 15px; font-weight: bold; color: #00FF96; letter-spacing: 1px;")
         toolbar.addWidget(title)
         toolbar.addStretch()
 
         self.txt_filter = QLineEdit()
-        self.txt_filter.setPlaceholderText("Filtrar items por nombre o ID...")
+        self.txt_filter.setPlaceholderText(_t("itm_filter_placeholder"))
         self.txt_filter.setFixedWidth(240)
         self.txt_filter.setStyleSheet("""
             QLineEdit { background: #0E0E14; color: #00E5FF; border: 1px solid #2A2A38; border-radius: 4px; padding: 4px 8px; font-size: 11px; }
@@ -425,12 +426,12 @@ class ItemEditorWidget(QWidget):
         self.txt_filter.textChanged.connect(self._apply_filter)
         toolbar.addWidget(self.txt_filter)
 
-        self.btn_refresh = QPushButton("RECARGAR")
+        self.btn_refresh = QPushButton(_t("itm_btn_reload"))
         self.btn_refresh.setStyleSheet("background: #1A1A26; color: white; border: 1px solid #333348; padding: 5px 12px; border-radius: 4px; font-size: 11px;")
         self.btn_refresh.clicked.connect(self.load_data)
         toolbar.addWidget(self.btn_refresh)
 
-        self.btn_save_all = QPushButton("GUARDAR EN ROM")
+        self.btn_save_all = QPushButton(_t("itm_btn_save_rom"))
         self.btn_save_all.setStyleSheet("background: #2e7d32; color: white; font-weight: bold; padding: 5px 14px; border-radius: 4px; font-size: 11px;")
         self.btn_save_all.clicked.connect(self.save_all_to_rom)
         toolbar.addWidget(self.btn_save_all)
@@ -451,15 +452,15 @@ class ItemEditorWidget(QWidget):
 
         # 1. Herramientas
         self.table_tools = self._create_table()
-        self.tabs.addTab(self.table_tools, "Herramientas (80)")
+        self.tabs.addTab(self.table_tools, _t("itm_tab_tools"))
 
         # 2. Comestibles
         self.table_foods = self._create_table()
-        self.tabs.addTab(self.table_foods, "Comestibles y Cultivos (170)")
+        self.tabs.addTab(self.table_foods, _t("itm_tab_foods"))
 
         # 3. Variados
         self.table_misc = self._create_table()
-        self.tabs.addTab(self.table_misc, "Minerales y Varios (94)")
+        self.tabs.addTab(self.table_misc, _t("itm_tab_misc"))
 
         self.tabs.currentChanged.connect(self._on_tab_changed)
         splitter.addWidget(self.tabs)
@@ -508,7 +509,7 @@ class ItemEditorWidget(QWidget):
             self.items = self.project.item_parser.scan_items()
             self._populate_category_tables()
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"Fallo al cargar items: {e}")
+            QMessageBox.warning(self, _t("msg_error"), _t("itm_load_error", err=e))
 
     def _populate_category_tables(self):
         self._populate_table(self.table_tools, "Herramienta")
@@ -522,15 +523,15 @@ class ItemEditorWidget(QWidget):
         query = self.txt_filter.text().strip().lower()
 
         if category == "Consumible/Comida":
-            headers = ["Icono", "ID", "Nombre", "Graphic ID", "Stamina", "Fatiga", "Bebida", "Venta (G)", "Compra (G)"]
+            headers = [_t("itm_col_icon"), "ID", _t("itm_col_name"), "Graphic ID", _t("itm_col_stamina"), _t("itm_col_fatigue"), _t("itm_drink"), _t("itm_col_sell"), _t("itm_col_buy")]
         elif category == "Herramienta":
-            headers = ["Icono", "ID", "Nombre", "Graphic ID", "Tier / Nivel", "Venta (G)", "Compra (G)"]
+            headers = [_t("itm_col_icon"), "ID", _t("itm_col_name"), "Graphic ID", _t("itm_col_tier"), _t("itm_col_sell"), _t("itm_col_buy")]
         else:
-            headers = ["Icono", "ID", "Nombre", "Graphic ID", "Flags", "Venta (G)", "Compra (G)"]
+            headers = [_t("itm_col_icon"), "ID", _t("itm_col_name"), "Graphic ID", "Flags", _t("itm_col_sell"), _t("itm_col_buy")]
 
         model.setHorizontalHeaderLabels(headers)
 
-        tier_names = ["Hierro", "Cobre", "Plata", "Oro", "Mystrile", "Maldita", "Bendita", "Mitica"]
+        tier_names = [_t("itm_tier_iron"), _t("itm_tier_copper"), _t("itm_tier_silver"), _t("itm_tier_gold"), "Mystrile", _t("itm_tier_cursed"), _t("itm_tier_blessed"), _t("itm_tier_mythic")]
 
         for itm in self.items:
             if itm.category != category:
@@ -614,6 +615,6 @@ class ItemEditorWidget(QWidget):
             return
         try:
             self.project.save_rom()
-            QMessageBox.information(self, "Guardado Exitoso", "Todos los cambios en items han sido sincronizados y guardados en ROM.")
+            QMessageBox.information(self, _t("itm_saved_all_title"), _t("itm_saved_all"))
         except Exception as e:
-            QMessageBox.critical(self, "Error al Guardar", f"No se pudo guardar la ROM:\n{e}")
+            QMessageBox.critical(self, _t("itm_save_error_title"), _t("itm_rom_save_error", err=e))

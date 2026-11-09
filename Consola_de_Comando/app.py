@@ -302,21 +302,16 @@ class FoMTStudioApp(QMainWindow):
             return widget
         return None
 
-    def _setup_ui(self):
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget) # Cambiar a Vertical para poner la barra arriba
-        
-        # --- BARRA DE HERRAMIENTAS PRINCIPAL (TOOLBAR) ---
-        from PyQt6.QtWidgets import QToolBar, QMenu, QToolButton
-        self.toolbar = QToolBar("Barra de Herramientas Principal")
-        self.toolbar.setMovable(False)
-        self.addToolBar(self.toolbar)
-        
+    def _build_toolbar(self):
+        """Construye (o reconstruye al cambiar de idioma) la barra de herramientas principal."""
+        from PyQt6.QtWidgets import QMenu, QToolButton
+        explorer_visible = self.action_toggle_explorer.isChecked() if hasattr(self, "action_toggle_explorer") else True
+        self.toolbar.clear()
+
         # 1. Explorador lateral
         self.action_toggle_explorer = QAction(tr("tb_explorer", self.current_lang), self)
         self.action_toggle_explorer.setCheckable(True)
-        self.action_toggle_explorer.setChecked(True)
+        self.action_toggle_explorer.setChecked(explorer_visible)
         self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
         self.toolbar.addAction(self.action_toggle_explorer)
         
@@ -396,6 +391,18 @@ class FoMTStudioApp(QMainWindow):
 
         btn_more.setMenu(menu_more)
         self.toolbar.addWidget(btn_more)
+
+    def _setup_ui(self):
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget) # Cambiar a Vertical para poner la barra arriba
+        
+        # --- BARRA DE HERRAMIENTAS PRINCIPAL (TOOLBAR) ---
+        from PyQt6.QtWidgets import QToolBar
+        self.toolbar = QToolBar("Barra de Herramientas Principal")
+        self.toolbar.setMovable(False)
+        self.addToolBar(self.toolbar)
+        self._build_toolbar()
         
         self.main_splitter = QSplitter(Qt.Orientation.Horizontal)
         self.main_splitter.setHandleWidth(4)
@@ -621,6 +628,9 @@ class FoMTStudioApp(QMainWindow):
         self.settings.setValue("language", lang_code)
         self.menuBar().clear()
         self._setup_menu()
+        self._build_toolbar()
+        self.search_bar.setPlaceholderText(tr("search_placeholder", lang_code))
+        self.btn_n.setText(tr("btn_n_active" if getattr(self, "_n_active", False) else "btn_install_n", lang_code))
         title_hint = tr('explorer_title', lang_code)
         self.setWindowTitle(f"FoMT Studio - {title_hint}")
         self.status.showMessage(tr("status_ready", lang_code))
@@ -814,11 +824,11 @@ class FoMTStudioApp(QMainWindow):
     def _open_map_viewer(self):
         if not self.project:
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Visor de Mapas", "Debes cargar una ROM o Proyecto primero.")
+            QMessageBox.warning(self, tr("tab_map_editor", self.current_lang), tr("msg_must_load_rom", self.current_lang))
             return
         from Nucleos_Positronicos.Nucleo_de_Mapas.visor_mapas import VisorMapas
         viewer = VisorMapas(self.project)
-        win = FloatingWindow(viewer, "Visor de Mapas", self)
+        win = FloatingWindow(viewer, tr("tab_map_editor", self.current_lang), self)
         self.floating_windows.append(win)
         win.show()
         self.apply_theme(self.current_theme)
@@ -925,7 +935,7 @@ class FoMTStudioApp(QMainWindow):
 
     def _open_anim_extractor(self):
         if not self.project or not self.project.base_rom_path:
-            QMessageBox.warning(self, "Extractor de Animaciones", "Debes cargar una ROM o Proyecto primero.")
+            QMessageBox.warning(self, tr("menu_anim_extractor", self.current_lang), tr("msg_must_load_rom", self.current_lang))
             return
             
         out_dir = QFileDialog.getExistingDirectory(self, "Seleccionar carpeta para exportar animaciones")
@@ -978,10 +988,12 @@ class FoMTStudioApp(QMainWindow):
                 # La firma N_MODE se encuentra en el espacio libre del sistema (0x13AA24)
                 flag = self.project.read_rom(0x0013AA24, 6)
                 if flag == b'N_MODE':
-                    self.btn_n.setText("Ñ Activada")
+                    self._n_active = True
+                    self.btn_n.setText(tr("btn_n_active", self.current_lang))
                     self.btn_n.setEnabled(False)
                 else:
-                    self.btn_n.setText("¡Instalar Ñ!")
+                    self._n_active = False
+                    self.btn_n.setText(tr("btn_install_n", self.current_lang))
                     self.btn_n.setEnabled(True)
             except:
                 pass
@@ -1054,7 +1066,7 @@ class FoMTStudioApp(QMainWindow):
                 self.btn_n.setEnabled(False)
                 if hasattr(self, 'magic_circle'):
                     self.magic_circle.stop_animation()
-                QMessageBox.information(self, tr("title_info", self.current_lang), "Soporte de caracteres extendidos instalado correctamente.")
+                QMessageBox.information(self, tr("title_info", self.current_lang), tr("msg_n_installed", self.current_lang))
                 
                 # Refrescar Tile Editor si está abierto
                 for i in range(self.tabs.count()):

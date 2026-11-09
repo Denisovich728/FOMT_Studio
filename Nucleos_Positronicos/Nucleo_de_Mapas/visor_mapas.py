@@ -7,10 +7,18 @@ from PyQt6.QtWidgets import (
     QGridLayout, QDialogButtonBox
 )
 from PyQt6.QtGui import QPixmap, QImage, QShortcut, QKeySequence
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QSettings
 
 from Nucleos_Positronicos.Nucleo_de_Mapas.mapas import MapParser
 from Nucleos_Positronicos.Nucleo_de_Mapas.fomt_mapdata import FomtMapRenderer
+from Consola_de_Comando.i18n import tr
+
+
+def _t(key, **kwargs):
+    """Traduce una clave con el idioma activo de la aplicacion (QSettings 'language')."""
+    lang = QSettings("FoMTStudio", "ModdingSuite").value("language", "es")
+    text = tr(key, lang)
+    return text.format(**kwargs) if kwargs else text
 
 
 class MapLoaderThread(QThread):
@@ -106,7 +114,7 @@ class ClickableMapLabel(QLabel):
 class MapResizeDialog(QDialog):
     def __init__(self, current_width, current_height, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Creador / Redimensionador de Mapa")
+        self.setWindowTitle(_t("vmap_resize_title"))
         self.setModal(True)
         self.resize(300, 150)
         
@@ -122,22 +130,22 @@ class MapResizeDialog(QDialog):
         self.spin_height.setRange(1, 100)
         self.spin_height.setValue(current_height)
         
-        form.addRow("Nuevo Ancho (Max 150):", self.spin_width)
-        form.addRow("Nuevo Alto (Max 100):", self.spin_height)
+        form.addRow(_t("vmap_new_width"), self.spin_width)
+        form.addRow(_t("vmap_new_height"), self.spin_height)
         
         layout.addLayout(form)
         
         btn_layout = QHBoxLayout()
-        btn_ok = QPushButton("Aplicar (Repuntear y Extender)")
+        btn_ok = QPushButton(_t("vmap_btn_apply_resize"))
         btn_ok.clicked.connect(self.accept)
-        btn_cancel = QPushButton("Cancelar")
+        btn_cancel = QPushButton(_t("btn_cancel"))
         btn_cancel.clicked.connect(self.reject)
         
         btn_layout.addWidget(btn_ok)
         btn_layout.addWidget(btn_cancel)
         layout.addLayout(btn_layout)
         
-        self.lbl_warning = QLabel("[Alerta] Al aplicar, se asignará nuevo espacio en ROM\ny se actualizará la tabla maestra y punteros.")
+        self.lbl_warning = QLabel(_t("vmap_resize_warning"))
         self.lbl_warning.setStyleSheet("color: #ffaa00; font-size: 10px;")
         layout.addWidget(self.lbl_warning)
         
@@ -147,13 +155,13 @@ class MapResizeDialog(QDialog):
 class TriggerEditorDialog(QDialog):
     def __init__(self, behavior_id, flags, script_id, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(f"Editar Trigger (ID 0x{behavior_id:02X})")
+        self.setWindowTitle(_t("vmap_trigger_title", id=f"0x{behavior_id:02X}"))
         self.setModal(True)
         self.resize(300, 150)
         
         layout = QVBoxLayout(self)
         
-        self.chk_solid = QCheckBox("Sólido (Bloquea el paso)")
+        self.chk_solid = QCheckBox(_t("vmap_chk_solid"))
         self.chk_solid.setChecked(bool(flags & 1))
         
         self.spin_script = QSpinBox()
@@ -162,19 +170,19 @@ class TriggerEditorDialog(QDialog):
         
         self.txt_flags = QLineEdit()
         self.txt_flags.setText(hex(flags))
-        self.txt_flags.setPlaceholderText("Ej. 0x01")
+        self.txt_flags.setPlaceholderText(_t("vmap_flags_placeholder"))
         
         form = QFormLayout()
-        form.addRow("Flags Crudos (Hex):", self.txt_flags)
-        form.addRow("¿Sólido?:", self.chk_solid)
-        form.addRow("Script ID (Real):", self.spin_script)
+        form.addRow(_t("vmap_raw_flags"), self.txt_flags)
+        form.addRow(_t("vmap_is_solid"), self.chk_solid)
+        form.addRow(_t("vmap_script_id"), self.spin_script)
         
         layout.addLayout(form)
         
         btn_layout = QHBoxLayout()
-        btn_ok = QPushButton("Aceptar")
+        btn_ok = QPushButton(_t("vmap_btn_accept"))
         btn_ok.clicked.connect(self.accept)
-        btn_cancel = QPushButton("Cancelar")
+        btn_cancel = QPushButton(_t("btn_cancel"))
         btn_cancel.clicked.connect(self.reject)
         btn_layout.addStretch()
         btn_layout.addWidget(btn_ok)
@@ -274,11 +282,11 @@ class VisorMapas(QWidget):
 
         # Barra Superior
         top_bar_layout = QHBoxLayout()
-        lbl_titulo = QLabel("🗺️ Visor de Mapas — Motor FoMT (Pilar Blue-Spider)")
+        lbl_titulo = QLabel(_t("vmap_title"))
         lbl_titulo.setStyleSheet("font-size: 16px; font-weight: bold; color: #44aaff; padding: 4px;")
         top_bar_layout.addWidget(lbl_titulo)
         
-        self.lbl_info = QLabel("Selecciona un mapa de la lista...")
+        self.lbl_info = QLabel(_t("vmap_select_map"))
         self.lbl_info.setStyleSheet("color: #aaa; font-size: 11px; padding-left: 20px;")
         top_bar_layout.addWidget(self.lbl_info)
         
@@ -305,7 +313,7 @@ class VisorMapas(QWidget):
         left_layout = QVBoxLayout(left_panel)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.btn_refresh = QPushButton("Recargar Lista")
+        self.btn_refresh = QPushButton(_t("vmap_btn_reload_list"))
         self.btn_refresh.clicked.connect(self.load_maps)
         left_layout.addWidget(self.btn_refresh)
 
@@ -324,12 +332,12 @@ class VisorMapas(QWidget):
         # Modos de Edición - Ahora como QTabWidget en lugar de ComboBox
         self.tabs_edit_mode = QTabWidget()
         self.tabs_edit_mode.setUsesScrollButtons(False)
-        self.tabs_edit_mode.addTab(QWidget(), "General")
-        self.tabs_edit_mode.addTab(QWidget(), "Fondo (p_bg3)")
-        self.tabs_edit_mode.addTab(QWidget(), "Medio (p_bg2)")
-        self.tabs_edit_mode.addTab(QWidget(), "Frente (p_bg1)")
-        self.tabs_edit_mode.addTab(QWidget(), "Colisiones")
-        self.tabs_edit_mode.addTab(QWidget(), "Estructuras Dinámicas")
+        self.tabs_edit_mode.addTab(QWidget(), _t("vmap_tab_general"))
+        self.tabs_edit_mode.addTab(QWidget(), _t("vmap_tab_bg3"))
+        self.tabs_edit_mode.addTab(QWidget(), _t("vmap_tab_bg2"))
+        self.tabs_edit_mode.addTab(QWidget(), _t("vmap_tab_bg1"))
+        self.tabs_edit_mode.addTab(QWidget(), _t("vmap_tab_collision"))
+        self.tabs_edit_mode.addTab(QWidget(), _t("vmap_tab_dynamic"))
         self.tabs_edit_mode.currentChanged.connect(self._on_edit_mode_changed)
         
         # Controles de Herramientas
@@ -337,22 +345,22 @@ class VisorMapas(QWidget):
         tools_row1 = QHBoxLayout()
         tools_row2 = QHBoxLayout()
 
-        tools_row1.addWidget(QLabel("Modo de edición:"))
+        tools_row1.addWidget(QLabel(_t("vmap_edit_mode")))
         tools_row1.addWidget(self.tabs_edit_mode)
         
         self.cmb_bank = QComboBox()
-        self.cmb_bank.addItems(["Paleta 1 (Verano/Día)", "Paleta 2 (Invierno/Noche)"])
-        tools_row1.addWidget(QLabel("Variante:"))
+        self.cmb_bank.addItems([_t("vmap_pal_summer"), _t("vmap_pal_winter")])
+        tools_row1.addWidget(QLabel(_t("vmap_variant")))
         tools_row1.addWidget(self.cmb_bank)
         
-        self.chk_invert_bg = QCheckBox("Invertir Z-Index (BG1/BG3)")
+        self.chk_invert_bg = QCheckBox(_t("vmap_invert_z"))
         tools_row1.addWidget(self.chk_invert_bg)
         tools_row1.addStretch()
         
         # Paleta de Colisiones (se llenará dinámicamente al cargar el mapa)
         self.cmb_col_brush = QComboBox()
         self.cmb_col_brush.setVisible(False)
-        self.lbl_col_brush = QLabel("Pincel Colisión:")
+        self.lbl_col_brush = QLabel(_t("vmap_col_brush"))
         self.lbl_col_brush.setVisible(False)
         
         tools_row2.addWidget(self.lbl_col_brush)
@@ -377,29 +385,29 @@ class VisorMapas(QWidget):
         tools_row2.addStretch()
         
         # Botón Guardar
-        self.btn_save = QPushButton("Guardar Cambios (ROM)")
+        self.btn_save = QPushButton(_t("vmap_btn_save"))
         self.btn_save.clicked.connect(self._save_map)
         tools_row2.addWidget(self.btn_save)
         
-        self.btn_resize = QPushButton("Redimensionar Mapa")
+        self.btn_resize = QPushButton(_t("vmap_btn_resize"))
         self.btn_resize.clicked.connect(self._open_resize_dialog)
         tools_row2.addWidget(self.btn_resize)
 
-        self.btn_create = QPushButton("Crear Nuevo Mapa")
+        self.btn_create = QPushButton(_t("vmap_btn_create"))
         self.btn_create.clicked.connect(self._open_create_dialog)
         tools_row2.addWidget(self.btn_create)
 
-        self.btn_export_map = QPushButton("⬇ Exportar Mapa (BMP/PNG)")
+        self.btn_export_map = QPushButton(_t("vmap_btn_export_map"))
         self.btn_export_map.clicked.connect(self._export_map_image)
         tools_row2.addWidget(self.btn_export_map)
 
-        self.btn_import_map = QPushButton("⬆ Importar Mapa (BMP/PNG)")
+        self.btn_import_map = QPushButton(_t("vmap_btn_import_map"))
         self.btn_import_map.clicked.connect(self._import_map_image)
         tools_row2.addWidget(self.btn_import_map)
         
         # Fila de Estructuras Dinámicas
         self.tools_row_dyn = QHBoxLayout()
-        self.chk_dyn_enabled = QCheckBox("Estructuras Dinámicas")
+        self.chk_dyn_enabled = QCheckBox(_t("vmap_tab_dynamic"))
         self.chk_dyn_enabled.setChecked(True)
         self.chk_dyn_enabled.toggled.connect(self._on_dynamic_config_changed)
         self.tools_row_dyn.addWidget(self.chk_dyn_enabled)
@@ -410,38 +418,38 @@ class VisorMapas(QWidget):
         layout_dyn_farm.setContentsMargins(0, 0, 0, 0)
         layout_dyn_farm.setSpacing(6)
 
-        layout_dyn_farm.addWidget(QLabel("Casa:"))
+        layout_dyn_farm.addWidget(QLabel(_t("vmap_house")))
         self.cmb_dyn_house = QComboBox()
-        self.cmb_dyn_house.addItems(["Lv1", "Lv2", "Lv3", "Ninguna"])
+        self.cmb_dyn_house.addItems(["Lv1", "Lv2", "Lv3", _t("vmap_none_f")])
         self.cmb_dyn_house.currentIndexChanged.connect(self._on_dynamic_config_changed)
         layout_dyn_farm.addWidget(self.cmb_dyn_house)
 
-        layout_dyn_farm.addWidget(QLabel("Establo:"))
+        layout_dyn_farm.addWidget(QLabel(_t("vmap_barn")))
         self.cmb_dyn_barn = QComboBox()
-        self.cmb_dyn_barn.addItems(["Lv1", "Lv2", "Ninguno"])
+        self.cmb_dyn_barn.addItems(["Lv1", "Lv2", _t("vmap_none_m")])
         self.cmb_dyn_barn.currentIndexChanged.connect(self._on_dynamic_config_changed)
         layout_dyn_farm.addWidget(self.cmb_dyn_barn)
 
-        layout_dyn_farm.addWidget(QLabel("Gallinero:"))
+        layout_dyn_farm.addWidget(QLabel(_t("vmap_coop")))
         self.cmb_dyn_coop = QComboBox()
-        self.cmb_dyn_coop.addItems(["Lv1", "Lv2", "Ninguno"])
+        self.cmb_dyn_coop.addItems(["Lv1", "Lv2", _t("vmap_none_m")])
         self.cmb_dyn_coop.currentIndexChanged.connect(self._on_dynamic_config_changed)
         layout_dyn_farm.addWidget(self.cmb_dyn_coop)
 
-        self.chk_dyn_extras = QCheckBox("Buzón/Caseta")
+        self.chk_dyn_extras = QCheckBox(_t("vmap_mailbox"))
         self.chk_dyn_extras.setChecked(True)
         self.chk_dyn_extras.toggled.connect(self._on_dynamic_config_changed)
         layout_dyn_farm.addWidget(self.chk_dyn_extras)
 
-        self.chk_dyn_field = QCheckBox("Malla Cultivo (43x25)")
+        self.chk_dyn_field = QCheckBox(_t("vmap_crop_grid"))
         self.chk_dyn_field.setChecked(False)
         self.chk_dyn_field.toggled.connect(self._on_dynamic_config_changed)
         layout_dyn_farm.addWidget(self.chk_dyn_field)
         self.tools_row_dyn.addWidget(self.widget_dyn_farm)
 
         # 1b. Botón de Configuración de Estructuras Dinámicas (Abre ventana flotante)
-        self.btn_dyn_configure = QPushButton("Configurar Estructuras...")
-        self.btn_dyn_configure.setToolTip("Abre la ventana de configuración de estructuras dinámicas para este mapa")
+        self.btn_dyn_configure = QPushButton(_t("vmap_btn_dyn_configure"))
+        self.btn_dyn_configure.setToolTip(_t("vmap_btn_dyn_configure_tip"))
         self.btn_dyn_configure.clicked.connect(self._open_dynamic_structures_dialog)
         self.btn_dyn_configure.setVisible(False)
         self.tools_row_dyn.addWidget(self.btn_dyn_configure)
@@ -452,7 +460,7 @@ class VisorMapas(QWidget):
         layout_dyn_editor.setContentsMargins(0, 0, 0, 0)
         layout_dyn_editor.setSpacing(6)
 
-        layout_dyn_editor.addWidget(QLabel("Mover Estructura:"))
+        layout_dyn_editor.addWidget(QLabel(_t("vmap_move_struct")))
         self.cmb_dyn_selected = QComboBox()
         self.cmb_dyn_selected.currentIndexChanged.connect(self._on_dyn_selected_changed)
         layout_dyn_editor.addWidget(self.cmb_dyn_selected)
@@ -469,7 +477,7 @@ class VisorMapas(QWidget):
         self.spn_dyn_y.valueChanged.connect(self._on_dyn_pos_spin_changed)
         layout_dyn_editor.addWidget(self.spn_dyn_y)
 
-        self.btn_dyn_reset = QPushButton("Reset Posiciones")
+        self.btn_dyn_reset = QPushButton(_t("vmap_btn_reset_pos"))
         self.btn_dyn_reset.clicked.connect(self._on_dyn_reset_positions)
         layout_dyn_editor.addWidget(self.btn_dyn_reset)
 
@@ -480,7 +488,7 @@ class VisorMapas(QWidget):
         self.widget_dyn_beach = QWidget()
         layout_dyn_beach = QHBoxLayout(self.widget_dyn_beach)
         layout_dyn_beach.setContentsMargins(0, 0, 0, 0)
-        self.chk_dyn_beach = QCheckBox("Villa de la Playa (Gotz)")
+        self.chk_dyn_beach = QCheckBox(_t("vmap_beach_villa"))
         self.chk_dyn_beach.setChecked(True)
         self.chk_dyn_beach.toggled.connect(self._on_dynamic_config_changed)
         layout_dyn_beach.addWidget(self.chk_dyn_beach)
@@ -491,7 +499,7 @@ class VisorMapas(QWidget):
         self.widget_dyn_mountain = QWidget()
         layout_dyn_mountain = QHBoxLayout(self.widget_dyn_mountain)
         layout_dyn_mountain.setContentsMargins(0, 0, 0, 0)
-        self.chk_dyn_mountain = QCheckBox("Villa de la Montaña (Gotz)")
+        self.chk_dyn_mountain = QCheckBox(_t("vmap_mountain_villa"))
         self.chk_dyn_mountain.setChecked(True)
         self.chk_dyn_mountain.toggled.connect(self._on_dynamic_config_changed)
         layout_dyn_mountain.addWidget(self.chk_dyn_mountain)
@@ -502,7 +510,7 @@ class VisorMapas(QWidget):
         self.widget_dyn_town = QWidget()
         layout_dyn_town = QHBoxLayout(self.widget_dyn_town)
         layout_dyn_town.setContentsMargins(0, 0, 0, 0)
-        self.chk_dyn_town = QCheckBox("Villa de la Ciudad (100M G)")
+        self.chk_dyn_town = QCheckBox(_t("vmap_town_villa"))
         self.chk_dyn_town.setChecked(True)
         self.chk_dyn_town.toggled.connect(self._on_dynamic_config_changed)
         layout_dyn_town.addWidget(self.chk_dyn_town)
@@ -510,7 +518,7 @@ class VisorMapas(QWidget):
         self.tools_row_dyn.addWidget(self.widget_dyn_town)
 
         # Label para mapas sin estructuras dinámicas
-        self.lbl_dyn_none = QLabel("(Sin estructuras dinámicas en este mapa)")
+        self.lbl_dyn_none = QLabel(_t("vmap_no_dyn"))
         self.lbl_dyn_none.setStyleSheet("color: #777; font-style: italic;")
         self.lbl_dyn_none.setVisible(False)
         self.tools_row_dyn.addWidget(self.lbl_dyn_none)
@@ -545,21 +553,21 @@ class VisorMapas(QWidget):
         # Tileset
         ts_layout = QVBoxLayout()
         ts_controls = QHBoxLayout()
-        ts_controls.addWidget(QLabel("Tileset Pal:"))
+        ts_controls.addWidget(QLabel(_t("vmap_ts_pal")))
         self.cmb_ts_pal = QComboBox()
-        self.cmb_ts_pal.addItems(["Auto (Mapa)"] + [f"Pal {i}" for i in range(1, 16)])
+        self.cmb_ts_pal.addItems([_t("vmap_pal_auto")] + [f"Pal {i}" for i in range(1, 16)])
         self.cmb_ts_pal.currentIndexChanged.connect(self._re_render_tileset)
         ts_controls.addWidget(self.cmb_ts_pal)
         
-        self.btn_edit_palette = QPushButton("Editar Paleta")
+        self.btn_edit_palette = QPushButton(_t("vmap_btn_edit_palette"))
         self.btn_edit_palette.clicked.connect(self._open_palette_editor)
         ts_controls.addWidget(self.btn_edit_palette)
 
-        self.btn_export_ts = QPushButton("⬇ Exportar TS")
+        self.btn_export_ts = QPushButton(_t("vmap_btn_export_ts"))
         self.btn_export_ts.clicked.connect(self._export_tileset_image)
         ts_controls.addWidget(self.btn_export_ts)
 
-        self.btn_import_ts = QPushButton("⬆ Importar TS")
+        self.btn_import_ts = QPushButton(_t("vmap_btn_import_ts"))
         self.btn_import_ts.clicked.connect(self._import_tileset_image)
         ts_controls.addWidget(self.btn_import_ts)
         
@@ -618,7 +626,7 @@ class VisorMapas(QWidget):
     def load_maps(self):
         self.list_maps.clear()
         if not self.project or not self.project.base_rom_data:
-            QMessageBox.warning(self, "Error", "No hay ROM cargada.")
+            QMessageBox.warning(self, _t("msg_error"), _t("vmap_no_rom"))
             return
 
         self.map_parser.scan_maps()
@@ -856,7 +864,7 @@ class VisorMapas(QWidget):
         self._save_state_pending = False
         img, ts_img = result
         if img is None:
-            self.lbl_info.setText("[Alerta] No se pudo renderizar el mapa (faltan datos).")
+            self.lbl_info.setText(_t("vmap_render_failed"))
             self.lbl_image.clear()
             self.lbl_ts.clear()
             return
@@ -903,7 +911,7 @@ class VisorMapas(QWidget):
 
     def _on_map_error(self, error_msg):
         self.progress.setVisible(False)
-        self.lbl_info.setText(f"[Error] Error: {error_msg[:120]}")
+        self.lbl_info.setText(_t("vmap_render_error", msg=error_msg[:120]))
         print(f"[VisorMapas] Error:\n{error_msg}")
 
     def _on_tileset_clicked(self, px, py):
@@ -917,7 +925,7 @@ class VisorMapas(QWidget):
         self._copied_from_map = False
         
         assigned_pal = self.renderer.get_tile_palette(self.selected_tile) if self.cmb_ts_pal.currentIndex() == 0 else self.cmb_ts_pal.currentIndex()
-        self.lbl_info.setText(f"Pincel Tile: 0x{self.selected_tile:03X} (Pal {assigned_pal})")
+        self.lbl_info.setText(_t("vmap_tile_brush", tile=f"0x{self.selected_tile:03X}", pal=assigned_pal))
         self._re_render_tileset()
 
     def _on_map_mouse_released(self):
@@ -929,7 +937,7 @@ class VisorMapas(QWidget):
         self.cmb_col_brush.clear()
         
         if not self.renderer.behavior_dict:
-            self.cmb_col_brush.addItems([f"{i:02X}: Desconocido" for i in range(256)])
+            self.cmb_col_brush.addItems([f"{i:02X}: {_t('vmap_unknown')}" for i in range(256)])
             self.cmb_col_brush.blockSignals(False)
             return
 
@@ -1136,7 +1144,7 @@ class VisorMapas(QWidget):
             
             self.selected_tile = val
             self._copied_from_map = True
-            self.lbl_info.setText(f"Cuentagotas: Tile 0x{self.selected_tile:04X} copiado (incluye paleta).")
+            self.lbl_info.setText(_t("vmap_eyedropper", tile=f"0x{self.selected_tile:04X}"))
             self._re_render_tileset()
             return
 
@@ -1147,12 +1155,12 @@ class VisorMapas(QWidget):
             
         val = self.renderer.collision_map[idx]
         if val == 0:
-            QMessageBox.information(self, "Trigger Info", "Esta celda es terreno caminable normal (00). No es un Trigger.")
+            QMessageBox.information(self, _t("vmap_trigger_info"), _t("vmap_trigger_walkable"))
             return
             
         trigger_info = self.renderer.get_trigger(cell_x, cell_y, val)
         if not trigger_info:
-            QMessageBox.information(self, "Trigger Info", "Esta celda tiene asignada una colisión, pero no se encontró un Evento de Script en estas coordenadas.")
+            QMessageBox.information(self, _t("vmap_trigger_info"), _t("vmap_trigger_no_script"))
             return
             
         flags, script_id, rom_addr = trigger_info
@@ -1162,7 +1170,7 @@ class VisorMapas(QWidget):
             new_flags, new_script = dlg.get_data()
             self.renderer.set_trigger(val, rom_addr, new_flags, new_script)
             self.project.base_rom_data = bytearray(self.renderer.rom)
-            self.lbl_info.setText(f"Trigger {val:02X} actualizado: Script {new_script}, Flags {new_flags:04X}")
+            self.lbl_info.setText(_t("vmap_trigger_updated", val=f"{val:02X}", script=new_script, flags=f"{new_flags:04X}"))
 
     def _on_behavior_changed(self, val):
         pass # Remove behavior sync since we removed the inspector info panel
@@ -1207,7 +1215,7 @@ class VisorMapas(QWidget):
         
     def _open_resize_dialog(self):
         if self.selected_map_index < 0 or not self.renderer._loaded:
-            QMessageBox.warning(self, "Error", "Debe cargar un mapa primero.")
+            QMessageBox.warning(self, _t("msg_error"), _t("vmap_must_load_map"))
             return
             
         current_w = self.renderer.width
@@ -1223,7 +1231,7 @@ class VisorMapas(QWidget):
             
     def _open_create_dialog(self):
         dlg = MapResizeDialog(10, 10, self)
-        dlg.setWindowTitle("Crear Nuevo Mapa")
+        dlg.setWindowTitle(_t("vmap_btn_create"))
         if dlg.exec() == QDialog.DialogCode.Accepted:
             new_w, new_h = dlg.get_size()
             self._create_map_prototype(new_w, new_h)
@@ -1231,10 +1239,10 @@ class VisorMapas(QWidget):
     def _create_map_prototype(self, new_w, new_h):
         try:
             new_id = self.map_parser.create_new_map(new_w, new_h)
-            QMessageBox.information(self, "Mapa Creado", f"Se ha creado el nuevo mapa con ID {new_id}.\nRecarga la lista para verlo.")
+            QMessageBox.information(self, _t("vmap_map_created_title"), _t("vmap_map_created", id=new_id))
             self.load_maps()
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error al crear mapa: {e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("vmap_create_error", err=e))
 
     def _resize_map_prototype(self, new_w, new_h):
         # 1. Analizar tamaño anterior y calcular la diferencia
@@ -1261,20 +1269,18 @@ class VisorMapas(QWidget):
         # 6. Guardar la nueva cabecera y potencialmente reescribir/repuntear la tabla maestra en el Literal Pool
         # header_table_offset = self.map_parser._table_offset
         
-        QMessageBox.information(self, "Redimensionador (Prototipo)", 
-            f"Estructura de repunteo generada.\n"
-            f"El mapa {mh.map_id} pasaría de {old_w}x{old_h} a {new_w}x{new_h}.\n"
-            "Falta conectar la sobreescritura real de los arrays y ROM.")
+        QMessageBox.information(self, _t("vmap_resize_proto_title"),
+            _t("vmap_resize_proto", id=mh.map_id, old=f"{old_w}x{old_h}", new=f"{new_w}x{new_h}"))
 
     def _save_map(self):
         from PyQt6.QtWidgets import QMessageBox
         if self.selected_map_index >= 0:
             try:
                 self.map_parser.save_map(self.selected_map_index, self.renderer)
-                QMessageBox.information(self, "Exito", "Mapa compilado y guardado en la ROM exitosamente.")
+                QMessageBox.information(self, _t("msg_success"), _t("vmap_saved_ok"))
             except Exception as e:
                 import traceback
-                QMessageBox.critical(self, "Error", f"Error guardando mapa:\n{e}\n{traceback.format_exc()}")
+                QMessageBox.critical(self, _t("msg_error"), _t("vmap_save_error", err=e) + "\n" + traceback.format_exc())
 
     # ── MÉTODOS DE ESTRUCTURAS DINÁMICAS (CAPA 5) ──────────────────────────
 
@@ -1343,7 +1349,7 @@ class VisorMapas(QWidget):
             self.renderer.dynamic_config['positions'] = {}
 
         self.renderer.dynamic_config['positions'][struct_id] = (new_x, new_y)
-        self.lbl_info.setText(f"[Estructuras Dinámicas] '{struct_id}' reubicada en X={new_x}, Y={new_y}")
+        self.lbl_info.setText(_t("vmap_dyn_moved", id=struct_id, x=new_x, y=new_y))
         self.spn_dyn_x.blockSignals(True)
         self.spn_dyn_y.blockSignals(True)
         self.spn_dyn_x.setValue(new_x)
@@ -1357,13 +1363,13 @@ class VisorMapas(QWidget):
             self.renderer.dynamic_config['positions'].clear()
             self._update_dyn_structures_combo()
             self._re_render_map_only()
-            self.lbl_info.setText("[Estructuras Dinámicas] Posiciones restablecidas a valores de ROM.")
+            self.lbl_info.setText(_t("vmap_dyn_reset"))
 
     # ── IMPORTACIÓN Y EXPORTACIÓN DE MAPAS Y TILESETS ─────────────────────
 
     def _export_map_image(self):
         if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
-            QMessageBox.warning(self, "Aviso", "No hay ningún mapa cargado para exportar.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("vmap_no_map_export"))
             return
 
         map_name = f"mapa_{self.selected_map_index:02d}"
@@ -1377,9 +1383,9 @@ class VisorMapas(QWidget):
 
         path, _ = QFileDialog.getSaveFileName(
             self,
-            "Exportar Mapa Completo",
+            _t("vmap_dlg_export_map"),
             default_dir,
-            "Imagen PNG (*.png);;Mapa de Bits BMP (*.bmp);;Todos los archivos (*.*)"
+            _t("vmap_filter_save_img")
         )
         if not path:
             return
@@ -1402,22 +1408,22 @@ class VisorMapas(QWidget):
             else:
                 img.save(path)
 
-            QMessageBox.information(self, "Exportación Exitosa", f"Mapa exportado correctamente a:\n{path}")
+            QMessageBox.information(self, _t("vmap_export_ok_title"), _t("vmap_map_exported", path=path))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Fallo al exportar el mapa:\n{e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("vmap_map_export_error", err=e))
 
     def _import_map_image(self):
         if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
-            QMessageBox.warning(self, "Aviso", "Debes cargar un mapa primero.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("vmap_must_load_map"))
             return
 
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
         from PyQt6.QtWidgets import QFileDialog
         path, _ = QFileDialog.getOpenFileName(
             self,
-            "Importar Imagen de Mapa (BMP/PNG)",
+            _t("vmap_dlg_import_map"),
             get_default_workspace_dir(),
-            "Imágenes (*.png *.bmp *.jpg);;Todos los archivos (*.*)"
+            _t("vmap_filter_open_img")
         )
         if not path:
             return
@@ -1434,7 +1440,7 @@ class VisorMapas(QWidget):
             if target_layer not in (1, 2, 3):
                 target_layer = 1 # Fondo por defecto
 
-            layer_name = "Fondo (p_bg3)" if target_layer == 1 else ("Medio (p_bg2)" if target_layer == 2 else "Frente (p_bg1)")
+            layer_name = _t("vmap_tab_bg3") if target_layer == 1 else (_t("vmap_tab_bg2") if target_layer == 2 else _t("vmap_tab_bg1"))
             target_tilemap = self.renderer.tilemap_bg3 if target_layer == 1 else (self.renderer.tilemap_bg2 if target_layer == 2 else self.renderer.tilemap_bg1)
 
             cols = min(map_w, img_w // 8)
@@ -1449,13 +1455,13 @@ class VisorMapas(QWidget):
                         target_tilemap[idx] = (pal_idx << 12) | ((r * cols + c) % max(1, len(self.renderer.tiles)))
 
             self._re_render_map_only()
-            QMessageBox.information(self, "Importación", f"Imagen importada exitosamente sobre la capa {layer_name}.")
+            QMessageBox.information(self, _t("vmap_import_title"), _t("vmap_img_imported", layer=layer_name))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error al importar imagen de mapa:\n{e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("vmap_img_import_error", err=e))
 
     def _export_tileset_image(self):
         if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded or not self.renderer.tiles:
-            QMessageBox.warning(self, "Aviso", "No hay tileset disponible para exportar.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("vmap_no_tileset"))
             return
 
         map_id = self.selected_map_index
@@ -1466,7 +1472,7 @@ class VisorMapas(QWidget):
         bank = self.pal_bank
         ts_img = self.renderer.render_tileset(pal_idx=pal_idx, bank=bank)
         if not ts_img:
-            QMessageBox.warning(self, "Aviso", "No se pudo renderizar el tileset.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("vmap_ts_render_failed"))
             return
 
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
@@ -1475,9 +1481,9 @@ class VisorMapas(QWidget):
 
         path, _ = QFileDialog.getSaveFileName(
             self,
-            "Exportar Tileset de Mapa",
+            _t("vmap_dlg_export_ts"),
             default_path,
-            "Imagen PNG (*.png);;Mapa de Bits BMP (*.bmp);;Todos los archivos (*.*)"
+            _t("vmap_filter_save_img")
         )
         if not path:
             return
@@ -1487,22 +1493,22 @@ class VisorMapas(QWidget):
                 ts_img.convert("RGB").save(path, format="BMP")
             else:
                 ts_img.save(path)
-            QMessageBox.information(self, "Exportación Exitosa", f"Tileset exportado correctamente a:\n{path}")
+            QMessageBox.information(self, _t("vmap_export_ok_title"), _t("vmap_ts_exported", path=path))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Fallo al exportar el tileset:\n{e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("vmap_ts_export_error", err=e))
 
     def _import_tileset_image(self):
         if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
-            QMessageBox.warning(self, "Aviso", "Debes cargar un mapa primero.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("vmap_must_load_map"))
             return
 
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
         from PyQt6.QtWidgets import QFileDialog
         path, _ = QFileDialog.getOpenFileName(
             self,
-            "Importar Tileset (BMP/PNG)",
+            _t("vmap_dlg_import_ts"),
             get_default_workspace_dir(),
-            "Imágenes (*.png *.bmp *.jpg);;Todos los archivos (*.*)"
+            _t("vmap_filter_open_img")
         )
         if not path:
             return
@@ -1565,12 +1571,12 @@ class VisorMapas(QWidget):
                         raw_4bpp.append(px_left | (px_right << 4))
 
                 self.map_parser.save_tileset(self.selected_map_index, bytes(raw_4bpp))
-                QMessageBox.information(self, "Inyección Exitosa", "Tileset comprimido con ArcanoMarvelous e inyectado en la ROM.")
+                QMessageBox.information(self, _t("vmap_inject_ok_title"), _t("vmap_ts_injected"))
 
             self._re_render()
         except Exception as e:
             import traceback
-            QMessageBox.critical(self, "Error", f"Fallo al importar el tileset:\n{e}\n{traceback.format_exc()}")
+            QMessageBox.critical(self, _t("msg_error"), _t("vmap_ts_import_error", err=e) + "\n" + traceback.format_exc())
 
     def _open_utensils_dialog(self):
         from PyQt6.QtWidgets import QDialog, QVBoxLayout, QCheckBox, QDialogButtonBox, QLabel
@@ -1582,9 +1588,9 @@ class VisorMapas(QWidget):
         dialog = QDialog(self)
         self._utensils_dialog = dialog
         dialog.setWindowModality(Qt.WindowModality.NonModal)
-        dialog.setWindowTitle("Utensilios de Cocina")
+        dialog.setWindowTitle(_t("vmap_utensils_title"))
         layout = QVBoxLayout(dialog)
-        layout.addWidget(QLabel("Selecciona los utensilios visibles en la cocina:"))
+        layout.addWidget(QLabel(_t("vmap_utensils_prompt")))
 
         utensil_names = [
             "Cuchillo", "Sartén", "Olla", "Batidora",
@@ -1628,7 +1634,7 @@ class VisorMapas(QWidget):
         dialog = QDialog(self)
         self._dynamic_structs_dialog = dialog
         dialog.setWindowModality(Qt.WindowModality.NonModal)
-        dialog.setWindowTitle(f"Estructuras Dinámicas - Mapa {map_id}")
+        dialog.setWindowTitle(_t("vmap_dyn_dialog_title", id=map_id))
         dialog.setMinimumWidth(380)
         dlg_layout = QVBoxLayout(dialog)
         dlg_layout.setSpacing(10)
@@ -1679,20 +1685,20 @@ class VisorMapas(QWidget):
 
         if map_id in (41, 42, 43):
             # 1. Almacenamiento y Sonido
-            grp_storage = QGroupBox("Almacenamiento y Sonido")
+            grp_storage = QGroupBox(_t("vmap_grp_storage"))
             grid_s = QGridLayout(grp_storage)
 
-            grid_s.addWidget(QLabel("Caja de Herramientas:"), 0, 0)
+            grid_s.addWidget(QLabel(_t("vmap_toolbox")), 0, 0)
             cmb_tb = QComboBox()
-            cmb_tb.addItems(["Cerrada", "Abierta", "Ocultar"])
+            cmb_tb.addItems([_t("vmap_closed_f"), _t("vmap_open_f"), _t("vmap_hide")])
             tb_val = getattr(self, 'house_toolbox_choice', 'closed')
             cmb_tb.setCurrentIndex(0 if tb_val == 'closed' else (1 if tb_val == 'open' else 2))
             cmb_tb.currentIndexChanged.connect(sync_live_config)
             grid_s.addWidget(cmb_tb, 0, 1)
 
-            grid_s.addWidget(QLabel("Tocadiscos:"), 1, 0)
+            grid_s.addWidget(QLabel(_t("vmap_record_player")), 1, 0)
             cmb_rp = QComboBox()
-            cmb_rp.addItems(["Base", "Con Discos", "Activo", "Ocultar"])
+            cmb_rp.addItems([_t("vmap_rp_base"), _t("vmap_rp_records"), _t("vmap_rp_active"), _t("vmap_hide")])
             rp_val = getattr(self, 'house_record_player_choice', 'base')
             cmb_rp.setCurrentIndex(0 if rp_val == 'base' else (1 if rp_val == 'discs' else (2 if rp_val == 'active' else 3)))
             cmb_rp.currentIndexChanged.connect(sync_live_config)
@@ -1701,62 +1707,62 @@ class VisorMapas(QWidget):
 
             # 2. Cocina y Almacenamiento (Mapas 42 y 43)
             if map_id in (42, 43):
-                grp_kitchen = QGroupBox("Cocina y Almacenamiento")
+                grp_kitchen = QGroupBox(_t("vmap_grp_kitchen"))
                 grid_k = QGridLayout(grp_kitchen)
 
-                grid_k.addWidget(QLabel("Refrigerador:"), 0, 0)
+                grid_k.addWidget(QLabel(_t("vmap_fridge")), 0, 0)
                 cmb_fridge = QComboBox()
-                cmb_fridge.addItems(["Cerrado", "Abierto", "Ocultar"])
+                cmb_fridge.addItems([_t("vmap_closed_m"), _t("vmap_open_m"), _t("vmap_hide")])
                 f_val = getattr(self, 'house_fridge_choice', 'closed')
                 cmb_fridge.setCurrentIndex(0 if f_val == 'closed' else (1 if f_val == 'open' else 2))
                 cmb_fridge.currentIndexChanged.connect(sync_live_config)
                 grid_k.addWidget(cmb_fridge, 0, 1)
 
-                grid_k.addWidget(QLabel("Anaquel:"), 1, 0)
+                grid_k.addWidget(QLabel(_t("vmap_shelf")), 1, 0)
                 cmb_shelf = QComboBox()
-                cmb_shelf.addItems(["Cerrado", "Abierto", "Ocultar"])
+                cmb_shelf.addItems([_t("vmap_closed_m"), _t("vmap_open_m"), _t("vmap_hide")])
                 s_val = getattr(self, 'house_shelf_choice', 'closed')
                 cmb_shelf.setCurrentIndex(0 if s_val == 'closed' else (1 if s_val == 'open' else 2))
                 cmb_shelf.currentIndexChanged.connect(sync_live_config)
                 grid_k.addWidget(cmb_shelf, 1, 1)
 
-                chk_kitchen = QCheckBox("Mueble de Cocina")
+                chk_kitchen = QCheckBox(_t("vmap_kitchen_counter"))
                 chk_kitchen.setChecked(getattr(self, 'house_kitchen_choice', True))
                 chk_kitchen.toggled.connect(sync_live_config)
                 grid_k.addWidget(chk_kitchen, 2, 0)
 
-                btn_u = QPushButton("Utensilios (8)...")
+                btn_u = QPushButton(_t("vmap_btn_utensils"))
                 btn_u.clicked.connect(self._open_utensils_dialog)
                 grid_k.addWidget(btn_u, 2, 1)
                 dlg_layout.addWidget(grp_kitchen)
 
             # 3. Estructuras de Casa
-            grp_rooms = QGroupBox("Estructuras de Casa")
+            grp_rooms = QGroupBox(_t("vmap_grp_rooms"))
             vbox_r = QVBoxLayout(grp_rooms)
 
             if map_id in (42, 43):
-                chk_dining = QCheckBox("Comedor / Mesa Grande (con Alfombra)")
+                chk_dining = QCheckBox(_t("vmap_dining"))
                 chk_dining.setChecked(getattr(self, 'house_dining_choice', True))
                 chk_dining.toggled.connect(sync_live_config)
                 vbox_r.addWidget(chk_dining)
 
             if map_id == 43:
-                chk_fireplace = QCheckBox("Chimenea (6x8 tiles)")
+                chk_fireplace = QCheckBox(_t("vmap_fireplace"))
                 chk_fireplace.setChecked(getattr(self, 'house_fireplace_choice', True))
                 chk_fireplace.toggled.connect(sync_live_config)
                 vbox_r.addWidget(chk_fireplace)
 
                 row_bd = QHBoxLayout()
-                row_bd.addWidget(QLabel("Puerta del Baño:"))
+                row_bd.addWidget(QLabel(_t("vmap_bath_door")))
                 cmb_bath_door = QComboBox()
-                cmb_bath_door.addItems(["Cerrada", "Abierta", "Ocultar"])
+                cmb_bath_door.addItems([_t("vmap_closed_f"), _t("vmap_open_f"), _t("vmap_hide")])
                 bd_val = getattr(self, 'house_bathroom_door_choice', 'closed')
                 cmb_bath_door.setCurrentIndex(0 if bd_val == 'closed' else (1 if bd_val == 'open' else 2))
                 cmb_bath_door.currentIndexChanged.connect(sync_live_config)
                 row_bd.addWidget(cmb_bath_door)
                 vbox_r.addLayout(row_bd)
 
-                chk_bed = QCheckBox("Cama Matrimonial (6x8 tiles)")
+                chk_bed = QCheckBox(_t("vmap_double_bed"))
                 chk_bed.setChecked(getattr(self, 'house_double_bed_choice', True))
                 chk_bed.toggled.connect(sync_live_config)
                 vbox_r.addWidget(chk_bed)
@@ -1764,21 +1770,21 @@ class VisorMapas(QWidget):
             dlg_layout.addWidget(grp_rooms)
 
             # 4. Decoración
-            grp_decor = QGroupBox("Decoración")
+            grp_decor = QGroupBox(_t("vmap_grp_decor"))
             vbox_d = QVBoxLayout(grp_decor)
 
-            chk_vase = QCheckBox("Florero")
+            chk_vase = QCheckBox(_t("vmap_vase"))
             chk_vase.setChecked(getattr(self, 'house_vase_choice', True))
             chk_vase.toggled.connect(sync_live_config)
             vbox_d.addWidget(chk_vase)
 
-            chk_mirror = QCheckBox("Espejo")
+            chk_mirror = QCheckBox(_t("vmap_mirror"))
             chk_mirror.setChecked(getattr(self, 'house_mirror_choice', True))
             chk_mirror.toggled.connect(sync_live_config)
             vbox_d.addWidget(chk_mirror)
 
             if map_id in (42, 43):
-                chk_clock = QCheckBox("Reloj")
+                chk_clock = QCheckBox(_t("vmap_clock"))
                 chk_clock.setChecked(getattr(self, 'house_clock_choice', True))
                 chk_clock.toggled.connect(sync_live_config)
                 vbox_d.addWidget(chk_clock)
@@ -1786,23 +1792,23 @@ class VisorMapas(QWidget):
             dlg_layout.addWidget(grp_decor)
 
         elif map_id in (36, 37):
-            grp_coop = QGroupBox("Maquinaria del Gallinero")
+            grp_coop = QGroupBox(_t("vmap_grp_coop"))
             vbox_c = QVBoxLayout(grp_coop)
-            chk_mayo = QCheckBox("Máquina de Mayonesa (3x5 tiles, Canon X=2, Y=5)")
+            chk_mayo = QCheckBox(_t("vmap_mayo"))
             chk_mayo.setChecked(getattr(self, 'maker_mayo_choice', True))
             chk_mayo.toggled.connect(sync_live_config)
             vbox_c.addWidget(chk_mayo)
             dlg_layout.addWidget(grp_coop)
 
         elif map_id in (38, 39):
-            grp_barn = QGroupBox("Maquinaria del Establo")
+            grp_barn = QGroupBox(_t("vmap_grp_barn"))
             vbox_b = QVBoxLayout(grp_barn)
-            chk_cheese = QCheckBox("Máquina de Queso (3x5 tiles, Canon X=12, Y=5)")
+            chk_cheese = QCheckBox(_t("vmap_cheese"))
             chk_cheese.setChecked(getattr(self, 'maker_cheese_choice', True))
             chk_cheese.toggled.connect(sync_live_config)
             vbox_b.addWidget(chk_cheese)
 
-            chk_yarn = QCheckBox("Máquina de Lana (3x5 tiles, Canon X=8, Y=5)")
+            chk_yarn = QCheckBox(_t("vmap_yarn"))
             chk_yarn.setChecked(getattr(self, 'maker_yarn_choice', True))
             chk_yarn.toggled.connect(sync_live_config)
             vbox_b.addWidget(chk_yarn)

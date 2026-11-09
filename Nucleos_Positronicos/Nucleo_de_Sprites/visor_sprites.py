@@ -32,6 +32,7 @@ from PyQt6.QtGui import QImage, QPixmap, QPainter, QColor, QPen
 
 from Banco_de_Datos.Utilidades.rutas import get_data_path
 from Consola_de_Comando.i18n import tr, get_lang_from_widget
+from Consola_de_Comando.i18n import t as _t
 
 
 # ============================================================
@@ -343,7 +344,7 @@ class SpriteInfoPanel(QFrame):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(6)
 
-        title = QLabel("TELEMETRIA CANONICA")
+        title = QLabel(_t("spr_telemetry"))
         title.setStyleSheet("color: #00FF96; font-size: 12px; font-weight: bold; letter-spacing: 2px;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
@@ -353,14 +354,14 @@ class SpriteInfoPanel(QFrame):
         sep.setStyleSheet("color: #1F1F2C;")
         layout.addWidget(sep)
 
-        self.lbl_name = self._field("Animacion:")
+        self.lbl_name = self._field(_t("spr_f_anim") + ":")
         self.lbl_id = self._field("ID:")
-        self.lbl_category = self._field("Categoria:")
+        self.lbl_category = self._field(_t("spr_f_category") + ":")
         self.lbl_rom_addr = self._field("Script ROM:")
         self.lbl_frames = self._field("Frames:")
-        self.lbl_unique = self._field("Frames Unicos:")
-        self.lbl_oam = self._field("Partes OAM:")
-        self.lbl_pal_idx = self._field("Indice Paleta:")
+        self.lbl_unique = self._field(_t("spr_f_unique") + ":")
+        self.lbl_oam = self._field(_t("spr_f_oam") + ":")
+        self.lbl_pal_idx = self._field(_t("spr_f_pal") + ":")
 
         for lbl in [
             self.lbl_name, self.lbl_id, self.lbl_category, self.lbl_rom_addr,
@@ -373,7 +374,7 @@ class SpriteInfoPanel(QFrame):
         sep2.setStyleSheet("color: #1F1F2C;")
         layout.addWidget(sep2)
 
-        lbl_pal = QLabel("PALETA BGR555 ACTIVA:")
+        lbl_pal = QLabel(_t("spr_active_pal"))
         lbl_pal.setStyleSheet("color: #FFD700; font-size: 10px; font-weight: bold; letter-spacing: 1px;")
         layout.addWidget(lbl_pal)
 
@@ -388,7 +389,7 @@ class SpriteInfoPanel(QFrame):
         return lbl
 
     def update_info(self, name: str, anim_id: int, category: str, anim_data: Dict[str, Any]):
-        self.lbl_name.setText(f"Animacion: {name}")
+        self.lbl_name.setText(f"{_t('spr_f_anim')}: {name}")
         self.lbl_id.setText(f"ID: 0x{anim_id:04X} ({anim_id})")
 
         cat_colors = {
@@ -399,14 +400,14 @@ class SpriteInfoPanel(QFrame):
             "Varios": "#CCCCCC"
         }
         color = cat_colors.get(category, "#CCCCCC")
-        self.lbl_category.setText(f"Categoria: {category}")
+        self.lbl_category.setText(f"{_t('spr_f_category')}: {category}")
         self.lbl_category.setStyleSheet(f"color: {color}; font-size: 11px; font-family: 'Consolas'; font-weight: bold;")
 
         self.lbl_rom_addr.setText(f"Script ROM: 0x{anim_data['script_rom_addr']:08X}")
         self.lbl_frames.setText(f"Frames: {len(anim_data['frames'])}")
-        self.lbl_unique.setText(f"Frames Unicos: {len(anim_data['unique_frames'])}")
-        self.lbl_oam.setText(f"Partes OAM: {anim_data['avg_oam_parts']} prom.")
-        self.lbl_pal_idx.setText(f"Indice Paleta: #{anim_data['pal_idx']}")
+        self.lbl_unique.setText(f"{_t('spr_f_unique')}: {len(anim_data['unique_frames'])}")
+        self.lbl_oam.setText(f"{_t('spr_f_oam')}: " + _t("spr_avg", n=anim_data['avg_oam_parts']))
+        self.lbl_pal_idx.setText(f"{_t('spr_f_pal')}: #{anim_data['pal_idx']}")
 
         self.pal_preview.set_palette(anim_data.get("palette_rgb", []))
 
@@ -487,7 +488,7 @@ class LiveAnimationPlayer(QWidget):
         self.btn_step_prev.clicked.connect(self._step_prev)
         btn_row.addWidget(self.btn_step_prev)
 
-        self.btn_play_pause = QPushButton("PAUSA")
+        self.btn_play_pause = QPushButton(_t("spr_pause"))
         self.btn_play_pause.setFixedSize(70, 26)
         self.btn_play_pause.setStyleSheet("font-weight: bold; background: #00FF96; color: black;")
         self.btn_play_pause.clicked.connect(self._toggle_play)
@@ -501,7 +502,7 @@ class LiveAnimationPlayer(QWidget):
         btn_row.addSpacing(10)
 
         # Selector de Velocidad
-        btn_row.addWidget(QLabel("Velocidad:", styleSheet="color: #888899; font-size: 10px;"))
+        btn_row.addWidget(QLabel(_t("spr_speed"), styleSheet="color: #888899; font-size: 10px;"))
         self.combo_speed = QComboBox()
         self.combo_speed.addItems(["0.25x", "0.5x", "1.0x", "2.0x"])
         self.combo_speed.setCurrentText("1.0x")
@@ -532,7 +533,7 @@ class LiveAnimationPlayer(QWidget):
 
         if not anim_data or not anim_data.get("frames"):
             self.display.set_image(QPixmap())
-            self.display.setText("Sin datos de animacion")
+            self.display.setText(_t("spr_no_anim_data"))
             self.lbl_frame_counter.setText("Frame: 0 / 0")
             self.lbl_duration.setText("0 ms")
             self.slider.setRange(0, 0)
@@ -593,12 +594,12 @@ class LiveAnimationPlayer(QWidget):
     def _toggle_play(self):
         self.is_playing = not self.is_playing
         if self.is_playing:
-            self.btn_play_pause.setText("PAUSA")
+            self.btn_play_pause.setText(_t("spr_pause"))
             self.btn_play_pause.setStyleSheet("font-weight: bold; background: #00FF96; color: black;")
             self._schedule_next_frame()
         else:
             self.timer.stop()
-            self.btn_play_pause.setText("REPRODUCIR")
+            self.btn_play_pause.setText(_t("spr_play"))
             self.btn_play_pause.setStyleSheet("font-weight: bold; background: #FFD700; color: black;")
 
     def _step_next(self):
@@ -606,7 +607,7 @@ class LiveAnimationPlayer(QWidget):
             return
         self.timer.stop()
         self.is_playing = False
-        self.btn_play_pause.setText("REPRODUCIR")
+        self.btn_play_pause.setText(_t("spr_play"))
         self.btn_play_pause.setStyleSheet("font-weight: bold; background: #FFD700; color: black;")
 
         total = len(self.anim_data["frames"])
@@ -618,7 +619,7 @@ class LiveAnimationPlayer(QWidget):
             return
         self.timer.stop()
         self.is_playing = False
-        self.btn_play_pause.setText("REPRODUCIR")
+        self.btn_play_pause.setText(_t("spr_play"))
         self.btn_play_pause.setStyleSheet("font-weight: bold; background: #FFD700; color: black;")
 
         total = len(self.anim_data["frames"])
@@ -671,16 +672,16 @@ class SheetViewer(QWidget):
         bar = QHBoxLayout()
         bar.setSpacing(8)
 
-        bar.addWidget(QLabel("Modo Sheet:", styleSheet="color: #888899; font-size: 10px;"))
+        bar.addWidget(QLabel(_t("spr_sheet_mode"), styleSheet="color: #888899; font-size: 10px;"))
         self.combo_mode = QComboBox()
-        self.combo_mode.addItems(["Mosaico Grilla", "Tira Horizontal"])
+        self.combo_mode.addItems([_t("spr_mode_grid"), _t("spr_mode_strip")])
         self.combo_mode.setStyleSheet("background: #181822; color: white; padding: 2px 6px; font-size: 10px;")
         self.combo_mode.currentIndexChanged.connect(self._on_mode_changed)
         bar.addWidget(self.combo_mode)
 
         bar.addSpacing(10)
 
-        bar.addWidget(QLabel("Zoom Sheet:", styleSheet="color: #888899; font-size: 10px;"))
+        bar.addWidget(QLabel(_t("spr_sheet_zoom"), styleSheet="color: #888899; font-size: 10px;"))
         self.spn_zoom = QSpinBox()
         self.spn_zoom.setRange(1, 8)
         self.spn_zoom.setValue(2)
@@ -699,7 +700,7 @@ class SheetViewer(QWidget):
         if not anim_data:
             self.sheet_img = None
             self.display.set_image(QPixmap())
-            self.display.setText("Sin hoja de sprites")
+            self.display.setText(_t("spr_no_sheet"))
             self.lbl_dims.setText("-- x -- px")
             return
 
@@ -752,12 +753,12 @@ class VisorSprites(QWidget):
 
         # Header principal
         header_layout = QHBoxLayout()
-        header = QLabel("VISOR CANONICO DE SPRITES Y ANIMACIONES FoMT GBA")
+        header = QLabel(_t("spr_title"))
         header.setStyleSheet("font-size: 15px; font-weight: bold; color: #00FF96; letter-spacing: 1px;")
         header_layout.addWidget(header)
         header_layout.addStretch()
 
-        self.lbl_status = QLabel("Listo. Esperando ROM.")
+        self.lbl_status = QLabel(_t("spr_ready_wait"))
         self.lbl_status.setStyleSheet("color: #888899; font-size: 11px;")
         header_layout.addWidget(self.lbl_status)
         layout.addLayout(header_layout)
@@ -767,7 +768,7 @@ class VisorSprites(QWidget):
         filter_box.setSpacing(6)
 
         self.txt_search = QLineEdit()
-        self.txt_search.setPlaceholderText("Buscar por nombre o ID (ej: Player, Axe, Dog, 0x0010)...")
+        self.txt_search.setPlaceholderText(_t("spr_search"))
         self.txt_search.setStyleSheet("""
             QLineEdit {
                 background: #0D0D14; color: #00E5FF;
@@ -859,10 +860,10 @@ class VisorSprites(QWidget):
         """)
 
         self.player_widget = LiveAnimationPlayer()
-        self.tab_views.addTab(self.player_widget, "ANIMACION EN VIVO (GIF)")
+        self.tab_views.addTab(self.player_widget, _t("spr_tab_live"))
 
         self.sheet_widget = SheetViewer()
-        self.tab_views.addTab(self.sheet_widget, "HOJA DE SPRITES (SHEET)")
+        self.tab_views.addTab(self.sheet_widget, _t("spr_tab_sheet"))
 
         center_layout.addWidget(self.tab_views, 1)
 
@@ -870,7 +871,7 @@ class VisorSprites(QWidget):
         action_bar = QHBoxLayout()
         action_bar.setSpacing(8)
 
-        self.btn_export_gif = QPushButton("EXPORTAR GIF ANIMADO")
+        self.btn_export_gif = QPushButton(_t("spr_btn_gif"))
         self.btn_export_gif.setStyleSheet("""
             QPushButton { background: #00FF96; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
             QPushButton:hover { background: #33FFB0; }
@@ -878,7 +879,7 @@ class VisorSprites(QWidget):
         self.btn_export_gif.clicked.connect(self._on_export_gif)
         action_bar.addWidget(self.btn_export_gif)
 
-        self.btn_export_sheet = QPushButton("EXPORTAR SHEET (PNG)")
+        self.btn_export_sheet = QPushButton(_t("spr_btn_sheet"))
         self.btn_export_sheet.setStyleSheet("""
             QPushButton { background: #00BFFF; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
             QPushButton:hover { background: #33CCFF; }
@@ -886,7 +887,7 @@ class VisorSprites(QWidget):
         self.btn_export_sheet.clicked.connect(self._on_export_sheet)
         action_bar.addWidget(self.btn_export_sheet)
 
-        self.btn_export_strip = QPushButton("EXPORTAR TIRA (STRIP)")
+        self.btn_export_strip = QPushButton(_t("spr_btn_strip"))
         self.btn_export_strip.setStyleSheet("""
             QPushButton { background: #FFD700; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
             QPushButton:hover { background: #FFE033; }
@@ -896,7 +897,7 @@ class VisorSprites(QWidget):
 
         action_bar.addStretch()
 
-        self.btn_export_bulk = QPushButton("VOLCADO MASIVO...")
+        self.btn_export_bulk = QPushButton(_t("spr_btn_bulk"))
         self.btn_export_bulk.setStyleSheet("""
             QPushButton { background: #2A2A3C; color: #FFFFFF; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; border: 1px solid #444458; }
             QPushButton:hover { background: #3A3A52; }
@@ -924,7 +925,7 @@ class VisorSprites(QWidget):
     def set_project(self, project):
         self.project = project
         if not project or not project.base_rom_data:
-            self.lbl_status.setText("Error: No hay ROM cargada en el proyecto.")
+            self.lbl_status.setText(_t("spr_no_rom"))
             return
 
         from Banco_de_Datos.parche_splash import require_rom_signature
@@ -933,7 +934,7 @@ class VisorSprites(QWidget):
         mode = "mfomt" if getattr(project, "is_mfomt", False) else "fomt"
         self._load_animations_database(mode)
         self._apply_filters()
-        self.lbl_status.setText(f"ROM lista. Total: {len(self._animations)} animaciones canonicas.")
+        self.lbl_status.setText(_t("spr_rom_ready", n=len(self._animations)))
 
     def reset(self):
         self.project = None
@@ -945,7 +946,7 @@ class VisorSprites(QWidget):
         self.player_widget.load_animation(None)
         self.sheet_widget.load_sheet_data(None)
         self.info_panel.clear_info()
-        self.lbl_status.setText("Visor reiniciado.")
+        self.lbl_status.setText(_t("spr_reset"))
 
     # ============================================================
     #  CARGA DE DATOS CANONICOS
@@ -1082,7 +1083,7 @@ class VisorSprites(QWidget):
         data = self.engine.render_animation_data(anim_id)
 
         if not data:
-            self.lbl_status.setText(f"Sin frames validos para 0x{anim_id:04X} ({item['name']}).")
+            self.lbl_status.setText(_t("spr_no_frames", id=f"0x{anim_id:04X}", name=item['name']))
             self.player_widget.load_animation(None)
             self.sheet_widget.load_sheet_data(None)
             self.info_panel.clear_info()
@@ -1092,7 +1093,7 @@ class VisorSprites(QWidget):
         self.player_widget.load_animation(data)
         self.sheet_widget.load_sheet_data(data)
         self.info_panel.update_info(item["name"], anim_id, item["category"], data)
-        self.lbl_status.setText(f"Mostrando: {item['name']} (0x{anim_id:04X}) | {len(data['frames'])} frames")
+        self.lbl_status.setText(_t("spr_showing", name=item['name'], id=f"0x{anim_id:04X}", n=len(data['frames'])))
 
     # ============================================================
     #  EXPORTACION CANONICA
@@ -1100,14 +1101,14 @@ class VisorSprites(QWidget):
 
     def _on_export_gif(self):
         if not self._current_anim_data or not self.anim_list.currentItem():
-            QMessageBox.warning(self, "Aviso", "No hay ninguna animacion seleccionada.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("spr_no_anim_selected"))
             return
 
         row = self.anim_list.currentRow()
         item = self._animations[self._filtered_indices[row]]
         name = "".join(c if c not in '\\/:*?"<>|' else '_' for c in item["name"])
 
-        path, _ = QFileDialog.getSaveFileName(self, "Exportar GIF Animado", f"{name}.gif", "GIF (*.gif)")
+        path, _ = QFileDialog.getSaveFileName(self, _t("spr_dlg_gif"), f"{name}.gif", "GIF (*.gif)")
         if not path:
             return
 
@@ -1125,20 +1126,20 @@ class VisorSprites(QWidget):
                 loop=0,
                 disposal=2
             )
-            QMessageBox.information(self, "Exportacion Exitosa", f"GIF guardado en:\n{path}")
+            QMessageBox.information(self, _t("spr_export_ok_title"), _t("spr_gif_saved", path=path))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Fallo al guardar GIF:\n{e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("spr_gif_error", err=e))
 
     def _on_export_sheet(self):
         if not self._current_anim_data or not self.anim_list.currentItem():
-            QMessageBox.warning(self, "Aviso", "No hay ningun sheet disponible.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("spr_no_sheet_avail"))
             return
 
         row = self.anim_list.currentRow()
         item = self._animations[self._filtered_indices[row]]
         name = "".join(c if c not in '\\/:*?"<>|' else '_' for c in item["name"])
 
-        path, _ = QFileDialog.getSaveFileName(self, "Exportar Sprite Sheet", f"{name}_sheet.png", "PNG (*.png)")
+        path, _ = QFileDialog.getSaveFileName(self, _t("spr_dlg_sheet"), f"{name}_sheet.png", "PNG (*.png)")
         if not path:
             return
 
@@ -1148,20 +1149,20 @@ class VisorSprites(QWidget):
 
         try:
             sheet.save(path, format="PNG")
-            QMessageBox.information(self, "Exportacion Exitosa", f"Hoja de sprites guardada en:\n{path}")
+            QMessageBox.information(self, _t("spr_export_ok_title"), _t("spr_sheet_saved", path=path))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Fallo al guardar Sprite Sheet:\n{e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("spr_sheet_error", err=e))
 
     def _on_export_strip(self):
         if not self._current_anim_data or not self.anim_list.currentItem():
-            QMessageBox.warning(self, "Aviso", "No hay ninguna tira disponible.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("spr_no_strip"))
             return
 
         row = self.anim_list.currentRow()
         item = self._animations[self._filtered_indices[row]]
         name = "".join(c if c not in '\\/:*?"<>|' else '_' for c in item["name"])
 
-        path, _ = QFileDialog.getSaveFileName(self, "Exportar Tira de Frames", f"{name}_strip.png", "PNG (*.png)")
+        path, _ = QFileDialog.getSaveFileName(self, _t("spr_dlg_strip"), f"{name}_strip.png", "PNG (*.png)")
         if not path:
             return
 
@@ -1171,16 +1172,16 @@ class VisorSprites(QWidget):
 
         try:
             strip.save(path, format="PNG")
-            QMessageBox.information(self, "Exportacion Exitosa", f"Tira horizontal guardada en:\n{path}")
+            QMessageBox.information(self, _t("spr_export_ok_title"), _t("spr_strip_saved", path=path))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Fallo al guardar Tira:\n{e}")
+            QMessageBox.critical(self, _t("msg_error"), _t("spr_strip_error", err=e))
 
     def _on_export_bulk(self):
         if not self.engine or not self._animations:
-            QMessageBox.warning(self, "Aviso", "No hay datos cargados para volcado masivo.")
+            QMessageBox.warning(self, _t("msg_warning"), _t("spr_no_bulk_data"))
             return
 
-        out_dir = QFileDialog.getExistingDirectory(self, "Seleccionar Carpeta para Volcado Masivo")
+        out_dir = QFileDialog.getExistingDirectory(self, _t("spr_dlg_bulk_dir"))
         if not out_dir:
             return
 
@@ -1189,8 +1190,8 @@ class VisorSprites(QWidget):
 
         reply = QMessageBox.question(
             self,
-            "Confirmar Volcado Masivo",
-            f"Se exportaran {count} animaciones (GIFs y Sheets) en:\n{out_dir}\n\n¿Desea continuar?",
+            _t("spr_bulk_confirm_title"),
+            _t("spr_bulk_confirm", count=count, path=out_dir),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply != QMessageBox.StandardButton.Yes:
@@ -1228,6 +1229,6 @@ class VisorSprites(QWidget):
 
         QMessageBox.information(
             self,
-            "Volcado Finalizado",
-            f"Se exportaron exitosamente {exported} de {count} animaciones canonicas en:\n{out_dir}"
+            _t("spr_bulk_done_title"),
+            _t("spr_bulk_done", exported=exported, count=count, path=out_dir)
         )

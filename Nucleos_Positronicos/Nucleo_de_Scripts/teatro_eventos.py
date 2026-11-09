@@ -32,6 +32,7 @@ from PyQt6.QtGui import (
     QPainterPath, QTransform, QIcon
 )
 from PyQt6.QtCore import Qt, QRectF, QPointF, pyqtSignal, QTimer
+from Consola_de_Comando.i18n import t as _t
 
 from Nucleos_Positronicos.Nucleo_de_Mapas.fomt_mapdata import FomtMapRenderer
 from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.routine_codec import NPC_NAMES, NPC_COUNT
@@ -1274,7 +1275,7 @@ class TeatroEventosWidget(QWidget):
         top_lay.setContentsMargins(6, 4, 6, 4)
         top_lay.setSpacing(8)
 
-        lbl_ev = QLabel("Evento FoMT:")
+        lbl_ev = QLabel(_t("thr_event"))
         lbl_ev.setFont(QFont("Segoe UI", 9, QFont.Weight.Bold))
         lbl_ev.setStyleSheet("color: #58A6FF;")
         top_lay.addWidget(lbl_ev)
@@ -1285,12 +1286,12 @@ class TeatroEventosWidget(QWidget):
         self.combo_events.currentIndexChanged.connect(self._on_event_combo_changed)
         top_lay.addWidget(self.combo_events)
 
-        btn_load_rom = QPushButton("Cargar desde ROM")
+        btn_load_rom = QPushButton(_t("thr_btn_load_rom"))
         btn_load_rom.setStyleSheet("background-color: #238636; color: white; font-weight: bold; padding: 4px 10px;")
         btn_load_rom.clicked.connect(self._on_reload_from_rom)
         top_lay.addWidget(btn_load_rom)
 
-        btn_export = QPushButton("Compilar & Exportar Script")
+        btn_export = QPushButton(_t("thr_btn_export"))
         btn_export.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold; padding: 4px 10px;")
         btn_export.clicked.connect(lambda: self._on_export_script(show_dialog=True))
         top_lay.addWidget(btn_export)
@@ -1320,19 +1321,19 @@ class TeatroEventosWidget(QWidget):
         hud_lay = QHBoxLayout(self.hud_banner)
         hud_lay.setContentsMargins(6, 2, 6, 2)
 
-        self.lbl_step_num = QLabel("Paso 00 / 00")
+        self.lbl_step_num = QLabel(_t("thr_step_empty"))
         self.lbl_step_num.setFont(QFont("Consolas", 9, QFont.Weight.Bold))
         self.lbl_step_num.setStyleSheet("color: #E3B341;")
         hud_lay.addWidget(self.lbl_step_num)
 
         hud_lay.addWidget(QLabel("|"))
 
-        self.lbl_ins_desc = QLabel("Instruccion: Ninguna")
+        self.lbl_ins_desc = QLabel(_t("thr_ins_none"))
         self.lbl_ins_desc.setFont(QFont("Consolas", 9))
         self.lbl_ins_desc.setStyleSheet("color: #58A6FF;")
         hud_lay.addWidget(self.lbl_ins_desc, 1)
 
-        self.lbl_map_bgm_info = QLabel("Mapa: 0x00 | BGM: 0x00")
+        self.lbl_map_bgm_info = QLabel(_t("thr_map_bgm_empty"))
         self.lbl_map_bgm_info.setFont(QFont("Segoe UI", 8))
         self.lbl_map_bgm_info.setStyleSheet("color: #8B949E;")
         hud_lay.addWidget(self.lbl_map_bgm_info)
@@ -1366,83 +1367,83 @@ class TeatroEventosWidget(QWidget):
         self.list_instructions.setStyleSheet("background-color: #0D1117; color: #C9D1D9;")
         self.list_instructions.currentRowChanged.connect(self._on_ins_list_row_changed)
         lay_tab_ins.addWidget(self.list_instructions)
-        self.tabs_side.addTab(tab_ins, "Instrucciones")
+        self.tabs_side.addTab(tab_ins, _t("thr_tab_instructions"))
 
         # Pestaña 2: Actor Seleccionado
         tab_act = QWidget()
         lay_tab_act = QVBoxLayout(tab_act)
         lay_tab_act.setContentsMargins(6, 6, 6, 6)
 
-        lay_tab_act.addWidget(QLabel("Actor Activo:"))
+        lay_tab_act.addWidget(QLabel(_t("thr_active_actor")))
         self.combo_actor_list = QComboBox()
         self.combo_actor_list.currentIndexChanged.connect(self._on_actor_combo_changed)
         lay_tab_act.addWidget(self.combo_actor_list)
 
         pos_box = QHBoxLayout()
-        pos_box.addWidget(QLabel("Coord X:"))
+        pos_box.addWidget(QLabel(_t("thr_coord_x")))
         self.spin_x = QSpinBox()
         self.spin_x.setRange(0, 2048)
         self.spin_x.valueChanged.connect(self._on_actor_spin_changed)
         pos_box.addWidget(self.spin_x)
-        pos_box.addWidget(QLabel("Coord Y:"))
+        pos_box.addWidget(QLabel(_t("thr_coord_y")))
         self.spin_y = QSpinBox()
         self.spin_y.setRange(0, 2048)
         self.spin_y.valueChanged.connect(self._on_actor_spin_changed)
         pos_box.addWidget(self.spin_y)
         lay_tab_act.addLayout(pos_box)
 
-        lay_tab_act.addWidget(QLabel("Orientacion (Facing):"))
+        lay_tab_act.addWidget(QLabel(_t("thr_facing")))
         self.combo_facing = QComboBox()
         self.combo_facing.addItems(["Down", "Up", "Left", "Right"])
         self.combo_facing.currentIndexChanged.connect(self._on_facing_changed)
         lay_tab_act.addWidget(self.combo_facing)
 
-        lay_tab_act.addWidget(QLabel("Globo de Emocion (Emote):"))
+        lay_tab_act.addWidget(QLabel(_t("thr_emote")))
         self.combo_emote = QComboBox()
-        self.combo_emote.addItem("Sin Emocion", "none")
-        self.combo_emote.addItem("Exclamacion (!)", "exclamation")
-        self.combo_emote.addItem("Corazon (Heart)", "heart")
-        self.combo_emote.addItem("Gota de Sudor (~)", "sweat")
-        self.combo_emote.addItem("Nota Musical (Music)", "music")
-        self.combo_emote.addItem("Interrogacion (?)", "question")
+        self.combo_emote.addItem(_t("thr_emote_none"), "none")
+        self.combo_emote.addItem(_t("thr_emote_excl"), "exclamation")
+        self.combo_emote.addItem(_t("thr_emote_heart"), "heart")
+        self.combo_emote.addItem(_t("thr_emote_sweat"), "sweat")
+        self.combo_emote.addItem(_t("thr_emote_music"), "music")
+        self.combo_emote.addItem(_t("thr_emote_question"), "question")
         self.combo_emote.currentIndexChanged.connect(self._on_emote_changed)
         lay_tab_act.addWidget(self.combo_emote)
 
         lay_tab_act.addStretch()
-        self.tabs_side.addTab(tab_act, "Actor")
+        self.tabs_side.addTab(tab_act, _t("thr_tab_actor"))
 
         # Pestaña 3: Escenario & Audio
         tab_stage = QWidget()
         lay_tab_stage = QVBoxLayout(tab_stage)
         lay_tab_stage.setContentsMargins(6, 6, 6, 6)
 
-        lay_tab_stage.addWidget(QLabel("Mapa GBA:"))
+        lay_tab_stage.addWidget(QLabel(_t("thr_gba_map")))
         self.combo_map = QComboBox()
         self._populate_maps_combo()
         self.combo_map.currentIndexChanged.connect(self._on_map_changed)
         lay_tab_stage.addWidget(self.combo_map)
 
-        lay_tab_stage.addWidget(QLabel("Musica de Fondo (BGM):"))
+        lay_tab_stage.addWidget(QLabel(_t("thr_bgm")))
         self.combo_bgm = QComboBox()
         for bid, bname in self.asset_bank.bgm_catalog:
             self.combo_bgm.addItem(f"0x{bid:02X} - {bname}", bid)
         self.combo_bgm.currentIndexChanged.connect(self._on_bgm_changed)
         lay_tab_stage.addWidget(self.combo_bgm)
 
-        lay_tab_stage.addWidget(QLabel("Efecto de Sonido (SFX):"))
+        lay_tab_stage.addWidget(QLabel(_t("thr_sfx")))
         self.combo_sfx = QComboBox()
         for sid, sname in self.asset_bank.sfx_catalog:
             self.combo_sfx.addItem(f"0x{sid:02X} - {sname}", sid)
         self.combo_sfx.currentIndexChanged.connect(self._on_sfx_changed)
         lay_tab_stage.addWidget(self.combo_sfx)
 
-        lay_tab_stage.addWidget(QLabel("Transicion:"))
+        lay_tab_stage.addWidget(QLabel(_t("thr_transition")))
         self.combo_fade = QComboBox()
         self.combo_fade.addItems(["Normal", "Fade In", "Fade Out"])
         lay_tab_stage.addWidget(self.combo_fade)
 
         lay_tab_stage.addStretch()
-        self.tabs_side.addTab(tab_stage, "Escenario & Audio")
+        self.tabs_side.addTab(tab_stage, _t("thr_tab_stage"))
 
         # Pestaña 4: Diálogo & Retrato
         tab_dial = QWidget()
@@ -1450,7 +1451,7 @@ class TeatroEventosWidget(QWidget):
         lay_tab_dial.setContentsMargins(6, 6, 6, 6)
         lay_tab_dial.setSpacing(6)
 
-        self.chk_dialogue_active = QCheckBox("Activar Cuadro de Diálogo en Escena")
+        self.chk_dialogue_active = QCheckBox(_t("thr_dialogue_active"))
         self.chk_dialogue_active.setStyleSheet("color: #7EE787; font-weight: bold;")
         self.chk_dialogue_active.toggled.connect(self._on_dialogue_active_toggled)
         lay_tab_dial.addWidget(self.chk_dialogue_active)
@@ -1464,16 +1465,16 @@ class TeatroEventosWidget(QWidget):
         port_box.addWidget(self.lbl_portrait_preview)
 
         port_meta = QVBoxLayout()
-        self.lbl_portrait_name = QLabel("Sin Retrato")
+        self.lbl_portrait_name = QLabel(_t("thr_no_portrait"))
         self.lbl_portrait_name.setFont(QFont("Segoe UI", 8, QFont.Weight.Bold))
         self.lbl_portrait_name.setStyleSheet("color: #58A6FF;")
         port_meta.addWidget(self.lbl_portrait_name)
 
-        self.lbl_speaker_name = QLabel("Hablante: Nadie")
+        self.lbl_speaker_name = QLabel(_t("thr_speaker", name=_t("thr_nobody")))
         self.lbl_speaker_name.setFont(QFont("Segoe UI", 8))
         port_meta.addWidget(self.lbl_speaker_name)
 
-        self.btn_edit_melody = QPushButton("Editar en Melody")
+        self.btn_edit_melody = QPushButton(_t("thr_btn_edit_melody"))
         self.btn_edit_melody.setStyleSheet("background-color: #1F3A5F; color: #58A6FF; border: 1px solid #388BFD; padding: 4px; border-radius: 4px; font-weight: bold;")
         self.btn_edit_melody.clicked.connect(self._on_open_melody_editor)
         port_meta.addWidget(self.btn_edit_melody)
@@ -1481,13 +1482,13 @@ class TeatroEventosWidget(QWidget):
         port_box.addLayout(port_meta)
         lay_tab_dial.addLayout(port_box)
 
-        lay_tab_dial.addWidget(QLabel("Texto del Mensaje de la ROM:"))
+        lay_tab_dial.addWidget(QLabel(_t("thr_rom_message")))
         self.txt_dialogue = QTextEdit()
         self.txt_dialogue.setFont(QFont("Segoe UI", 9))
         self.txt_dialogue.textChanged.connect(self._on_dialogue_text_edited)
         lay_tab_dial.addWidget(self.txt_dialogue)
 
-        self.tabs_side.addTab(tab_dial, "Dialogo & Retrato")
+        self.tabs_side.addTab(tab_dial, _t("thr_tab_dialogue"))
 
         side_lay.addWidget(self.tabs_side)
         splitter.addWidget(side_panel)
@@ -1513,7 +1514,7 @@ class TeatroEventosWidget(QWidget):
         btn_prev.clicked.connect(self._go_prev_step)
         t_lay.addWidget(btn_prev)
 
-        self.btn_play = QPushButton("Play")
+        self.btn_play = QPushButton(_t("thr_play"))
         self.btn_play.setFixedWidth(64)
         self.btn_play.setStyleSheet("background-color: #238636; color: white; font-weight: bold;")
         self.btn_play.clicked.connect(self._toggle_playback)
@@ -1610,9 +1611,9 @@ class TeatroEventosWidget(QWidget):
         step = steps[self.current_step_idx]
 
         # 1. Actualizar HUD
-        self.lbl_step_num.setText(f"Paso {step.step_idx:02d} / {len(steps):02d}")
-        self.lbl_ins_desc.setText(f"Instruccion: {step.summary}")
-        self.lbl_map_bgm_info.setText(f"Mapa: 0x{step.map_id:02X} | BGM: 0x{step.bgm_id:02X} | SFX: 0x{step.sfx_id:02X}")
+        self.lbl_step_num.setText(_t("thr_step", cur=f"{step.step_idx:02d}", total=f"{len(steps):02d}"))
+        self.lbl_ins_desc.setText(_t("thr_ins", summary=step.summary))
+        self.lbl_map_bgm_info.setText(_t("thr_map_bgm", map=f"0x{step.map_id:02X}", bgm=f"0x{step.bgm_id:02X}", sfx=f"0x{step.sfx_id:02X}"))
 
         # 2. Sincronizar Lienzo
         self.canvas.load_step_state(step)
@@ -1672,9 +1673,9 @@ class TeatroEventosWidget(QWidget):
             self.lbl_portrait_name.setText(self.asset_bank.get_portrait_name(dial.portrait_id))
         else:
             self.lbl_portrait_preview.clear()
-            self.lbl_portrait_name.setText("Sin Retrato")
+            self.lbl_portrait_name.setText(_t("thr_no_portrait"))
 
-        self.lbl_speaker_name.setText(f"Hablante: {dial.speaker_name or 'Nadie'}")
+        self.lbl_speaker_name.setText(_t("thr_speaker", name=dial.speaker_name or _t("thr_nobody")))
         self.txt_dialogue.blockSignals(True)
         self.txt_dialogue.setPlainText(dial.text)
         self.txt_dialogue.blockSignals(False)
@@ -1735,11 +1736,11 @@ class TeatroEventosWidget(QWidget):
     def _toggle_playback(self):
         if self.play_timer.isActive():
             self.play_timer.stop()
-            self.btn_play.setText("Play")
+            self.btn_play.setText(_t("thr_play"))
             self.btn_play.setStyleSheet("background-color: #238636; color: white; font-weight: bold;")
         else:
             self.play_timer.start(self.play_speed_ms)
-            self.btn_play.setText("Pausa")
+            self.btn_play.setText(_t("thr_pause"))
             self.btn_play.setStyleSheet("background-color: #D29922; color: white; font-weight: bold;")
 
     def _on_play_step(self):
@@ -1873,7 +1874,7 @@ class TeatroEventosWidget(QWidget):
         code = self.vm.export_script_code()
         if show_dialog:
             dlg = QDialog(self)
-            dlg.setWindowTitle(f"Script Recompilado - Evento {self.current_event_id:04d}")
+            dlg.setWindowTitle(_t("thr_recompiled_title", id=f"{self.current_event_id:04d}"))
             dlg.resize(650, 520)
             lay = QVBoxLayout(dlg)
             txt = QTextEdit()
