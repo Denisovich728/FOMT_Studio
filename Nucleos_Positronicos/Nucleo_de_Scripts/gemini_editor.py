@@ -171,7 +171,7 @@ class GeminiEditorWidget(QWidget):
         # --- Controles ---
         self.btn_translate = QPushButton(_t("gem_btn_translate"))
         self.btn_translate.clicked.connect(self.start_translation_flow)
-        self.btn_translate.setStyleSheet("height: 40px; font-weight: bold; background-color: #004d40; color: white;")
+        self.btn_translate.setProperty("variant", "primary")
         layout.addWidget(self.btn_translate)
         
         self.progress = QProgressBar()
@@ -212,17 +212,17 @@ class GeminiEditorWidget(QWidget):
         
         self.btn_mega_events = QPushButton(_t("gem_btn_mass_events"))
         self.btn_mega_events.clicked.connect(self.start_mega_event_batch)
-        self.btn_mega_events.setStyleSheet("background-color: #311b92; color: white; font-weight: bold;")
+        self.btn_mega_events.setProperty("variant", "secondary")
         mega_layout.addWidget(self.btn_mega_events)
         
         self.btn_mega_items = QPushButton(_t("gem_btn_mass_items"))
         self.btn_mega_items.clicked.connect(self.start_mega_item_batch)
-        self.btn_mega_items.setStyleSheet("background-color: #1a237e; color: white; font-weight: bold;")
+        self.btn_mega_items.setProperty("variant", "secondary")
         mega_layout.addWidget(self.btn_mega_items)
 
         self.btn_stop_mega = QPushButton(_t("gem_btn_stop"))
         self.btn_stop_mega.clicked.connect(self.stop_mega_batch)
-        self.btn_stop_mega.setStyleSheet("background-color: #b71c1c; color: white; font-weight: bold;")
+        self.btn_stop_mega.setProperty("variant", "danger")
         self.btn_stop_mega.setEnabled(False)
         mega_layout.addWidget(self.btn_stop_mega)
         

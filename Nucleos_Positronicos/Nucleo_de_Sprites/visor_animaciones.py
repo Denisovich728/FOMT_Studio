@@ -70,13 +70,7 @@ class VisorAnimaciones(QWidget):
         header.setStyleSheet("font-size: 18px; font-weight: bold; color: #00FF96;")
         
         self.btn_load = QPushButton("📂 Cargar Carpeta Extracción")
-        self.btn_load.setStyleSheet("""
-            QPushButton {
-                background: #00BFFF; color: black; font-weight: bold;
-                padding: 6px 12px; border-radius: 4px; font-size: 12px;
-            }
-            QPushButton:hover { background: #33CCFF; }
-        """)
+        self.btn_load.setProperty("variant", "primary")
         self.btn_load.clicked.connect(self.load_directory)
         
         # --- ZOOM SLIDER ---

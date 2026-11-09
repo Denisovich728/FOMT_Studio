@@ -239,17 +239,7 @@ class BlockPuzzleEditor(QWidget):
         side_layout.addStretch()
         
         self.btn_compile = QPushButton("Generar Script 🛠️")
-        self.btn_compile.setStyleSheet("""
-            QPushButton {
-                background: #4A90E2;
-                color: white;
-                font-weight: bold;
-                padding: 10px;
-                border-radius: 5px;
-                margin: 10px;
-            }
-            QPushButton:hover { background: #357ABD; }
-        """)
+        self.btn_compile.setProperty("variant", "primary")
         self.btn_compile.clicked.connect(self.compile_logic)
         side_layout.addWidget(self.btn_compile)
         

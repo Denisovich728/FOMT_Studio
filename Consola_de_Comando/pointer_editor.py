@@ -34,11 +34,11 @@ class MasterPointerEditor(QWidget):
         btn_refresh.clicked.connect(self.load_pointers)
         
         btn_save = QPushButton(tr('btn_save_ptr', lang))
-        btn_save.setStyleSheet("background-color: #388e3c; color: white; font-weight: bold;")
+        btn_save.setProperty("variant", "primary")
         btn_save.clicked.connect(self.save_pointers)
         
         btn_relocate = QPushButton(tr('btn_relocate', lang))
-        btn_relocate.setStyleSheet("background-color: #ff9800; color: black; font-weight: bold;")
+        btn_relocate.setProperty("variant", "danger")
         btn_relocate.clicked.connect(self.relocate_table)
         
         toolbar.addWidget(lbl)

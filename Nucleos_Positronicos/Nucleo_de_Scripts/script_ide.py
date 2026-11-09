@@ -614,11 +614,11 @@ class ScriptIDEWidget(QWidget):
         self.lbl_title = QLabel(f"<h3>{tr('ide_title', lang)}</h3>")
         
         self.btn_compile = QPushButton(tr('btn_compile_script', lang))
-        self.btn_compile.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold; padding: 5px 15px;")
+        self.btn_compile.setProperty("variant", "primary")
         self.btn_compile.clicked.connect(self.on_compile_clicked)
 
         self.btn_ai = QPushButton("🤖 Copilot Analyze")
-        self.btn_ai.setStyleSheet("background-color: #8e44ad; color: white; font-weight: bold; padding: 5px 15px;")
+        self.btn_ai.setProperty("variant", "secondary")
         self.btn_ai.clicked.connect(self.on_ai_analyze)
         
         # Visibilidad inicial según configuración persistente

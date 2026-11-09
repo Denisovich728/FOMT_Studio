@@ -40,11 +40,11 @@ class NpcEditorWidget(QWidget):
         self.btn_refresh.clicked.connect(self.load_data)
         
         self.btn_save = QPushButton(tr('btn_save_names', lang))
-        self.btn_save.setStyleSheet("background-color: #2e7d32; color: white;")
+        self.btn_save.setProperty("variant", "primary")
         self.btn_save.clicked.connect(self.save_data)
         
         self.btn_expand = QPushButton("Portrait Expand (Experimental)")
-        self.btn_expand.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold;")
+        self.btn_expand.setProperty("variant", "danger")
         self.btn_expand.setToolTip("Aumentar el límite de tamaño e IDs de retratos en la ROM.")
         self.btn_expand.clicked.connect(self.expand_portraits)
         
@@ -200,7 +200,7 @@ class NpcDetailDialog(QDialog):
         self.side_graphics.addWidget(self.lbl_portrait)
         
         self.btn_edit_portrait = QPushButton(tr("npc_edit_portrait", lang))
-        self.btn_edit_portrait.setStyleSheet("background-color: #1F3A5F; color: #58A6FF; border: 1px solid #388BFD; font-weight: bold; padding: 6px;")
+        self.btn_edit_portrait.setProperty("variant", "secondary")
         self.btn_edit_portrait.clicked.connect(self.abrir_editor_retrato)
         self.side_graphics.addWidget(self.btn_edit_portrait)
         
@@ -238,7 +238,7 @@ class NpcDetailDialog(QDialog):
         script_layout = QHBoxLayout()
         lbl_script = QLabel("<b>Script:</b>")
         self.btn_script = QPushButton(f"{self.script_target_name}")
-        self.btn_script.setStyleSheet("color: #3FB950; background: transparent; border: 1px dashed #238636; text-align: left; font-weight: bold; padding: 4px 8px;")
+        self.btn_script.setProperty("variant", "ghost")
         self.btn_script.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_script.setToolTip("Abrir script de personalidad en el Script IDE")
         self.btn_script.clicked.connect(self.abrir_script)
@@ -253,7 +253,7 @@ class NpcDetailDialog(QDialog):
         lbl_routine = QLabel("<b>Rutina AI:</b>")
         if self.routine_target_id is not None:
             self.btn_routine = QPushButton(f"Orquestador #{self.routine_target_id:02d}")
-            self.btn_routine.setStyleSheet("color: #58A6FF; background: transparent; border: 1px dashed #1F6FEB; text-align: left; font-weight: bold; padding: 4px 8px;")
+            self.btn_routine.setProperty("variant", "ghost")
             self.btn_routine.setCursor(Qt.CursorShape.PointingHandCursor)
             self.btn_routine.setToolTip("Abrir orquestador de rutina diaria")
             self.btn_routine.clicked.connect(self.abrir_rutina)
@@ -270,7 +270,7 @@ class NpcDetailDialog(QDialog):
         layout.addStretch()
 
         btn_close = QPushButton(tr('btn_close_viewer', lang))
-        btn_close.setStyleSheet("background-color: #21262D; color: #F0F6FC; border: 1px solid #30363D; padding: 6px;")
+        btn_close.setProperty("variant", "secondary")
         btn_close.clicked.connect(self.close)
         layout.addWidget(btn_close)
         

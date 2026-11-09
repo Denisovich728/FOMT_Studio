@@ -13,7 +13,11 @@
 # Para colorear un widget concreto, usar color("muted"), color("warning"),
 # etc. en lugar de escribir un hex fijo: devuelve el color del tema activo.
 #
-# Botón principal de una pantalla:  boton.setProperty("variant", "primary")
+# Variantes de boton (QPushButton):  boton.setProperty("variant", ...)
+#   "primary"   accion principal de la pantalla (guardar, aplicar, inyectar)
+#   "secondary" resto de acciones (equivale a no poner variante)
+#   "danger"    acciones arriesgadas o que detienen algo
+#   "ghost"     enlaces y botones planos sin borde
 # ============================================================
 from string import Template
 
@@ -91,6 +95,12 @@ _QSS = Template("""
     QPushButton:disabled { color: $muted; border-color: $border; }
     QPushButton[variant="primary"] { background-color: $accent_strong; color: $on_accent; border-color: $accent_strong; font-weight: bold; }
     QPushButton[variant="primary"]:hover { color: $on_accent; border-color: $text; }
+    QPushButton[variant="primary"]:disabled { background-color: $surface_alt; color: $muted; border-color: $border; }
+    QPushButton[variant="danger"] { background-color: transparent; color: $danger; border-color: $danger; }
+    QPushButton[variant="danger"]:hover { background-color: $surface_alt; color: $danger; border-color: $danger; }
+    QPushButton[variant="ghost"] { background-color: transparent; color: $accent; border-color: transparent; text-align: left; }
+    QPushButton[variant="ghost"]:hover { background-color: $surface_alt; color: $accent; border-color: transparent; }
+    QPushButton:checked { background-color: $surface_alt; color: $accent; border-color: $accent; }
 
     QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {
         background-color: $surface; color: $text; border: 1px solid $border; border-radius: $radius;

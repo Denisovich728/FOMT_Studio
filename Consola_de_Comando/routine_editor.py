@@ -71,7 +71,7 @@ class RoutineEditorWidget(QWidget):
         # Controles
         btn_layout = QHBoxLayout()
         btn_save = QPushButton("💾 Guardar Rutina en ROM")
-        btn_save.setStyleSheet("background-color: #2e7d32; color: white; font-weight: bold;")
+        btn_save.setProperty("variant", "primary")
         btn_save.clicked.connect(self.save_routine)
         btn_layout.addStretch()
         btn_layout.addWidget(btn_save)

@@ -52,7 +52,7 @@ class DecorationControlDialog(QDialog):
         btn_layout = QHBoxLayout()
         self.btn_apply = QPushButton("Aplicar Cambios")
         self.btn_apply.clicked.connect(self.accept)
-        self.btn_apply.setStyleSheet("background-color: #2E86C1; color: white; font-weight: bold; padding: 5px;")
+        self.btn_apply.setProperty("variant", "primary")
         
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_apply)

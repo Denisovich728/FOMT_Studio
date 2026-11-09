@@ -280,11 +280,11 @@ class VisorMetasprites(QWidget):
         self.btn_export.clicked.connect(self._export_png)
 
         self.btn_dump_all = QPushButton(" Extraer Todos los Retratos")
-        self.btn_dump_all.setStyleSheet("background: #007ACC; color: white; font-weight: bold;")
+        self.btn_dump_all.setProperty("variant", "secondary")
         self.btn_dump_all.clicked.connect(self._dump_all_portraits)
         
         self.btn_inject = QPushButton(" Inyectar (Melody Engine)")
-        self.btn_inject.setStyleSheet("background: #d32f2f; color: white; font-weight: bold;")
+        self.btn_inject.setProperty("variant", "primary")
         self.btn_inject.clicked.connect(self._inject_to_rom)
         
         action_layout.addWidget(self.btn_import)
@@ -316,7 +316,7 @@ class VisorMetasprites(QWidget):
         right_panel.addLayout(self.pal_grid)
         
         self.btn_edit_pal = QPushButton(" Editar Paleta")
-        self.btn_edit_pal.setStyleSheet("background: #1F3A5F; color: #89B4FA; font-weight: bold; border-color: #4A90D9;")
+        self.btn_edit_pal.setProperty("variant", "secondary")
         self.btn_edit_pal.clicked.connect(self._open_palette_editor)
         right_panel.addWidget(self.btn_edit_pal)
         
