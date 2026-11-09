@@ -15,6 +15,8 @@
 #
 # Botón principal de una pantalla:  boton.setProperty("variant", "primary")
 # ============================================================
+import os
+import tempfile
 from string import Template
 
 DEFAULT_THEME = "forerunner"
@@ -72,11 +74,22 @@ _QSS = Template("""
     QToolButton { background-color: transparent; color: $text; border: 1px solid transparent; border-radius: $radius; padding: 6px 10px; }
     QToolButton:hover { background-color: $surface_alt; border-color: $border; }
     QToolButton:pressed { background-color: $border; }
+    QToolButton:checked { background-color: $surface_alt; border-color: $border; }
+    QToolButton[variant="primary"] { background-color: $accent_strong; color: $on_accent; border-color: $accent_strong; font-weight: bold; }
+    QToolButton[variant="primary"]:hover { border-color: $text; }
+    QToolBar::separator { background: $border; width: 1px; margin: 6px 6px; }
+
+    QPushButton#chipN { background-color: transparent; color: $warning; border: 1px solid $warning; border-radius: 12px; padding: 3px 12px; margin: 4px 10px 4px 0px; font-weight: bold; }
+    QPushButton#chipN:hover { background-color: $surface_alt; color: $warning; border-color: $warning; }
+    QPushButton#chipN:disabled { color: $muted; border-color: $border; }
+    QPushButton#chipN[estado="activo"], QPushButton#chipN[estado="activo"]:disabled { color: $success; border-color: $success; }
 
     QTabWidget::pane { border: 1px solid $border; background-color: $bg; }
     QTabBar::tab { background: $surface; color: $muted; border: 1px solid $border; border-bottom: none; padding: 8px 14px; margin-right: 2px; border-top-left-radius: $radius; border-top-right-radius: $radius; }
     QTabBar::tab:hover { color: $text; }
     QTabBar::tab:selected { background: $bg; color: $text; border-bottom: 2px solid $accent; font-weight: bold; }
+    QTabBar::close-button { image: url($close_icon); subcontrol-position: right; margin: 2px; border-radius: 3px; }
+    QTabBar::close-button:hover { background-color: $surface_alt; image: url($close_icon_hover); }
 
     QTableView, QTreeView, QListView, QListWidget, QTableWidget, QTreeWidget {
         background-color: $surface; color: $text; border: 1px solid $border;
@@ -124,10 +137,35 @@ _QSS = Template("""
 """)
 
 
+_CLOSE_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">'
+    '<path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="{color}" stroke-width="1.6" stroke-linecap="round"/></svg>'
+)
+
+
+def _icon_path(name, color):
+    """Escribe (una vez) un icono SVG del color pedido y devuelve su ruta para usarla en QSS."""
+    folder = os.path.join(tempfile.gettempdir(), "fomt_studio_icons")
+    path = os.path.join(folder, f"{name}_{color.lstrip('#').lower()}.svg")
+    try:
+        if not os.path.exists(path):
+            os.makedirs(folder, exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(_CLOSE_SVG.format(color=color))
+    except OSError:
+        return ""
+    return path.replace("\\", "/")
+
+
 def build_stylesheet(theme_name):
     """Genera la hoja de estilo Qt de un tema a partir de sus tokens."""
     name = theme_name if theme_name in TOKENS else "light"
-    return _QSS.substitute(TOKENS[name], **_STYLE[name])
+    tokens = TOKENS[name]
+    icons = {
+        "close_icon": _icon_path("close", tokens["muted"]),
+        "close_icon_hover": _icon_path("close", tokens["danger"]),
+    }
+    return _QSS.substitute(tokens, **_STYLE[name], **icons)
 
 
 def active_theme_name():
