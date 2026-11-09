@@ -15,11 +15,39 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot, QRect, QIODevice, QUr
 from PyQt6.QtGui import QPainter, QColor, QLinearGradient, QPen, QFont
 # Removed QMediaPlayer imports to rely on native winsound
 from Consola_de_Comando.i18n import tr
+from Consola_de_Comando.i18n import t as _t
+from Consola_de_Comando.themes import color, colors
 
+# Categorias de cancion que entrega SappyEngine -> clave de texto en i18n.json
+CATEGORY_KEYS = {
+    "BGM": "aud_cat_bgm",
+    "AMBIENT": "aud_cat_ambient",
+    "UNUSED": "aud_cat_unused",
+    "SFX": "aud_cat_sfx",
+    "TITLE": "aud_cat_title",
+    "UNKNOWN": "aud_cat_unknown",
+}
+
+
+def category_label(category):
+    return _t(CATEGORY_KEYS.get(category, "aud_cat_unknown"))
+
+
+def _section_title(text):
+    lbl = QLabel(text.upper())
+    lbl.setStyleSheet(f"color: {color('muted')}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
+    return lbl
+
+
+def _separator():
+    sep = QFrame()
+    sep.setFrameShape(QFrame.Shape.HLine)
+    sep.setStyleSheet(f"color: {color('border')};")
+    return sep
 
 
 class RetroBitVisualizer(QFrame):
-    """Visualizador estilo 8-bit / Matrix (Bloques de Píxeles)."""
+    """Visualizador estilo 8-bit (bloques de pixeles) con los colores del tema activo."""
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumHeight(120)
@@ -48,19 +76,20 @@ class RetroBitVisualizer(QFrame):
         self.update()
 
     def paintEvent(self, event):
+        # Los colores se leen en cada repintado, asi el medidor sigue al tema activo.
+        tk = colors()
         painter = QPainter(self)
         w, h = self.width(), self.height()
 
-        # Fondo Negro Puro (Retro)
-        painter.fillRect(self.rect(), QColor(0, 0, 0))
+        painter.fillRect(self.rect(), QColor(tk["surface_alt"]))
 
         cols = 32
         rows = 16
         col_w = w / cols
         row_h = h / rows
 
-        # Dibujar Cuadrícula de Fondo (Sutil)
-        painter.setPen(QPen(QColor(40, 40, 40), 1))
+        # Cuadricula de fondo
+        painter.setPen(QPen(QColor(tk["border"]), 1))
         for c in range(cols + 1):
             x = int(c * col_w)
             painter.drawLine(x, 0, x, h)
@@ -68,6 +97,8 @@ class RetroBitVisualizer(QFrame):
             y = int(r * row_h)
             painter.drawLine(0, y, w, y)
 
+        low, mid, high, peak = (QColor(tk["success"]), QColor(tk["warning"]),
+                                QColor(tk["danger"]), QColor(tk["text"]))
         for c in range(cols):
             val = int(self.levels[c] * rows)
             peak_row = int(self.peaks[c] * rows)
@@ -77,16 +108,10 @@ class RetroBitVisualizer(QFrame):
                              int(col_w - 2), int(row_h - 2))
 
                 if r < val:
-                    if r < 10:
-                        color = QColor(0, 255, 100)
-                    elif r < 14:
-                        color = QColor(255, 255, 0)
-                    else:
-                        color = QColor(255, 50, 50)
-                    painter.fillRect(rect, color)
+                    painter.fillRect(rect, low if r < 10 else (mid if r < 14 else high))
 
                 if r == peak_row and r > 0:
-                    painter.fillRect(rect, QColor(255, 255, 255))
+                    painter.fillRect(rect, peak)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -99,12 +124,13 @@ class SongInfoPanel(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedWidth(280)
-        self.setStyleSheet("""
-            SongInfoPanel {
-                background: #0D0D12;
-                border: 1px solid #2A2A35;
+        self.setStyleSheet(f"""
+            SongInfoPanel {{
+                background: {color('surface')};
+                border: 1px solid {color('border')};
                 border-radius: 6px;
-            }
+            }}
+            SongInfoPanel QLabel {{ background: transparent; }}
         """)
         self._build_ui()
 
@@ -113,99 +139,74 @@ class SongInfoPanel(QFrame):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(6)
 
-        # Título
-        title = QLabel("SONG INFO")
-        title.setStyleSheet("color: #00FF96; font-size: 13px; font-weight: bold; letter-spacing: 2px;")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
-
-        # Separador
-        sep = QFrame()
-        sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setStyleSheet("color: #2A2A35;")
-        layout.addWidget(sep)
+        layout.addWidget(_section_title(_t("aud_info_title")))
+        layout.addWidget(_separator())
 
         # Campos de información
-        self.lbl_id = self._make_field("ID:")
-        self.lbl_category = self._make_field("Category:")
-        self.lbl_offset = self._make_field("ROM Offset:")
-        self.lbl_tracks = self._make_field("Tracks:")
-        self.lbl_voicegroup = self._make_field("Voicegroup:")
-        self.lbl_unused = self._make_field("Status:")
+        self.lbl_id = self._make_field()
+        self.lbl_category = self._make_field()
+        self.lbl_offset = self._make_field()
+        self.lbl_tracks = self._make_field()
+        self.lbl_voicegroup = self._make_field()
+        self.lbl_unused = self._make_field()
+        for lbl in (self.lbl_id, self.lbl_category, self.lbl_offset,
+                    self.lbl_tracks, self.lbl_voicegroup, self.lbl_unused):
+            layout.addWidget(lbl)
 
-        layout.addWidget(self.lbl_id)
-        layout.addWidget(self.lbl_category)
-        layout.addWidget(self.lbl_offset)
-        layout.addWidget(self.lbl_tracks)
-        layout.addWidget(self.lbl_voicegroup)
-        layout.addWidget(self.lbl_unused)
-
-        # Separador
-        sep2 = QFrame()
-        sep2.setFrameShape(QFrame.Shape.HLine)
-        sep2.setStyleSheet("color: #2A2A35;")
-        layout.addWidget(sep2)
+        layout.addWidget(_separator())
 
         # Sección: Dónde se usa
-        used_title = QLabel("USED BY")
-        used_title.setStyleSheet("color: #FFD700; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
-        layout.addWidget(used_title)
-
+        layout.addWidget(_section_title(_t("aud_used_by")))
         self.used_by_list = QLabel("—")
         self.used_by_list.setWordWrap(True)
-        self.used_by_list.setStyleSheet("color: #AAAAAA; font-size: 11px; font-family: 'Consolas';")
+        self.used_by_list.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
         layout.addWidget(self.used_by_list)
 
-        # Separador
-        sep3 = QFrame()
-        sep3.setFrameShape(QFrame.Shape.HLine)
-        sep3.setStyleSheet("color: #2A2A35;")
-        layout.addWidget(sep3)
+        layout.addWidget(_separator())
 
         # Sección: BGM ARM Offsets
-        arm_title = QLabel("ARM CODE OFFSETS")
-        arm_title.setStyleSheet("color: #FF6B35; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
-        layout.addWidget(arm_title)
-
+        layout.addWidget(_section_title(_t("aud_arm_offsets")))
         self.arm_offsets_label = QLabel("—")
         self.arm_offsets_label.setWordWrap(True)
-        self.arm_offsets_label.setStyleSheet("color: #AAAAAA; font-size: 10px; font-family: 'Consolas';")
+        self.arm_offsets_label.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
         layout.addWidget(self.arm_offsets_label)
 
         layout.addStretch()
+        self.clear_info()
 
-    def _make_field(self, label_text):
-        lbl = QLabel(f"{label_text} —")
-        lbl.setStyleSheet("color: #CCCCCC; font-size: 11px; font-family: 'Consolas';")
+    def _make_field(self):
+        lbl = QLabel()
+        lbl.setStyleSheet(f"color: {color('text')}; font-size: 11px; font-family: 'Consolas';")
         return lbl
+
+    @staticmethod
+    def _field(key, value):
+        return f"{_t(key)}: {value}"
 
     def update_info(self, song, sappy_engine):
         """Actualiza todo el panel con los datos de la canción seleccionada."""
         sid = song["id"]
         cat = song.get("category", "UNKNOWN")
-        cat_label = sappy_engine.get_category_label(cat)
-        cat_color = sappy_engine.get_category_color_hex(cat)
 
-        self.lbl_id.setText(f"ID: 0x{sid:02X} (dec: {sid})")
-        self.lbl_category.setText(f"Category: {cat_label}")
-        self.lbl_category.setStyleSheet(f"color: {cat_color}; font-size: 11px; font-family: 'Consolas'; font-weight: bold;")
-        self.lbl_offset.setText(f"ROM Offset: 0x{song['offset']:06X}")
-        self.lbl_tracks.setText(f"Tracks: {song['tracks_count']}")
-        self.lbl_voicegroup.setText(f"Voicegroup: 0x{song['voicegroup_ptr']:06X}")
+        self.lbl_id.setText(self._field("aud_f_id", f"0x{sid:02X} ({sid})"))
+        self.lbl_category.setText(self._field("aud_f_category", category_label(cat)))
+        self.lbl_offset.setText(self._field("aud_f_offset", f"0x{song['offset']:06X}"))
+        self.lbl_tracks.setText(self._field("aud_f_tracks", song['tracks_count']))
+        self.lbl_voicegroup.setText(self._field("aud_f_voicegroup", f"0x{song['voicegroup_ptr']:06X}"))
 
         if song.get("is_unused"):
-            self.lbl_unused.setText("Status: ⚠ UNUSED / RARE")
-            self.lbl_unused.setStyleSheet("color: #FF6B35; font-size: 11px; font-weight: bold;")
+            self.lbl_unused.setText(self._field("aud_f_status", _t("aud_status_unused")))
+            self.lbl_unused.setStyleSheet(f"color: {color('warning')}; font-size: 11px; font-weight: bold;")
         else:
-            self.lbl_unused.setText("Status: ✓ In Use")
-            self.lbl_unused.setStyleSheet("color: #00FF96; font-size: 11px;")
+            self.lbl_unused.setText(self._field("aud_f_status", _t("aud_status_in_use")))
+            self.lbl_unused.setStyleSheet(f"color: {color('success')}; font-size: 11px;")
 
         # Used by
         used = song.get("used_by", [])
         if used:
-            self.used_by_list.setText("\n".join(f"• {loc}" for loc in used))
+            self.used_by_list.setText("\n".join(f"- {loc}" for loc in used))
         else:
-            self.used_by_list.setText("— No BGM assignment found")
+            self.used_by_list.setText(_t("aud_no_bgm_assignment"))
 
         # ARM offsets que referencian este song ID
         arm_refs = []
@@ -218,17 +219,14 @@ class SongInfoPanel(QFrame):
         if arm_refs:
             self.arm_offsets_label.setText("\n".join(arm_refs))
         else:
-            self.arm_offsets_label.setText("— No ARM references")
+            self.arm_offsets_label.setText(_t("aud_no_arm_refs"))
 
     def clear_info(self):
-        self.lbl_id.setText("ID: —")
-        self.lbl_category.setText("Category: —")
-        self.lbl_category.setStyleSheet("color: #CCCCCC; font-size: 11px; font-family: 'Consolas';")
-        self.lbl_offset.setText("ROM Offset: —")
-        self.lbl_tracks.setText("Tracks: —")
-        self.lbl_voicegroup.setText("Voicegroup: —")
-        self.lbl_unused.setText("Status: —")
-        self.lbl_unused.setStyleSheet("color: #CCCCCC; font-size: 11px;")
+        for lbl, key in ((self.lbl_id, "aud_f_id"), (self.lbl_category, "aud_f_category"),
+                         (self.lbl_offset, "aud_f_offset"), (self.lbl_tracks, "aud_f_tracks"),
+                         (self.lbl_voicegroup, "aud_f_voicegroup"), (self.lbl_unused, "aud_f_status")):
+            lbl.setText(self._field(key, "—"))
+        self.lbl_unused.setStyleSheet(f"color: {color('text')}; font-size: 11px;")
         self.used_by_list.setText("—")
         self.arm_offsets_label.setText("—")
 
@@ -242,12 +240,13 @@ class BGMAssignmentsPanel(QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet("""
-            BGMAssignmentsPanel {
-                background: #0D0D12;
-                border: 1px solid #2A2A35;
+        self.setStyleSheet(f"""
+            BGMAssignmentsPanel {{
+                background: {color('surface')};
+                border: 1px solid {color('border')};
                 border-radius: 4px;
-            }
+            }}
+            BGMAssignmentsPanel QFrame, BGMAssignmentsPanel QLabel {{ background: transparent; }}
         """)
         self._collapsed = True
         self._build_ui()
@@ -258,7 +257,7 @@ class BGMAssignmentsPanel(QFrame):
         self.main_layout.setSpacing(2)
 
         # Toggle button
-        self.toggle_btn = QPushButton("▶ BGM Assignments (ROM)")
+        self.toggle_btn = QPushButton(_t("aud_bgm_show"))
         self.toggle_btn.setProperty("variant", "ghost")
         self.toggle_btn.clicked.connect(self._toggle)
         self.main_layout.addWidget(self.toggle_btn)
@@ -274,8 +273,7 @@ class BGMAssignmentsPanel(QFrame):
     def _toggle(self):
         self._collapsed = not self._collapsed
         self.content_frame.setVisible(not self._collapsed)
-        arrow = "▼" if not self._collapsed else "▶"
-        self.toggle_btn.setText(f"{arrow} BGM Assignments (ROM)")
+        self.toggle_btn.setText(_t("aud_bgm_show" if self._collapsed else "aud_bgm_hide"))
 
     def populate(self, assignments, sound_names):
         """Llena la tabla con las asignaciones BGM."""
@@ -287,13 +285,13 @@ class BGMAssignmentsPanel(QFrame):
 
         for a in assignments:
             sid = a["current_song_id"]
-            s_name = sound_names.get(str(sid), f"Song {sid}")
-            mod_tag = " ✏️" if a["is_modified"] else ""
-            color = "#FF6B35" if a["is_modified"] else "#888888"
+            s_name = sound_names.get(str(sid), _t("aud_song_fallback", id=sid))
+            mod_tag = f" ({_t('aud_modified')})" if a["is_modified"] else ""
+            fg = color("warning") if a["is_modified"] else color("muted")
 
-            text = f"0x{a['rom_offset'] + 0x08000000:08X}  {a['location']:<22s}  → [{sid:02X}] {s_name}{mod_tag}"
+            text = f"0x{a['rom_offset'] + 0x08000000:08X}  {a['location']:<22s}  -> [{sid:02X}] {s_name}{mod_tag}"
             lbl = QLabel(text)
-            lbl.setStyleSheet(f"color: {color}; font-size: 10px; font-family: 'Consolas';")
+            lbl.setStyleSheet(f"color: {fg}; font-size: 11px; font-family: 'Consolas';")
             self.content_layout.addWidget(lbl)
 
 
@@ -312,6 +310,7 @@ class SappyAudioViewer(QWidget):
         # Eliminado QMediaPlayer. Usaremos winsound nativo de forma exclusiva.
         self.audio_phase = 0
         self.is_playing = False
+        self._track_base = ""
         self.init_ui()
 
     def load_sound_names(self):
@@ -319,7 +318,7 @@ class SappyAudioViewer(QWidget):
         import csv
         import os
         from Banco_de_Datos.Utilidades.rutas import get_resource_path
-        
+
         names = {}
         # Cargar nombres desde el nuevo CSV (prioridad)
         csv_path = get_resource_path("Banco_de_Datos/Listas_de_Nombres/canciones_offsets.csv")
@@ -331,7 +330,7 @@ class SappyAudioViewer(QWidget):
                         names[str(row['ID'])] = row['Name']
             except Exception as e:
                 print(f"Error leyendo CSV de canciones: {e}")
-                
+
         # Cargar fallback (json viejo)
         path = get_resource_path("Banco_de_Datos/Listas_de_Nombres/sonidos.json")
         if os.path.exists(path):
@@ -347,45 +346,39 @@ class SappyAudioViewer(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout(self)
-        layout.setSpacing(8)
+        layout.setSpacing(10)
 
         # ── Título y Cabecera ──
-        header = QLabel("🎵 Explorador de Audio Sappy (GBA M4A Engine)")
-        header.setStyleSheet("font-size: 18px; font-weight: bold; color: #00FF96;")
-        layout.addWidget(header)
+        header_row = QHBoxLayout()
+        header = QLabel(_t("aud_title"))
+        header.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {color('text')};")
+        header_row.addWidget(header)
+        header_row.addStretch()
+        engine_lbl = QLabel(_t("aud_engine"))
+        engine_lbl.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
+        header_row.addWidget(engine_lbl)
+        layout.addLayout(header_row)
 
         # ── Filtros por categoría ──
         filter_layout = QHBoxLayout()
-        filter_label = QLabel("Filter:")
-        filter_label.setStyleSheet("color: #888888; font-size: 11px;")
+        filter_label = QLabel(_t("aud_filter"))
+        filter_label.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
         filter_layout.addWidget(filter_label)
 
         self.filter_buttons = {}
         filter_defs = [
-            ("ALL",     "All",              "#FFFFFF"),
-            ("BGM",     "🎵 BGM",           "#00FF96"),
-            ("AMBIENT", "🌧 Ambient",       "#FFD700"),
-            ("UNUSED",  "⚠ Unused/Rare",   "#FF6B35"),
-            ("SFX",     "🔊 SFX",           "#888888"),
-            ("TITLE",   "🎬 Title",         "#00BFFF"),
+            ("ALL", "aud_filter_all"),
+            ("BGM", "aud_cat_bgm"),
+            ("AMBIENT", "aud_cat_ambient"),
+            ("UNUSED", "aud_cat_unused"),
+            ("SFX", "aud_cat_sfx"),
+            ("TITLE", "aud_cat_title"),
         ]
 
-        for cat_key, cat_label, cat_color in filter_defs:
-            btn = QPushButton(cat_label)
+        for cat_key, label_key in filter_defs:
+            btn = QPushButton(_t(label_key))
             btn.setCheckable(True)
             btn.setChecked(cat_key == "ALL")
-            btn.setStyleSheet(f"""
-                QPushButton {{
-                    background: #1A1A1E; color: {cat_color};
-                    border: 1px solid #333; border-radius: 4px;
-                    padding: 4px 10px; font-size: 11px;
-                }}
-                QPushButton:checked {{
-                    background: {cat_color}; color: #000000;
-                    font-weight: bold;
-                }}
-                QPushButton:hover {{ border-color: {cat_color}; }}
-            """)
             btn.clicked.connect(lambda checked, k=cat_key: self._on_filter(k))
             filter_layout.addWidget(btn)
             self.filter_buttons[cat_key] = btn
@@ -394,7 +387,7 @@ class SappyAudioViewer(QWidget):
 
         # Song count
         self.count_label = QLabel("")
-        self.count_label.setStyleSheet("color: #555555; font-size: 11px;")
+        self.count_label.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
         filter_layout.addWidget(self.count_label)
 
         layout.addLayout(filter_layout)
@@ -402,18 +395,13 @@ class SappyAudioViewer(QWidget):
         # ── Área Principal (Lista + Visualizador + Info Panel) ──
         main_h = QHBoxLayout()
 
-        # 1. Lista de Canciones (con colores por categoría)
+        # 1. Lista de Canciones
         self.song_list = QListWidget()
         self.song_list.setFixedWidth(300)
-        self.song_list.setStyleSheet("""
-            QListWidget {
-                background: #0D0D12; color: white;
-                border: 1px solid #2A2A35; border-radius: 4px;
-                font-family: 'Consolas'; font-size: 11px;
-            }
-            QListWidget::item { padding: 3px 6px; border-bottom: 1px solid #1A1A1E; }
-            QListWidget::item:selected { background: #1A3A2A; border-left: 3px solid #00FF96; }
-            QListWidget::item:hover { background: #151520; }
+        self.song_list.setStyleSheet(f"""
+            QListWidget {{ font-family: 'Consolas'; font-size: 12px; }}
+            QListWidget::item {{ padding: 4px 6px; border-bottom: 1px solid {color('surface_alt')}; }}
+            QListWidget::item:selected {{ background: {color('surface_alt')}; color: {color('text')}; border-left: 3px solid {color('accent')}; }}
         """)
         self.populate_songs()
         main_h.addWidget(self.song_list)
@@ -421,47 +409,42 @@ class SappyAudioViewer(QWidget):
         # 2. Panel de Visualización Central
         vis_panel = QVBoxLayout()
         self.retro_vis = RetroBitVisualizer()
-        vis_panel.addWidget(self.retro_vis)
+        vis_panel.addWidget(self.retro_vis, 1)  # el medidor ocupa el espacio libre
 
         # Waveform label
-        self.waveform_label = QLabel("Waveform Monitor (8-bit)")
-        self.waveform_label.setStyleSheet("color: #333333; font-size: 10px;")
+        self.waveform_label = QLabel(_t("aud_waveform"))
+        self.waveform_label.setStyleSheet(f"color: {color('muted')}; font-size: 11px;")
         vis_panel.addWidget(self.waveform_label)
 
         # Info Pista (Now Playing)
-        self.track_info_label = QLabel("No Track Selected")
+        self.track_info_label = QLabel(_t("aud_no_track"))
         self.track_info_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.track_info_label.setStyleSheet("color: #666666; font-family: 'Consolas'; font-size: 11px;")
+        self.track_info_label.setStyleSheet(f"color: {color('muted')}; font-family: 'Consolas'; font-size: 12px;")
         vis_panel.addWidget(self.track_info_label)
 
         # Controles de reproducción
         ctrl_layout = QHBoxLayout()
-        self.btn_play = QPushButton("▶ PLAY")
-        self.btn_stop = QPushButton("■ STOP")
-        self.btn_export = QPushButton("💾 EXPORT MIDI/SF2")
-        self.btn_import = QPushButton("📤 IMPORT MIDI")
+        self.btn_play = QPushButton(_t("aud_play"))
+        self.btn_stop = QPushButton(_t("aud_stop"))
+        self.btn_export = QPushButton(_t("aud_export"))
+        self.btn_import = QPushButton(_t("aud_import"))
         self.btn_play.setProperty("variant", "primary")
         self.btn_stop.setProperty("variant", "danger")
         self.btn_export.setProperty("variant", "secondary")
         self.btn_import.setProperty("variant", "secondary")
         ctrl_layout.addWidget(self.btn_play)
         ctrl_layout.addWidget(self.btn_stop)
+        ctrl_layout.addStretch()
         ctrl_layout.addWidget(self.btn_export)
         ctrl_layout.addWidget(self.btn_import)
 
         # Speed control
         speed_layout = QHBoxLayout()
-        speed_label = QLabel("Speed")
-        speed_label.setStyleSheet("color: #888888; font-size: 11px;")
+        speed_label = QLabel(_t("aud_speed"))
+        speed_label.setStyleSheet(f"color: {color('muted')}; font-size: 12px;")
         self.speed_combo = QComboBox()
         self.speed_combo.addItems([f"{x:.2f}x" for x in np.arange(0.25, 4.25, 0.25)])
         self.speed_combo.setCurrentText("1.00x")
-        self.speed_combo.setStyleSheet("""
-            QComboBox {
-                background: #1A1A1E; color: white; border: 1px solid #333;
-                padding: 4px; border-radius: 3px;
-            }
-        """)
         speed_layout.addWidget(speed_label)
         speed_layout.addWidget(self.speed_combo)
         ctrl_layout.addLayout(speed_layout)
@@ -471,13 +454,13 @@ class SappyAudioViewer(QWidget):
         # Seek bar
         self.seek_bar = QSlider(Qt.Orientation.Horizontal)
         self.seek_bar.setRange(0, 1000)
-        self.seek_bar.setStyleSheet("""
-            QSlider::groove:horizontal { background: #1A1A1E; height: 6px; border-radius: 3px; }
-            QSlider::handle:horizontal {
-                background: #00FF96; width: 14px; height: 14px;
+        self.seek_bar.setStyleSheet(f"""
+            QSlider::groove:horizontal {{ background: {color('surface_alt')}; height: 6px; border-radius: 3px; }}
+            QSlider::handle:horizontal {{
+                background: {color('accent')}; width: 14px; height: 14px;
                 margin: -4px 0; border-radius: 7px;
-            }
-            QSlider::sub-page:horizontal { background: #00FF96; border-radius: 3px; }
+            }}
+            QSlider::sub-page:horizontal {{ background: {color('accent')}; border-radius: 3px; }}
         """)
         self.seek_bar.sliderMoved.connect(self.on_seek)
         vis_panel.addWidget(self.seek_bar)
@@ -528,14 +511,14 @@ class SappyAudioViewer(QWidget):
     # ═══════════════════════════════════════════════════════════════════
 
     def populate_songs(self):
-        """Poblar la lista con canciones, coloreadas por categoría."""
+        """Poblar la lista con canciones; las no usadas se marcan con el color de aviso."""
         self.song_list.clear()
 
         if not hasattr(self.project, 'songs'):
             return
 
-        sappy = self.project.sappy_engine
         visible_count = 0
+        warning = QColor(color("warning"))
 
         for song in self.project.songs:
             cat = song.get("category", "UNKNOWN")
@@ -545,22 +528,12 @@ class SappyAudioViewer(QWidget):
                 continue
 
             s_id = str(song['id'])
-            s_name = self.sound_names.get(s_id, f"Track {s_id}")
-            cat_icon = {
-                "BGM": "🎵", "AMBIENT": "🌧", "UNUSED": "⚠",
-                "SFX": "🔊", "TITLE": "🎬", "UNKNOWN": "❓",
-            }.get(cat, "")
+            s_name = self.sound_names.get(s_id, _t("aud_track_fallback", id=s_id))
 
-            item_text = f"[{int(s_id):03d}] {cat_icon} {s_name}"
-            item = QListWidgetItem(item_text)
-
-            # Color por categoría
-            cat_color = sappy.get_category_color_hex(cat)
-            item.setForeground(QColor(cat_color))
-
-            # Fondo sutilmente tintado para unused
+            item = QListWidgetItem(f"[{int(s_id):03d}] {s_name}")
+            item.setToolTip(category_label(cat))
             if cat == "UNUSED":
-                item.setBackground(QColor(255, 107, 53, 25))
+                item.setForeground(warning)
 
             # Guardar referencia al song data
             item.setData(Qt.ItemDataRole.UserRole, song['id'])
@@ -568,7 +541,7 @@ class SappyAudioViewer(QWidget):
             self.song_list.addItem(item)
             visible_count += 1
 
-        self.count_label.setText(f"{visible_count} / {len(self.project.songs)} songs")
+        self.count_label.setText(_t("aud_count", n=visible_count, total=len(self.project.songs)))
 
     # ═══════════════════════════════════════════════════════════════════
     # SELECCIÓN Y REPRODUCCIÓN
@@ -584,6 +557,14 @@ class SappyAudioViewer(QWidget):
             return None
         return self.project.sappy_engine.get_song_by_id(song_id)
 
+    def _set_track_status(self, status_key, fg_token, bold=False):
+        """Muestra la pista seleccionada con su estado (lista / reproduciendo)."""
+        if not self._track_base:
+            return
+        self.track_info_label.setText(f"{self._track_base} ({_t(status_key)})")
+        weight = "font-weight: bold; " if bold else ""
+        self.track_info_label.setStyleSheet(f"color: {color(fg_token)}; {weight}font-family: 'Consolas'; font-size: 12px;")
+
     def on_song_selected(self, index):
         if index < 0:
             self.info_panel.clear_info()
@@ -594,11 +575,10 @@ class SappyAudioViewer(QWidget):
             return
 
         s_id = str(song['id'])
-        s_name = self.sound_names.get(s_id, f"Track {s_id}")
+        s_name = self.sound_names.get(s_id, _t("aud_track_fallback", id=s_id))
 
-        cat_color = self.project.sappy_engine.get_category_color_hex(song.get("category", "UNKNOWN"))
-        self.track_info_label.setText(f"Track: [{int(s_id):03d}] {s_name} (Ready)")
-        self.track_info_label.setStyleSheet(f"color: {cat_color}; font-family: 'Consolas'; font-size: 11px;")
+        self._track_base = _t("aud_track", id=f"{int(s_id):03d}", name=s_name)
+        self._set_track_status("aud_ready", "text")
 
         # Actualizar panel de info
         self.info_panel.update_info(song, self.project.sappy_engine)
@@ -611,36 +591,36 @@ class SappyAudioViewer(QWidget):
         if self.is_playing:
             self.on_stop()
 
-        self.btn_play.setText("PREPARING...")
+        self.btn_play.setText(_t("aud_preparing"))
         self.btn_play.setEnabled(False)
         self.btn_stop.setEnabled(False)
-        
+
         # Temp build folder
         import os, tempfile
         out_wav = os.path.join(tempfile.gettempdir(), "fomt_preview.wav")
-        
+
         import threading
         def _bg_prep():
             success = self.project.sappy_engine.preview_song_natively(song, out_wav)
             # Call back to main thread
             from PyQt6.QtCore import QMetaObject, Qt, Q_ARG
-            QMetaObject.invokeMethod(self, "_on_play_ready", Qt.ConnectionType.QueuedConnection, 
+            QMetaObject.invokeMethod(self, "_on_play_ready", Qt.ConnectionType.QueuedConnection,
                                      Q_ARG(bool, success), Q_ARG(str, out_wav))
-                                     
+
         threading.Thread(target=_bg_prep).start()
 
     @pyqtSlot(bool, str)
     def _on_play_ready(self, success, wav_path):
-        self.btn_play.setText("▶ PLAY")
+        self.btn_play.setText(_t("aud_play"))
         self.btn_play.setEnabled(True)
         self.btn_stop.setEnabled(True)
-        
+
         if not success:
             print("No se pudo generar la preview usando Fluidsynth/GBA-Mus-Ripper.")
             return
-            
+
         self.is_playing = True
-        
+
         # Cargar datos WAV a memoria para sincronizar el visualizador
         import wave, time, os
         try:
@@ -653,7 +633,7 @@ class SappyAudioViewer(QWidget):
         except Exception as e:
             print(f"Error cargando WAV a memoria: {e}")
             self.wav_data = None
-        
+
         # Reproducción nativa exclusiva con winsound (Garantiza que no haya locks ni problemas de codecs)
         import sys
         if sys.platform == 'win32':
@@ -664,17 +644,15 @@ class SappyAudioViewer(QWidget):
             except Exception as e:
                 print(f"Error reproduciendo con winsound: {e}")
 
-        current_text = self.track_info_label.text().replace("(Ready)", "(Playing)")
-        self.track_info_label.setText(current_text)
-        self.track_info_label.setStyleSheet("color: #00FF96; font-weight: bold; font-family: 'Consolas'; font-size: 11px;")
-        
+        self._set_track_status("aud_playing", "accent", bold=True)
+
         self.play_timer = QTimer(self)
         self.play_timer.timeout.connect(self._sync_visuals)
         self.play_timer.start(50)
 
     def _sync_visuals(self):
         if not self.is_playing: return
-        
+
         if not hasattr(self, 'wav_data') or not self.wav_data:
             # Fallback a visuales aleatorios si falló la carga
             import random
@@ -684,35 +662,35 @@ class SappyAudioViewer(QWidget):
 
         import time
         import numpy as np
-        
+
         elapsed = time.time() - self.playback_start_time
         frame_idx = int(elapsed * self.wav_framerate)
         byte_idx = frame_idx * self.wav_channels * self.wav_sampwidth
-        
+
         # Leer ~50ms
         chunk_frames = int(0.05 * self.wav_framerate)
         chunk_bytes = chunk_frames * self.wav_channels * self.wav_sampwidth
-        
+
         if byte_idx + chunk_bytes > len(self.wav_data):
             # Final de pista (detener reproducción visual)
             self.on_stop()
             return
-            
+
         chunk = self.wav_data[byte_idx : byte_idx + chunk_bytes]
         if not chunk: return
-        
+
         if self.wav_sampwidth == 2:
             arr = np.frombuffer(chunk, dtype=np.int16)
         else:
             arr = np.frombuffer(chunk, dtype=np.int8)
-            
+
         if self.wav_channels == 2:
             arr = arr[::2]
-            
+
         arr = np.abs(arr)
         bars = 32
         if len(arr) < bars: return
-        
+
         bin_size = len(arr) // bars
         v_data = bytearray(32)
         for i in range(bars):
@@ -722,7 +700,7 @@ class SappyAudioViewer(QWidget):
             else:
                 norm = int((val / 128.0) * 255)
             v_data[i] = max(0, min(255, norm))
-            
+
         self.retro_vis.update_from_data(v_data)
 
     def on_position_changed(self, pos):
@@ -737,7 +715,7 @@ class SappyAudioViewer(QWidget):
 
     def on_stop(self):
         self.is_playing = False
-        
+
         import sys
         if sys.platform == 'win32':
             import winsound
@@ -750,93 +728,91 @@ class SappyAudioViewer(QWidget):
             self.play_timer.stop()
         self.btn_play.setEnabled(True)
         self.seek_bar.setValue(0)
-        
+
         # Reset visualizer
         self.retro_vis.update_from_data(bytes([0]*32))
 
-        current_text = self.track_info_label.text().replace("(Playing)", "(Ready)")
-        self.track_info_label.setText(current_text)
-        self.track_info_label.setStyleSheet("color: #888888; font-family: 'Consolas'; font-size: 11px;")
+        self._set_track_status("aud_ready", "text")
         print("Cerrando sesión de audio...")
-        
+
     def on_export_data(self):
         from PyQt6.QtWidgets import QFileDialog, QMessageBox
         import subprocess
-        
+
         song = self._get_selected_song()
         if not song:
-            QMessageBox.warning(self, "Export", "Please select a song to export.")
+            QMessageBox.warning(self, _t("aud_export"), _t("aud_select_to_export"))
             return
 
-        out_dir = QFileDialog.getExistingDirectory(self, "Select Export Directory")
+        out_dir = QFileDialog.getExistingDirectory(self, _t("aud_dlg_export_dir"))
         if not out_dir: return
-        
+
         try:
-            self.btn_export.setText("EXPORTING (PLEASE WAIT)...")
+            self.btn_export.setText(_t("aud_exporting"))
             self.btn_export.setEnabled(False)
-            
+
             import threading
             def bg_task():
                 try:
+                    from Banco_de_Datos.Utilidades.rutas import get_resource_path
                     ripper_dir = get_resource_path(os.path.join("Nucleos_Positronicos", "Nucleo_de_Sonido", "gba-mus-ripper"))
                     song_ripper = os.path.join(ripper_dir, "song_ripper.exe")
                     sf2_ripper = os.path.join(ripper_dir, "sound_font_ripper.exe")
                     rom_path = self.project.base_rom_path
-                    
+
                     s_addr = hex(song['offset'])
                     vg_addr = hex(song['voicegroup_ptr'])
-                    
+
                     s_id = song['id']
                     mid_file = os.path.join(out_dir, f"song_{s_id:03d}.mid")
                     sf2_file = os.path.join(out_dir, f"song_{s_id:03d}.sf2")
-                    
+
                     subprocess.run([song_ripper, rom_path, mid_file, s_addr], cwd=ripper_dir, capture_output=True)
                     subprocess.run([sf2_ripper, rom_path, sf2_file, vg_addr], cwd=ripper_dir, capture_output=True)
-                    
+
                     print(f"Exported song {s_id} successfully to {out_dir}")
                 except Exception as e:
                     print(f"Export task error: {e}")
                 finally:
                     # Reset button
-                    self.btn_export.setText("💾 EXPORT MIDI/SF2")
+                    self.btn_export.setText(_t("aud_export"))
                     self.btn_export.setEnabled(True)
-                    
+
             threading.Thread(target=bg_task).start()
         except Exception as e:
             print(f"Export Error: {e}")
-            self.btn_export.setText("💾 EXPORT MIDI/SF2")
+            self.btn_export.setText(_t("aud_export"))
             self.btn_export.setEnabled(True)
 
     def on_import_data(self):
         from PyQt6.QtWidgets import QFileDialog, QMessageBox
         from Nucleos_Positronicos.Nucleo_de_Sonido.midi_compiler import MidiToSappyCompiler
-        
+
         song = self._get_selected_song()
         if not song:
-            QMessageBox.warning(self, "Import", "Please select a song slot to overwrite.")
+            QMessageBox.warning(self, _t("aud_import"), _t("aud_select_to_import"))
             return
 
-        midi_path, _ = QFileDialog.getOpenFileName(self, "Select MIDI to Import", "", "MIDI Files (*.mid)")
+        midi_path, _ = QFileDialog.getOpenFileName(self, _t("aud_dlg_import_midi"), "", _t("aud_filter_midi"))
         if not midi_path: return
-        
+
         try:
-            self.btn_import.setText("IMPORTING...")
+            self.btn_import.setText(_t("aud_importing"))
             self.btn_import.setEnabled(False)
-            
+
             compiler = MidiToSappyCompiler(self.project)
             success, msg = compiler.inject_midi(midi_path, song['id'])
-            
+
             if success:
-                QMessageBox.information(self, "Success", f"MIDI Injected successfully!\n{msg}")
+                QMessageBox.information(self, _t("msg_success"), _t("aud_import_ok", msg=msg))
                 # Refresh ROM data and songs
                 self.project.sappy_engine.scan_songs()
                 self.populate_songs()
             else:
-                QMessageBox.warning(self, "Failed", f"Failed to inject MIDI:\n{msg}")
-                
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error during import:\n{e}")
-        finally:
-            self.btn_import.setText("📤 IMPORT MIDI")
-            self.btn_import.setEnabled(True)
+                QMessageBox.warning(self, _t("msg_warning"), _t("aud_import_failed", msg=msg))
 
+        except Exception as e:
+            QMessageBox.critical(self, _t("msg_error"), _t("aud_import_error", err=e))
+        finally:
+            self.btn_import.setText(_t("aud_import"))
+            self.btn_import.setEnabled(True)
