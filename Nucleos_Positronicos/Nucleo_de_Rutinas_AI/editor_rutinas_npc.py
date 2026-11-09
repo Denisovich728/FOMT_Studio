@@ -299,7 +299,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.btn_del_step = QPushButton(_t("rut_btn_delete"))
         self.btn_del_step.clicked.connect(self._on_delete_waypoint)
         self.btn_edit_step = QPushButton(_t("rut_btn_edit_step"))
-        self.btn_edit_step.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold;")
+        self.btn_edit_step.setProperty("variant", "secondary")
         self.btn_edit_step.clicked.connect(self._on_edit_step_clicked)
 
         btn_seg_layout.addWidget(self.btn_add_step)
@@ -311,7 +311,7 @@ class EditorRutinasNPCWidget(QWidget):
         # 4. Botones de Inyección en ROM y Guardado
         rom_actions = QHBoxLayout()
         self.btn_inject_rom = QPushButton(_t("rut_btn_inject"))
-        self.btn_inject_rom.setStyleSheet("background-color: #238636; color: white; font-weight: bold; padding: 7px;")
+        self.btn_inject_rom.setProperty("variant", "primary")
         self.btn_inject_rom.clicked.connect(self._on_inject_rom_clicked)
 
         self.btn_export_json = QPushButton(_t("rut_btn_export_json"))
@@ -874,7 +874,7 @@ class EditorRutinasNPCWidget(QWidget):
         btn_close_insp = QPushButton("")
         btn_close_insp.setFixedSize(20, 20)
         btn_close_insp.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_close_insp.setStyleSheet("background-color: transparent; border: none; color: #8B949E; font-size: 12px; font-weight: bold;")
+        btn_close_insp.setProperty("variant", "ghost")
         btn_close_insp.clicked.connect(lambda: self.act_rc_inspector.setChecked(False))
 
         header_layout.addWidget(lbl_insp_title)
@@ -1059,7 +1059,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.btn_snap_tiles.clicked.connect(self._on_snap_to_walkable_clicked)
 
         self.btn_recalc_path = QPushButton(_t("rut_btn_recalc"))
-        self.btn_recalc_path.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold;")
+        self.btn_recalc_path.setProperty("variant", "secondary")
         self.btn_recalc_path.clicked.connect(self._on_recalc_a_star_clicked)
 
         self.btn_toggle_loop = QPushButton(_t("rut_btn_loop_mode"))

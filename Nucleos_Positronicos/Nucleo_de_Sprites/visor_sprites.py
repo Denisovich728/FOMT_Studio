@@ -490,7 +490,7 @@ class LiveAnimationPlayer(QWidget):
 
         self.btn_play_pause = QPushButton(_t("spr_pause"))
         self.btn_play_pause.setFixedSize(70, 26)
-        self.btn_play_pause.setStyleSheet("font-weight: bold; background: #00FF96; color: black;")
+        self.btn_play_pause.setProperty("variant", "primary")
         self.btn_play_pause.clicked.connect(self._toggle_play)
         btn_row.addWidget(self.btn_play_pause)
 
@@ -595,12 +595,12 @@ class LiveAnimationPlayer(QWidget):
         self.is_playing = not self.is_playing
         if self.is_playing:
             self.btn_play_pause.setText(_t("spr_pause"))
-            self.btn_play_pause.setStyleSheet("font-weight: bold; background: #00FF96; color: black;")
+            self.btn_play_pause.setProperty("variant", "primary")
             self._schedule_next_frame()
         else:
             self.timer.stop()
             self.btn_play_pause.setText(_t("spr_play"))
-            self.btn_play_pause.setStyleSheet("font-weight: bold; background: #FFD700; color: black;")
+            self.btn_play_pause.setProperty("variant", "primary")
 
     def _step_next(self):
         if not self.anim_data or not self.anim_data["frames"]:
@@ -608,7 +608,7 @@ class LiveAnimationPlayer(QWidget):
         self.timer.stop()
         self.is_playing = False
         self.btn_play_pause.setText(_t("spr_play"))
-        self.btn_play_pause.setStyleSheet("font-weight: bold; background: #FFD700; color: black;")
+        self.btn_play_pause.setProperty("variant", "primary")
 
         total = len(self.anim_data["frames"])
         self.current_frame = (self.current_frame + 1) % total
@@ -620,7 +620,7 @@ class LiveAnimationPlayer(QWidget):
         self.timer.stop()
         self.is_playing = False
         self.btn_play_pause.setText(_t("spr_play"))
-        self.btn_play_pause.setStyleSheet("font-weight: bold; background: #FFD700; color: black;")
+        self.btn_play_pause.setProperty("variant", "primary")
 
         total = len(self.anim_data["frames"])
         self.current_frame = (self.current_frame - 1 + total) % total
@@ -872,36 +872,24 @@ class VisorSprites(QWidget):
         action_bar.setSpacing(8)
 
         self.btn_export_gif = QPushButton(_t("spr_btn_gif"))
-        self.btn_export_gif.setStyleSheet("""
-            QPushButton { background: #00FF96; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
-            QPushButton:hover { background: #33FFB0; }
-        """)
+        self.btn_export_gif.setProperty("variant", "secondary")
         self.btn_export_gif.clicked.connect(self._on_export_gif)
         action_bar.addWidget(self.btn_export_gif)
 
         self.btn_export_sheet = QPushButton(_t("spr_btn_sheet"))
-        self.btn_export_sheet.setStyleSheet("""
-            QPushButton { background: #00BFFF; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
-            QPushButton:hover { background: #33CCFF; }
-        """)
+        self.btn_export_sheet.setProperty("variant", "secondary")
         self.btn_export_sheet.clicked.connect(self._on_export_sheet)
         action_bar.addWidget(self.btn_export_sheet)
 
         self.btn_export_strip = QPushButton(_t("spr_btn_strip"))
-        self.btn_export_strip.setStyleSheet("""
-            QPushButton { background: #FFD700; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
-            QPushButton:hover { background: #FFE033; }
-        """)
+        self.btn_export_strip.setProperty("variant", "secondary")
         self.btn_export_strip.clicked.connect(self._on_export_strip)
         action_bar.addWidget(self.btn_export_strip)
 
         action_bar.addStretch()
 
         self.btn_export_bulk = QPushButton(_t("spr_btn_bulk"))
-        self.btn_export_bulk.setStyleSheet("""
-            QPushButton { background: #2A2A3C; color: #FFFFFF; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; border: 1px solid #444458; }
-            QPushButton:hover { background: #3A3A52; }
-        """)
+        self.btn_export_bulk.setProperty("variant", "secondary")
         self.btn_export_bulk.clicked.connect(self._on_export_bulk)
         action_bar.addWidget(self.btn_export_bulk)
 

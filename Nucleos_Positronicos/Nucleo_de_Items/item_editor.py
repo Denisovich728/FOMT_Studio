@@ -130,12 +130,12 @@ class ItemInspectorPanel(QFrame):
         # Botones de Modding Gráfico (Importar / Exportar Icono)
         icon_btn_row = QHBoxLayout()
         self.btn_export_icon = QPushButton(_t("itm_btn_export_png"))
-        self.btn_export_icon.setStyleSheet("background: #1F3A5F; color: #89B4FA; font-weight: bold; font-size: 10px; padding: 4px;")
+        self.btn_export_icon.setProperty("variant", "secondary")
         self.btn_export_icon.clicked.connect(self._on_export_icon_clicked)
         icon_btn_row.addWidget(self.btn_export_icon)
 
         self.btn_import_icon = QPushButton(_t("itm_btn_reinject_png"))
-        self.btn_import_icon.setStyleSheet("background: #5F1F3A; color: #FF89B4; font-weight: bold; font-size: 10px; padding: 4px;")
+        self.btn_import_icon.setProperty("variant", "secondary")
         self.btn_import_icon.clicked.connect(self._on_import_icon_clicked)
         icon_btn_row.addWidget(self.btn_import_icon)
         layout.addLayout(icon_btn_row)
@@ -227,10 +227,7 @@ class ItemInspectorPanel(QFrame):
 
         # Boton Aplicar Cambios
         self.btn_apply = QPushButton(_t("itm_btn_apply"))
-        self.btn_apply.setStyleSheet("""
-            QPushButton { background: #00FF96; color: black; font-weight: bold; padding: 8px; border-radius: 4px; font-size: 11px; }
-            QPushButton:hover { background: #33FFB0; }
-        """)
+        self.btn_apply.setProperty("variant", "primary")
         self.btn_apply.clicked.connect(self._on_apply_clicked)
         layout.addWidget(self.btn_apply)
 
@@ -427,12 +424,12 @@ class ItemEditorWidget(QWidget):
         toolbar.addWidget(self.txt_filter)
 
         self.btn_refresh = QPushButton(_t("itm_btn_reload"))
-        self.btn_refresh.setStyleSheet("background: #1A1A26; color: white; border: 1px solid #333348; padding: 5px 12px; border-radius: 4px; font-size: 11px;")
+        self.btn_refresh.setProperty("variant", "secondary")
         self.btn_refresh.clicked.connect(self.load_data)
         toolbar.addWidget(self.btn_refresh)
 
         self.btn_save_all = QPushButton(_t("itm_btn_save_rom"))
-        self.btn_save_all.setStyleSheet("background: #2e7d32; color: white; font-weight: bold; padding: 5px 14px; border-radius: 4px; font-size: 11px;")
+        self.btn_save_all.setProperty("variant", "primary")
         self.btn_save_all.clicked.connect(self.save_all_to_rom)
         toolbar.addWidget(self.btn_save_all)
 

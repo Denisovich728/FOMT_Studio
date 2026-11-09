@@ -595,7 +595,7 @@ class NativeProcViewerWidget(QWidget):
 
         btn_layout = QHBoxLayout()
         self.btn_edit_patch = QPushButton("✏️ Modificar y Parchear en ROM")
-        self.btn_edit_patch.setStyleSheet("font-weight: bold; background-color: #0E639C; color: white; padding: 6px; border-radius: 4px;")
+        self.btn_edit_patch.setProperty("variant", "primary")
         self.btn_edit_patch.clicked.connect(self._on_patch_clicked)
         btn_layout.addWidget(self.btn_edit_patch)
         det_layout.addLayout(btn_layout)

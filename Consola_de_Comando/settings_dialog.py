@@ -249,11 +249,11 @@ class SettingsDialog(QDialog):
         btn_layout.addStretch()
         
         btn_cancel = QPushButton("Cancelar")
-        btn_cancel.setStyleSheet("background-color: transparent; border: 1px solid #F38BA8; color: #F38BA8;")
+        btn_cancel.setProperty("variant", "secondary")
         btn_cancel.clicked.connect(self.reject)
         
         btn_save = QPushButton("💾 Guardar Cambios")
-        btn_save.setStyleSheet("background-color: #A6E3A1; color: #11111B; border: none;")
+        btn_save.setProperty("variant", "primary")
         btn_save.clicked.connect(self._save_settings)
         
         btn_layout.addWidget(btn_cancel)

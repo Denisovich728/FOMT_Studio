@@ -41,7 +41,7 @@ class VisorTilesetsWidget(QWidget):
         
         self.btn_inject = QPushButton("💉 Reinsertar Dinámico")
         self.btn_inject.clicked.connect(self._inject_tileset)
-        self.btn_inject.setStyleSheet("background-color: #A31515; color: white; font-weight: bold;")
+        self.btn_inject.setProperty("variant", "primary")
         
         h_header.addWidget(self.btn_export)
         h_header.addWidget(self.btn_import)

@@ -1287,12 +1287,12 @@ class TeatroEventosWidget(QWidget):
         top_lay.addWidget(self.combo_events)
 
         btn_load_rom = QPushButton(_t("thr_btn_load_rom"))
-        btn_load_rom.setStyleSheet("background-color: #238636; color: white; font-weight: bold; padding: 4px 10px;")
+        btn_load_rom.setProperty("variant", "secondary")
         btn_load_rom.clicked.connect(self._on_reload_from_rom)
         top_lay.addWidget(btn_load_rom)
 
         btn_export = QPushButton(_t("thr_btn_export"))
-        btn_export.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold; padding: 4px 10px;")
+        btn_export.setProperty("variant", "primary")
         btn_export.clicked.connect(lambda: self._on_export_script(show_dialog=True))
         top_lay.addWidget(btn_export)
 
@@ -1475,7 +1475,7 @@ class TeatroEventosWidget(QWidget):
         port_meta.addWidget(self.lbl_speaker_name)
 
         self.btn_edit_melody = QPushButton(_t("thr_btn_edit_melody"))
-        self.btn_edit_melody.setStyleSheet("background-color: #1F3A5F; color: #58A6FF; border: 1px solid #388BFD; padding: 4px; border-radius: 4px; font-weight: bold;")
+        self.btn_edit_melody.setProperty("variant", "secondary")
         self.btn_edit_melody.clicked.connect(self._on_open_melody_editor)
         port_meta.addWidget(self.btn_edit_melody)
 
@@ -1516,7 +1516,7 @@ class TeatroEventosWidget(QWidget):
 
         self.btn_play = QPushButton(_t("thr_play"))
         self.btn_play.setFixedWidth(64)
-        self.btn_play.setStyleSheet("background-color: #238636; color: white; font-weight: bold;")
+        self.btn_play.setProperty("variant", "primary")
         self.btn_play.clicked.connect(self._toggle_playback)
         t_lay.addWidget(self.btn_play)
 
@@ -1737,11 +1737,11 @@ class TeatroEventosWidget(QWidget):
         if self.play_timer.isActive():
             self.play_timer.stop()
             self.btn_play.setText(_t("thr_play"))
-            self.btn_play.setStyleSheet("background-color: #238636; color: white; font-weight: bold;")
+            self.btn_play.setProperty("variant", "primary")
         else:
             self.play_timer.start(self.play_speed_ms)
             self.btn_play.setText(_t("thr_pause"))
-            self.btn_play.setStyleSheet("background-color: #D29922; color: white; font-weight: bold;")
+            self.btn_play.setProperty("variant", "primary")
 
     def _on_play_step(self):
         if self.current_step_idx < len(self.vm.steps) - 1:

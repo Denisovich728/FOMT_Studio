@@ -43,7 +43,7 @@ class ItemBulkEditorWidget(QWidget):
         btn_layout = QHBoxLayout()
         self.btn_save = QPushButton(tr("btn_bulk_sync").format(category=self.category_label.upper()))
         self.btn_save.setFixedHeight(45)
-        self.btn_save.setStyleSheet("background-color: #27AE60; color: white; font-weight: bold; border-radius: 5px;")
+        self.btn_save.setProperty("variant", "primary")
         self.btn_save.clicked.connect(self.save_to_rom)
         
         self.btn_refresh = QPushButton(tr("btn_bulk_refresh"))

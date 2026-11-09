@@ -523,13 +523,12 @@ class PropertiesPanel(QWidget):
 
         # — Gestor de Diccionario —
         self.btn_open_dict = QPushButton("📖 Gestor de Comportamientos")
-        self.btn_open_dict.setStyleSheet("background-color:#004080; color:white; font-weight:bold; padding:4px;")
+        self.btn_open_dict.setProperty("variant", "secondary")
         layout.addWidget(self.btn_open_dict)
 
         # — Guardar en ROM —
         self.btn_save_rom = QPushButton("💾 Guardar en ROM")
-        self.btn_save_rom.setStyleSheet(
-            "background-color:#1a6b1a; color:white; font-weight:bold; padding:4px;")
+        self.btn_save_rom.setProperty("variant", "primary")
         layout.addWidget(self.btn_save_rom)
 
         layout.addStretch()

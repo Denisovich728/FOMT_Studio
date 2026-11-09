@@ -259,14 +259,7 @@ class BGMAssignmentsPanel(QFrame):
 
         # Toggle button
         self.toggle_btn = QPushButton("▶ BGM Assignments (ROM)")
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background: transparent; color: #FFD700;
-                font-size: 11px; font-weight: bold;
-                text-align: left; border: none; padding: 4px;
-            }
-            QPushButton:hover { color: #FFFFFF; }
-        """)
+        self.toggle_btn.setProperty("variant", "ghost")
         self.toggle_btn.clicked.connect(self._toggle)
         self.main_layout.addWidget(self.toggle_btn)
 
@@ -447,35 +440,10 @@ class SappyAudioViewer(QWidget):
         self.btn_stop = QPushButton("■ STOP")
         self.btn_export = QPushButton("💾 EXPORT MIDI/SF2")
         self.btn_import = QPushButton("📤 IMPORT MIDI")
-        self.btn_play.setStyleSheet("""
-            QPushButton {
-                background: #00FF96; color: black; font-weight: bold;
-                padding: 10px 20px; border-radius: 4px; font-size: 12px;
-            }
-            QPushButton:hover { background: #33FFB0; }
-            QPushButton:disabled { background: #333333; color: #666666; }
-        """)
-        self.btn_stop.setStyleSheet("""
-            QPushButton {
-                background: #FF3232; color: white; font-weight: bold;
-                padding: 10px 20px; border-radius: 4px; font-size: 12px;
-            }
-            QPushButton:hover { background: #FF5555; }
-        """)
-        self.btn_export.setStyleSheet("""
-            QPushButton {
-                background: #00BFFF; color: black; font-weight: bold;
-                padding: 10px 20px; border-radius: 4px; font-size: 12px;
-            }
-            QPushButton:hover { background: #33CCFF; }
-        """)
-        self.btn_import.setStyleSheet("""
-            QPushButton {
-                background: #FFD700; color: black; font-weight: bold;
-                padding: 10px 20px; border-radius: 4px; font-size: 12px;
-            }
-            QPushButton:hover { background: #FFE033; }
-        """)
+        self.btn_play.setProperty("variant", "primary")
+        self.btn_stop.setProperty("variant", "danger")
+        self.btn_export.setProperty("variant", "secondary")
+        self.btn_import.setProperty("variant", "secondary")
         ctrl_layout.addWidget(self.btn_play)
         ctrl_layout.addWidget(self.btn_stop)
         ctrl_layout.addWidget(self.btn_export)

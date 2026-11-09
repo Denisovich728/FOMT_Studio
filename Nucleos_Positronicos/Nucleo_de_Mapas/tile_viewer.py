@@ -107,9 +107,7 @@ class TileViewerWidget(QWidget):
         self.btn_8bpp = QPushButton("4bpp")
         self.btn_8bpp.setCheckable(True)
         self.btn_8bpp.setFixedWidth(55)
-        self.btn_8bpp.setStyleSheet(
-            "QPushButton { background:#1a2a1a; color:#88ff88; border:1px solid #226622; border-radius:3px; }"
-            "QPushButton:checked { background:#006600; color:white; }")
+        self.btn_8bpp.setProperty("variant", "secondary")
         self.btn_8bpp.toggled.connect(self._on_bpp_toggled)
         tb.addWidget(self.btn_8bpp)
 

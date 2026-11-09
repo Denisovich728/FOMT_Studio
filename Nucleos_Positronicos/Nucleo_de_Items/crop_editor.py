@@ -107,8 +107,7 @@ class CropEditorWidget(QWidget):
         # Bottom bar
         btn_bar = QHBoxLayout()
         self.btn_save = QPushButton("💾 Guardar Cambios al Proyecto")
-        self.btn_save.setStyleSheet("QPushButton { background-color: #2a6e2a; color: white; padding: 6px 12px; font-weight: bold; border-radius: 4px; }"
-                                    "QPushButton:hover { background-color: #3a9e3a; }")
+        self.btn_save.setProperty("variant", "primary")
         self.btn_save.clicked.connect(self._save_all)
         btn_bar.addStretch()
         btn_bar.addWidget(self.btn_save)

@@ -161,12 +161,12 @@ class MenuEditorWidget(QWidget):
         
         btn_save = QPushButton(tr("btn_save_sync_all", lang))
         btn_save.setFixedHeight(45)
-        btn_save.setStyleSheet("background-color: #2ECC71; color: white; font-weight: bold; border-radius: 5px;")
+        btn_save.setProperty("variant", "primary")
         btn_save.clicked.connect(self.save_all)
         
         btn_inject = QPushButton(tr("btn_inject_script", lang))
         btn_inject.setFixedHeight(45)
-        btn_inject.setStyleSheet("background-color: #3498DB; color: white; font-weight: bold; border-radius: 5px;")
+        btn_inject.setProperty("variant", "secondary")
         btn_inject.clicked.connect(self.inject_script_at_cursor)
         
         actions_panel.addWidget(btn_save)
