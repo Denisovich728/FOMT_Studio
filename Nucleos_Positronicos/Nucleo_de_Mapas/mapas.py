@@ -1380,8 +1380,6 @@ class MapParser:
         mh = self.maps[map_index]
         
         # 1. Empaquetar tilemaps (16-bit array -> bytes)
-        # Para evitar quemar duplicadas las estructuras dinámicas en la ROM base,
-        # guardamos las capas base (tilemap_bg*) ya que el motor FoMT las estampa en tiempo real.
         t_bg3 = renderer.tilemap_bg3
         t_bg2 = renderer.tilemap_bg2
         t_bg1 = renderer.tilemap_bg1
@@ -1395,19 +1393,18 @@ class MapParser:
         bg1_comp = compress_arcano_marvelous(bg1_raw)
         
         # 3. Inyectar tilemaps al final de la ROM
-        total_size = len(bg3_comp) + len(bg2_comp) + len(bg1_comp)
+        col_to_save = bytes(renderer.collision_map) if renderer.collision_map else b''
+        total_size = len(bg3_comp) + len(bg2_comp) + len(bg1_comp) + len(col_to_save)
         
-        # Expandir la ROM si no hay espacio
         rom_len = len(self.project.base_rom_data)
         free_space = self.find_free_space(total_size)
         
         if free_space == -1:
             free_space = rom_len
-            # Alinear a 4 bytes
             if free_space % 4 != 0:
                 free_space += 4 - (free_space % 4)
                 
-        # 5. Escribir datos a través de overwrite_rom_directly para asegurar que persista en el archivo
+        # 5. Escribir datos a través de overwrite_rom_directly
         offset = free_space
         
         new_bg3_ptr = offset | 0x08000000
@@ -1422,12 +1419,13 @@ class MapParser:
         self.project.overwrite_rom_directly(offset, bg1_comp)
         offset += len(bg1_comp)
         
-        # 6. Guardar Collision Map base
-        obj2_off = mh.p_obj2 & 0x01FFFFFF
-        col_to_save = renderer.collision_map
-        if obj2_off > 0 and col_to_save and len(col_to_save) == mh.width * mh.height:
-            self.project.overwrite_rom_directly(obj2_off, bytes(col_to_save))
-            renderer.collision_map = bytes(col_to_save)
+        # 6. Guardar Collision Map en espacio seguro
+        if col_to_save:
+            new_col_ptr = offset | 0x08000000
+            self.project.overwrite_rom_directly(offset, col_to_save)
+            offset += len(col_to_save)
+        else:
+            new_col_ptr = mh.p_obj2
 
         # Sincronizar capas base en memoria del renderer con lo guardado
         renderer.tilemap_bg3 = list(t_bg3)
@@ -1437,30 +1435,172 @@ class MapParser:
         # 7. Inyectar posiciones reubicadas de estructuras dinámicas en la ROM
         self.save_dynamic_structure_positions_to_rom(mh.map_id, renderer)
             
-        # 8. Actualizar Map Header
+        # 8. Actualizar Map Header en la tabla maestra
         if self._table_offset is None:
             self._table_offset = 0x105EDC
         header_off = self._table_offset + (map_index * 40)
         
-        # Ptr 3, 4, 5 (bg3, bg2, bg1)
+        # Ptr 3, 4, 5 (bg3, bg2, bg1) en +12
         pointers_data = struct.pack('<3I', new_bg3_ptr, new_bg2_ptr, new_bg1_ptr)
         self.project.overwrite_rom_directly(header_off + 12, pointers_data)
+        
+        # Ptr colisión (p_obj2) en +28
+        self.project.overwrite_rom_directly(header_off + 28, struct.pack('<I', new_col_ptr))
+        
+        # Dimensiones (width, height) en +32, +34
+        self.project.overwrite_rom_directly(header_off + 32, struct.pack('<2H', mh.width, mh.height))
         
         mh.p_bg3 = new_bg3_ptr
         mh.p_bg2 = new_bg2_ptr
         mh.p_bg1 = new_bg1_ptr
+        mh.p_obj2 = new_col_ptr
+
+        # Sincronizar buffer en RAM del renderer para que la sesión actual detecte los cambios
+        if hasattr(renderer, 'rom'):
+            renderer.rom = bytearray(self.project.base_rom_data)
         
         print(f"Mapa {map_index} guardado en {hex(free_space)}. Tamaño: {total_size} bytes.")
         return True
 
+    def resize_map(self, map_index: int, new_w: int, new_h: int, renderer, expand_top_left: bool = True) -> bool:
+        """
+        Redimensiona un mapa en ROM y RAM de forma segura.
+        Si expand_top_left=True, expande hacia arriba y a la izquierda (desplazando el contenido a
+        x+dx, y+dy), manteniendo el sistema de coordenadas base y las posiciones relativas de puertas y muebles.
+        Si expand_top_left=False, expande hacia abajo y a la derecha.
+        """
+        import struct
+
+        if map_index < 0 or map_index >= len(self.maps):
+            return False
+
+        mh = self.maps[map_index]
+        old_w = mh.width
+        old_h = mh.height
+
+        if new_w == old_w and new_h == old_h:
+            return True
+
+        dx = max(0, new_w - old_w) if expand_top_left else 0
+        dy = max(0, new_h - old_h) if expand_top_left else 0
+
+        # 1. Expandir arrays de capas
+        old_bg3 = renderer.tilemap_bg3 if renderer.tilemap_bg3 else []
+        old_bg2 = renderer.tilemap_bg2 if renderer.tilemap_bg2 else []
+        old_bg1 = renderer.tilemap_bg1 if renderer.tilemap_bg1 else []
+        old_col = bytearray(renderer.collision_map) if renderer.collision_map else bytearray()
+
+        def_tile_bg3 = old_bg3[0] if old_bg3 else 0x0000
+
+        new_bg3 = [def_tile_bg3] * (new_w * new_h)
+        new_bg2 = [0x03FF] * (new_w * new_h)
+        new_bg1 = [0x03FF] * (new_w * new_h)
+        new_col = bytearray(new_w * new_h)
+
+        for r in range(old_h):
+            for c in range(old_w):
+                nr = r + dy
+                nc = c + dx
+                if 0 <= nr < new_h and 0 <= nc < new_w:
+                    src_idx = r * old_w + c
+                    dst_idx = nr * new_w + nc
+                    if src_idx < len(old_bg3): new_bg3[dst_idx] = old_bg3[src_idx]
+                    if src_idx < len(old_bg2): new_bg2[dst_idx] = old_bg2[src_idx]
+                    if src_idx < len(old_bg1): new_bg1[dst_idx] = old_bg1[src_idx]
+                    if src_idx < len(old_col): new_col[dst_idx] = old_col[src_idx]
+
+        # 2. Empaquetar y comprimir
+        bg3_raw = struct.pack(f'<{len(new_bg3)}H', *new_bg3)
+        bg2_raw = struct.pack(f'<{len(new_bg2)}H', *new_bg2)
+        bg1_raw = struct.pack(f'<{len(new_bg1)}H', *new_bg1)
+        bg3_comp = compress_arcano_marvelous(bg3_raw)
+        bg2_comp = compress_arcano_marvelous(bg2_raw)
+        bg1_comp = compress_arcano_marvelous(bg1_raw)
+        col_raw = bytes(new_col)
+
+        # 3. Asignar nuevo espacio en ROM
+        total_size = len(bg3_comp) + len(bg2_comp) + len(bg1_comp) + len(col_raw)
+        rom_len = len(self.project.base_rom_data)
+        free_space = self.find_free_space(total_size)
+        if free_space == -1:
+            free_space = rom_len
+            if free_space % 4 != 0:
+                free_space += 4 - (free_space % 4)
+
+        offset = free_space
+        new_bg3_ptr = offset | 0x08000000
+        self.project.overwrite_rom_directly(offset, bg3_comp)
+        offset += len(bg3_comp)
+
+        new_bg2_ptr = offset | 0x08000000
+        self.project.overwrite_rom_directly(offset, bg2_comp)
+        offset += len(bg2_comp)
+
+        new_bg1_ptr = offset | 0x08000000
+        self.project.overwrite_rom_directly(offset, bg1_comp)
+        offset += len(bg1_comp)
+
+        new_col_ptr = offset | 0x08000000
+        self.project.overwrite_rom_directly(offset, col_raw)
+        offset += len(col_raw)
+
+        # 4. Actualizar tabla maestra de Map Headers
+        if self._table_offset is None:
+            self._table_offset = 0x105EDC
+        header_off = self._table_offset + (map_index * 40)
+
+        self.project.overwrite_rom_directly(header_off + 12, struct.pack('<3I', new_bg3_ptr, new_bg2_ptr, new_bg1_ptr))
+        self.project.overwrite_rom_directly(header_off + 28, struct.pack('<I', new_col_ptr))
+        self.project.overwrite_rom_directly(header_off + 32, struct.pack('<2H', new_w, new_h))
+
+        # 5. Actualizar objetos en memoria RAM
+        mh.width = new_w
+        mh.height = new_h
+        mh.p_bg3 = new_bg3_ptr
+        mh.p_bg2 = new_bg2_ptr
+        mh.p_bg1 = new_bg1_ptr
+        mh.p_obj2 = new_col_ptr
+
+        renderer.width = new_w
+        renderer.height = new_h
+        renderer.tilemap_bg3 = new_bg3
+        renderer.tilemap_bg2 = new_bg2
+        renderer.tilemap_bg1 = new_bg1
+        renderer.collision_map = col_raw
+
+        # 6. Desplazar estructuras dinámicas si se expandió hacia arriba/izquierda
+        if expand_top_left and (dx > 0 or dy > 0):
+            if hasattr(renderer, 'get_active_dynamic_structures'):
+                active_structs = renderer.get_active_dynamic_structures()
+                if not hasattr(renderer, 'dynamic_config') or renderer.dynamic_config is None:
+                    renderer.dynamic_config = {}
+                if 'positions' not in renderer.dynamic_config:
+                    renderer.dynamic_config['positions'] = {}
+                for s in active_structs:
+                    s_id = s['id']
+                    curr_x = s['x']
+                    curr_y = s['y']
+                    renderer.dynamic_config['positions'][s_id] = (curr_x + dx, curr_y + dy)
+                self.save_dynamic_structure_positions_to_rom(mh.map_id, renderer)
+
+        # 7. Sincronizar buffer ROM del renderer para detección inmediata en la misma sesión
+        if hasattr(renderer, 'rom'):
+            renderer.rom = bytearray(self.project.base_rom_data)
+
+        print(f"[MapParser] Mapa {map_index} redimensionado a {new_w}x{new_h}. Repunteado en {hex(free_space)}.")
+        return True
+
     def save_dynamic_structure_positions_to_rom(self, map_id: int, renderer) -> bool:
         """
-        Inyecta permanentemente en la ROM las nuevas coordenadas (X, Y) de estructuras dinamicas
-        reubicadas en el visor de mapas (granja, establo, gallinero, buzon, maquinas, etc.).
+        Inyecta permanentemente en la ROM las nuevas coordenadas (X, Y) y variantes de estructuras
+        dinamicas reubicadas o configuradas en el visor de mapas (granja, establo, gallinero,
+        buzon, villas, casa del jugador lv1-lv3, maquinas, etc.).
         """
+        import struct
         dyn_cfg = getattr(renderer, 'dynamic_config', {})
         positions = dyn_cfg.get('positions', {})
-        if not positions or not self.project:
+        house_cfg = dyn_cfg.get('house', {})
+        if not self.project:
             return False
 
         rom_overwrites = {}
@@ -1471,93 +1611,316 @@ class MapParser:
                 fx, fy = positions['farmhouse']
                 h_lvl = dyn_cfg.get('farmhouse', 'lv1')
                 if h_lvl == 'lv1':
-                    rom_overwrites[0x0172EE] = bytes([fx]) # GFX X
-                    rom_overwrites[0x0172E6] = bytes([fy]) # GFX Y
-                    rom_overwrites[0x0A6CE8] = bytes([fx]) # Col X
-                    rom_overwrites[0x0A6CF6] = bytes([fy]) # Col Y
+                    rom_overwrites[0x0172EE] = bytes([fx & 0xFF]) # GFX X
+                    rom_overwrites[0x0172E6] = bytes([fy & 0xFF]) # GFX Y
+                    rom_overwrites[0x0A6CE8] = bytes([fx & 0xFF]) # Summer Col X
+                    rom_overwrites[0x0A6CF6] = bytes([fy & 0xFF]) # Summer Col Y (shared Lv1/Lv2)
+                    rom_overwrites[0x0A6E48] = bytes([fx & 0xFF]) # Winter Col X
+                    rom_overwrites[0x0A6E56] = bytes([fy & 0xFF]) # Winter Col Y (shared Lv1/Lv2)
                 elif h_lvl == 'lv2':
-                    rom_overwrites[0x017312] = bytes([fx]) # GFX X
-                    rom_overwrites[0x01730A] = bytes([fy]) # GFX Y
-                    rom_overwrites[0x0A6CF4] = bytes([fx]) # Col X
-                    rom_overwrites[0x0A6CF6] = bytes([fy]) # Col Y
+                    rom_overwrites[0x017312] = bytes([fx & 0xFF]) # GFX X
+                    rom_overwrites[0x01730A] = bytes([fy & 0xFF]) # GFX Y
+                    rom_overwrites[0x0A6CF4] = bytes([fx & 0xFF]) # Summer Col X
+                    rom_overwrites[0x0A6CF6] = bytes([fy & 0xFF]) # Summer Col Y (shared Lv1/Lv2)
+                    rom_overwrites[0x0A6E54] = bytes([fx & 0xFF]) # Winter Col X
+                    rom_overwrites[0x0A6E56] = bytes([fy & 0xFF]) # Winter Col Y (shared Lv1/Lv2)
                 elif h_lvl == 'lv3':
-                    rom_overwrites[0x017334] = bytes([fx]) # GFX X
-                    rom_overwrites[0x01732E] = bytes([fy]) # GFX Y
-                    rom_overwrites[0x0A6D08] = bytes([fx]) # Col X
-                    rom_overwrites[0x0A6D0A] = bytes([fy]) # Col Y
+                    rom_overwrites[0x017334] = bytes([fx & 0xFF]) # GFX X (Note: 0x01732E is str r0,[sp], do not overwrite)
+                    rom_overwrites[0x0A6D08] = bytes([fx & 0xFF]) # Summer Col X
+                    rom_overwrites[0x0A6D0A] = bytes([fy & 0xFF]) # Summer Col Y
+                    rom_overwrites[0x0A6E68] = bytes([fx & 0xFF]) # Winter Col X
+                    rom_overwrites[0x0A6E6A] = bytes([fy & 0xFF]) # Winter Col Y
 
             # 2. Granja: Barn
             if 'barn' in positions:
                 bx, by = positions['barn']
                 b_lvl = dyn_cfg.get('barn', 'lv1')
                 if b_lvl == 'lv1':
-                    rom_overwrites[0x01736E] = bytes([bx]) # GFX X
-                    rom_overwrites[0x017366] = bytes([by]) # GFX Y
-                    rom_overwrites[0x0A6D30] = bytes([bx]) # Col X
-                    rom_overwrites[0x0A6D32] = bytes([by]) # Col Y
+                    rom_overwrites[0x01736E] = bytes([bx & 0xFF]) # GFX X
+                    rom_overwrites[0x017366] = bytes([by & 0xFF]) # GFX Y
+                    rom_overwrites[0x0A6D30] = bytes([bx & 0xFF]) # Summer Col X
+                    rom_overwrites[0x0A6D32] = bytes([by & 0xFF]) # Summer Col Y
+                    rom_overwrites[0x0A6E90] = bytes([bx & 0xFF]) # Winter Col X
+                    rom_overwrites[0x0A6E92] = bytes([by & 0xFF]) # Winter Col Y
                 elif b_lvl == 'lv2':
-                    rom_overwrites[0x017392] = bytes([bx]) # GFX X
-                    rom_overwrites[0x01738A] = bytes([by]) # GFX Y
-                    rom_overwrites[0x0A6D44] = bytes([bx]) # Col X
-                    rom_overwrites[0x0A6D46] = bytes([by]) # Col Y
+                    rom_overwrites[0x017392] = bytes([bx & 0xFF]) # GFX X
+                    rom_overwrites[0x01738A] = bytes([by & 0xFF]) # GFX Y
+                    rom_overwrites[0x0A6D44] = bytes([bx & 0xFF]) # Summer Col X
+                    rom_overwrites[0x0A6D46] = bytes([by & 0xFF]) # Summer Col Y
+                    rom_overwrites[0x0A6EA4] = bytes([bx & 0xFF]) # Winter Col X
+                    rom_overwrites[0x0A6EA6] = bytes([by & 0xFF]) # Winter Col Y
 
             # 3. Granja: Chicken Coop
             if 'chicken_coop' in positions:
                 cx, cy = positions['chicken_coop']
-                rom_overwrites[0x0173CA] = bytes([cx]) # Lv1 GFX X
-                rom_overwrites[0x0173C2] = bytes([cy]) # Lv1 GFX Y
-                rom_overwrites[0x0173EE] = bytes([cx]) # Lv2 GFX X
-                rom_overwrites[0x0173E6] = bytes([cy]) # Lv2 GFX Y
-                rom_overwrites[0x0A6ED4] = bytes([cx]) # Col X
-                rom_overwrites[0x0A6ED6] = bytes([cy]) # Col Y
+                rom_overwrites[0x0173CA] = bytes([cx & 0xFF]) # Lv1 GFX X
+                rom_overwrites[0x0173C2] = bytes([cy & 0xFF]) # Lv1 GFX Y
+                rom_overwrites[0x0173EE] = bytes([cx & 0xFF]) # Lv2 GFX X
+                rom_overwrites[0x0173E6] = bytes([cy & 0xFF]) # Lv2 GFX Y
+                rom_overwrites[0x0A6ED4] = bytes([cx & 0xFF]) # Summer/Winter Col X
+                rom_overwrites[0x0A6ED6] = bytes([cy & 0xFF]) # Summer/Winter Col Y
 
             # 4. Granja: Mailbox
             if 'mailbox' in positions:
                 mx, my = positions['mailbox']
-                rom_overwrites[0x0A6B48] = bytes([mx]) # GFX X
-                rom_overwrites[0x0A6B4A] = bytes([my]) # GFX Y
-                rom_overwrites[0x0A6EE8] = bytes([mx]) # Col X
-                rom_overwrites[0x0A6EEA] = bytes([my]) # Col Y
+                rom_overwrites[0x0A6B48] = bytes([mx & 0xFF]) # State 1 X
+                rom_overwrites[0x0A6B4A] = bytes([my & 0xFF]) # State 1 Y
+                rom_overwrites[0x0A6B6C] = bytes([mx & 0xFF]) # State 2 X
+                rom_overwrites[0x0A6B6E] = bytes([my & 0xFF]) # State 2 Y
+                rom_overwrites[0x0AA8A2] = bytes([mx & 0xFF]) # Live update X
+                rom_overwrites[0x0AA8A4] = bytes([my & 0xFF]) # Live update Y
+
+        elif map_id in (4, 5, 6, 7):
+            # Villa de la Ciudad (Town Cottage)
+            if 'town_cottage' in positions:
+                tx, ty = positions['town_cottage']
+                rom_overwrites[0x0A6C06] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A6C08] = bytes([ty & 0xFF])
+
+        elif map_id in (8, 9):
+            # Villa de la Playa (Beach Cottage)
+            if 'beach_cottage' in positions:
+                bx, by = positions['beach_cottage']
+                rom_overwrites[0x0A697A] = bytes([bx & 0xFF]) # Summer X
+                rom_overwrites[0x0A699E] = bytes([bx & 0xFF]) # Winter X
+
+        elif map_id in (14, 15):
+            # Villa de la Montana (Mountain Cottage)
+            if 'mountain_cottage' in positions:
+                mx, my = positions['mountain_cottage']
+                rom_overwrites[0x0A743A] = bytes([mx & 0xFF]) # Summer X
+                rom_overwrites[0x0A743C] = bytes([my & 0xFF]) # Summer Y
+                rom_overwrites[0x0A7466] = bytes([mx & 0xFF]) # Winter X
+                rom_overwrites[0x0A7468] = bytes([my & 0xFF]) # Winter Y
 
         elif map_id in (38, 39):
-            # Establo: Maquinas
+            # Establo: Maquinas de Queso y Lana
             if 'cheese_maker' in positions:
                 cx, cy = positions['cheese_maker']
-                rom_overwrites[0x0A73FE] = bytes([cx])
-                rom_overwrites[0x0A7400] = bytes([cy])
+                rom_overwrites[0x0A73FE] = bytes([cx & 0xFF])
+                rom_overwrites[0x0A7400] = bytes([cy & 0xFF])
             if 'yarn_maker' in positions:
                 yx, yy = positions['yarn_maker']
-                rom_overwrites[0x0A7416] = bytes([yx])
-                rom_overwrites[0x0A7418] = bytes([yy])
+                rom_overwrites[0x0A7416] = bytes([yx & 0xFF])
+                rom_overwrites[0x0A7418] = bytes([yy & 0xFF])
 
         elif map_id in (36, 37):
-            # Gallinero: Maquina de Mayonesa
+            # Gallinero: Maquina de Mayonesa (0x08106C2C en func_080A6660)
             if 'mayo_maker' in positions:
                 mx, my = positions['mayo_maker']
-                if map_id == 36:
-                    rom_overwrites[0x0A63E8] = bytes([mx])
-                    rom_overwrites[0x0A63EA] = bytes([my])
-                else:
-                    rom_overwrites[0x0A6406] = bytes([mx])
-                    rom_overwrites[0x0A6400] = bytes([my])
+                rom_overwrites[0x0A72F2] = bytes([mx & 0xFF])
+                rom_overwrites[0x0A72F4] = bytes([my & 0xFF])
 
-        elif map_id in (42, 43):
-            # Casa: Mueble de Cocina
+        elif map_id == 41:
+            # Casa Nivel 1
+            if 'tool_box' in positions:
+                tx, ty = positions['tool_box']
+                rom_overwrites[0x0A6EE8] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A6EEA] = bytes([ty & 0xFF])
+                # Rutina interactiva Open Toolbox (0x080A6138): Map 41 originalmente saltaba a Map 42 para compartir Y=15.
+                # Inyectamos secuencia autonoma: movs r2, #tx; movs r3, #ty; b #0x80a6168
+                rom_overwrites[0x0A6156] = bytes([tx & 0xFF, 0x22, ty & 0xFF, 0x23, 0x05, 0xE0])
+                # Rutina interactiva Close Toolbox (0x080A6194):
+                # Inyectamos secuencia autonoma: movs r2, #tx; movs r3, #ty; b #0x80a61c4
+                rom_overwrites[0x0A61B2] = bytes([tx & 0xFF, 0x22, ty & 0xFF, 0x23, 0x05, 0xE0])
+            if 'record_player' in positions:
+                rx, ry = positions['record_player']
+                rom_overwrites[0x0A6F1C] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A6F1E] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A6F30] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A6F32] = bytes([ry & 0xFF])
+                # Rutinas interactivas tocadiscos Map 41 (0x080A6300 y 0x080A635C):
+                # movs r2, #rx; movs r3, #ry; b #0x80a6330
+                rom_overwrites[0x0A631E] = bytes([rx & 0xFF, 0x22, ry & 0xFF, 0x23, 0x05, 0xE0])
+                # movs r2, #rx; movs r3, #ry; b #0x80a638c
+                rom_overwrites[0x0A637A] = bytes([rx & 0xFF, 0x22, ry & 0xFF, 0x23, 0x05, 0xE0])
+            if 'vase' in positions:
+                vx, vy = positions['vase']
+                rom_overwrites[0x0A6F50] = bytes([vx & 0xFF])
+                rom_overwrites[0x0A6F52] = bytes([vy & 0xFF])
+            if 'mirror' in positions:
+                mx, my = positions['mirror']
+                rom_overwrites[0x0A6F6C] = bytes([mx & 0xFF])
+                rom_overwrites[0x0A6F6E] = bytes([my & 0xFF])
+
+            # Variantes visuales configuradas para Casa Nivel 1
+            tb_choice = house_cfg.get('tool_box', 'closed')
+            if tb_choice in ('closed', 'open'):
+                tb_ptr = 0x08106A94 if tb_choice == 'closed' else 0x08106A7C
+                rom_overwrites[0x0A6F10] = struct.pack('<I', tb_ptr)
+            rp_choice = house_cfg.get('record_player', 'base')
+            if rp_choice in ('base', 'discs', 'active'):
+                rp_ptr = 0x08106B0C if rp_choice == 'base' else (0x08106B24 if rp_choice == 'discs' else 0x08106B3C)
+                rom_overwrites[0x0A6F90] = struct.pack('<I', rp_ptr)
+
+        elif map_id == 42:
+            # Casa Nivel 2
+            if 'tool_box' in positions:
+                tx, ty = positions['tool_box']
+                rom_overwrites[0x0A6FA4] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A6FA6] = bytes([ty & 0xFF])
+                rom_overwrites[0x0A6164] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A6166] = bytes([ty & 0xFF])
+                rom_overwrites[0x0A61C0] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A61C2] = bytes([ty & 0xFF])
             if 'kitchen_counter' in positions:
                 kx, ky = positions['kitchen_counter']
-                if map_id == 42:
-                    rom_overwrites[0x0A6FC4] = bytes([kx])
-                    rom_overwrites[0x0A6FC6] = bytes([ky])
-                elif map_id == 43:
-                    rom_overwrites[0x0A7100] = bytes([kx])
-                    rom_overwrites[0x0A7102] = bytes([ky])
+                rom_overwrites[0x0A6FC4] = bytes([kx & 0xFF])
+                rom_overwrites[0x0A6FC6] = bytes([ky & 0xFF])
+            if 'fridge' in positions:
+                fx, fy = positions['fridge']
+                rom_overwrites[0x0A6FDE] = bytes([fx & 0xFF])
+                rom_overwrites[0x0A6FE0] = bytes([fy & 0xFF])
+                rom_overwrites[0x0A6204] = bytes([fx & 0xFF])
+                rom_overwrites[0x0A6206] = bytes([fy & 0xFF])
+                rom_overwrites[0x0A6248] = bytes([fx & 0xFF])
+                rom_overwrites[0x0A624A] = bytes([fy & 0xFF])
+            if 'shelf' in positions:
+                sx, sy = positions['shelf']
+                rom_overwrites[0x0A6FF8] = bytes([sx & 0xFF])
+                rom_overwrites[0x0A6FFA] = bytes([sy & 0xFF])
+                rom_overwrites[0x0A628C] = bytes([sx & 0xFF])
+                rom_overwrites[0x0A628E] = bytes([sy & 0xFF])
+                rom_overwrites[0x0A62D0] = bytes([sx & 0xFF])
+                rom_overwrites[0x0A62D2] = bytes([sy & 0xFF])
+            if 'record_player' in positions:
+                rx, ry = positions['record_player']
+                rom_overwrites[0x0A7034] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A7036] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A7048] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A704A] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A632C] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A632E] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A6388] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A638A] = bytes([ry & 0xFF])
+            if 'carpet_dining' in positions:
+                cx, cy = positions['carpet_dining']
+                rom_overwrites[0x0A7068] = bytes([cx & 0xFF])
+                rom_overwrites[0x0A706A] = bytes([cy & 0xFF])
+            if 'vase' in positions:
+                vx, vy = positions['vase']
+                rom_overwrites[0x0A7084] = bytes([vx & 0xFF])
+                rom_overwrites[0x0A7086] = bytes([vy & 0xFF])
+            if 'mirror' in positions:
+                mx, my = positions['mirror']
+                rom_overwrites[0x0A70A0] = bytes([mx & 0xFF])
+                rom_overwrites[0x0A70A2] = bytes([my & 0xFF])
+            if 'clock' in positions:
+                clx, cly = positions['clock']
+                rom_overwrites[0x0A70BE] = bytes([clx & 0xFF])
+                rom_overwrites[0x0A70C0] = bytes([cly & 0xFF])
+
+            # Variantes visuales configuradas para Casa Nivel 2
+            tb_choice = house_cfg.get('tool_box', 'closed')
+            if tb_choice in ('closed', 'open'):
+                rom_overwrites[0x0A701C] = struct.pack('<I', 0x08106A94 if tb_choice == 'closed' else 0x08106A7C)
+            f_choice = house_cfg.get('fridge', 'closed')
+            if f_choice in ('closed', 'open'):
+                rom_overwrites[0x0A7024] = struct.pack('<I', 0x08106AC4 if f_choice == 'closed' else 0x08106AAC)
+            s_choice = house_cfg.get('shelf', 'closed')
+            if s_choice in ('closed', 'open'):
+                rom_overwrites[0x0A7028] = struct.pack('<I', 0x08106AF4 if s_choice == 'closed' else 0x08106ADC)
+            rp_choice = house_cfg.get('record_player', 'base')
+            if rp_choice in ('base', 'discs', 'active'):
+                rp_ptr = 0x08106B0C if rp_choice == 'base' else (0x08106B24 if rp_choice == 'discs' else 0x08106B3C)
+                rom_overwrites[0x0A70C8] = struct.pack('<I', rp_ptr)
+
+        elif map_id == 43:
+            # Casa Nivel 3
+            if 'tool_box' in positions:
+                tx, ty = positions['tool_box']
+                rom_overwrites[0x0A70E0] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A70E2] = bytes([ty & 0xFF])
+                rom_overwrites[0x0A6178] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A617A] = bytes([ty & 0xFF])
+                rom_overwrites[0x0A61D4] = bytes([tx & 0xFF])
+                rom_overwrites[0x0A61D6] = bytes([ty & 0xFF])
+            if 'kitchen_counter' in positions:
+                kx, ky = positions['kitchen_counter']
+                rom_overwrites[0x0A7100] = bytes([kx & 0xFF])
+                rom_overwrites[0x0A7102] = bytes([ky & 0xFF])
+            if 'fridge' in positions:
+                fx, fy = positions['fridge']
+                rom_overwrites[0x0A711A] = bytes([fx & 0xFF])
+                rom_overwrites[0x0A711C] = bytes([fy & 0xFF])
+                rom_overwrites[0x0A6218] = bytes([fx & 0xFF])
+                rom_overwrites[0x0A621A] = bytes([fy & 0xFF])
+                rom_overwrites[0x0A625C] = bytes([fx & 0xFF])
+                rom_overwrites[0x0A625E] = bytes([fy & 0xFF])
+            if 'shelf' in positions:
+                sx, sy = positions['shelf']
+                rom_overwrites[0x0A7134] = bytes([sx & 0xFF])
+                rom_overwrites[0x0A7136] = bytes([sy & 0xFF])
+                rom_overwrites[0x0A62A0] = bytes([sx & 0xFF])
+                rom_overwrites[0x0A62A2] = bytes([sy & 0xFF])
+                rom_overwrites[0x0A62E4] = bytes([sx & 0xFF])
+                rom_overwrites[0x0A62E6] = bytes([sy & 0xFF])
+            if 'record_player' in positions:
+                rx, ry = positions['record_player']
+                rom_overwrites[0x0A7170] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A7172] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A7184] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A7186] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A6340] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A6342] = bytes([ry & 0xFF])
+                rom_overwrites[0x0A639C] = bytes([rx & 0xFF])
+                rom_overwrites[0x0A639E] = bytes([ry & 0xFF])
+            if 'fireplace' in positions:
+                fpx, fpy = positions['fireplace']
+                rom_overwrites[0x0A7190] = bytes([fpx & 0xFF])
+                rom_overwrites[0x0A7192] = bytes([fpy & 0xFF])
+            if 'double_bed' in positions:
+                dbx, dby = positions['double_bed']
+                rom_overwrites[0x0A71B0] = bytes([dbx & 0xFF])
+                rom_overwrites[0x0A71B2] = bytes([dby & 0xFF])
+            if 'carpet_dining' in positions:
+                cx, cy = positions['carpet_dining']
+                rom_overwrites[0x0A71CC] = bytes([cx & 0xFF])
+                rom_overwrites[0x0A71CE] = bytes([cy & 0xFF])
+            if 'vase' in positions:
+                vx, vy = positions['vase']
+                rom_overwrites[0x0A71E8] = bytes([vx & 0xFF])
+                rom_overwrites[0x0A71EA] = bytes([vy & 0xFF])
+            if 'mirror' in positions:
+                mx, my = positions['mirror']
+                rom_overwrites[0x0A7204] = bytes([mx & 0xFF])
+                rom_overwrites[0x0A7206] = bytes([my & 0xFF])
+            if 'clock' in positions:
+                clx, cly = positions['clock']
+                rom_overwrites[0x0A7220] = bytes([clx & 0xFF])
+                rom_overwrites[0x0A7222] = bytes([cly & 0xFF])
+            if 'bathroom_door' in positions:
+                bdx, bdy = positions['bathroom_door']
+                rom_overwrites[0x10376C] = bytes([bdx & 0xFF])
+                rom_overwrites[0x10376D] = bytes([bdy & 0xFF])
+
+            # Variantes visuales configuradas para Casa Nivel 3
+            tb_choice = house_cfg.get('tool_box', 'closed')
+            if tb_choice in ('closed', 'open'):
+                rom_overwrites[0x0A7158] = struct.pack('<I', 0x08106A94 if tb_choice == 'closed' else 0x08106A7C)
+            f_choice = house_cfg.get('fridge', 'closed')
+            if f_choice in ('closed', 'open'):
+                rom_overwrites[0x0A7160] = struct.pack('<I', 0x08106AC4 if f_choice == 'closed' else 0x08106AAC)
+            s_choice = house_cfg.get('shelf', 'closed')
+            if s_choice in ('closed', 'open'):
+                rom_overwrites[0x0A7164] = struct.pack('<I', 0x08106AF4 if s_choice == 'closed' else 0x08106ADC)
+            rp_choice = house_cfg.get('record_player', 'base')
+            if rp_choice in ('base', 'discs', 'active'):
+                rp_ptr = 0x08106B0C if rp_choice == 'base' else (0x08106B24 if rp_choice == 'discs' else 0x08106B3C)
+                rom_overwrites[0x0A7244] = struct.pack('<I', rp_ptr)
+            bd_choice = house_cfg.get('bathroom_door', 'closed')
+            if bd_choice in ('closed', 'open'):
+                if bd_choice == 'closed':
+                    rom_overwrites[0x103764] = struct.pack('<2I', 0x08106C14, 0x08106BFC)
+                else:
+                    rom_overwrites[0x103764] = struct.pack('<2I', 0x08106BFC, 0x08106C14)
 
         for off, val in rom_overwrites.items():
             self.project.overwrite_rom_directly(off, val)
 
         if hasattr(renderer, 'rom') and renderer.rom:
             for off, val in rom_overwrites.items():
-                if off < len(renderer.rom):
+                if off + len(val) <= len(renderer.rom):
                     renderer.rom[off:off+len(val)] = val
             if hasattr(renderer, '_sync_dynamic_positions_from_rom'):
                 renderer._sync_dynamic_positions_from_rom()

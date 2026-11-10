@@ -108,7 +108,7 @@ class MapResizeDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Creador / Redimensionador de Mapa")
         self.setModal(True)
-        self.resize(300, 150)
+        self.resize(360, 200)
         
         layout = QVBoxLayout(self)
         
@@ -121,9 +121,16 @@ class MapResizeDialog(QDialog):
         self.spin_height = QSpinBox()
         self.spin_height.setRange(1, 100)
         self.spin_height.setValue(current_height)
+
+        self.cmb_direction = QComboBox()
+        self.cmb_direction.addItems([
+            "Abajo y Derecha (Recomendado: Mantiene (0,0), entradas de warps y spawns intactos)",
+            "Arriba e Izquierda (Desplaza el mapa a +dx, +dy)"
+        ])
         
         form.addRow("Nuevo Ancho (Max 150):", self.spin_width)
         form.addRow("Nuevo Alto (Max 100):", self.spin_height)
+        form.addRow("Dirección Expansión:", self.cmb_direction)
         
         layout.addLayout(form)
         
@@ -137,12 +144,19 @@ class MapResizeDialog(QDialog):
         btn_layout.addWidget(btn_cancel)
         layout.addLayout(btn_layout)
         
-        self.lbl_warning = QLabel("[Alerta] Al aplicar, se asignará nuevo espacio en ROM\ny se actualizará la tabla maestra y punteros.")
+        self.lbl_warning = QLabel(
+            "[Recomendación] 'Abajo y Derecha' expande el lienzo agregando espacio al fondo y derecha,\n"
+            "preservando idénticas las coordenadas de puertas, spawns y warps de entrada del jugador.\n"
+            "'Arriba e Izquierda' desplaza los tiles originales a (x+dx, y+dy)."
+        )
         self.lbl_warning.setStyleSheet("color: #ffaa00; font-size: 10px;")
         layout.addWidget(self.lbl_warning)
         
     def get_size(self):
         return self.spin_width.value(), self.spin_height.value()
+
+    def get_expand_top_left(self) -> bool:
+        return self.cmb_direction.currentIndex() == 1
 
 class TriggerEditorDialog(QDialog):
     def __init__(self, behavior_id, flags, script_id, parent=None):
@@ -204,6 +218,7 @@ class VisorMapas(QWidget):
         self._loader_thread = None
         self.zoom_factor = 2.0
         self.ts_zoom_factor = 1.33  # Factor de zoom independiente para el tileset
+        self.ts_cols = 32           # Ancho del tileset en columnas de tiles (8px c/u) para cazar formas canónicas
         
         # Historial de deshacer/rehacer
         self.undo_stack = []
@@ -241,7 +256,9 @@ class VisorMapas(QWidget):
         if state['bg2'] is not None: self.renderer.tilemap_bg2 = state['bg2'].copy()
         if state['bg3'] is not None: self.renderer.tilemap_bg3 = state['bg3'].copy()
         if state['col'] is not None: self.renderer.collision_map = bytearray(state['col'])
-        self._re_render()
+        if hasattr(self.renderer, 'invalidate_dynamic_buffers'):
+            self.renderer.invalidate_dynamic_buffers()
+        self._re_render_map_only()
 
     def _push_undo_state(self):
         state = self._get_current_state()
@@ -293,15 +310,17 @@ class VisorMapas(QWidget):
         
         main_layout.addLayout(top_bar_layout)
 
-        # Splitter principal
+        # Splitter principal con redimensionado libre y colapsable
         splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setHandleWidth(6)
+        splitter.setChildrenCollapsible(True)
         main_layout.addWidget(splitter, stretch=1)
 
         # ── Panel izquierdo: lista de mapas ────────────────────
         left_panel = QWidget()
-        left_panel.setMinimumWidth(220)
+        left_panel.setMinimumWidth(0)
         from PyQt6.QtWidgets import QSizePolicy
-        left_panel.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        left_panel.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         left_layout = QVBoxLayout(left_panel)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -347,6 +366,13 @@ class VisorMapas(QWidget):
         
         self.chk_invert_bg = QCheckBox("Invertir Z-Index (BG1/BG3)")
         tools_row1.addWidget(self.chk_invert_bg)
+        
+        self.chk_col_shadow = QCheckBox("Sombra de Colisiones")
+        self.chk_col_shadow.setChecked(False)
+        self.chk_col_shadow.setToolTip("Muestra una sombra translúcida de la capa de colisiones sobre las capas de tiles.")
+        self.chk_col_shadow.toggled.connect(self._on_col_shadow_toggled)
+        tools_row1.addWidget(self.chk_col_shadow)
+        
         tools_row1.addStretch()
         
         # Paleta de Colisiones (se llenará dinámicamente al cargar el mapa)
@@ -376,8 +402,8 @@ class VisorMapas(QWidget):
         
         tools_row2.addStretch()
         
-        # Botón Guardar
-        self.btn_save = QPushButton("Guardar Cambios (ROM)")
+        # Botón Guardar / Compilar
+        self.btn_save = QPushButton("Compilar y Guardar (ROM)")
         self.btn_save.clicked.connect(self._save_map)
         tools_row2.addWidget(self.btn_save)
         
@@ -389,11 +415,11 @@ class VisorMapas(QWidget):
         self.btn_create.clicked.connect(self._open_create_dialog)
         tools_row2.addWidget(self.btn_create)
 
-        self.btn_export_map = QPushButton("⬇ Exportar Mapa (BMP/PNG)")
+        self.btn_export_map = QPushButton("Exportar Mapa (BMP/PNG)")
         self.btn_export_map.clicked.connect(self._export_map_image)
         tools_row2.addWidget(self.btn_export_map)
 
-        self.btn_import_map = QPushButton("⬆ Importar Mapa (BMP/PNG)")
+        self.btn_import_map = QPushButton("Importar Mapa (BMP/PNG)")
         self.btn_import_map.clicked.connect(self._import_map_image)
         tools_row2.addWidget(self.btn_import_map)
         
@@ -524,14 +550,19 @@ class VisorMapas(QWidget):
 
         # Eventos
         self.cmb_bank.currentIndexChanged.connect(self._re_render)
-        self.chk_invert_bg.toggled.connect(self._re_render)
+        self.chk_invert_bg.toggled.connect(self._re_render_map_only)
         
-        # Visores
-        viewers_layout = QHBoxLayout()
+        # Visores con QSplitter para permitir redimensionar o achicar el tileset / mapa libremente
+        self.viewers_splitter = QSplitter(Qt.Orientation.Horizontal)
+        self.viewers_splitter.setHandleWidth(6)
+        self.viewers_splitter.setChildrenCollapsible(True)
         
         # Mapa
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setMinimumWidth(0)
+        from PyQt6.QtWidgets import QSizePolicy
+        self.scroll_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.lbl_image = ClickableMapLabel()
         self.lbl_image.clicked.connect(self._on_map_clicked)
         self.lbl_image.mouseMoved.connect(self._on_map_dragged)
@@ -540,16 +571,29 @@ class VisorMapas(QWidget):
         self.lbl_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_image.setStyleSheet("background-color: #000; border: 1px solid #333;")
         self.scroll_area.setWidget(self.lbl_image)
-        viewers_layout.addWidget(self.scroll_area, stretch=3)
+        self.viewers_splitter.addWidget(self.scroll_area)
         
         # Tileset
-        ts_layout = QVBoxLayout()
+        ts_container = QWidget()
+        ts_container.setMinimumWidth(0)
+        ts_container.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        ts_layout = QVBoxLayout(ts_container)
+        ts_layout.setContentsMargins(0, 0, 0, 0)
+
         ts_controls = QHBoxLayout()
         ts_controls.addWidget(QLabel("Tileset Pal:"))
         self.cmb_ts_pal = QComboBox()
         self.cmb_ts_pal.addItems(["Auto (Mapa)"] + [f"Pal {i}" for i in range(1, 16)])
         self.cmb_ts_pal.currentIndexChanged.connect(self._re_render_tileset)
         ts_controls.addWidget(self.cmb_ts_pal)
+
+        ts_controls.addWidget(QLabel("Ancho (Tiles):"))
+        self.spn_ts_cols = QSpinBox()
+        self.spn_ts_cols.setRange(1, 128)
+        self.spn_ts_cols.setValue(32)
+        self.spn_ts_cols.setToolTip("Ajusta el número de columnas (ancho en tiles de 8px) para cazar las formas canónicas de estructuras o sprites")
+        self.spn_ts_cols.valueChanged.connect(self._on_ts_cols_changed)
+        ts_controls.addWidget(self.spn_ts_cols)
         
         self.btn_edit_palette = QPushButton("Editar Paleta")
         self.btn_edit_palette.clicked.connect(self._open_palette_editor)
@@ -567,12 +611,8 @@ class VisorMapas(QWidget):
         
         self.ts_scroll = QScrollArea()
         self.ts_scroll.setWidgetResizable(True)
-        self.ts_scroll.setMinimumWidth(100) # Ensure tileset has minimum width, reduced to allow map viewer expansion
-        
-        # Set size policies to allow shrinking
-        from PyQt6.QtWidgets import QSizePolicy
-        self.ts_scroll.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Expanding)
-        self.scroll_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.ts_scroll.setMinimumWidth(0)
+        self.ts_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
         self.lbl_ts = ClickableMapLabel()
         self.lbl_ts.clicked.connect(self._on_tileset_clicked)
@@ -582,12 +622,12 @@ class VisorMapas(QWidget):
         self.ts_scroll.setWidget(self.lbl_ts)
         ts_layout.addWidget(self.ts_scroll)
         
-        viewers_layout.addLayout(ts_layout, stretch=1)
+        self.viewers_splitter.addWidget(ts_container)
+        self.viewers_splitter.setStretchFactor(0, 3)
+        self.viewers_splitter.setStretchFactor(1, 1)
+        self.viewers_splitter.setSizes([750, 250])
         
-        # Wrapper widget para forzar que los visores ocupen el espacio
-        viewers_container = QWidget()
-        viewers_container.setLayout(viewers_layout)
-        right_layout.addWidget(viewers_container, stretch=1)
+        right_layout.addWidget(self.viewers_splitter, stretch=1)
 
 
         splitter.addWidget(right_panel)
@@ -603,17 +643,27 @@ class VisorMapas(QWidget):
                 self.ts_zoom_factor -= 0.25
                 self._re_render_tileset()
 
+    def _on_ts_cols_changed(self, val):
+        self.ts_cols = max(1, min(128, int(val)))
+        self._re_render_tileset()
+
     def _zoom_in(self):
         if self.zoom_factor < 8.0:
             self.zoom_factor += 0.5
             self.lbl_zoom.setText(f"Zoom: {int(self.zoom_factor * 100)}%")
-            self._re_render()
+            if hasattr(self, '_cached_qimage') and self._cached_qimage:
+                self._flush_canvas_update()
+            else:
+                self._re_render()
 
     def _zoom_out(self):
         if self.zoom_factor > 1.0:
             self.zoom_factor -= 0.5
             self.lbl_zoom.setText(f"Zoom: {int(self.zoom_factor * 100)}%")
-            self._re_render()
+            if hasattr(self, '_cached_qimage') and self._cached_qimage:
+                self._flush_canvas_update()
+            else:
+                self._re_render()
 
     def load_maps(self):
         self.list_maps.clear()
@@ -626,16 +676,20 @@ class VisorMapas(QWidget):
             name = m.get_name()
             self.list_maps.addItem(f"[{m.map_id:03X}] {name}  ({m.width}×{m.height})")
 
+    def _on_col_shadow_toggled(self, checked):
+        self._re_render_map_only()
+
     def _get_layer_visibility(self):
         tab_idx = self.tabs_edit_mode.currentIndex()
+        show_shadow = getattr(self, 'chk_col_shadow', None) is not None and self.chk_col_shadow.isChecked()
         if tab_idx == 0: # General
-            return {'show_bg1': True, 'show_bg2': True, 'show_bg3': True, 'show_col': False}
+            return {'show_bg1': True, 'show_bg2': True, 'show_bg3': True, 'show_col': show_shadow}
         elif tab_idx == 1: # Fondo (p_bg3)
-            return {'show_bg1': False, 'show_bg2': False, 'show_bg3': True, 'show_col': False}
+            return {'show_bg1': False, 'show_bg2': False, 'show_bg3': True, 'show_col': show_shadow}
         elif tab_idx == 2: # Medio (p_bg2)
-            return {'show_bg1': False, 'show_bg2': True, 'show_bg3': False, 'show_col': False}
+            return {'show_bg1': False, 'show_bg2': True, 'show_bg3': False, 'show_col': show_shadow}
         elif tab_idx == 3: # Frente (p_bg1)
-            return {'show_bg1': True, 'show_bg2': False, 'show_bg3': False, 'show_col': False}
+            return {'show_bg1': True, 'show_bg2': False, 'show_bg3': False, 'show_col': show_shadow}
         elif tab_idx == 4: # Colisiones
             return {'show_bg1': True, 'show_bg2': True, 'show_bg3': True, 'show_col': True}
         
@@ -643,7 +697,7 @@ class VisorMapas(QWidget):
             'show_bg1': True,
             'show_bg2': True,
             'show_bg3': True,
-            'show_col': False
+            'show_col': show_shadow
         }
 
     def on_map_selected(self, row):
@@ -677,6 +731,8 @@ class VisorMapas(QWidget):
             bank=self.cmb_bank.currentIndex() + 1,
             invert_bg=self.chk_invert_bg.isChecked()
         )
+        if hasattr(self.renderer, 'dynamic_config') and 'positions' in self.renderer.dynamic_config:
+            self.renderer.dynamic_config['positions'].clear()
         self._loader_thread.finished.connect(self._on_map_loaded)
         self._loader_thread.error.connect(self._on_map_error)
         self._loader_thread.start()
@@ -691,7 +747,7 @@ class VisorMapas(QWidget):
             self.widget_dyn_editor.setVisible(is_dyn_layer)
             if is_dyn_layer:
                 self._update_dyn_structures_combo()
-        self._re_render()
+        self._re_render_map_only()
         
     def _on_dynamic_config_changed(self):
         house_map = {0: 'lv1', 1: 'lv2', 2: 'lv3', 3: 'none'}
@@ -736,6 +792,8 @@ class VisorMapas(QWidget):
                 },
                 'positions': old_positions
             }
+            if hasattr(self.renderer, 'invalidate_dynamic_buffers'):
+                self.renderer.invalidate_dynamic_buffers()
             if hasattr(self, 'widget_dyn_editor') and self.widget_dyn_editor.isVisible():
                 self._update_dyn_structures_combo()
             self._re_render_map_only()
@@ -760,9 +818,11 @@ class VisorMapas(QWidget):
 
     def _re_render_tileset(self):
         if not self.renderer._loaded: return
+        cols = getattr(self, 'ts_cols', 32)
         ts_img = self.renderer.render_tileset(
             pal_idx=self.cmb_ts_pal.currentIndex(), 
-            bank=self.cmb_bank.currentIndex() + 1
+            bank=self.cmb_bank.currentIndex() + 1,
+            cols=cols
         )
         if ts_img:
             from PyQt6.QtGui import QPainter, QColor, QPen
@@ -782,8 +842,8 @@ class VisorMapas(QWidget):
                 
             if hasattr(self, 'selected_tile'):
                 idx_only = self.selected_tile & 0x03FF
-                sel_x = (idx_only % 32) * 8
-                sel_y = (idx_only // 32) * 8
+                sel_x = (idx_only % cols) * 8
+                sel_y = (idx_only // cols) * 8
                 pen_sel = QPen(QColor(255, 0, 0, 200))
                 pen_sel.setWidth(2)
                 painter.setPen(pen_sel)
@@ -814,8 +874,10 @@ class VisorMapas(QWidget):
             selected_id = getattr(self, 'selected_dyn_struct_id', None)
 
             for s in structs:
-                sx = s['x'] * 8
-                sy = s['y'] * 8
+                ox = s.get('vis_ox', 0)
+                oy = s.get('vis_oy', 0)
+                sx = (s['x'] + ox) * 8
+                sy = (s['y'] + oy) * 8
                 sw = s['w'] * 8
                 sh = s['h'] * 8
                 is_selected = (s['id'] == selected_id)
@@ -844,10 +906,72 @@ class VisorMapas(QWidget):
 
             painter.end()
 
+        self._cached_rendered_img = img.copy()
+        self._cached_qimage = qim
         pix = QPixmap.fromImage(qim)
         if self.zoom_factor != 1.0:
             pix = pix.scaled(int(img.width * self.zoom_factor), int(img.height * self.zoom_factor), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
         label.setPixmap(pix)
+
+    def _fast_patch_cell(self, cx: int, cy: int):
+        """Parchea una celda única en la imagen en caché de RAM y refresca el lienzo al instante."""
+        if not hasattr(self, '_cached_rendered_img') or not self._cached_rendered_img or not hasattr(self.renderer, 'render_cell'):
+            self._re_render_map_only()
+            return
+
+        visibility = self._get_layer_visibility()
+        cell_img = self.renderer.render_cell(
+            cx, cy,
+            show_bg1=visibility['show_bg1'],
+            show_bg2=visibility['show_bg2'],
+            show_bg3=visibility['show_bg3'],
+            show_col=visibility['show_col'],
+            bank=self.cmb_bank.currentIndex() + 1,
+            invert_bg=self.chk_invert_bg.isChecked()
+        )
+        if not cell_img:
+            return
+
+        # 1. Parchear imagen PIL en RAM
+        self._cached_rendered_img.paste(cell_img, (cx * 8, cy * 8))
+
+        # 2. Parchear QImage en RAM
+        if hasattr(self, '_cached_qimage') and self._cached_qimage:
+            from PyQt6.QtGui import QPainter
+            cell_data = cell_img.tobytes("raw", "RGBA")
+            cell_qim = QImage(cell_data, 8, 8, 32, QImage.Format.Format_RGBA8888)
+            painter = QPainter(self._cached_qimage)
+            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
+            painter.drawImage(cx * 8, cy * 8, cell_qim)
+            painter.end()
+
+        # 3. Solicitar refresco visual
+        self._request_canvas_update()
+
+    def _request_canvas_update(self):
+        """Programa un refresco visual fluido a 60 FPS sin saturar la GUI."""
+        if not hasattr(self, '_canvas_update_timer'):
+            from PyQt6.QtCore import QTimer
+            self._canvas_update_timer = QTimer(self)
+            self._canvas_update_timer.setSingleShot(True)
+            self._canvas_update_timer.setInterval(16)
+            self._canvas_update_timer.timeout.connect(self._flush_canvas_update)
+
+        if not self._canvas_update_timer.isActive():
+            self._canvas_update_timer.start()
+
+    def _flush_canvas_update(self):
+        if not hasattr(self, '_cached_qimage') or not self._cached_qimage:
+            return
+        pix = QPixmap.fromImage(self._cached_qimage)
+        if self.zoom_factor != 1.0:
+            pix = pix.scaled(
+                int(self._cached_qimage.width() * self.zoom_factor),
+                int(self._cached_qimage.height() * self.zoom_factor),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.FastTransformation
+            )
+        self.lbl_image.setPixmap(pix)
 
     def _on_map_loaded(self, result):
         self.progress.setVisible(False)
@@ -912,7 +1036,7 @@ class VisorMapas(QWidget):
         py = int(py / ts_zoom)
         cell_x = px // 8
         cell_y = py // 8
-        tileset_width = 32 # 256 pixels / 8
+        tileset_width = getattr(self, 'ts_cols', 32)
         self.selected_tile = cell_y * tileset_width + cell_x
         self._copied_from_map = False
         
@@ -923,6 +1047,9 @@ class VisorMapas(QWidget):
     def _on_map_mouse_released(self):
         self._last_drag_cell = None
         self._save_state_pending = False
+        if hasattr(self, '_canvas_update_timer') and self._canvas_update_timer.isActive():
+            self._canvas_update_timer.stop()
+        self._flush_canvas_update()
 
     def _update_collision_brush(self):
         self.cmb_col_brush.blockSignals(True)
@@ -1004,14 +1131,20 @@ class VisorMapas(QWidget):
             if tab_idx == 1 and idx < len(self.renderer.tilemap_bg3):
                 if self.renderer.tilemap_bg3[idx] != new_val:
                     self.renderer.tilemap_bg3[idx] = new_val
+                    if hasattr(self.renderer, 'active_tilemap_bg3') and self.renderer.active_tilemap_bg3 and idx < len(self.renderer.active_tilemap_bg3):
+                        self.renderer.active_tilemap_bg3[idx] = new_val
                     modified = True
             elif tab_idx == 2 and idx < len(self.renderer.tilemap_bg2):
                 if self.renderer.tilemap_bg2[idx] != new_val:
                     self.renderer.tilemap_bg2[idx] = new_val
+                    if hasattr(self.renderer, 'active_tilemap_bg2') and self.renderer.active_tilemap_bg2 and idx < len(self.renderer.active_tilemap_bg2):
+                        self.renderer.active_tilemap_bg2[idx] = new_val
                     modified = True
             elif tab_idx == 3 and idx < len(self.renderer.tilemap_bg1):
                 if self.renderer.tilemap_bg1[idx] != new_val:
                     self.renderer.tilemap_bg1[idx] = new_val
+                    if hasattr(self.renderer, 'active_tilemap_bg1') and self.renderer.active_tilemap_bg1 and idx < len(self.renderer.active_tilemap_bg1):
+                        self.renderer.active_tilemap_bg1[idx] = new_val
                     modified = True
 
         is_dlg_open = getattr(self, '_dynamic_structs_dialog', None) is not None and self._dynamic_structs_dialog.isVisible()
@@ -1019,7 +1152,9 @@ class VisorMapas(QWidget):
             structs = self.renderer.get_active_dynamic_structures() if hasattr(self.renderer, 'get_active_dynamic_structures') else []
             clicked_struct = None
             for s in structs:
-                if s['x'] <= cell_x < s['x'] + s['w'] and s['y'] <= cell_y < s['y'] + s['h']:
+                ox = s.get('vis_ox', 0)
+                oy = s.get('vis_oy', 0)
+                if s['x'] + ox <= cell_x < s['x'] + ox + s['w'] and s['y'] + oy <= cell_y < s['y'] + oy + s['h']:
                     clicked_struct = s
                     break
 
@@ -1054,8 +1189,14 @@ class VisorMapas(QWidget):
                 val = 0
             if idx < len(self.renderer.collision_map):
                 if self.renderer.collision_map[idx] != val:
-                    self.renderer.collision_map = bytearray(self.renderer.collision_map)
+                    if isinstance(self.renderer.collision_map, bytes):
+                        self.renderer.collision_map = bytearray(self.renderer.collision_map)
                     self.renderer.collision_map[idx] = val
+                    if hasattr(self.renderer, 'active_collision_map') and self.renderer.active_collision_map:
+                        if isinstance(self.renderer.active_collision_map, bytes):
+                            self.renderer.active_collision_map = bytearray(self.renderer.active_collision_map)
+                        if idx < len(self.renderer.active_collision_map):
+                            self.renderer.active_collision_map[idx] = val
                     modified = True
 
         return modified
@@ -1073,7 +1214,11 @@ class VisorMapas(QWidget):
 
         self._last_drag_cell = (cell_x, cell_y)
         if self._apply_paint_at_cell(cell_x, cell_y):
-            self._re_render_map_only()
+            is_dlg_open = getattr(self, '_dynamic_structs_dialog', None) is not None and self._dynamic_structs_dialog.isVisible()
+            if self.tabs_edit_mode.currentIndex() == 5 or is_dlg_open:
+                self._re_render_map_only()
+            else:
+                self._fast_patch_cell(cell_x, cell_y)
 
     def _on_map_dragged(self, px, py):
         px = int(px / self.zoom_factor)
@@ -1106,12 +1251,18 @@ class VisorMapas(QWidget):
         self._last_drag_cell = (cell_x, cell_y)
 
         any_modified = False
+        dirty_cells = []
         for cx, cy in cells_to_paint:
             if self._apply_paint_at_cell(cx, cy):
+                dirty_cells.append((cx, cy))
                 any_modified = True
 
         if any_modified:
-            self._re_render_map_only()
+            if self.tabs_edit_mode.currentIndex() == 5 or is_dlg_open:
+                self._re_render_map_only()
+            else:
+                for cx, cy in dirty_cells:
+                    self._fast_patch_cell(cx, cy)
 
     def _on_map_right_clicked(self, px, py):
         tab_idx = self.tabs_edit_mode.currentIndex()
@@ -1216,18 +1367,19 @@ class VisorMapas(QWidget):
         dlg = MapResizeDialog(current_w, current_h, self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
             new_w, new_h = dlg.get_size()
+            expand_top_left = dlg.get_expand_top_left()
             if new_w == current_w and new_h == current_h:
                 return
                 
-            self._resize_map_prototype(new_w, new_h)
-            
+            self._resize_map(new_w, new_h, expand_top_left=expand_top_left)
+
     def _open_create_dialog(self):
         dlg = MapResizeDialog(10, 10, self)
         dlg.setWindowTitle("Crear Nuevo Mapa")
         if dlg.exec() == QDialog.DialogCode.Accepted:
             new_w, new_h = dlg.get_size()
             self._create_map_prototype(new_w, new_h)
-            
+
     def _create_map_prototype(self, new_w, new_h):
         try:
             new_id = self.map_parser.create_new_map(new_w, new_h)
@@ -1236,45 +1388,87 @@ class VisorMapas(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error al crear mapa: {e}")
 
-    def _resize_map_prototype(self, new_w, new_h):
-        # 1. Analizar tamaño anterior y calcular la diferencia
+    def _resize_map(self, new_w: int, new_h: int, expand_top_left: bool = True):
+        if self.selected_map_index < 0:
+            return
+
         old_w = self.renderer.width
         old_h = self.renderer.height
-        
-        # 2. Obtener MapHeader actual
         mh = self.map_parser.maps[self.selected_map_index]
-        
-        # 3. Crear nuevos arrays expandidos llenos de ceros/vacío
-        import numpy as np # as prototype
-        # bg1, bg2, bg3, col = ...
-        # (Aquí va la lógica de copiar viejo a nuevo conservando x,y y rellenando lo demás)
-        
-        # 4. Asignar nuevo espacio en la ROM (Repunteo)
-        # new_offset = self.map_parser.find_free_space(nuevo_tamaño_total)
-        # self.project.overwrite_rom_directly(new_offset, datos_comprimidos)
-        
-        # 5. Actualizar la cabecera en RAM
-        # mh.width = new_w
-        # mh.height = new_h
-        # mh.p_bg1 = new_offset_bg1 ...
-        
-        # 6. Guardar la nueva cabecera y potencialmente reescribir/repuntear la tabla maestra en el Literal Pool
-        # header_table_offset = self.map_parser._table_offset
-        
-        QMessageBox.information(self, "Redimensionador (Prototipo)", 
-            f"Estructura de repunteo generada.\n"
-            f"El mapa {mh.map_id} pasaría de {old_w}x{old_h} a {new_w}x{new_h}.\n"
-            "Falta conectar la sobreescritura real de los arrays y ROM.")
+
+        try:
+            ok = self.map_parser.resize_map(
+                self.selected_map_index,
+                new_w,
+                new_h,
+                self.renderer,
+                expand_top_left=expand_top_left
+            )
+            if not ok:
+                QMessageBox.critical(self, "Error", "No se pudo redimensionar el mapa en la ROM.")
+                return
+
+            # Invalidar caché de descompresión para reflejar nuevos punteros
+            from Nucleos_Positronicos.Nucleo_de_Mapas.fomt_mapdata import clear_decomp_cache
+            clear_decomp_cache()
+
+            # Actualizar texto en la lista de mapas
+            item = self.list_maps.item(self.selected_map_index)
+            if item:
+                item.setText(f"[{mh.map_id:03X}] {mh.get_name()}  ({new_w}×{new_h})")
+
+            # Recargar el mapa en la sesión activa inmediatamente
+            self.on_map_selected(self.selected_map_index)
+
+            dir_str = "arriba e izquierda" if expand_top_left else "abajo y derecha"
+            self.lbl_info.setText(f"[Redimensionado] Mapa {mh.map_id} ({old_w}x{old_h} -> {new_w}x{new_h}) expandido hacia {dir_str}.")
+
+            QMessageBox.information(
+                self,
+                "Mapa Redimensionado y Repunteado",
+                f"El mapa ID {mh.map_id} se ha redimensionado con éxito de {old_w}x{old_h} a {new_w}x{new_h}.\n\n"
+                f"Dirección: Expandido hacia {dir_str}.\n"
+                f"Punteros de BG3, BG2, BG1 y Colisión reasignados en espacio seguro de la ROM.\n"
+                f"Cabecera maestra actualizada y sincronizada en tiempo real."
+            )
+        except Exception as e:
+            import traceback
+            QMessageBox.critical(self, "Error", f"Fallo al redimensionar mapa:\n{e}\n{traceback.format_exc()}")
 
     def _save_map(self):
         from PyQt6.QtWidgets import QMessageBox
         if self.selected_map_index >= 0:
             try:
+                mh = getattr(self, 'current_map_header', None)
+                map_id = mh.map_id if mh else self.selected_map_index
+
+                # 1. Compilar y guardar posiciones de estructuras dinámicas configuradas en la ROM
+                if hasattr(self, 'map_parser') and self.map_parser and hasattr(self, 'renderer'):
+                    self.map_parser.save_dynamic_structure_positions_to_rom(map_id, self.renderer)
+
+                # 2. Compilar capas (BG3, BG2, BG1) y mapa de colisiones en la ROM
                 self.map_parser.save_map(self.selected_map_index, self.renderer)
-                QMessageBox.information(self, "Exito", "Mapa compilado y guardado en la ROM exitosamente.")
+
+                # Invalidar buffers dinámicos para forzar reconstrucción limpia
+                if hasattr(self.renderer, 'invalidate_dynamic_buffers'):
+                    self.renderer.invalidate_dynamic_buffers()
+
+                # 3. Sincronizar y recargar buffer maestro de la ROM
+                if self.project and self.project.base_rom_data:
+                    self.renderer.rom = bytearray(self.project.base_rom_data)
+                    self.map_parser.rom = self.renderer.rom
+
+                self.lbl_info.setText(f"[ROM Actualizada] Mapa ID {map_id} compilado y guardado en la ROM.")
+                QMessageBox.information(
+                    self,
+                    "Compilación y Guardado Exitoso",
+                    f"El mapa ID {map_id}, sus capas gráficas, colisiones y estructuras dinámicas "
+                    f"se han compilado e inyectado en la ROM exitosamente.\n\n"
+                    f"Buffer de la ROM recargado y sincronizado."
+                )
             except Exception as e:
                 import traceback
-                QMessageBox.critical(self, "Error", f"Error guardando mapa:\n{e}\n{traceback.format_exc()}")
+                QMessageBox.critical(self, "Error", f"Error compilando mapa:\n{e}\n{traceback.format_exc()}")
 
     # ── MÉTODOS DE ESTRUCTURAS DINÁMICAS (CAPA 5) ──────────────────────────
 
@@ -1343,7 +1537,9 @@ class VisorMapas(QWidget):
             self.renderer.dynamic_config['positions'] = {}
 
         self.renderer.dynamic_config['positions'][struct_id] = (new_x, new_y)
-        self.lbl_info.setText(f"[Estructuras Dinámicas] '{struct_id}' reubicada en X={new_x}, Y={new_y}")
+        if hasattr(self.renderer, 'invalidate_dynamic_buffers'):
+            self.renderer.invalidate_dynamic_buffers()
+        self.lbl_info.setText(f"[Estructuras Dinámicas (RAM)] '{struct_id}' reubicada en X={new_x}, Y={new_y} (Pendiente de compilar)")
         self.spn_dyn_x.blockSignals(True)
         self.spn_dyn_y.blockSignals(True)
         self.spn_dyn_x.setValue(new_x)
@@ -1354,12 +1550,101 @@ class VisorMapas(QWidget):
 
     def _on_dyn_reset_positions(self):
         if hasattr(self.renderer, 'dynamic_config') and 'positions' in self.renderer.dynamic_config:
-            self.renderer.dynamic_config['positions'].clear()
+            from Nucleos_Positronicos.Nucleo_de_Mapas.fomt_mapdata import CANONICAL_ROM_DEFAULTS
+            pos_dict = self.renderer.dynamic_config['positions']
+            pos_dict.clear()
+            mh = getattr(self, 'current_map_header', None)
+            map_id = getattr(mh, 'map_id', 0) if mh else 0
+            if map_id in (0, 1):
+                h_lvl = self.renderer.dynamic_config.get('farmhouse', 'lv1')
+                b_lvl = self.renderer.dynamic_config.get('barn', 'lv1')
+                c_lvl = self.renderer.dynamic_config.get('chicken_coop', 'lv1')
+                if h_lvl in CANONICAL_ROM_DEFAULTS['farmhouse']:
+                    pos_dict['farmhouse'] = CANONICAL_ROM_DEFAULTS['farmhouse'][h_lvl]
+                if b_lvl in CANONICAL_ROM_DEFAULTS['barn']:
+                    pos_dict['barn'] = CANONICAL_ROM_DEFAULTS['barn'][b_lvl]
+                if c_lvl in CANONICAL_ROM_DEFAULTS['chicken_coop']:
+                    pos_dict['chicken_coop'] = CANONICAL_ROM_DEFAULTS['chicken_coop'][c_lvl]
+                pos_dict['mailbox'] = CANONICAL_ROM_DEFAULTS['mailbox']
+            elif map_id in (4, 5, 6, 7):
+                pos_dict['town_cottage'] = CANONICAL_ROM_DEFAULTS['town_cottage']
+            elif map_id in (8, 9):
+                pos_dict['beach_cottage'] = CANONICAL_ROM_DEFAULTS['beach_cottage']
+            elif map_id in (14, 15):
+                pos_dict['mountain_cottage'] = CANONICAL_ROM_DEFAULTS['mountain_cottage']
+            elif map_id in (36, 37):
+                pos_dict['mayo_maker'] = CANONICAL_ROM_DEFAULTS['mayo_maker']
+            elif map_id in (38, 39):
+                pos_dict['yarn_maker'] = CANONICAL_ROM_DEFAULTS['yarn_maker']
+                pos_dict['cheese_maker'] = CANONICAL_ROM_DEFAULTS['cheese_maker']
+            elif map_id in (41, 42, 43) and map_id in CANONICAL_ROM_DEFAULTS:
+                for k, v in CANONICAL_ROM_DEFAULTS[map_id].items():
+                    pos_dict[k] = v
+            pos_dict.clear()
+            if hasattr(self.renderer, 'invalidate_dynamic_buffers'):
+                self.renderer.invalidate_dynamic_buffers()
             self._update_dyn_structures_combo()
             self._re_render_map_only()
-            self.lbl_info.setText("[Estructuras Dinámicas] Posiciones restablecidas a valores de ROM.")
+            self.lbl_info.setText("[Estructuras Dinámicas (RAM)] Posiciones restablecidas en memoria.")
 
     # ── IMPORTACIÓN Y EXPORTACIÓN DE MAPAS Y TILESETS ─────────────────────
+
+    def _render_collision_grid_image(self):
+        """Genera una imagen BMP/RGB con la malla de colisiones completa y colores por tipo."""
+        from PIL import Image, ImageDraw
+        import struct
+
+        col_data = getattr(self.renderer, 'active_collision_map', None) or self.renderer.collision_map
+        b_dict = getattr(self.renderer, 'active_behavior_dict', None) or self.renderer.behavior_dict
+        w = self.renderer.width
+        h = self.renderer.height
+
+        img_col = Image.new('RGB', (w * 8, h * 8), (20, 24, 30))
+        draw = ImageDraw.Draw(img_col)
+
+        if not col_data:
+            return img_col
+
+        for row in range(h):
+            for col in range(w):
+                idx = row * w + col
+                if idx >= len(col_data):
+                    break
+                val = col_data[idx]
+                if b_dict and val * 4 + 3 < len(b_dict):
+                    behavior = struct.unpack_from('<H', b_dict, val * 4)[0]
+                    script_id = struct.unpack_from('<H', b_dict, val * 4 + 2)[0]
+                else:
+                    behavior = 0
+                    script_id = 0
+
+                is_solid = bool(behavior & 1)
+                has_script = (script_id > 0)
+
+                if val == 0:
+                    fill = (26, 30, 40)
+                    outline = (40, 46, 60)
+                elif val == 0x40:
+                    fill = (200, 150, 30)
+                    outline = (235, 185, 50)
+                elif is_solid and has_script:
+                    fill = (235, 195, 0)
+                    outline = (255, 230, 80)
+                elif is_solid:
+                    fill = (220, 45, 45)
+                    outline = (255, 80, 80)
+                elif has_script:
+                    fill = (35, 190, 60)
+                    outline = (70, 240, 100)
+                else:
+                    fill = (30, 130, 220)
+                    outline = (60, 170, 255)
+
+                x0, y0 = col * 8, row * 8
+                x1, y1 = x0 + 7, y0 + 7
+                draw.rectangle([x0, y0, x1, y1], fill=fill, outline=outline)
+
+        return img_col
 
     def _export_map_image(self):
         if not hasattr(self, 'renderer') or not self.renderer or not self.renderer._loaded:
@@ -1369,40 +1654,124 @@ class VisorMapas(QWidget):
         map_name = f"mapa_{self.selected_map_index:02d}"
         if self.selected_map_index < len(self.map_parser.maps):
             mh = self.map_parser.maps[self.selected_map_index]
-            map_name = f"mapa_{mh.map_id:02d}_{self.map_parser.map_names.get(mh.map_id, 'map')}"
+            safe_name = mh.get_name().replace(' ', '_').replace('/', '_').replace('\\', '_')
+            map_name = f"mapa_{mh.map_id:02d}_{safe_name}"
 
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
         from PyQt6.QtWidgets import QFileDialog
-        default_dir = os.path.join(get_default_workspace_dir(), f"{map_name}.png")
+        import re
 
-        path, _ = QFileDialog.getSaveFileName(
+        default_dir = os.path.join(get_default_workspace_dir(), f"{map_name}.bmp")
+
+        filters = (
+            "Lote 4 Capas BMP (BG1, BG2, BG3, Colisión) (*.bmp);;"
+            "Imagen PNG Compuesta (*.png);;"
+            "Imagen BMP Compuesta (*.bmp);;"
+            "Todos los archivos (*.*)"
+        )
+
+        path, selected_filter = QFileDialog.getSaveFileName(
             self,
-            "Exportar Mapa Completo",
+            "Exportar Mapa",
             default_dir,
-            "Imagen PNG (*.png);;Mapa de Bits BMP (*.bmp);;Todos los archivos (*.*)"
+            filters
         )
         if not path:
             return
 
         try:
-            visibility = self._get_layer_visibility()
-            img = self.renderer.render(
-                show_bg1=visibility['show_bg1'],
-                show_bg2=visibility['show_bg2'],
-                show_bg3=visibility['show_bg3'],
-                show_col=visibility['show_col'],
-                bank=self.cmb_bank.currentIndex() + 1,
-                invert_bg=self.chk_invert_bg.isChecked()
-            )
-            if not img:
-                raise ValueError("El renderizador devolvió una imagen vacía.")
+            base_dir = os.path.dirname(path)
+            filename = os.path.basename(path)
+            base_no_ext, ext = os.path.splitext(filename)
+            clean_base = re.sub(r'_(?:bg[123]|col|preview)$', '', base_no_ext, flags=re.IGNORECASE)
 
-            if path.lower().endswith(".bmp"):
-                img.convert("RGB").save(path, format="BMP")
-            else:
+            bank = self.cmb_bank.currentIndex() + 1
+            invert_bg = self.chk_invert_bg.isChecked()
+
+            # Caso 1: Exportación en lote de 4 capas BMP
+            if "Lote 4 Capas" in selected_filter or (ext.lower() == ".bmp" and "Compuesta" not in selected_filter):
+                # 1. Capa BG3 (Suelo / Fondo)
+                img_bg3 = self.renderer.render(
+                    show_bg1=False, show_bg2=False, show_bg3=True, show_col=False,
+                    bank=bank, invert_bg=invert_bg
+                )
+                path_bg3 = os.path.join(base_dir, f"{clean_base}_bg3.bmp")
+                img_bg3.convert("RGB").save(path_bg3, format="BMP")
+
+                # 2. Capa BG2 (Medio / Objetos / Muebles)
+                img_bg2 = self.renderer.render(
+                    show_bg1=False, show_bg2=True, show_bg3=False, show_col=False,
+                    bank=bank, invert_bg=invert_bg
+                )
+                path_bg2 = os.path.join(base_dir, f"{clean_base}_bg2.bmp")
+                img_bg2.convert("RGB").save(path_bg2, format="BMP")
+
+                # 3. Capa BG1 (Frente / Techos / Overlay)
+                img_bg1 = self.renderer.render(
+                    show_bg1=True, show_bg2=False, show_bg3=False, show_col=False,
+                    bank=bank, invert_bg=invert_bg
+                )
+                path_bg1 = os.path.join(base_dir, f"{clean_base}_bg1.bmp")
+                img_bg1.convert("RGB").save(path_bg1, format="BMP")
+
+                # 4. Capa de Colisiones / Triggers (Malla de Colisión)
+                img_col = self._render_collision_grid_image()
+                path_col = os.path.join(base_dir, f"{clean_base}_col.bmp")
+                img_col.save(path_col, format="BMP")
+
+                # 5. Vista previa compuesta en PNG
+                img_prev = self.renderer.render(
+                    show_bg1=True, show_bg2=True, show_bg3=True, show_col=False,
+                    bank=bank, invert_bg=invert_bg
+                )
+                path_prev = os.path.join(base_dir, f"{clean_base}_preview.png")
+                img_prev.save(path_prev)
+
+                QMessageBox.information(
+                    self,
+                    "Exportación Exitosa",
+                    f"Se exportaron con éxito las 4 capas del mapa en formato BMP:\n\n"
+                    f"• {os.path.basename(path_bg3)}  (Capa BG3: Suelo / Terreno)\n"
+                    f"• {os.path.basename(path_bg2)}  (Capa BG2: Medio / Objetos / Muebles)\n"
+                    f"• {os.path.basename(path_bg1)}  (Capa BG1: Frente / Techos / Overlay)\n"
+                    f"• {os.path.basename(path_col)}  (Capa Colisión: Malla y Triggers)\n\n"
+                    f"Vista previa: {os.path.basename(path_prev)}\n"
+                    f"Directorio: {base_dir}"
+                )
+            elif "PNG" in selected_filter or ext.lower() == ".png":
+                # Imagen PNG compuesta
+                if not path.lower().endswith(".png"):
+                    path = os.path.splitext(path)[0] + ".png"
+                visibility = self._get_layer_visibility()
+                img = self.renderer.render(
+                    show_bg1=visibility['show_bg1'],
+                    show_bg2=visibility['show_bg2'],
+                    show_bg3=visibility['show_bg3'],
+                    show_col=visibility['show_col'],
+                    bank=bank,
+                    invert_bg=invert_bg
+                )
+                if not img:
+                    raise ValueError("El renderizador devolvió una imagen vacía.")
                 img.save(path)
-
-            QMessageBox.information(self, "Exportación Exitosa", f"Mapa exportado correctamente a:\n{path}")
+                QMessageBox.information(self, "Exportación Exitosa", f"Mapa compuesto exportado correctamente a:\n{path}")
+            else:
+                # Imagen BMP compuesta
+                if not path.lower().endswith(".bmp"):
+                    path = os.path.splitext(path)[0] + ".bmp"
+                visibility = self._get_layer_visibility()
+                img = self.renderer.render(
+                    show_bg1=visibility['show_bg1'],
+                    show_bg2=visibility['show_bg2'],
+                    show_bg3=visibility['show_bg3'],
+                    show_col=visibility['show_col'],
+                    bank=bank,
+                    invert_bg=invert_bg
+                )
+                if not img:
+                    raise ValueError("El renderizador devolvió una imagen vacía.")
+                img.convert("RGB").save(path, format="BMP")
+                QMessageBox.information(self, "Exportación Exitosa", f"Mapa BMP compuesto exportado correctamente a:\n{path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Fallo al exportar el mapa:\n{e}")
 
@@ -1412,44 +1781,119 @@ class VisorMapas(QWidget):
             return
 
         from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
-        from PyQt6.QtWidgets import QFileDialog
+        from PyQt6.QtWidgets import QFileDialog, QMessageBox
+        from PIL import Image
+        import re
+
         path, _ = QFileDialog.getOpenFileName(
             self,
             "Importar Imagen de Mapa (BMP/PNG)",
             get_default_workspace_dir(),
-            "Imágenes (*.png *.bmp *.jpg);;Todos los archivos (*.*)"
+            "Imágenes (*.bmp *.png *.jpg);;Todos los archivos (*.*)"
         )
         if not path:
             return
 
         try:
-            from PIL import Image
-            imported_img = Image.open(path).convert('RGBA')
-            img_w, img_h = imported_img.size
-            map_w = self.renderer.width
-            map_h = self.renderer.height
+            base_dir = os.path.dirname(path)
+            filename = os.path.basename(path)
+            base_no_ext, ext = os.path.splitext(filename)
+            clean_base = re.sub(r'_(?:bg[123]|col|preview)$', '', base_no_ext, flags=re.IGNORECASE)
 
-            # Mapear cada bloque 8x8 al tile más cercano
-            target_layer = self.tabs_edit_mode.currentIndex()
-            if target_layer not in (1, 2, 3):
-                target_layer = 1 # Fondo por defecto
+            # Detectar capas hermanas en la misma carpeta
+            sisters = {}
+            for tag in ('bg3', 'bg2', 'bg1', 'col'):
+                for e in ('.bmp', '.png'):
+                    cand = os.path.join(base_dir, f"{clean_base}_{tag}{e}")
+                    if os.path.isfile(cand):
+                        sisters[tag] = cand
+                        break
 
-            layer_name = "Fondo (p_bg3)" if target_layer == 1 else ("Medio (p_bg2)" if target_layer == 2 else "Frente (p_bg1)")
-            target_tilemap = self.renderer.tilemap_bg3 if target_layer == 1 else (self.renderer.tilemap_bg2 if target_layer == 2 else self.renderer.tilemap_bg1)
+            import_all = False
+            if len(sisters) > 1:
+                tags_found = ", ".join(f"_{k}" for k in sisters.keys())
+                ans = QMessageBox.question(
+                    self,
+                    "Importar Lote de Capas",
+                    f"Se detectaron múltiples capas del mapa ({tags_found}) en la misma carpeta.\n\n"
+                    f"¿Deseas importar el lote completo de capas detectadas?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel,
+                    QMessageBox.StandardButton.Yes
+                )
+                if ans == QMessageBox.StandardButton.Cancel:
+                    return
+                import_all = (ans == QMessageBox.StandardButton.Yes)
 
-            cols = min(map_w, img_w // 8)
-            rows = min(map_h, img_h // 8)
-            pal_idx = self.cmb_ts_pal.currentIndex() or 1
+            def _import_single_layer(layer_path, target_layer_idx):
+                imported_img = Image.open(layer_path).convert('RGBA')
+                img_w, img_h = imported_img.size
+                map_w = self.renderer.width
+                map_h = self.renderer.height
+                cols = min(map_w, img_w // 8)
+                rows = min(map_h, img_h // 8)
 
-            for r in range(rows):
-                for c in range(cols):
-                    idx = r * map_w + c
-                    if idx < len(target_tilemap):
-                        # Asignar tile base
-                        target_tilemap[idx] = (pal_idx << 12) | ((r * cols + c) % max(1, len(self.renderer.tiles)))
+                if target_layer_idx == 4: # Colisiones
+                    col_arr = bytearray(self.renderer.collision_map) if self.renderer.collision_map else bytearray(map_w * map_h)
+                    for r in range(rows):
+                        for c in range(cols):
+                            idx = r * map_w + c
+                            if idx < len(col_arr):
+                                px = imported_img.getpixel((c * 8 + 4, r * 8 + 4))
+                                cr, cg, cb = px[0], px[1], px[2]
+                                if cr > 180 and cg < 100 and cb < 100:
+                                    col_arr[idx] = 1 # Bloqueado
+                                elif cg > 150 and cr < 100:
+                                    col_arr[idx] = 2 # Script/Trigger
+                                elif cr > 180 and cg > 150 and cb < 80:
+                                    col_arr[idx] = 0x40 if cr < 220 else 3 # Cultivable o Bloqueado+Script
+                                elif cb > 180:
+                                    col_arr[idx] = 4 # Agua / Evento
+                                elif cr < 50 and cg < 50 and cb < 50:
+                                    col_arr[idx] = 0 # Libre
+                    self.renderer.collision_map = bytes(col_arr)
+                    return "Colisiones"
+
+                target_tilemap = (
+                    self.renderer.tilemap_bg3 if target_layer_idx == 1
+                    else (self.renderer.tilemap_bg2 if target_layer_idx == 2 else self.renderer.tilemap_bg1)
+                )
+                pal_idx = self.cmb_ts_pal.currentIndex() or 1
+                for r in range(rows):
+                    for c in range(cols):
+                        idx = r * map_w + c
+                        if idx < len(target_tilemap):
+                            px_test = imported_img.getpixel((c * 8 + 4, r * 8 + 4))
+                            if px_test[3] == 0 or (px_test[0] == 0 and px_test[1] == 0 and px_test[2] == 0 and target_layer_idx != 1):
+                                target_tilemap[idx] = 0x03FF # Tile transparente en GBA
+                            else:
+                                target_tilemap[idx] = (pal_idx << 12) | ((r * cols + c) % max(1, len(self.renderer.tiles)))
+
+                return "BG3" if target_layer_idx == 1 else ("BG2" if target_layer_idx == 2 else "BG1")
+
+            imported_msgs = []
+            if import_all:
+                tag_to_idx = {'bg3': 1, 'bg2': 2, 'bg1': 3, 'col': 4}
+                for tag, fpath in sisters.items():
+                    name = _import_single_layer(fpath, tag_to_idx[tag])
+                    imported_msgs.append(name)
+            else:
+                fn_lower = filename.lower()
+                if '_bg3' in fn_lower: target_idx = 1
+                elif '_bg2' in fn_lower: target_idx = 2
+                elif '_bg1' in fn_lower: target_idx = 3
+                elif '_col' in fn_lower: target_idx = 4
+                else:
+                    curr = self.tabs_edit_mode.currentIndex()
+                    target_idx = curr if curr in (1, 2, 3) else 1
+                name = _import_single_layer(path, target_idx)
+                imported_msgs.append(name)
 
             self._re_render_map_only()
-            QMessageBox.information(self, "Importación", f"Imagen importada exitosamente sobre la capa {layer_name}.")
+            QMessageBox.information(
+                self,
+                "Importación Exitosa",
+                f"Se importaron correctamente las capas: {', '.join(imported_msgs)}."
+            )
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error al importar imagen de mapa:\n{e}")
 
@@ -1463,8 +1907,9 @@ class VisorMapas(QWidget):
             map_id = self.map_parser.maps[self.selected_map_index].map_id
 
         pal_idx = self.cmb_ts_pal.currentIndex()
-        bank = self.pal_bank
-        ts_img = self.renderer.render_tileset(pal_idx=pal_idx, bank=bank)
+        bank = self.cmb_bank.currentIndex() + 1
+        cols = getattr(self, 'ts_cols', 32)
+        ts_img = self.renderer.render_tileset(pal_idx=pal_idx, bank=bank, cols=cols)
         if not ts_img:
             QMessageBox.warning(self, "Aviso", "No se pudo renderizar el tileset.")
             return
@@ -1473,7 +1918,7 @@ class VisorMapas(QWidget):
         from PyQt6.QtWidgets import QFileDialog
         default_path = os.path.join(get_default_workspace_dir(), f"tileset_mapa_{map_id:02d}.png")
 
-        path, _ = QFileDialog.getSaveFileName(
+        path, selected_filter = QFileDialog.getSaveFileName(
             self,
             "Exportar Tileset de Mapa",
             default_path,
@@ -1481,6 +1926,14 @@ class VisorMapas(QWidget):
         )
         if not path:
             return
+
+        # Asegurar extension correcta segun el filtro elegido
+        if "BMP" in selected_filter and not path.lower().endswith(".bmp"):
+            base, _ = os.path.splitext(path)
+            path = base + ".bmp"
+        elif "PNG" in selected_filter and not path.lower().endswith(".png"):
+            base, _ = os.path.splitext(path)
+            path = base + ".png"
 
         try:
             if path.lower().endswith(".bmp"):
@@ -1519,7 +1972,7 @@ class VisorMapas(QWidget):
             total_tiles = cols * rows
 
             pal_idx = self.cmb_ts_pal.currentIndex() or 1
-            pal = self.renderer.palettes_1[pal_idx] if self.pal_bank == 1 else self.renderer.palettes_2[pal_idx]
+            pal = self.renderer.palettes_1[pal_idx] if self.cmb_bank.currentIndex() == 0 else self.renderer.palettes_2[pal_idx]
 
             new_tiles = []
             img_rgba = ts_img.convert('RGBA')

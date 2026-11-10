@@ -359,6 +359,8 @@ class FoMTProject:
             
     def read_rom(self, offset, size):
         """Lee directamente del buffer de memoria virtual (Base + Parches)."""
+        if offset is not None and offset >= 0x08000000:
+            offset &= 0x01FFFFFF
         if not hasattr(self, 'virtual_rom'):
             return self.base_rom_data[offset : offset + size]
         return bytes(self.virtual_rom[offset : offset + size])
@@ -463,9 +465,35 @@ class FoMTProject:
         assert_rom_signed(self, 'export_ips')
         """Exporta los parches acumulados en el formato estándar IPS."""
         import struct
+        # Si self.patches está vacío, calcular automáticamente el diff binario
+        active_rom = getattr(self, 'virtual_rom', None) or getattr(self, 'base_rom_data', None)
+        patches_to_export = dict(self.patches)
+        if not patches_to_export and active_rom:
+            clean_path = self._resolve_base_rom_path()
+            clean_data = None
+            if clean_path and os.path.isfile(clean_path):
+                try:
+                    with open(clean_path, "rb") as fc:
+                        clean_data = fc.read()
+                except Exception:
+                    clean_data = None
+            if clean_data and len(clean_data) > 0 and clean_data != active_rom:
+                min_len = min(len(clean_data), len(active_rom))
+                i = 0
+                while i < min_len:
+                    if clean_data[i] != active_rom[i]:
+                        start = i
+                        while i < min_len and clean_data[i] != active_rom[i]:
+                            i += 1
+                        patches_to_export[start] = bytes(active_rom[start:i])
+                    else:
+                        i += 1
+                if len(active_rom) > min_len:
+                    patches_to_export[min_len] = bytes(active_rom[min_len:])
+
         with open(export_path, "wb") as f:
             f.write(b"PATCH")
-            for offset, data in sorted(self.patches.items()):
+            for offset, data in sorted(patches_to_export.items()):
                 # IPS soporta máximo archivos de 16MB (Offset 24 bits)
                 if offset >= 0x1000000:
                     print(f"[!] Offset fuera del límite IPS: 0x{offset:08X}. Ignorando.")
@@ -509,21 +537,38 @@ class FoMTProject:
         """
         ¡PELIGRO!: Escribe directamente en el archivo ROM base.
         Útil para pruebas rápidas cuando el juego no está comprimido.
-        También actualiza el buffer en memoria para consistencia.
+        También actualiza el buffer en memoria y el registro de parches para consistencia.
         """
+        data_bytes = bytes(data)
+
+        # 0. Registrar siempre en el diccionario de parches del proyecto (.fsp / compile_to_rom / export_ips)
+        self.patches[offset] = data_bytes
+
         # 1. Escribir en el archivo físico
-        with open(self.base_rom_path, "r+b") as f:
-            f.seek(offset)
-            f.write(data)
+        rom_path = self.base_rom_path or self._resolve_base_rom_path()
+        if rom_path and os.path.exists(rom_path):
+            self.base_rom_path = rom_path
+            with open(rom_path, "r+b") as f:
+                f.seek(0, os.SEEK_END)
+                end_pos = f.tell()
+                if offset > end_pos:
+                    f.write(b'\xFF' * (offset - end_pos))
+                f.seek(offset)
+                f.write(data_bytes)
             
         # 2. Sincronizar buffer en memoria
         if self.base_rom_data:
-            # Los bytes en Python son inmutables, reconstruimos el buffer
             ba = bytearray(self.base_rom_data)
-            ba[offset : offset + len(data)] = data
+            req_len = offset + len(data_bytes)
+            if req_len > len(ba):
+                ba.extend(b'\xFF' * (req_len - len(ba)))
+            ba[offset : offset + len(data_bytes)] = data_bytes
             self.base_rom_data = bytes(ba)
             
-        if hasattr(self, 'virtual_rom'):
-            self.virtual_rom[offset : offset + len(data)] = data
+        if hasattr(self, 'virtual_rom') and self.virtual_rom is not None:
+            req_len = offset + len(data_bytes)
+            if req_len > len(self.virtual_rom):
+                self.virtual_rom.extend(b'\xFF' * (req_len - len(self.virtual_rom)))
+            self.virtual_rom[offset : offset + len(data_bytes)] = data_bytes
             
-        print(f"Direct Overwrite: 0x{offset:08X} -> {len(data)} bytes escritos en la ROM base.")
+        print(f"Direct Overwrite: 0x{offset:08X} -> {len(data_bytes)} bytes escritos en la ROM base.")

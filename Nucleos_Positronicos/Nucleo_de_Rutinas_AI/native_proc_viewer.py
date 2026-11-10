@@ -15,6 +15,7 @@
 import struct
 import csv
 import os
+from Consola_de_Comando.i18n import tr
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTextEdit,
     QLabel, QComboBox, QPushButton, QSplitter, QGroupBox, QTableWidget, 
@@ -568,13 +569,28 @@ class NativeProcViewerWidget(QWidget):
         self.decompiler = None
         self._setup_ui()
         self._load_data()
+
+    @property
+    def lang(self) -> str:
+        p = self.parent_app or self.parent()
+        while p:
+            if hasattr(p, 'lang') and p.lang:
+                return str(p.lang).lower()
+            if hasattr(p, 'current_lang') and p.current_lang:
+                return str(p.current_lang).lower()
+            try:
+                p = p.parent()
+            except Exception:
+                break
+        return "es"
     
     def _setup_ui(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(4, 4, 4, 4)
+        lang = self.lang
         
         # Header
-        header = QLabel("Rutinas Nativas del Engine (THUMB)")
+        header = QLabel(tr("np_title", lang))
         header.setStyleSheet("font-size: 14px; font-weight: bold; padding: 4px;")
         layout.addWidget(header)
         
@@ -582,11 +598,16 @@ class NativeProcViewerWidget(QWidget):
         splitter = QSplitter(Qt.Orientation.Vertical)
         
         # Top: Detections table
-        det_group = QGroupBox("Valores Detectados")
+        det_group = QGroupBox(tr("np_detected_group", lang))
         det_layout = QVBoxLayout(det_group)
         self.det_table = QTableWidget()
         self.det_table.setColumnCount(4)
-        self.det_table.setHorizontalHeaderLabels(["Tipo", "Valor", "Descripcion", "Offset"])
+        self.det_table.setHorizontalHeaderLabels([
+            tr("np_col_type", lang),
+            tr("np_col_val", lang),
+            tr("np_col_desc", lang),
+            tr("np_col_offset", lang)
+        ])
         self.det_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         self.det_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.det_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -594,7 +615,7 @@ class NativeProcViewerWidget(QWidget):
         det_layout.addWidget(self.det_table)
 
         btn_layout = QHBoxLayout()
-        self.btn_edit_patch = QPushButton("✏️ Modificar y Parchear en ROM")
+        self.btn_edit_patch = QPushButton(tr("np_btn_patch", lang))
         self.btn_edit_patch.setStyleSheet("font-weight: bold; background-color: #0E639C; color: white; padding: 6px; border-radius: 4px;")
         self.btn_edit_patch.clicked.connect(self._on_patch_clicked)
         btn_layout.addWidget(self.btn_edit_patch)
@@ -602,7 +623,7 @@ class NativeProcViewerWidget(QWidget):
         splitter.addWidget(det_group)
         
         # Bottom: Pseudo-code view
-        code_group = QGroupBox("Pseudo-Script")
+        code_group = QGroupBox(tr("np_pseudo_group", lang))
         code_layout = QVBoxLayout(code_group)
         self.code_view = QTextEdit()
         self.code_view.setReadOnly(True)
@@ -683,8 +704,9 @@ class NativeProcViewerWidget(QWidget):
 
     def _on_patch_clicked(self):
         selected_rows = self.det_table.selectionModel().selectedRows()
+        lang = self.lang
         if not selected_rows:
-            QMessageBox.information(self, "Seleccionar Valor", "Por favor seleccione un valor detectado de la tabla para editar.")
+            QMessageBox.information(self, tr("np_col_val", lang), tr("np_select_val_prompt", lang))
             return
         row = selected_rows[0].row()
         dtype = self.det_table.item(row, 0).text()
@@ -695,13 +717,13 @@ class NativeProcViewerWidget(QWidget):
         try:
             offset = int(offset_str, 16)
         except ValueError:
-            QMessageBox.warning(self, "Error", "Offset inválido.")
+            QMessageBox.warning(self, tr("rt_error", lang), tr("np_invalid_offset", lang))
             return
 
         new_val_str, ok = QInputDialog.getText(
             self, 
-            "Modificar Parámetro en ROM",
-            f"Tipo: {dtype} ({desc})\nOffset ROM: 0x{offset:06X}\n\nIngrese nuevo valor (hex ej. 0x2A o decimal):",
+            tr("np_modify_title", lang),
+            tr("np_modify_prompt", lang).format(dtype, desc, offset),
             text=curr_val
         )
         if not ok or not new_val_str.strip():
@@ -711,16 +733,16 @@ class NativeProcViewerWidget(QWidget):
             val_clean = new_val_str.strip()
             new_val = int(val_clean, 16) if '0x' in val_clean.lower() else int(val_clean)
         except ValueError:
-            QMessageBox.warning(self, "Error", "El valor ingresado no es un número válido.")
+            QMessageBox.warning(self, tr("rt_error", lang), tr("np_invalid_val", lang))
             return
 
         success, msg = self.patch_rom_value(offset, new_val)
         if success:
-            QMessageBox.information(self, "ROM Parcheada con Éxito", msg)
+            QMessageBox.information(self, tr("np_patch_success", lang), msg)
             if hasattr(self, '_current_call_id') and self._current_call_id is not None:
                 self.load_proc(self._current_call_id)
         else:
-            QMessageBox.critical(self, "Error al Parchear ROM", msg)
+            QMessageBox.critical(self, tr("np_patch_error", lang), msg)
 
     def patch_rom_value(self, rom_offset, new_val):
         if not self.project or not self.project.base_rom_path:

@@ -26,6 +26,10 @@ if os.path.exists(_BLUESPIDER_PATH) and _BLUESPIDER_PATH not in sys.path:
 
 _decomp_cache = {}
 
+def clear_decomp_cache():
+    """Limpia el caché de descompresión tras repunteos o ediciones."""
+    _decomp_cache.clear()
+
 def _decompress(rom: bytes, offset: int) -> bytes:
     """Descomprime usando el motor nativo de FoMT Studio con caché para máxima fluidez."""
     key = (id(rom), offset)
@@ -126,6 +130,50 @@ def _render_tile(tile_indices: list, palette: list,
 
 ROM_BUILDINGS_TABLE = 0x10692C
 
+CANONICAL_ROM_DEFAULTS = {
+    'farmhouse': {'lv1': (26, 3), 'lv2': (18, 3), 'lv3': (10, 2)},
+    'barn': {'lv1': (58, 2), 'lv2': (58, 2)},
+    'chicken_coop': {'lv1': (14, 52), 'lv2': (14, 52)},
+    'mailbox': (33, 20),
+    'town_cottage': (60, 0),
+    'beach_cottage': (23, 52),
+    'mountain_cottage': (36, 2),
+    'mayo_maker': (2, 5),
+    'yarn_maker': (8, 5),
+    'cheese_maker': (12, 5),
+    41: {
+        'tool_box': (25, 10),
+        'record_player': (1, 17),
+        'vase': (19, 6),
+        'mirror': (8, 2),
+    },
+    42: {
+        'tool_box': (40, 15),
+        'record_player': (16, 17),
+        'fridge': (11, 3),
+        'shelf': (15, 2),
+        'kitchen_counter': (2, 1),
+        'carpet_dining': (23, 10),
+        'vase': (34, 6),
+        'mirror': (23, 2),
+        'clock': (20, 3),
+    },
+    43: {
+        'tool_box': (54, 15),
+        'record_player': (24, 17),
+        'fridge': (19, 3),
+        'shelf': (23, 2),
+        'kitchen_counter': (10, 1),
+        'fireplace': (4, 1),
+        'bathroom_door': (1, 2),
+        'double_bed': (52, 5),
+        'carpet_dining': (31, 10),
+        'vase': (42, 6),
+        'mirror': (31, 2),
+        'clock': (28, 3),
+    }
+}
+
 BUILDING_ROM_ENTRIES = {
     'farmhouse': {
         'lv1': {'summer': 0, 'winter': 1, 'x': 26, 'y': 3},
@@ -147,25 +195,25 @@ BUILDING_ROM_ENTRIES = {
 }
 
 HOUSE_ROM_ENTRIES = {
-    # Caja de Herramientas (Toolbox) - 4x6 tiles
-    'tool_box_closed': {'entry': 15, 'desc_off': 0x106A94, 'w': 4, 'h': 6, 'name': 'Caja de Herramientas (Cerrada)'},
-    'tool_box_open': {'entry': 14, 'desc_off': 0x106A7C, 'w': 4, 'h': 6, 'name': 'Caja de Herramientas (Abierta)'},
+    # Caja de Herramientas (Toolbox) - 3x4 tiles visuales (descriptor ROM 4x6 con 2 filas superiores de padding para tapa abierta)
+    'tool_box_closed': {'entry': 15, 'desc_off': 0x106A94, 'w': 3, 'h': 4, 'vis_ox': 0, 'vis_oy': 2, 'desc_w': 4, 'desc_h': 6, 'name': 'Caja de Herramientas (Cerrada)'},
+    'tool_box_open': {'entry': 14, 'desc_off': 0x106A7C, 'w': 4, 'h': 6, 'vis_ox': 0, 'vis_oy': 0, 'desc_w': 4, 'desc_h': 6, 'name': 'Caja de Herramientas (Abierta)'},
     
-    # Mesa Tocadiscos (Record Player) - 4x3 tiles
-    'record_player_base': {'entry': 20, 'desc_off': 0x106B0C, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Base)'},
-    'record_player_discs': {'entry': 21, 'desc_off': 0x106B24, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Con Discos)'},
-    'record_player_active': {'entry': 22, 'desc_off': 0x106B3C, 'w': 4, 'h': 3, 'name': 'Mesa Tocadiscos (Reproduciendo)'},
+    # Mesa Tocadiscos (Record Player) - 4x2 tiles visuales (fila 0 es padding)
+    'record_player_base': {'entry': 20, 'desc_off': 0x106B0C, 'w': 4, 'h': 2, 'vis_ox': 0, 'vis_oy': 1, 'desc_w': 4, 'desc_h': 3, 'name': 'Mesa Tocadiscos (Base)'},
+    'record_player_discs': {'entry': 21, 'desc_off': 0x106B24, 'w': 4, 'h': 2, 'vis_ox': 0, 'vis_oy': 1, 'desc_w': 4, 'desc_h': 3, 'name': 'Mesa Tocadiscos (Con Discos)'},
+    'record_player_active': {'entry': 22, 'desc_off': 0x106B3C, 'w': 4, 'h': 2, 'vis_ox': 0, 'vis_oy': 1, 'desc_w': 4, 'desc_h': 3, 'name': 'Mesa Tocadiscos (Reproduciendo)'},
     
-    # Refrigerador (Fridge) - 4x6 tiles
-    'fridge_closed': {'entry': 17, 'desc_off': 0x106AC4, 'w': 4, 'h': 6, 'name': 'Refrigerador (Cerrado)'},
-    'fridge_open': {'entry': 16, 'desc_off': 0x106AAC, 'w': 4, 'h': 6, 'name': 'Refrigerador (Abierto)'},
+    # Refrigerador (Fridge) - 4x5 tiles visuales (fila 5 es padding)
+    'fridge_closed': {'entry': 17, 'desc_off': 0x106AC4, 'w': 4, 'h': 5, 'vis_ox': 0, 'vis_oy': 0, 'desc_w': 4, 'desc_h': 6, 'name': 'Refrigerador (Cerrado)'},
+    'fridge_open': {'entry': 16, 'desc_off': 0x106AAC, 'w': 4, 'h': 6, 'vis_ox': 0, 'vis_oy': 0, 'desc_w': 4, 'desc_h': 6, 'name': 'Refrigerador (Abierto)'},
     
-    # Anaquel / Estante (Shelf) - 4x7 tiles
-    'shelf_closed': {'entry': 19, 'desc_off': 0x106AF4, 'w': 4, 'h': 7, 'name': 'Anaquel (Cerrado)'},
-    'shelf_open': {'entry': 18, 'desc_off': 0x106ADC, 'w': 4, 'h': 7, 'name': 'Anaquel (Abierto)'},
+    # Anaquel / Estante (Shelf) - 4x6 tiles visuales (fila 6 es padding)
+    'shelf_closed': {'entry': 19, 'desc_off': 0x106AF4, 'w': 4, 'h': 6, 'vis_ox': 0, 'vis_oy': 0, 'desc_w': 4, 'desc_h': 7, 'name': 'Anaquel (Cerrado)'},
+    'shelf_open': {'entry': 18, 'desc_off': 0x106ADC, 'w': 4, 'h': 6, 'vis_ox': 0, 'vis_oy': 0, 'desc_w': 4, 'desc_h': 7, 'name': 'Anaquel (Abierto)'},
     
-    # Mueble de Cocina (Kitchen Counter) - 10x15 tiles
-    'kitchen_counter': {'entry': 23, 'desc_off': 0x106B54, 'w': 10, 'h': 15, 'name': 'Mueble de Cocina'},
+    # Mueble de Cocina (Kitchen Counter) - 8x12 tiles visuales (cols 0 y 9 son padding, filas 12-14 son padding)
+    'kitchen_counter': {'entry': 23, 'desc_off': 0x106B54, 'w': 8, 'h': 12, 'vis_ox': 1, 'vis_oy': 0, 'desc_w': 10, 'desc_h': 15, 'name': 'Mueble de Cocina'},
     
     # Chimenea (Fireplace) - 6x8 tiles (Entry 24 auténtica)
     'fireplace': {'entry': 24, 'desc_off': 0x106B6C, 'w': 6, 'h': 8, 'name': 'Chimenea'},
@@ -207,7 +255,7 @@ HOUSE_UTENSILS = [
 
 HOUSE_MAP_DEFAULTS = {
     41: {
-        'tool_box': {'type': 'tool_box_closed', 'x': 25, 'y': 15, 'name': 'Caja de Herramientas'},
+        'tool_box': {'type': 'tool_box_closed', 'x': 25, 'y': 10, 'name': 'Caja de Herramientas'},
         'record_player': {'type': 'record_player_base', 'x': 1, 'y': 17, 'name': 'Mesa Tocadiscos'},
         'vase': {'type': 'vase', 'x': 19, 'y': 6, 'name': 'Florero'},
         'mirror': {'type': 'mirror', 'x': 8, 'y': 2, 'name': 'Espejo'},
@@ -299,7 +347,7 @@ class FomtMapRenderer:
 
     def _sync_dynamic_positions_from_rom(self):
         """Lee las coordenadas canonicas reales grabadas en la ROM para reflejar cambios persistidos."""
-        if not self.rom or len(self.rom) < 0x0B0000:
+        if not self.rom or len(self.rom) < 0x108000:
             return
         try:
             if 'farmhouse' in BUILDING_ROM_ENTRIES:
@@ -308,7 +356,7 @@ class FomtMapRenderer:
                 BUILDING_ROM_ENTRIES['farmhouse']['lv2']['x'] = self.rom[0x017312]
                 BUILDING_ROM_ENTRIES['farmhouse']['lv2']['y'] = self.rom[0x01730A]
                 BUILDING_ROM_ENTRIES['farmhouse']['lv3']['x'] = self.rom[0x017334]
-                BUILDING_ROM_ENTRIES['farmhouse']['lv3']['y'] = self.rom[0x01732E]
+                BUILDING_ROM_ENTRIES['farmhouse']['lv3']['y'] = self.rom[0x0A6D0A]
             if 'barn' in BUILDING_ROM_ENTRIES:
                 BUILDING_ROM_ENTRIES['barn']['lv1']['x'] = self.rom[0x01736E]
                 BUILDING_ROM_ENTRIES['barn']['lv1']['y'] = self.rom[0x017366]
@@ -322,6 +370,15 @@ class FomtMapRenderer:
             if 'mailbox' in BUILDING_ROM_ENTRIES:
                 BUILDING_ROM_ENTRIES['mailbox']['x'] = self.rom[0x0A6B48]
                 BUILDING_ROM_ENTRIES['mailbox']['y'] = self.rom[0x0A6B4A]
+            if 'town_cottage' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['town_cottage']['x'] = self.rom[0x0A6C06]
+                BUILDING_ROM_ENTRIES['town_cottage']['y'] = self.rom[0x0A6C08]
+            if 'beach_cottage' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['beach_cottage']['x'] = self.rom[0x0A697A]
+                BUILDING_ROM_ENTRIES['beach_cottage']['y'] = self.rom[0x0A6ED6]
+            if 'mountain_cottage' in BUILDING_ROM_ENTRIES:
+                BUILDING_ROM_ENTRIES['mountain_cottage']['x'] = self.rom[0x0A743A]
+                BUILDING_ROM_ENTRIES['mountain_cottage']['y'] = self.rom[0x0A743C]
             if 'cheese_maker' in MAKER_ROM_ENTRIES:
                 MAKER_ROM_ENTRIES['cheese_maker']['x'] = self.rom[0x0A73FE]
                 MAKER_ROM_ENTRIES['cheese_maker']['y'] = self.rom[0x0A7400]
@@ -329,14 +386,92 @@ class FomtMapRenderer:
                 MAKER_ROM_ENTRIES['yarn_maker']['x'] = self.rom[0x0A7416]
                 MAKER_ROM_ENTRIES['yarn_maker']['y'] = self.rom[0x0A7418]
             if 'mayo_maker' in MAKER_ROM_ENTRIES:
-                MAKER_ROM_ENTRIES['mayo_maker']['x'] = self.rom[0x0A63E8]
-                MAKER_ROM_ENTRIES['mayo_maker']['y'] = self.rom[0x0A63EA]
-            if 42 in HOUSE_MAP_DEFAULTS and 'kitchen_counter' in HOUSE_MAP_DEFAULTS[42]:
-                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['x'] = self.rom[0x0A6FC4]
-                HOUSE_MAP_DEFAULTS[42]['kitchen_counter']['y'] = self.rom[0x0A6FC6]
-            if 43 in HOUSE_MAP_DEFAULTS and 'kitchen_counter' in HOUSE_MAP_DEFAULTS[43]:
-                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['x'] = self.rom[0x0A7100]
-                HOUSE_MAP_DEFAULTS[43]['kitchen_counter']['y'] = self.rom[0x0A7102]
+                MAKER_ROM_ENTRIES['mayo_maker']['x'] = self.rom[0x0A72F2]
+                MAKER_ROM_ENTRIES['mayo_maker']['y'] = self.rom[0x0A72F4]
+
+            if 41 in HOUSE_MAP_DEFAULTS:
+                d41 = HOUSE_MAP_DEFAULTS[41]
+                if 'tool_box' in d41:
+                    d41['tool_box']['x'] = self.rom[0x0A6EE8]
+                    d41['tool_box']['y'] = self.rom[0x0A6EEA]
+                if 'record_player' in d41:
+                    d41['record_player']['x'] = self.rom[0x0A6F1C]
+                    d41['record_player']['y'] = self.rom[0x0A6F1E]
+                if 'vase' in d41:
+                    d41['vase']['x'] = self.rom[0x0A6F50]
+                    d41['vase']['y'] = self.rom[0x0A6F52]
+                if 'mirror' in d41:
+                    d41['mirror']['x'] = self.rom[0x0A6F6C]
+                    d41['mirror']['y'] = self.rom[0x0A6F6E]
+
+            if 42 in HOUSE_MAP_DEFAULTS:
+                d42 = HOUSE_MAP_DEFAULTS[42]
+                if 'tool_box' in d42:
+                    d42['tool_box']['x'] = self.rom[0x0A6FA4]
+                    d42['tool_box']['y'] = self.rom[0x0A6FA6]
+                if 'kitchen_counter' in d42:
+                    d42['kitchen_counter']['x'] = self.rom[0x0A6FC4]
+                    d42['kitchen_counter']['y'] = self.rom[0x0A6FC6]
+                if 'fridge' in d42:
+                    d42['fridge']['x'] = self.rom[0x0A6FDE]
+                    d42['fridge']['y'] = self.rom[0x0A6FE0]
+                if 'shelf' in d42:
+                    d42['shelf']['x'] = self.rom[0x0A6FF8]
+                    d42['shelf']['y'] = self.rom[0x0A6FFA]
+                if 'record_player' in d42:
+                    d42['record_player']['x'] = self.rom[0x0A7034]
+                    d42['record_player']['y'] = self.rom[0x0A7036]
+                if 'carpet_dining' in d42:
+                    d42['carpet_dining']['x'] = self.rom[0x0A7068]
+                    d42['carpet_dining']['y'] = self.rom[0x0A706A]
+                if 'vase' in d42:
+                    d42['vase']['x'] = self.rom[0x0A7084]
+                    d42['vase']['y'] = self.rom[0x0A7086]
+                if 'mirror' in d42:
+                    d42['mirror']['x'] = self.rom[0x0A70A0]
+                    d42['mirror']['y'] = self.rom[0x0A70A2]
+                if 'clock' in d42:
+                    d42['clock']['x'] = self.rom[0x0A70BE]
+                    d42['clock']['y'] = self.rom[0x0A70C0]
+
+            if 43 in HOUSE_MAP_DEFAULTS:
+                d43 = HOUSE_MAP_DEFAULTS[43]
+                if 'tool_box' in d43:
+                    d43['tool_box']['x'] = self.rom[0x0A70E0]
+                    d43['tool_box']['y'] = self.rom[0x0A70E2]
+                if 'kitchen_counter' in d43:
+                    d43['kitchen_counter']['x'] = self.rom[0x0A7100]
+                    d43['kitchen_counter']['y'] = self.rom[0x0A7102]
+                if 'fridge' in d43:
+                    d43['fridge']['x'] = self.rom[0x0A711A]
+                    d43['fridge']['y'] = self.rom[0x0A711C]
+                if 'shelf' in d43:
+                    d43['shelf']['x'] = self.rom[0x0A7134]
+                    d43['shelf']['y'] = self.rom[0x0A7136]
+                if 'record_player' in d43:
+                    d43['record_player']['x'] = self.rom[0x0A7170]
+                    d43['record_player']['y'] = self.rom[0x0A7172]
+                if 'fireplace' in d43:
+                    d43['fireplace']['x'] = self.rom[0x0A7190]
+                    d43['fireplace']['y'] = self.rom[0x0A7192]
+                if 'double_bed' in d43:
+                    d43['double_bed']['x'] = self.rom[0x0A71B0]
+                    d43['double_bed']['y'] = self.rom[0x0A71B2]
+                if 'carpet_dining' in d43:
+                    d43['carpet_dining']['x'] = self.rom[0x0A71CC]
+                    d43['carpet_dining']['y'] = self.rom[0x0A71CE]
+                if 'vase' in d43:
+                    d43['vase']['x'] = self.rom[0x0A71E8]
+                    d43['vase']['y'] = self.rom[0x0A71EA]
+                if 'mirror' in d43:
+                    d43['mirror']['x'] = self.rom[0x0A7204]
+                    d43['mirror']['y'] = self.rom[0x0A7206]
+                if 'clock' in d43:
+                    d43['clock']['x'] = self.rom[0x0A7220]
+                    d43['clock']['y'] = self.rom[0x0A7222]
+                if 'bathroom_door' in d43:
+                    d43['bathroom_door']['x'] = self.rom[0x10376C]
+                    d43['bathroom_door']['y'] = self.rom[0x10376D]
         except Exception:
             pass
 
@@ -374,10 +509,20 @@ class FomtMapRenderer:
             # 5. Behavior Dictionary (p_obj1)
             off_dict = map_header.p_obj1 & 0x01FFFFFF
             if off_dict and off_col and off_dict < off_col and off_col < len(rom):
-                dict_size = off_col - off_dict
+                dict_size = min(2048, off_col - off_dict)
                 self.behavior_dict = rom[off_dict : off_dict + dict_size]
+            elif off_dict and off_dict < len(rom):
+                self.behavior_dict = rom[off_dict : off_dict + 1024]
             else:
                 self.behavior_dict = None
+
+            # Resetear y preparar buffers de estructuras dinámicas en RAM
+            self.active_tilemap_bg3 = None
+            self.active_tilemap_bg2 = None
+            self.active_tilemap_bg1 = None
+            self.active_collision_map = None
+            self.active_behavior_dict = None
+            self._dynamic_buffers_dirty = True
 
             # 6. Mapeo dinámico de paleta por tile desde el mapa
             self._build_tile_palette_map()
@@ -526,15 +671,19 @@ class FomtMapRenderer:
                                 # que corresponden a ranuras no inicializadas en el overlay sin sobreescribir la base.
                                 if desc_off == 0x106B54 and ptr == p_bg2 and (t_val & 0x3FF) in range(0x235, 0x24D):
                                     continue
-                                dst_idx = (map_y + y) * self.width + (map_x + x)
-                                if dst_idx < len(tmap):
-                                    tmap[dst_idx] = t_val
+                                nx = map_x + x
+                                ny = map_y + y
+                                if 0 <= nx < self.width and 0 <= ny < self.height:
+                                    dst_idx = ny * self.width + nx
+                                    if dst_idx < len(tmap):
+                                        tmap[dst_idx] = t_val
 
         # 2. Malla de colision autentica de la estructura (reproduce func_08017180 / ApplyMapPatch_Blitter_080A5BD8)
         if p_lut != 0 and p_map != 0 and active_col is not None and active_dict is not None:
             lut_off = p_lut & 0x01FFFFFF
             map_off = p_map & 0x01FFFFFF
             if lut_off < len(self.rom) and map_off + w * h <= len(self.rom):
+                attr_dict_map = {bytes(active_dict[i*4 : i*4+4]): i for i in range(len(active_dict) // 4)}
                 for y in range(h):
                     for x in range(w):
                         lut_idx = self.rom[map_off + (y * w + x)]
@@ -543,17 +692,17 @@ class FomtMapRenderer:
                             # 0x00000000 es transitable/despejado sin trigger
                             continue
                         attr_bytes = struct.pack('<I', attr)
-                        found_idx = -1
-                        for di in range(len(active_dict) // 4):
-                            if active_dict[di*4 : di*4+4] == attr_bytes:
-                                found_idx = di
-                                break
+                        found_idx = attr_dict_map.get(attr_bytes, -1)
                         if found_idx == -1:
                             found_idx = len(active_dict) // 4
                             active_dict.extend(attr_bytes)
-                        dst_idx = (map_y + y) * self.width + (map_x + x)
-                        if dst_idx < len(active_col):
-                            active_col[dst_idx] = found_idx
+                            attr_dict_map[attr_bytes] = found_idx
+                        nx = map_x + x
+                        ny = map_y + y
+                        if 0 <= nx < self.width and 0 <= ny < self.height:
+                            dst_idx = ny * self.width + nx
+                            if dst_idx < len(active_col):
+                                active_col[dst_idx] = found_idx & 0xFF
 
     def render(self, show_bg1=True, show_bg2=True, show_bg3=True, show_col=False, bank=1, invert_bg=False) -> Image.Image | None:
         """
@@ -650,7 +799,7 @@ class FomtMapRenderer:
                 tb_choice = house_cfg.get('tool_box', 'closed') # 'closed', 'open', 'none'
                 if tb_choice in ('closed', 'open'):
                     tb_type = f'tool_box_{tb_choice}'
-                    def_pos = defaults.get('tool_box', {'x': 25, 'y': 15})
+                    def_pos = defaults.get('tool_box', {'x': 25, 'y': 10})
                     tx, ty = positions.get('tool_box', (def_pos['x'], def_pos['y']))
                     self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, HOUSE_ROM_ENTRIES[tb_type]['entry'], tx, ty, active_col, active_dict)
 
@@ -896,6 +1045,96 @@ class FomtMapRenderer:
         final_bg.paste(img, (0, 0), img)
         return final_bg
 
+    def render_cell(self, cx: int, cy: int, show_bg1=True, show_bg2=True, show_bg3=True, show_col=False, bank=1, invert_bg=False) -> Image.Image | None:
+        """
+        Renderiza una celda única de 8x8 píxeles en memoria RAM a partir de los buffers activos.
+        Rendimiento: ~0.01 ms por llamada (inmune a retrasos por redibujado de mapas gigantes).
+        """
+        if not self._loaded:
+            return None
+
+        w, h = self.width, self.height
+        if not (0 <= cx < w and 0 <= cy < h):
+            return None
+
+        palettes = self.palettes_1 if bank == 1 else self.palettes_2
+        idx = cy * w + cx
+        cell_img = Image.new('RGBA', (8, 8), (0, 0, 0, 0))
+
+        def _draw_single_tile(val, is_overlay=False):
+            t_idx  = val & 0x3FF
+            h_flip = bool((val >> 10) & 1)
+            v_flip = bool((val >> 11) & 1)
+            p_idx  = (val >> 12) & 0xF
+            if t_idx < len(self.tiles) and p_idx < len(palettes):
+                cache_key = (t_idx, p_idx, h_flip, v_flip, bank)
+                tile_img = self._tile_cache.get(cache_key)
+                if tile_img is None:
+                    tile_img = _render_tile(self.tiles[t_idx], palettes[p_idx], h_flip, v_flip)
+                    self._tile_cache[cache_key] = tile_img
+                if is_overlay:
+                    cell_img.paste(tile_img, (0, 0), tile_img)
+                else:
+                    cell_img.paste(tile_img, (0, 0))
+
+        # Capas activas en RAM
+        tmap_bg3 = getattr(self, 'active_tilemap_bg3', None) or self.tilemap_bg3
+        tmap_bg2 = getattr(self, 'active_tilemap_bg2', None) or self.tilemap_bg2
+        tmap_bg1 = getattr(self, 'active_tilemap_bg1', None) or self.tilemap_bg1
+
+        bg_bottom = tmap_bg3 if not invert_bg else tmap_bg1
+        bg_top    = tmap_bg1 if not invert_bg else tmap_bg3
+        show_bottom = show_bg3 if not invert_bg else show_bg1
+        show_top    = show_bg1 if not invert_bg else show_bg3
+
+        if show_bottom and bg_bottom and idx < len(bg_bottom):
+            _draw_single_tile(bg_bottom[idx], is_overlay=False)
+
+        if show_bg2 and tmap_bg2 and idx < len(tmap_bg2):
+            _draw_single_tile(tmap_bg2[idx], is_overlay=True)
+
+        if show_top and bg_top and idx < len(bg_top):
+            _draw_single_tile(bg_top[idx], is_overlay=True)
+
+        # Colisión en la celda si está activa
+        active_col = getattr(self, 'active_collision_map', None) or self.collision_map
+        active_dict = getattr(self, 'active_behavior_dict', None) or self.behavior_dict
+        if show_col and active_col and idx < len(active_col):
+            from PIL import ImageDraw
+            overlay = Image.new('RGBA', (8, 8), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(overlay)
+            val = active_col[idx]
+            if active_dict and val * 4 + 3 < len(active_dict):
+                behavior = struct.unpack_from('<H', active_dict, val * 4)[0]
+                script_id = struct.unpack_from('<H', active_dict, val * 4 + 2)[0]
+            else:
+                behavior = 0
+                script_id = 0
+
+            is_solid = bool(behavior & 1)
+            has_script = (script_id > 0)
+
+            if val == 0:
+                r, g, b, a = 255, 255, 255, 0
+            elif val == 0x40:
+                r, g, b, a = 218, 165, 32, 80
+            elif is_solid and has_script:
+                r, g, b, a = 255, 215, 0, 120
+            elif is_solid:
+                r, g, b, a = 255, 0, 0, 100
+            elif has_script:
+                r, g, b, a = 0, 255, 0, 100
+            else:
+                r, g, b, a = 0, 150, 255, 90
+
+            if a > 0:
+                draw.rectangle([0, 0, 7, 7], fill=(r, g, b, a), outline=(r, g, b, 200))
+                cell_img.paste(overlay, (0, 0), overlay)
+
+        final_cell = Image.new('RGBA', (8, 8), (0, 0, 0, 255))
+        final_cell.paste(cell_img, (0, 0), cell_img)
+        return final_cell
+
     def get_effective_collision(self) -> tuple[bytes | None, bytes | None]:
         """Devuelve (collision_map, behavior_dict) con las estructuras dinamicas estampadas."""
         if hasattr(self, 'active_collision_map') and self.active_collision_map:
@@ -932,9 +1171,11 @@ class FomtMapRenderer:
             return self.tile_palette_map[tile_idx]
         return getattr(self, 'dominant_palette', 1)
 
-    def render_tileset(self, pal_idx: int | None = None, bank: int = 1) -> Image.Image | None:
+    def render_tileset(self, pal_idx: int | None = None, bank: int = 1, cols: int = 32) -> Image.Image | None:
         """
-        Genera una imagen con todos los tiles de 8x8.
+        Genera una imagen con todos los tiles de 8x8 con un ancho configurable en número de columnas (tiles).
+        Permite ajustar el ancho (cols) para alinear y cazar visualmente las formas canónicas
+        de edificios, muebles y elementos del tileset.
         Si pal_idx es None o pal_idx == 0:
             Modo Auto: Cada tile se dibuja con la paleta activa que le manda el mapa.
         Si pal_idx > 0:
@@ -946,7 +1187,7 @@ class FomtMapRenderer:
         if not palettes:
             return None
 
-        cols = 32
+        cols = max(1, min(128, int(cols)))
         rows = (len(self.tiles) + cols - 1) // cols
         img = Image.new('RGB', (cols * 8, rows * 8), (0, 0, 0))
 
@@ -1086,10 +1327,10 @@ class FomtMapRenderer:
             tb_choice = house_cfg.get('tool_box', 'closed')
             if tb_choice in ('closed', 'open'):
                 tb_type = f'tool_box_{tb_choice}'
-                def_pos = defaults.get('tool_box', {'x': 25, 'y': 15})
+                def_pos = defaults.get('tool_box', {'x': 25, 'y': 10})
                 tx, ty = positions.get('tool_box', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES[tb_type]
-                results.append({'id': 'tool_box', 'name': e_info['name'], 'x': tx, 'y': ty, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'tool_box', 'name': e_info['name'], 'x': tx, 'y': ty, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 2. Mesa Tocadiscos
             rp_choice = house_cfg.get('record_player', 'base')
@@ -1098,7 +1339,7 @@ class FomtMapRenderer:
                 def_pos = defaults.get('record_player', {'x': 1, 'y': 17})
                 rx, ry = positions.get('record_player', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES[rp_type]
-                results.append({'id': 'record_player', 'name': e_info['name'], 'x': rx, 'y': ry, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'record_player', 'name': e_info['name'], 'x': rx, 'y': ry, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 3. Refrigerador
             if map_id in (42, 43):
@@ -1109,7 +1350,7 @@ class FomtMapRenderer:
                     def_pos = defaults.get('fridge', {'x': 11, 'y': 3})
                     fx, fy = positions.get('fridge', (def_pos['x'], def_pos['y']))
                     e_info = HOUSE_ROM_ENTRIES[f_type]
-                    results.append({'id': 'fridge', 'name': e_info['name'], 'x': fx, 'y': fy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                    results.append({'id': 'fridge', 'name': e_info['name'], 'x': fx, 'y': fy, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 4. Anaquel
             if map_id in (42, 43):
@@ -1120,14 +1361,14 @@ class FomtMapRenderer:
                     def_pos = defaults.get('shelf', {'x': 15, 'y': 2})
                     sx, sy = positions.get('shelf', (def_pos['x'], def_pos['y']))
                     e_info = HOUSE_ROM_ENTRIES[s_type]
-                    results.append({'id': 'shelf', 'name': e_info['name'], 'x': sx, 'y': sy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                    results.append({'id': 'shelf', 'name': e_info['name'], 'x': sx, 'y': sy, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 5. Mueble de Cocina y Utensilios
             if map_id in (42, 43) and house_cfg.get('kitchen_counter', True):
                 def_pos = defaults.get('kitchen_counter', {'x': 2, 'y': 1})
                 kx, ky = positions.get('kitchen_counter', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['kitchen_counter']
-                results.append({'id': 'kitchen_counter', 'name': e_info['name'], 'x': kx, 'y': ky, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'kitchen_counter', 'name': e_info['name'], 'x': kx, 'y': ky, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
                 active_utensils = house_cfg.get('utensils', [True]*8)
                 for u_idx, u_info in enumerate(HOUSE_UTENSILS):
@@ -1140,50 +1381,50 @@ class FomtMapRenderer:
                 def_pos = defaults.get('fireplace', {'x': 4, 'y': 1})
                 px, py = positions.get('fireplace', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['fireplace']
-                results.append({'id': 'fireplace', 'name': e_info['name'], 'x': px, 'y': py, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'fireplace', 'name': e_info['name'], 'x': px, 'y': py, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 7. Cama Matrimonial
             if map_id == 43 and house_cfg.get('double_bed', True):
                 def_pos = defaults.get('double_bed', {'x': 52, 'y': 5})
                 bx, by = positions.get('double_bed', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['double_bed']
-                results.append({'id': 'double_bed', 'name': e_info['name'], 'x': bx, 'y': by, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'double_bed', 'name': e_info['name'], 'x': bx, 'y': by, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 8. Puerta del Baño
             if map_id == 43:
                 bd_choice = house_cfg.get('bathroom_door', 'closed')
                 if bd_choice in ('closed', 'open'):
                     bd_type = f'bathroom_door_{bd_choice}'
-                    def_pos = defaults.get('bathroom_door', {'x': 4, 'y': 1})
+                    def_pos = defaults.get('bathroom_door', {'x': 1, 'y': 2})
                     dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
                     e_info = HOUSE_ROM_ENTRIES[bd_type]
-                    results.append({'id': 'bathroom_door', 'name': e_info['name'], 'x': dx, 'y': dy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['desc_off']})
+                    results.append({'id': 'bathroom_door', 'name': e_info['name'], 'x': dx, 'y': dy, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['desc_off']})
 
             # 9. Comedor / Mesa Grande
             if map_id in (42, 43) and house_cfg.get('carpet_dining', True):
                 def_pos = defaults.get('carpet_dining', {'x': 23 if map_id == 42 else 31, 'y': 10})
                 cx, cy = positions.get('carpet_dining', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['carpet_dining']
-                results.append({'id': 'carpet_dining', 'name': e_info['name'], 'x': cx, 'y': cy, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'carpet_dining', 'name': e_info['name'], 'x': cx, 'y': cy, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             # 10. Extras Individuales (Florero, Espejo, Reloj)
             if house_cfg.get('vase', True) and 'vase' in defaults:
                 def_pos = defaults['vase']
                 ex, ey = positions.get('vase', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['vase']
-                results.append({'id': 'vase', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'vase', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             if house_cfg.get('mirror', True) and 'mirror' in defaults:
                 def_pos = defaults['mirror']
                 ex, ey = positions.get('mirror', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['mirror']
-                results.append({'id': 'mirror', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'mirror', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
             if house_cfg.get('clock', True) and 'clock' in defaults:
                 def_pos = defaults['clock']
                 ex, ey = positions.get('clock', (def_pos['x'], def_pos['y']))
                 e_info = HOUSE_ROM_ENTRIES['clock']
-                results.append({'id': 'clock', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'entry': e_info['entry']})
+                results.append({'id': 'clock', 'name': e_info['name'], 'x': ex, 'y': ey, 'w': e_info['w'], 'h': e_info['h'], 'vis_ox': e_info.get('vis_ox', 0), 'vis_oy': e_info.get('vis_oy', 0), 'entry': e_info['entry']})
 
         elif map_id in (36, 37):
             if dyn_cfg.get('mayo_maker', True):
@@ -1200,6 +1441,27 @@ class FomtMapRenderer:
                 m_info = MAKER_ROM_ENTRIES['cheese_maker']
                 mx, my = positions.get('cheese_maker', (m_info['x'], m_info['y']))
                 results.append({'id': 'cheese_maker', 'name': m_info['name'], 'x': mx, 'y': my, 'w': m_info['w'], 'h': m_info['h'], 'entry': m_info['entry']})
+
+        elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
+            bc = BUILDING_ROM_ENTRIES['beach_cottage']
+            pos_x, pos_y = positions.get('beach_cottage', (bc['x'], bc['y']))
+            entry = bc['winter' if map_id == 9 else 'summer']
+            w, h = self._get_structure_dimensions(entry)
+            results.append({'id': 'beach_cottage', 'name': 'Villa de la Playa', 'x': pos_x, 'y': pos_y, 'w': w, 'h': h, 'entry': entry})
+
+        elif map_id in (14, 15) and dyn_cfg.get('mountain_cottage', True):
+            mc = BUILDING_ROM_ENTRIES['mountain_cottage']
+            pos_x, pos_y = positions.get('mountain_cottage', (mc['x'], mc['y']))
+            entry = mc['winter' if map_id == 15 else 'summer']
+            w, h = self._get_structure_dimensions(entry)
+            results.append({'id': 'mountain_cottage', 'name': 'Villa de la Montaña', 'x': pos_x, 'y': pos_y, 'w': w, 'h': h, 'entry': entry})
+
+        elif map_id in (4, 5, 6, 7) and dyn_cfg.get('town_cottage', True):
+            tc = BUILDING_ROM_ENTRIES['town_cottage']
+            pos_x, pos_y = positions.get('town_cottage', (tc['x'], tc['y']))
+            entry = tc['winter' if map_id == 7 else 'summer']
+            w, h = self._get_structure_dimensions(entry)
+            results.append({'id': 'town_cottage', 'name': 'Villa de la Ciudad', 'x': pos_x, 'y': pos_y, 'w': w, 'h': h, 'entry': entry})
 
         return results
 

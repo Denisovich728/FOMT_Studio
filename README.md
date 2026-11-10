@@ -1,10 +1,40 @@
 # ============================================================
-# FOMT STUDIO - Suite de Ingenieria Inversa (v4.0.0 "The Greatest Show"-Final Release)
+# FOMT STUDIO - Suite de Ingenieria Inversa (v4.0.1 "The Greatest Show"-Update Release)
 # ============================================================
 
 FOMT Studio es un entorno integral de desarrollo, desensamblado, analisis semantico y modificacion profunda (ROM Hacking) para el ecosistema "Harvest Moon: Friends of Mineral Town" (FoMT) y "More Friends of Mineral Town" (MFoMT) de Game Boy Advance (GBA).
 
 Desarrollado con una arquitectura modular desacoplada en Python 3 y PyQt6, la suite proporciona herramientas especializadas de bajo nivel para editar codigo, graficos, mapas, rutinas de inteligencia artificial, secuencias de audio y datos internos de la ROM sin requerir dependencias externas de 32 bits.
+
+------------------------------------------------------------
+NOVEDADES DE LA VERSION 4.0.1 "The Greatest Show"-Update Release
+------------------------------------------------------------
+
+0. EDICION ULTRA-FLUIDA EN CACHE/RAM Y COMPILACION DIFERIDA EN ROM:
+   - Eliminacion de la re-renderizacion completa del mapa (hasta 11.264 tiles) y escrituras directas a la ROM en cada click o arrastre.
+   - Motor incremental `render_cell` (0.01 ms por celda) con refresco visual fluido a 60 FPS en el lienzo.
+   - Modificaciones de capas, colisiones y estructuras dinamicas conservadas de forma no destructiva en RAM.
+   - Boton "Compilar y Guardar (ROM)": compila, comprime, inyecta y recarga la ROM unicamente cuando el usuario lo decide.
+
+1. EXPORTACION E IMPORTACION DE 4 CAPAS BMP (TITAN ENGINE):
+   - Exportacion canonica en lote de las 4 capas individuales del mapa en formato BMP:
+     * `{mapa}_bg3.bmp` (Capa BG3: Suelo / Terreno base).
+     * `{mapa}_bg2.bmp` (Capa BG2: Medio / Objetos / Muebles).
+     * `{mapa}_bg1.bmp` (Capa BG1: Frente / Overlay / Techos).
+     * `{mapa}_col.bmp` (Capa Colision: Malla visual demarcada por tipo de colision y trigger).
+     * `{mapa}_preview.png` (Vista previa compuesta de alta resolucion).
+   - Deteccion automatica de capas hermanas e importacion atomica individual o por lote.
+   - Opcion alternativa de exportacion de imagen compuesta unica en formato PNG o BMP.
+
+2. REDIMENSIONADO DINAMICO DE MAPAS SIN CORRUPCION DE COORDENADAS:
+   - Expansion superior-izquierda (`expand_top_left=True`) que preserva la posicion absoluta de puertas y paredes.
+   - Repunteo automatico en espacio seguro de la ROM para los 3 tilemaps, colisiones y dimensiones.
+   - Desplazamiento sincronizado de estructuras dinamicas en ROM por `(dx, dy)`.
+   - Sincronizacion completa del buffer ROM en tiempo real sin requerir recargar la sesion.
+
+3. PANELES TOTALMENTE AJUSTABLES Y COLAPSABLES EN TODA LA SUITE:
+   - Sustitucion de layouts fijos por QSplitter interactivo con tiradores redimensionables.
+   - Paneles izquierdo y derecho con soporte de colapso y ajuste a cualquier dimension (`setMinimumWidth(0)`).
 
 ------------------------------------------------------------
 NOVEDADES PRINCIPALES DE LA VERSION 4.0.0 "The Greatest Show"-Final Release
@@ -134,7 +164,7 @@ python main.py
 
 Compilacion de ejecutable autonomo (PyInstaller):
 ```bash
-pyinstaller FoMT_Studio_v4.0.0_FinalRelease.spec
+pyinstaller FoMT_Studio_v4.0.1_FinalRelease.spec
 ```
 
 ------------------------------------------------------------

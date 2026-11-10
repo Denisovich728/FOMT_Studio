@@ -9,6 +9,8 @@ def get_forerunner_theme():
         QWidget { background-color: #050B15; color: #00E5FF; font-family: 'Consolas', 'Segoe UI', sans-serif; }
         
         QSplitter::handle { background-color: #003B4F; }
+        QSplitter::handle:hover { background-color: #00E5FF; }
+        QSplitter::handle:pressed { background-color: #FFFFFF; }
         
         QMenuBar { background-color: #050B15; color: #00E5FF; border-bottom: 2px solid #00E5FF; }
         QMenu { background-color: #050B15; color: #00E5FF; border: 1px solid #00E5FF; }
@@ -42,6 +44,8 @@ def get_matrix_theme():
         QWidget { background-color: #000000; color: #00FF41; font-family: 'Consolas', 'Courier New', monospace; }
         
         QSplitter::handle { background-color: #003B00; }
+        QSplitter::handle:hover { background-color: #00FF41; }
+        QSplitter::handle:pressed { background-color: #FFFFFF; }
         
         QMenuBar { background-color: #000000; color: #00FF41; border-bottom: 1px solid #003B00; }
         QMenu { background-color: #000000; color: #00FF41; border: 1px solid #00FF41; }
@@ -76,6 +80,8 @@ def get_dark_theme():
         QWidget { background-color: #1e1e1e; color: #d4d4d4; font-family: 'Segoe UI', Arial, sans-serif; }
         
         QSplitter::handle { background-color: #333333; }
+        QSplitter::handle:hover { background-color: #007acc; }
+        QSplitter::handle:pressed { background-color: #ffffff; }
         
         QMenuBar { background-color: #252526; color: #cccccc; }
         QMenu { background-color: #252526; color: #cccccc; border: 1px solid #454545; }
@@ -132,6 +138,8 @@ def get_dracula_theme():
         QWidget { background-color: #282a36; color: #f8f8f2; font-family: 'Segoe UI', 'Consolas', sans-serif; }
         
         QSplitter::handle { background-color: #44475a; }
+        QSplitter::handle:hover { background-color: #bd93f9; }
+        QSplitter::handle:pressed { background-color: #50fa7b; }
         
         QMenuBar { background-color: #21222c; color: #f8f8f2; border-bottom: 1px solid #44475a; }
         QMenu { background-color: #21222c; color: #f8f8f2; border: 1px solid #6272a4; }

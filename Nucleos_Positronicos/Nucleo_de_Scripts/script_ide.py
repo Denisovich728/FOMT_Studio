@@ -84,9 +84,19 @@ class CodeEditor(QPlainTextEdit):
         self.parse_timer.setSingleShot(True)
         self.parse_timer.timeout.connect(self.run_background_check)
         self.textChanged.connect(lambda: self.parse_timer.start(800))
+
+    def closeEvent(self, event):
+        if hasattr(self, 'parse_timer'):
+            try:
+                self.parse_timer.stop()
+            except Exception:
+                pass
+        super().closeEvent(event)
         
     def run_background_check(self):
         """Analiza el código en segundo plano para detectar errores y patrones."""
+        if not self.isVisible():
+            return
         code = self.toPlainText()
         self.error_lines.clear()
         
@@ -99,10 +109,13 @@ class CodeEditor(QPlainTextEdit):
         except ParseError as e:
             # Los errores de línea en el parser son 1-based
             self.error_lines[e.line - 1] = str(e)
-        except Exception as e:
+        except Exception:
             pass
             
-        self.viewport().update()
+        try:
+            self.viewport().update()
+        except Exception:
+            pass
 
     def setCompleter(self, completer):
         if self._completer:
@@ -202,7 +215,7 @@ class CodeEditor(QPlainTextEdit):
         pattern = re.compile(rf'const\s+MESSAGE_(?:0x)?0*{search_id}\b\s*=\s*"(.*?)(?<!\\)"', re.IGNORECASE | re.DOTALL)
         match = pattern.search(text)
         if match:
-            return match.group(1).replace("\\n", "<br>").replace("\\BRK", "<hr>").replace("\\WAIT_CLICK", " 🖱️")
+            return match.group(1).replace("\\n", "<br>").replace("\\BRK", "<hr>").replace("\\WAIT_CLICK", " [CLICK]")
         return None
 
     def insertCompletion(self, completion):
@@ -240,7 +253,7 @@ class CodeEditor(QPlainTextEdit):
                 # Retrocedemos la longitud de args_hint + 1 (el paréntesis de cierre)
                 tc.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.MoveAnchor, 1)
                 tc.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor, len(args_hint))
-        elif item_type in ("item", "food", "tool", "npc", "candidate", "anim", "npc_routine"):
+        elif item_type in ("item", "food", "tool", "npc", "candidate", "anim", "npc_routine", "map", "season", "weather", "facing"):
             # Insertar con comillas automáticamente si no las tiene ya
             current_text = tc.block().text()
             cursor_pos = tc.positionInBlock()
@@ -356,7 +369,8 @@ class CodeEditor(QPlainTextEdit):
         completionPrefix = self.textUnderCursor()
 
         # Si no hay prefijo o se presionó una tecla de borrado, ocultar y salir
-        if not isManualTrigger and (not completionPrefix or event.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete)):
+        isCaseTrigger = bool(re.search(r'^\s*case\s*"?\s*$', line_text))
+        if not isManualTrigger and not isCaseTrigger and (not completionPrefix or event.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete)):
             self._completer.popup().hide()
             return
 
@@ -400,6 +414,57 @@ class CodeEditor(QPlainTextEdit):
             
         return suggestions
 
+    def get_enclosing_switch_expr(self) -> str:
+        """Busca hacia atrás desde la línea actual la expresión del switch que contiene este bloque."""
+        cursor = self.textCursor()
+        block = cursor.block()
+        brace_depth = 0
+        
+        current_text = cursor.block().text()[:cursor.positionInBlock()]
+        for ch in reversed(current_text):
+            if ch == '}':
+                brace_depth += 1
+            elif ch == '{':
+                brace_depth -= 1
+
+        prev_block = block.previous()
+        while prev_block.isValid():
+            text = prev_block.text()
+            for ch in reversed(text):
+                if ch == '}':
+                    brace_depth += 1
+                elif ch == '{':
+                    if brace_depth > 0:
+                        brace_depth -= 1
+                    else:
+                        sw = self._extract_switch_expr(text)
+                        if sw:
+                            return sw
+                        p2 = prev_block.previous()
+                        if p2.isValid():
+                            sw2 = self._extract_switch_expr(p2.text())
+                            if sw2:
+                                return sw2
+                        return ""
+            prev_block = prev_block.previous()
+        return ""
+
+    @staticmethod
+    def _extract_switch_expr(text: str) -> str:
+        m = re.search(r'switch\s*\(', text)
+        if not m:
+            return ""
+        start = m.end()
+        paren_depth = 1
+        for i in range(start, len(text)):
+            if text[i] == '(':
+                paren_depth += 1
+            elif text[i] == ')':
+                paren_depth -= 1
+                if paren_depth == 0:
+                    return text[start:i].strip()
+        return text[start:].strip()
+
     def update_completer_context(self, line_text):
         """Ajusta el filtro del completer según lo que se esté escribiendo."""
         if not self._completer: return
@@ -409,9 +474,24 @@ class CodeEditor(QPlainTextEdit):
 
         # Reset filter
         filter_type = None
-        
+
+        # Detección de case dentro de un switch
+        if re.search(r'^\s*case\s*"?\s*[^:]*$', line_text):
+            sw_expr = self.get_enclosing_switch_expr()
+            if "GetEntityLocation" in sw_expr or "Get_Entity_Location" in sw_expr:
+                filter_type = "map"
+            elif "Season" in sw_expr or "season" in sw_expr:
+                filter_type = "season"
+            elif "Weather" in sw_expr or "weather" in sw_expr:
+                filter_type = "weather"
+            elif "Facing" in sw_expr or "facing" in sw_expr:
+                filter_type = "facing"
+            elif any(w in sw_expr for w in ("Item", "Food", "Tool", "HasItem")):
+                filter_type = "item|food|tool"
+            else:
+                filter_type = "map|item|food|tool"
         # Give_Item( ...
-        if re.search(r'Give_Item\(\s*[^,)]*$', line_text):
+        elif re.search(r'Give_Item\(\s*[^,)]*$', line_text):
             filter_type = "item"
         # Funciones de entidades y personajes que toman un NPC ID como primer argumento
         elif re.search(r'(Set_Name_Window|Give_Friendship_Points|Free_Event_Entity|SetEntityPosition|GetEntityX|GetEntityY|SetEntityFacing|GetEntityFacing|Despawn_Entity|Is_NPC_Birthday|Chek_Friendship_Points|Has_NPC_Talked_Today|Has_NPC_Talked_Today_2|Kill_NPC|Execute_Movement|Hide_Entity|GetEntityLocation|Wait_For_Animation|Has_Met_NPC|Has_Spoken_To_NPC_Today|Routine_State_Override|Set_Vector_X|Set_Vector_Y|Show_Emote|Force_Entity_Move_To|Player_Hold_Entity|Initialize_Animal_Stats|Force_Entity_Seat_State|Warp_Entity_To_Map)\(\s*[^,)]*$', line_text):
@@ -617,7 +697,7 @@ class ScriptIDEWidget(QWidget):
         self.btn_compile.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold; padding: 5px 15px;")
         self.btn_compile.clicked.connect(self.on_compile_clicked)
 
-        self.btn_ai = QPushButton("🤖 Copilot Analyze")
+        self.btn_ai = QPushButton(tr("copilot_analyze", lang))
         self.btn_ai.setStyleSheet("background-color: #8e44ad; color: white; font-weight: bold; padding: 5px 15px;")
         self.btn_ai.clicked.connect(self.on_ai_analyze)
         
@@ -638,13 +718,13 @@ class ScriptIDEWidget(QWidget):
         self.search_input.setPlaceholderText("Buscar texto en todos los eventos...")
         self.search_input.returnPressed.connect(self.on_global_search)
         
-        self.btn_search = QPushButton("🔍")
-        self.btn_search.setFixedWidth(40)
+        self.btn_search = QPushButton(tr("btn_search", lang))
+        self.btn_search.setFixedWidth(60)
         self.btn_search.clicked.connect(self.on_global_search)
         
         self.check_only_messages = QCheckBox("Solo en mensajes")
-        self.btn_clear_search = QPushButton("❌")
-        self.btn_clear_search.setFixedWidth(40)
+        self.btn_clear_search = QPushButton(tr("btn_clear", lang))
+        self.btn_clear_search.setFixedWidth(60)
         self.btn_clear_search.clicked.connect(self.on_clear_search)
         self.btn_clear_search.setEnabled(False)
         
@@ -750,6 +830,7 @@ class ScriptIDEWidget(QWidget):
         
         if os.path.exists(lib_path):
             import csv
+            from Banco_de_Datos.opcode_docs import get_opcode_full_tooltip
             try:
                 with open(lib_path, "r", encoding="utf-8") as f:
                     reader = csv.reader(f)
@@ -759,9 +840,9 @@ class ScriptIDEWidget(QWidget):
                         if name:
                             q_item = QStandardItem(name)
                             args = row[4] if len(row) > 4 else ""
-                            # Formatear argumentos para que se vean bien
-                            args_display = f"({args})" if args else "()"
-                            q_item.setToolTip(f"{kind.upper()} | ID: {h_id}\nEstructura: {name}{args_display}")
+                            # Formatear tooltip localizado con documentación técnica
+                            tip = get_opcode_full_tooltip(name, kind, h_id, args, lang=self.lang)
+                            q_item.setToolTip(tip)
                             # Marcar como comando y guardar argumentos
                             q_item.setData("cmd", Qt.ItemDataRole.UserRole) 
                             q_item.setData(args, Qt.ItemDataRole.UserRole + 1)
@@ -877,6 +958,28 @@ class ScriptIDEWidget(QWidget):
                 q_item.setData(name, Qt.ItemDataRole.EditRole)
                 q_item.setToolTip(f"Animation ID: 0x{val:03X} ({val})")
                 self.completer_model.appendRow(q_item)
+
+        # 9. Temporadas, Clima y Orientaciones (para switches y condiciones)
+        for s in ("Spring", "Summer", "Autumn", "Winter"):
+            q_item = QStandardItem(s)
+            q_item.setData("season", Qt.ItemDataRole.UserRole)
+            q_item.setData(s, Qt.ItemDataRole.EditRole)
+            q_item.setToolTip(f"Season: {s}")
+            self.completer_model.appendRow(q_item)
+
+        for w in ("Sunny", "Rainy", "Snowy", "Typhoon", "Blizzard"):
+            q_item = QStandardItem(w)
+            q_item.setData("weather", Qt.ItemDataRole.UserRole)
+            q_item.setData(w, Qt.ItemDataRole.EditRole)
+            q_item.setToolTip(f"Weather: {w}")
+            self.completer_model.appendRow(q_item)
+
+        for f in ("Up", "Down", "Left", "Right"):
+            q_item = QStandardItem(f)
+            q_item.setData("facing", Qt.ItemDataRole.UserRole)
+            q_item.setData(f, Qt.ItemDataRole.EditRole)
+            q_item.setToolTip(f"Facing: {f}")
+            self.completer_model.appendRow(q_item)
         
         self.proxy_model = QSortFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.completer_model)
@@ -890,18 +993,37 @@ class ScriptIDEWidget(QWidget):
         self.editor.setCompleter(completer)
         
         self.editor.setPlainText("// Load a script to start editing...")
+
+    def closeEvent(self, event):
+        if hasattr(self, 'editor') and hasattr(self.editor, 'parse_timer'):
+            try:
+                self.editor.parse_timer.stop()
+            except Exception:
+                pass
+        super().closeEvent(event)
         
     def load_event(self, event_id):
         self.current_event_id = event_id
-        code, stmts = self.project.event_parser.decompile_to_ui(event_id)
-        self.editor.setPlainText(code)
+        if not getattr(self.project, 'event_parser', None):
+            self.project.step_2_scan_events()
+        try:
+            code, stmts = self.project.event_parser.decompile_to_ui(event_id)
+            self.editor.setPlainText(code)
+        except Exception as e:
+            self.editor.setPlainText(f"// [Error descompilando evento {event_id}]: {e}")
 
     def load_rom_script(self, offset):
-        """Carga y descompila un script desde un offset arbitrario (usado por Mapas)."""
+        """Carga y descompila un script desde un offset arbitrario (usado por Mapas y NPCs)."""
+        clean_off = offset & 0x01FFFFFF
         self.current_event_id = None
-        self.last_offset = offset
-        code, stmts = self.project.event_parser.decompile_from_offset(offset, hint="MapScript")
-        self.editor.setPlainText(code)
+        self.last_offset = clean_off
+        if not getattr(self.project, 'event_parser', None):
+            self.project.step_2_scan_events()
+        try:
+            code, stmts = self.project.event_parser.decompile_from_offset(clean_off, hint="RomScript")
+            self.editor.setPlainText(code)
+        except Exception as e:
+            self.editor.setPlainText(f"// [Error descompilando offset 0x{clean_off:06X}]: {e}")
         
     def on_compile_clicked(self):
         if self.mode == "bulk_items":

@@ -62,6 +62,48 @@ NPC_NAMES = {
     31: "Gourmet / Diosa (Eventos Especiales)",
 }
 
+LOCALIZED_NPC_NAMES = {
+    0: {"es": "Lillia (Granja Avícola)", "en": "Lillia (Poultry Farm)", "de": "Lillia (Geflügelfarm)", "jp": "リリア（養鶏場）", "ru": "Лилия (Птицеферма)", "zh": "莉莉娅 (养鸡场)", "pt": "Lillia (Granja Avícola)", "hi": "लिलिया (पोल्ट्री फार्म)"},
+    1: {"es": "Rick (Granja Avícola)", "en": "Rick (Poultry Farm)", "de": "Rick (Geflügelfarm)", "jp": "リック（養鶏場）", "ru": "Рик (Птицеферма)", "zh": "里克 (养鸡场)", "pt": "Rick (Granja Avícola)", "hi": "रिक (पोल्ट्री फार्म)"},
+    2: {"es": "Popuri (Granja Avícola)", "en": "Popuri (Poultry Farm)", "de": "Popuri (Geflügelfarm)", "jp": "ポプリ（養鶏場）", "ru": "Попури (Птицеферма)", "zh": "珀布莉 (养鸡场)", "pt": "Popuri (Granja Avícola)", "hi": "पोपुरी (पोल्ट्री फार्म)"},
+    3: {"es": "Harris (Policía)", "en": "Harris (Police Officer)", "de": "Harris (Polizist)", "jp": "ハリス（警官）", "ru": "Харрис (Полицейский)", "zh": "哈里斯 (警察)", "pt": "Harris (Policial)", "hi": "हैरिस (पुलिस)"},
+    4: {"es": "Barley (Granja Yodel)", "en": "Barley (Yodel Ranch)", "de": "Barley (Yodel-Farm)", "jp": "ムギ（ヨーデル牧場）", "ru": "Барли (Ферма Йодель)", "zh": "穆奇 (约德尔牧场)", "pt": "Barley (Fazenda Yodel)", "hi": "बार्ली (योदेल खेत)"},
+    5: {"es": "Saibara (Herrero)", "en": "Saibara (Blacksmith)", "de": "Saibara (Schmied)", "jp": "サイバラ（鍛冶屋）", "ru": "Сайбара (Кузнец)", "zh": "赛巴拉 (铁匠)", "pt": "Saibara (Ferreiro)", "hi": "सैबारा (लोहार)"},
+    6: {"es": "Gray (Aprendiz de Herrero)", "en": "Gray (Blacksmith Apprentice)", "de": "Gray (Schmiedelehrling)", "jp": "グレイ（鍛冶屋見習い）", "ru": "Грей (Ученик кузнеца)", "zh": "格雷 (铁匠学徒)", "pt": "Gray (Aprendiz de Ferreiro)", "hi": "ग्रे (लोहार प्रशिक्षु)"},
+    7: {"es": "Duke (Bodega Aja)", "en": "Duke (Aja Winery)", "de": "Duke (Aja-Weingut)", "jp": "デューク（アジャワイナリー）", "ru": "Дюк (Винодельня Аджа)", "zh": "狄克 (阿芝果园)", "pt": "Duke (Adega Aja)", "hi": "ड्यूक (अजा वाइनरी)"},
+    8: {"es": "Manna (Bodega Aja)", "en": "Manna (Aja Winery)", "de": "Manna (Aja-Weingut)", "jp": "マナ（アジャワイナリー）", "ru": "Манна (Винодельня Аджа)", "zh": "玛娜 (阿芝果园)", "pt": "Manna (Adega Aja)", "hi": "मन्ना (अजा वाइनरी)"},
+    9: {"es": "Basil (Botánico)", "en": "Basil (Botanist)", "de": "Basil (Botaniker)", "jp": "バジル（植物学者）", "ru": "Бэзил (Ботаник)", "zh": "巴基尔 (植物学者)", "pt": "Basil (Botânico)", "hi": "बेसिल (वनस्पतिशास्त्री)"},
+    10: {"es": "Anna (Esposa de Basil)", "en": "Anna (Basil's Wife)", "de": "Anna (Basils Frau)", "jp": "アンナ（バジルの妻）", "ru": "Анна (Жена Бэзила)", "zh": "安娜 (巴基尔妻子)", "pt": "Anna (Esposa de Basil)", "hi": "अन्ना (बेसिल की पत्नी)"},
+    11: {"es": "Mary (Biblioteca)", "en": "Mary (Library)", "de": "Mary (Bibliothek)", "jp": "マリー（図書館）", "ru": "Мэри (Библиотека)", "zh": "玛丽 (图书馆)", "pt": "Mary (Biblioteca)", "hi": "मैरी (पुस्तकालय)"},
+    12: {"es": "Thomas (Alcalde)", "en": "Thomas (Mayor)", "de": "Thomas (Bürgermeister)", "jp": "トーマス（町長）", "ru": "Томас (Мэр)", "zh": "托马斯 (镇长)", "pt": "Thomas (Prefeito)", "hi": "थॉमस (मेयर)"},
+    13: {"es": "Kano (Fotógrafo)", "en": "Kano (Photographer)", "de": "Kano (Fotograf)", "jp": "カノー（写真家）", "ru": "Кано (Фотограф)", "zh": "卡诺 (摄影师)", "pt": "Kano (Fotógrafo)", "hi": "कानो (फोटोग्राफर)"},
+    14: {"es": "Ellen (Abuela)", "en": "Ellen (Grandmother)", "de": "Ellen (Großmutter)", "jp": "エレン（おばあさん）", "ru": "Эллен (Бабушка)", "zh": "艾莲 (老奶奶)", "pt": "Ellen (Avó)", "hi": "एलेन (दादी)"},
+    15: {"es": "Stu (Nieto de Ellen)", "en": "Stu (Ellen's Grandson)", "de": "Stu (Ellens Enkel)", "jp": "ユウ（エレンの孫）", "ru": "Стю (Внук Эллен)", "zh": "优 (艾莲孙子)", "pt": "Stu (Neto de Ellen)", "hi": "स्टू (एलेन का पोता)"},
+    16: {"es": "Jeff (Supermercado)", "en": "Jeff (Supermarket)", "de": "Jeff (Supermarkt)", "jp": "ジェフ（スーパーマーケット）", "ru": "Джефф (Супермаркет)", "zh": "杰夫 (杂货店)", "pt": "Jeff (Supermercado)", "hi": "जेफ (सुपरमार्केट)"},
+    17: {"es": "Sasha (Supermercado)", "en": "Sasha (Supermarket)", "de": "Sasha (Supermarkt)", "jp": "サーシャ（スーパーマーケット）", "ru": "Саша (Супермаркет)", "zh": "莎夏 (杂货店)", "pt": "Sasha (Supermercado)", "hi": "साशा (सुपरमार्केट)"},
+    18: {"es": "Karen (Supermercado)", "en": "Karen (Supermarket)", "de": "Karen (Supermarkt)", "jp": "カレン（スーパーマーケット）", "ru": "Карен (Супермаркет)", "zh": "卡莲 (杂货店)", "pt": "Karen (Supermercado)", "hi": "करेन (सुपरमार्केट)"},
+    19: {"es": "Doctor (Clínica)", "en": "Doctor (Clinic)", "de": "Doctor (Klinik)", "jp": "ドクター（病院）", "ru": "Доктор (Клиника)", "zh": "多特 (医院医生)", "pt": "Doutor (Clínica)", "hi": "डॉक्टर (क्लिनिक)"},
+    20: {"es": "Elli (Enfermera de la Clínica)", "en": "Elli (Clinic Nurse)", "de": "Elli (Klinikschwester)", "jp": "エリィ（看護師）", "ru": "Элли (Медсестра)", "zh": "艾利 (护士)", "pt": "Elli (Enfermeira)", "hi": "एली (नर्स)"},
+    21: {"es": "Carter (Pastor de la Iglesia)", "en": "Carter (Church Pastor)", "de": "Carter (Pfarrer)", "jp": "カーター（神父）", "ru": "Картер (Священник)", "zh": "卡特 (教堂神父)", "pt": "Carter (Pastor da Igreja)", "hi": "कार्टर (पादरी)"},
+    22: {"es": "Cliff (Posada / Bodega)", "en": "Cliff (Inn / Winery)", "de": "Cliff (Gasthof / Weingut)", "jp": "クリフ（宿屋 / ワイナリー）", "ru": "Клифф (Гостиница / Винодельня)", "zh": "克里夫 (旅馆/果园)", "pt": "Cliff (Pousada / Adega)", "hi": "क्लिफ (सराय / वाइनरी)"},
+    23: {"es": "Doug (Posadero)", "en": "Doug (Innkeeper)", "de": "Doug (Gastwirt)", "jp": "ダット（宿屋店主）", "ru": "Даг (Трактирщик)", "zh": "达特 (旅馆老板)", "pt": "Doug (Hospedeiro)", "hi": "डग (सरायपाल)"},
+    24: {"es": "Ann (Posada de Doug)", "en": "Ann (Doug's Inn)", "de": "Ann (Dougs Gasthof)", "jp": "ラン（宿屋の娘）", "ru": "Энн (Гостиница Дага)", "zh": "兰 (宿屋女孩)", "pt": "Ann (Pousada de Doug)", "hi": "ऐन (डग की सराय)"},
+    25: {"es": "Kai (Chiringuito de Playa)", "en": "Kai (Seaside Shack)", "de": "Kai (Strandhütte)", "jp": "カイ（海の家）", "ru": "Кай (Пляжная хижина)", "zh": "凯伊 (海边之家)", "pt": "Kai (Quiosque da Praia)", "hi": "काई (समुद्रतट झोपड़ी)"},
+    26: {"es": "Gotz (Carpintero)", "en": "Gotz (Carpenter)", "de": "Gotz (Zimmermann)", "jp": "ゴッツ（木こり）", "ru": "Готц (Плотник)", "zh": "哥茨 (木匠)", "pt": "Gotz (Carpinteiro)", "hi": "गोट्ज़ (बढ़ई)"},
+    27: {"es": "Zack (Comprador de la Playa)", "en": "Zack (Beach Shipper)", "de": "Zack (Hafenmeister)", "jp": "ザック（出荷業者）", "ru": "Зак (Скупщик)", "zh": "扎克 (出货员)", "pt": "Zack (Comprador da Praia)", "hi": "जैक (समुद्रतट शिपर)"},
+    28: {"es": "Won (Vendedor Ambulante)", "en": "Won (Traveling Merchant)", "de": "Won (Händler)", "jp": "ホアン（行商人）", "ru": "Вон (Торговец)", "zh": "霍安 (旅行商人)", "pt": "Won (Vendedor Ambulante)", "hi": "वोन (व्यापारी)"},
+    29: {"es": "Van (Comerciante Viajero)", "en": "Van (Traveling Merchant)", "de": "Van (Reisender Händler)", "jp": "バァン（行商人）", "ru": "Ван (Торговец)", "zh": "班 (旅行商人)", "pt": "Van (Comerciante Viajante)", "hi": "वैन (व्यापारी)"},
+    30: {"es": "Lou (Cocinera Viajera)", "en": "Lou (Traveling Cook)", "de": "Lou (Reisende Köchin)", "jp": "ルウ（旅の料理人）", "ru": "Лу (Странствующий повар)", "zh": "露 (旅行料理人)", "pt": "Lou (Cozinheira Viajante)", "hi": "लू (रसोइया)"},
+    31: {"es": "Gourmet / Diosa (Eventos Especiales)", "en": "Gourmet / Goddess (Special Events)", "de": "Gourmet / Göttin (Spezial-Events)", "jp": "グルメマン / 女神（特別イベント）", "ru": "Гурман / Богиня (Особые события)", "zh": "美食家 / 女神 (特殊事件)", "pt": "Gourmet / Deusa (Eventos Especiais)", "hi": "पेटू / देवी (विशेष कार्यक्रम)"}
+}
+
+def get_localized_npc_name(npc_id: int, lang: str = "es") -> str:
+    lk = (lang or "es").lower()
+    entry = LOCALIZED_NPC_NAMES.get(npc_id)
+    if entry:
+        return entry.get(lk, entry.get("en", NPC_NAMES.get(npc_id, f"NPC #{npc_id}")))
+    return NPC_NAMES.get(npc_id, f"NPC #{npc_id}")
+
 
 class RoutineWaypoint:
     """Hito o acción individual en la línea temporal de un horario."""
@@ -184,6 +226,9 @@ class RoutineWaypoint:
                     else:
                         new_d[k] = v
                 setattr(self, attr, new_d)
+
+    def get_map_name(self, lang: str = "es") -> str:
+        return get_map_display_name(self.map_id, include_season=True, lang=lang)
 
     @property
     def map_name(self) -> str:

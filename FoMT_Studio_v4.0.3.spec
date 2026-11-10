@@ -34,7 +34,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='FoMT_Studio_v4.0.0',
+    name='FoMT_Studio_v4.0.3',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -45,7 +45,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['Icono_Fomt_Studio.ico'],
+    icon=['fomtv2.ico'],
     version='version_info.txt',
 )
 coll = COLLECT(
@@ -55,5 +55,6 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='FoMT_Studio_v4.0.0',
+    name='FoMT_Studio_v4.0.3',
 )
+

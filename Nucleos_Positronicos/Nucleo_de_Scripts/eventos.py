@@ -72,6 +72,9 @@ class FoMTEventParser:
         if script_off is None or script_off == 0:
             return (f"// [ALERTA] Offset inválido o NULL.\n// No hay script para mostrar.", [])
 
+        if script_off >= 0x08000000:
+            script_off &= 0x01FFFFFF
+
         # Comprobamos la cabecera
         header = self.project.read_rom(script_off, 4)
         is_riff = (header == b'RIFF')

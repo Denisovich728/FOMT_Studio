@@ -1,5 +1,5 @@
 # ============================================================
-# FOMT Studio - Suite de Ingenieria Inversa (v4.0.0 "The Greatest Show"-Final Release)
+# FOMT Studio - Suite de Ingenieria Inversa (v4.0.1 "The Greatest Show"-Update Release)
 # Desarrollado por: Denisovich728
 # ============================================================
 import os
@@ -120,7 +120,7 @@ class FoMTStudioApp(QMainWindow):
         super().__init__()
         self.floating_windows = []
         self.project = None
-        self.setWindowTitle('FoMT Studio v4.0.0 "The Greatest Show"-Final Release')
+        self.setWindowTitle('FoMT Studio v4.0.1 "The Greatest Show"-Update Release')
         self.setMinimumSize(600, 400) # Reduced to allow small laptop screens
         self.showMaximized()
         
@@ -308,97 +308,16 @@ class FoMTStudioApp(QMainWindow):
         main_layout = QVBoxLayout(central_widget) # Cambiar a Vertical para poner la barra arriba
         
         # --- BARRA DE HERRAMIENTAS PRINCIPAL (TOOLBAR) ---
-        from PyQt6.QtWidgets import QToolBar, QMenu, QToolButton
+        from PyQt6.QtWidgets import QToolBar
         self.toolbar = QToolBar("Barra de Herramientas Principal")
         self.toolbar.setMovable(False)
         self.addToolBar(self.toolbar)
-        
-        # 1. Explorador lateral
-        self.action_toggle_explorer = QAction(tr("tb_explorer", self.current_lang), self)
-        self.action_toggle_explorer.setCheckable(True)
-        self.action_toggle_explorer.setChecked(True)
-        self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
-        self.toolbar.addAction(self.action_toggle_explorer)
-        
-        self.toolbar.addSeparator()
-
-        # 2. Proyecto y ROM
-        act_save = QAction(tr("tb_save_rom", self.current_lang), self)
-        act_save.triggered.connect(self.action_save_project)
-        self.toolbar.addAction(act_save)
-
-        act_compile = QAction(tr("tb_compile_rom", self.current_lang), self)
-        act_compile.triggered.connect(self.action_compile_rom)
-        self.toolbar.addAction(act_compile)
-
-        self.toolbar.addSeparator()
-
-        # 3. Editor Principal de Espacio de Trabajo y Base de Datos de NPCs
-        act_code = QAction(tr("tb_event_editor", self.current_lang), self)
-        act_code.setToolTip(tr("tb_event_editor_tip", self.current_lang))
-        act_code.triggered.connect(self._open_default_event_editor)
-        self.toolbar.addAction(act_code)
-
-        act_npcs = QAction(tr("tb_npc_db", self.current_lang), self)
-        act_npcs.setToolTip(tr("tb_npc_db_tip", self.current_lang))
-        act_npcs.triggered.connect(lambda: self.open_or_switch_tab("npcs"))
-        self.toolbar.addAction(act_npcs)
-
-        self.toolbar.addSeparator()
-
-        # 4. Cuadro desplegable de Más Herramientas (Centralizado)
-        btn_more = QToolButton(self)
-        btn_more.setText(tr("tb_more_tools", self.current_lang))
-        btn_more.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        menu_more = QMenu(self)
-
-        # --- Editores de Interfaz ---
-        m_ui = menu_more.addMenu(tr("cat_editors_ui", self.current_lang))
-        m_ui.addAction(tr("menu_ui_texts", self.current_lang), self.open_menu_editor)
-        m_ui.addAction(tr("menu_intro_texts", self.current_lang), self.open_intro_editor)
-
-        # --- Gráficos & Audio ---
-        m_ga = menu_more.addMenu(tr("cat_graphics_audio", self.current_lang))
-        m_ga.addAction(tr("tab_metasprites", self.current_lang), self._open_visor_metasprites)
-        m_ga.addAction(tr("tab_sprites", self.current_lang), lambda: self.open_or_switch_tab("sprites"))
-        m_ga.addAction(tr("menu_anim_viewer", self.current_lang), self._open_visor_animaciones)
-        m_ga.addAction(tr("menu_anim_extractor", self.current_lang), self._open_anim_extractor)
-        m_ga.addAction(tr("tab_tile_editor", self.current_lang), self._open_tile_editor_extreme)
-        m_ga.addAction(tr("tab_audio_sappy", self.current_lang), lambda: self.open_or_switch_tab("audio"))
-
-        # --- Datos y Mapas ---
-        m_dm = menu_more.addMenu(tr("cat_data_maps", self.current_lang))
-        m_dm.addAction(tr("tab_map_editor", self.current_lang), self._open_map_viewer)
-        m_dm.addAction(tr("tab_npc_visual", self.current_lang), self._open_visor_npc)
-        m_dm.addAction(tr("menu_npc_routines", self.current_lang), self._open_editor_rutinas_npc)
-
-        # --- Base de Datos Interna (RAW) ---
-        m_db = menu_more.addMenu(tr("cat_internal_db", self.current_lang))
-        m_db.addAction(tr("tab_npc_raw", self.current_lang), lambda: self.open_or_switch_tab("npcs"))
-        m_db.addAction(tr("tab_item_raw", self.current_lang), lambda: self.open_or_switch_tab("items"))
-        m_db.addAction(tr("tab_menu_editor", self.current_lang), self.open_menu_editor)
-        m_db.addAction(tr("tab_pointer_editor", self.current_lang), lambda: self.open_or_switch_tab("pointers"))
-
-        # --- Volcado Masivo ---
-        m_bulk = menu_more.addMenu(tr("menu_bulk_items", self.current_lang))
-        m_bulk.addAction(tr("bulk_tools", self.current_lang), lambda: self.open_bulk_items(tr("bulk_tools", self.current_lang), "Herramienta"))
-        m_bulk.addAction(tr("bulk_foods", self.current_lang), lambda: self.open_bulk_items(tr("bulk_foods", self.current_lang), "Consumible/Comida"))
-        m_bulk.addAction(tr("bulk_misc", self.current_lang), lambda: self.open_bulk_items(tr("bulk_misc", self.current_lang), "Artículo"))
-
-        menu_more.addSeparator()
-
-        # --- Parches y Modificaciones del Juego ---
-        m_patch = menu_more.addMenu(tr("menu_patches", self.current_lang))
-        m_patch.addAction(tr("patch_n", self.current_lang), self._apply_n_patch)
-        m_patch.addAction(tr("patch_z_sort", self.current_lang), self._apply_z_sorting_patch)
-        m_patch.addAction(tr("patch_stairs", self.current_lang), self._apply_stairs_patch)
-        m_patch.addAction(tr("patch_teleport", self.current_lang), self._apply_teleport_stone_patch)
-
-        btn_more.setMenu(menu_more)
-        self.toolbar.addWidget(btn_more)
+        self.action_toggle_explorer = None
+        self._setup_toolbar()
         
         self.main_splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.main_splitter.setHandleWidth(4)
+        self.main_splitter.setHandleWidth(6)
+        self.main_splitter.setChildrenCollapsible(True)
         self.main_splitter.setOpaqueResize(True)
         main_layout.addWidget(self.main_splitter)
         
@@ -448,6 +367,9 @@ class FoMTStudioApp(QMainWindow):
         
         left_widget = QWidget()
         left_widget.setLayout(left_panel)
+        left_widget.setMinimumWidth(0)
+        self.tree_view.setMinimumWidth(0)
+        self.search_bar.setMinimumWidth(0)
         self.main_splitter.addWidget(left_widget)
         
         self.tabs = QTabWidget()
@@ -540,6 +462,101 @@ class FoMTStudioApp(QMainWindow):
                 # El widget ya fue eliminado por force_hide_startup_splash
                 pass
             
+    def _setup_toolbar(self):
+        self.toolbar.clear()
+        from PyQt6.QtWidgets import QMenu, QToolButton
+        from PyQt6.QtGui import QAction
+        lang = self.current_lang
+
+        # 1. Explorador lateral
+        is_checked = True
+        if hasattr(self, "action_toggle_explorer") and self.action_toggle_explorer is not None:
+            is_checked = self.action_toggle_explorer.isChecked()
+        elif hasattr(self, "main_splitter") and self.main_splitter.count() > 0:
+            is_checked = self.main_splitter.widget(0).isVisible()
+        self.action_toggle_explorer = QAction(tr("tb_explorer", lang), self)
+        self.action_toggle_explorer.setCheckable(True)
+        self.action_toggle_explorer.setChecked(is_checked)
+        self.action_toggle_explorer.toggled.connect(self._toggle_explorer)
+        self.toolbar.addAction(self.action_toggle_explorer)
+
+        self.toolbar.addSeparator()
+
+        # 2. Proyecto y ROM
+        act_save = QAction(tr("tb_save_rom", lang), self)
+        act_save.triggered.connect(self.action_save_project)
+        self.toolbar.addAction(act_save)
+
+        act_compile = QAction(tr("tb_compile_rom", lang), self)
+        act_compile.triggered.connect(self.action_compile_rom)
+        self.toolbar.addAction(act_compile)
+
+        self.toolbar.addSeparator()
+
+        # 3. Editor Principal de Espacio de Trabajo y Base de Datos de NPCs
+        act_code = QAction(tr("tb_event_editor", lang), self)
+        act_code.setToolTip(tr("tb_event_editor_tip", lang))
+        act_code.triggered.connect(self._open_default_event_editor)
+        self.toolbar.addAction(act_code)
+
+        act_npcs = QAction(tr("tb_npc_db", lang), self)
+        act_npcs.setToolTip(tr("tb_npc_db_tip", lang))
+        act_npcs.triggered.connect(lambda: self.open_or_switch_tab("npcs"))
+        self.toolbar.addAction(act_npcs)
+
+        self.toolbar.addSeparator()
+
+        # 4. Cuadro desplegable de Más Herramientas (Centralizado)
+        btn_more = QToolButton(self)
+        btn_more.setText(tr("tb_more_tools", lang))
+        btn_more.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        menu_more = QMenu(self)
+
+        # --- Editores de Interfaz ---
+        m_ui = menu_more.addMenu(tr("cat_editors_ui", lang))
+        m_ui.addAction(tr("menu_ui_texts", lang), self.open_menu_editor)
+        m_ui.addAction(tr("menu_intro_texts", lang), self.open_intro_editor)
+
+        # --- Gráficos & Audio ---
+        m_ga = menu_more.addMenu(tr("cat_graphics_audio", lang))
+        m_ga.addAction(tr("tab_metasprites", lang), self._open_visor_metasprites)
+        m_ga.addAction(tr("tab_sprites", lang), lambda: self.open_or_switch_tab("sprites"))
+        m_ga.addAction(tr("menu_anim_viewer", lang), self._open_visor_animaciones)
+        m_ga.addAction(tr("menu_anim_extractor", lang), self._open_anim_extractor)
+        m_ga.addAction(tr("tab_tile_editor", lang), self._open_tile_editor_extreme)
+        m_ga.addAction(tr("tab_audio_sappy", lang), lambda: self.open_or_switch_tab("audio"))
+
+        # --- Datos y Mapas ---
+        m_dm = menu_more.addMenu(tr("cat_data_maps", lang))
+        m_dm.addAction(tr("tab_map_editor", lang), self._open_map_viewer)
+        m_dm.addAction(tr("tab_npc_visual", lang), self._open_visor_npc)
+        m_dm.addAction(tr("menu_npc_routines", lang), self._open_editor_rutinas_npc)
+
+        # --- Base de Datos Interna (RAW) ---
+        m_db = menu_more.addMenu(tr("cat_internal_db", lang))
+        m_db.addAction(tr("tab_npc_raw", lang), lambda: self.open_or_switch_tab("npcs"))
+        m_db.addAction(tr("tab_item_raw", lang), lambda: self.open_or_switch_tab("items"))
+        m_db.addAction(tr("tab_menu_editor", lang), self.open_menu_editor)
+        m_db.addAction(tr("tab_pointer_editor", lang), lambda: self.open_or_switch_tab("pointers"))
+
+        # --- Volcado Masivo ---
+        m_bulk = menu_more.addMenu(tr("menu_bulk_items", lang))
+        m_bulk.addAction(tr("bulk_tools", lang), lambda: self.open_bulk_items(tr("bulk_tools", lang), "Herramienta"))
+        m_bulk.addAction(tr("bulk_foods", lang), lambda: self.open_bulk_items(tr("bulk_foods", lang), "Consumible/Comida"))
+        m_bulk.addAction(tr("bulk_misc", lang), lambda: self.open_bulk_items(tr("bulk_misc", lang), "Artículo"))
+
+        menu_more.addSeparator()
+
+        # --- Parches y Modificaciones del Juego ---
+        m_patch = menu_more.addMenu(tr("menu_patches", lang))
+        m_patch.addAction(tr("patch_n", lang), self._apply_n_patch)
+        m_patch.addAction(tr("patch_z_sort", lang), self._apply_z_sorting_patch)
+        m_patch.addAction(tr("patch_stairs", lang), self._apply_stairs_patch)
+        m_patch.addAction(tr("patch_teleport", lang), self._apply_teleport_stone_patch)
+
+        btn_more.setMenu(menu_more)
+        self.toolbar.addWidget(btn_more)
+
     def _setup_menu(self):
         menubar = self.menuBar()
         lang = self.current_lang
@@ -621,9 +638,50 @@ class FoMTStudioApp(QMainWindow):
         self.settings.setValue("language", lang_code)
         self.menuBar().clear()
         self._setup_menu()
+        if hasattr(self, "toolbar") and self.toolbar:
+            self._setup_toolbar()
+        if hasattr(self, "search_bar") and self.search_bar:
+            self.search_bar.setPlaceholderText(tr("search_placeholder", lang_code))
+        if hasattr(self, "btn_n") and self.btn_n:
+            self.btn_n.setText(tr('btn_install_n', lang_code))
         title_hint = tr('explorer_title', lang_code)
         self.setWindowTitle(f"FoMT Studio - {title_hint}")
         self.status.showMessage(tr("status_ready", lang_code))
+
+        # Actualizar pestañas abiertas que soporten re-traducción
+        if hasattr(self, "tabs") and self.tabs:
+            tab_name_keys = {
+                "ItemEditorWidget": "tab_items",
+                "NpcEditorWidget": "tab_npcs",
+                "MasterPointerEditor": "tab_pointers",
+                "MenuEditorWidget": "tab_menu_editor",
+                "TileEditorWidget": "tab_tile_editor",
+                "SappyAudioViewer": "tab_audio",
+                "EditorRutinasNPCWidget": "tab_npc_routines"
+            }
+            for i in range(self.tabs.count()):
+                w = self.tabs.widget(i)
+                if hasattr(w, "retranslate_ui"):
+                    try:
+                        w.retranslate_ui(lang_code)
+                    except Exception:
+                        pass
+                cname = type(w).__name__
+                if cname in tab_name_keys:
+                    k = tab_name_keys[cname]
+                    self.tabs.setTabText(i, tr(k, lang_code))
+
+        if hasattr(self, "floating_windows"):
+            for win in self.floating_windows:
+                w = win.centralWidget()
+                if hasattr(w, "retranslate_ui"):
+                    try:
+                        w.retranslate_ui(lang_code)
+                    except Exception:
+                        pass
+                if getattr(win, 'window_id', None) == "editor_rutinas_npc":
+                    win.setWindowTitle(tr("menu_npc_routines", lang_code))
+
         if self.project:
             self._on_project_loaded()
         else:
@@ -753,9 +811,20 @@ class FoMTStudioApp(QMainWindow):
             QMessageBox.critical(self, tr("err_fatal", self.current_lang), error_msg)
             self.status.showMessage(tr("msg_load_error", self.current_lang))
 
+    def _sync_open_map_viewers(self):
+        """Sincroniza estructuras dinamicas de cualquier VisorMapas abierto antes de guardar o compilar."""
+        for win in getattr(self, 'floating_windows', []):
+            w = win.centralWidget() if hasattr(win, 'centralWidget') else None
+            if w and hasattr(w, 'map_parser') and hasattr(w, 'renderer') and getattr(w, 'current_map_header', None):
+                try:
+                    w.map_parser.save_dynamic_structure_positions_to_rom(w.current_map_header.map_id, w.renderer)
+                except Exception:
+                    pass
+
     def action_save_project(self):
         if not self.project: return
         try:
+            self._sync_open_map_viewers()
             if hasattr(self, 'magic_circle'):
                 self.magic_circle.start_animation()
             from PyQt6.QtWidgets import QApplication
@@ -771,6 +840,7 @@ class FoMTStudioApp(QMainWindow):
             
     def action_compile_rom(self):
         if not self.project: return
+        self._sync_open_map_viewers()
         initial_dir = self.last_rom_dir
         if not initial_dir or not os.path.isdir(initial_dir) or "Documents" in initial_dir or "Documentos" in initial_dir:
             initial_dir = getattr(self.project, 'project_dir', "")
@@ -1088,7 +1158,7 @@ class FoMTStudioApp(QMainWindow):
                 self.cat_events_item.setText(f"{tr('cat_events', self.current_lang)} ({ev_count})")
                 ev_items = []
                 for i in range(1, ev_count + 1):
-                    ev_item = QStandardItem(self.project.super_lib.get_baptized_name(i, ""))
+                    ev_item = QStandardItem(self.project.super_lib.get_baptized_name(i, "", lang=self.current_lang))
                     ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
                     ev_item.setData(i, Qt.ItemDataRole.UserRole)
                     ev_items.append(ev_item)
@@ -1099,7 +1169,7 @@ class FoMTStudioApp(QMainWindow):
                 map_label = "MAPA" if self.current_lang == "es" else "MAP"
                 map_items = []
                 for i, m in enumerate(self.project.map_parser.maps):
-                    m_name = self.project.super_lib.get_map_name_hint(m.map_id)
+                    m_name = self.project.super_lib.get_map_name_hint(m.map_id, lang=self.current_lang)
                     map_item = QStandardItem(f"{map_label} {m.map_id:03d}: {m_name}")
                     map_item.setData("MAP", Qt.ItemDataRole.UserRole + 1)
                     map_item.setData(m.map_id, Qt.ItemDataRole.UserRole)
@@ -1244,7 +1314,7 @@ class FoMTStudioApp(QMainWindow):
                 return
         from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.editor_rutinas_npc import EditorRutinasNPCWidget
         editor = EditorRutinasNPCWidget(self.project, self)
-        float_win = FloatingWindow(editor, "Rutinas Diarias & Macromapa (NPC AI)", self)
+        float_win = FloatingWindow(editor, tr("menu_npc_routines", self.current_lang), self)
         float_win.window_id = window_id
         float_win.resize(1400, 900)
         self.floating_windows.append(float_win)
@@ -1268,7 +1338,9 @@ class FoMTStudioApp(QMainWindow):
         self.tabs.setCurrentWidget(editor)
 
     def open_event(self, event_id):
-        tab_name = self.project.super_lib.get_baptized_name(event_id, "")
+        if not getattr(self.project, 'event_parser', None):
+            self.project.step_2_scan_events()
+        tab_name = self.project.super_lib.get_baptized_name(event_id, "", lang=self.current_lang)
         for i in range(self.tabs.count()):
             if self.tabs.tabText(i) == tab_name:
                 self.tabs.setCurrentIndex(i)
@@ -1276,6 +1348,21 @@ class FoMTStudioApp(QMainWindow):
         ide = ScriptIDEWidget(self.project, self)
         ide.load_event(event_id)
         self.tabs.addTab(ide, tab_name)
+        self.tabs.setCurrentWidget(ide)
+
+    def open_script_offset(self, offset, tab_title=None):
+        """Abre un script descompilado desde un offset físico en una nueva pestaña."""
+        if not getattr(self.project, 'event_parser', None):
+            self.project.step_2_scan_events()
+        clean_off = offset & 0x01FFFFFF
+        title = tab_title or f"Script: 0x{clean_off:06X}"
+        for i in range(self.tabs.count()):
+            if self.tabs.tabText(i) == title:
+                self.tabs.setCurrentIndex(i)
+                return
+        ide = ScriptIDEWidget(self.project, self)
+        ide.load_rom_script(clean_off)
+        self.tabs.addTab(ide, title)
         self.tabs.setCurrentWidget(ide)
 
     def open_npc_routine(self, npc_id):
@@ -1375,6 +1462,12 @@ class FoMTStudioApp(QMainWindow):
     def _close_tab(self, index):
         widget = self.tabs.widget(index)
         if widget:
+            # Detener timers de CodeEditor para prevenir crashes en Qt
+            if hasattr(widget, 'editor') and hasattr(widget.editor, 'parse_timer'):
+                try:
+                    widget.editor.parse_timer.stop()
+                except Exception:
+                    pass
             # Limpiar referencias cacheadas para evitar RuntimeError: deleted object
             if getattr(self, 'metasprite_viewer', None) == widget:
                 self.metasprite_viewer = None
@@ -1386,6 +1479,14 @@ class FoMTStudioApp(QMainWindow):
                 self.tile_viewer = None
             if getattr(self, 'intro_editor', None) == widget:
                 self.intro_editor = None
+            if getattr(self, 'npc_editor', None) == widget:
+                self.npc_editor = None
+            if getattr(self, 'item_editor', None) == widget:
+                self.item_editor = None
+            if getattr(self, 'pointer_editor', None) == widget:
+                self.pointer_editor = None
+            if getattr(self, 'menu_editor', None) == widget:
+                self.menu_editor = None
                 
             widget.deleteLater()
         self.tabs.removeTab(index)
@@ -1395,11 +1496,11 @@ class FoMTStudioApp(QMainWindow):
         if index == -1: return
         
         menu = QMenu()
-        float_action = QAction("Hacer Flotante", self)
+        float_action = QAction(tr("menu_float_tab", self.current_lang), self)
         float_action.triggered.connect(lambda: self._float_tab(index))
         menu.addAction(float_action)
         
-        close_action = QAction("Cerrar", self)
+        close_action = QAction(tr("menu_close_tab", self.current_lang), self)
         close_action.triggered.connect(lambda: self._close_tab(index))
         menu.addAction(close_action)
         
@@ -1650,7 +1751,7 @@ class FoMTStudioApp(QMainWindow):
         val = item.data(Qt.ItemDataRole.UserRole)
         if item_type == "EVENT":
             menu = QMenu(self)
-            act_ide = menu.addAction("Abrir en Editor de Scripts (IDE)")
+            act_ide = menu.addAction(tr("menu_open_ide", self.current_lang))
             # act_theater = menu.addAction("Abrir en Teatro de Eventos (Visual)")
             chosen = menu.exec(self.tree_view.viewport().mapToGlobal(pos))
             if chosen == act_ide:

@@ -43,9 +43,9 @@ class NpcEditorWidget(QWidget):
         self.btn_save.setStyleSheet("background-color: #2e7d32; color: white;")
         self.btn_save.clicked.connect(self.save_data)
         
-        self.btn_expand = QPushButton("Portrait Expand (Experimental)")
+        self.btn_expand = QPushButton(tr("npc_btn_expand", lang))
         self.btn_expand.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold;")
-        self.btn_expand.setToolTip("Aumentar el límite de tamaño e IDs de retratos en la ROM.")
+        self.btn_expand.setToolTip(tr("npc_btn_expand_tip", lang))
         self.btn_expand.clicked.connect(self.expand_portraits)
         
         toolbar.addWidget(self.lbl_title)
@@ -74,13 +74,13 @@ class NpcEditorWidget(QWidget):
         
     def expand_portraits(self):
         lang = getattr(self.window(), 'current_lang', 'es')
-        reply = QMessageBox.warning(self, "Portrait Expand", 
-            "¿Quieres instalar el Assembly Hook para aumentar el límite de tamaño de portraits y permitir agregar más IDs a la ROM?\n\nEsta es una función EXPERIMENTAL. Úsalo bajo tu propio riesgo. Requiere una copia de seguridad de la ROM.",
+        reply = QMessageBox.warning(self, tr("npc_btn_expand", lang), 
+            tr("npc_expand_confirm", lang),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             
         if reply == QMessageBox.StandardButton.Yes:
             # Aquí irá la lógica de inyección del Assembly Hook del Repacker
-            QMessageBox.information(self, "Portrait Expand", "Hook de Expansión de Retratos preparado. La inyección se realizará durante el repacking.")
+            QMessageBox.information(self, tr("npc_btn_expand", lang), tr("npc_expand_success", lang))
         
     def load_data(self):
         if not self.project: return
@@ -236,11 +236,11 @@ class NpcDetailDialog(QDialog):
         self._resolve_script_personality(name, parent)
 
         script_layout = QHBoxLayout()
-        lbl_script = QLabel("<b>Script:</b>")
+        lbl_script = QLabel(f"<b>{tr('npc_script_title', lang)}:</b>")
         self.btn_script = QPushButton(f"{self.script_target_name}")
         self.btn_script.setStyleSheet("color: #3FB950; background: transparent; border: 1px dashed #238636; text-align: left; font-weight: bold; padding: 4px 8px;")
         self.btn_script.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_script.setToolTip("Abrir script de personalidad en el Script IDE")
+        self.btn_script.setToolTip(tr("npc_script_tip", lang))
         self.btn_script.clicked.connect(self.abrir_script)
         script_layout.addWidget(lbl_script)
         script_layout.addWidget(self.btn_script)
@@ -250,15 +250,15 @@ class NpcDetailDialog(QDialog):
         # Enlace Interactivo al Editor de Rutinas Diarias
         self.routine_target_id = self._resolve_routine_id(name)
         routine_layout = QHBoxLayout()
-        lbl_routine = QLabel("<b>Rutina AI:</b>")
+        lbl_routine = QLabel(f"<b>{tr('npc_routine_ai', lang)}</b>")
         if self.routine_target_id is not None:
-            self.btn_routine = QPushButton(f"Orquestador #{self.routine_target_id:02d}")
+            self.btn_routine = QPushButton(tr("npc_routine_orchestrator", lang).format(id=self.routine_target_id))
             self.btn_routine.setStyleSheet("color: #58A6FF; background: transparent; border: 1px dashed #1F6FEB; text-align: left; font-weight: bold; padding: 4px 8px;")
             self.btn_routine.setCursor(Qt.CursorShape.PointingHandCursor)
-            self.btn_routine.setToolTip("Abrir orquestador de rutina diaria")
+            self.btn_routine.setToolTip(tr("npc_routine_tip", lang))
             self.btn_routine.clicked.connect(self.abrir_rutina)
         else:
-            self.btn_routine = QLabel("<span style='color: #6E7681;'>Sin rutina de movimiento dedicada</span>")
+            self.btn_routine = QLabel(f"<span style='color: #6E7681;'>{tr('npc_no_routine', lang)}</span>")
         routine_layout.addWidget(lbl_routine)
         routine_layout.addWidget(self.btn_routine)
         routine_layout.addStretch()
@@ -291,7 +291,6 @@ class NpcDetailDialog(QDialog):
         return None
 
     def _resolve_script_personality(self, name, parent):
-        import csv
         clean_name = name.strip('\x00').strip()
         norm = clean_name.lower().replace(' ', '').replace('.', '')
         alias_map = {
@@ -302,12 +301,29 @@ class NpcDetailDialog(QDialog):
             'lou': 'loun_personality',
             'lu': 'lu_personality',
             'cliff': 'cliff_personality',
-            'h. goddess': 'goddess_personality',
+            'hgoddess': 'goddess_personality',
             'goddess': 'goddess_personality',
-            'harvest goddess': 'goddess_personality',
+            'harvestgoddess': 'goddess_personality',
         }
         target_event_key = alias_map.get(norm, f"{norm}_personality")
-        csv_path = r"Banco_de_Datos\Cilixes\fomt\Fomt_Events_Listname.csv"
+        target_event_key2 = alias_map.get(norm, f"{norm}_personaliti")
+
+        # 1. Intentar desde custom_event_names en super_lib
+        if self.project and getattr(self.project, 'super_lib', None):
+            custom_names = getattr(self.project.super_lib, 'custom_event_names', {})
+            for ev_id_str, ev_name in custom_names.items():
+                ev_low = ev_name.lower()
+                if ev_low == target_event_key or ev_low == target_event_key2 or ev_low.startswith(f"{norm}_person"):
+                    self.script_target_name = ev_name
+                    self.script_target_id = int(ev_id_str)
+                    return
+
+        # 2. Fallback a lectura directa de CSV con get_data_path
+        from Banco_de_Datos.Utilidades.rutas import get_data_path
+        import csv
+        mode = "mfomt" if (self.project and getattr(self.project, 'is_mfomt', False)) else "fomt"
+        csv_file = "MFomt_Events_Listname.csv" if mode == "mfomt" else "Fomt_Events_Listname.csv"
+        csv_path = get_data_path(mode, csv_file)
         if os.path.exists(csv_path):
             try:
                 with open(csv_path, 'r', encoding='utf-8') as f:
@@ -318,7 +334,7 @@ class NpcDetailDialog(QDialog):
                             ev_name = row[0].strip()
                             ev_id_str = row[1].strip()
                             ev_low = ev_name.lower()
-                            if ev_low == target_event_key or ev_low == f"{norm}_personaliti":
+                            if ev_low == target_event_key or ev_low == target_event_key2 or ev_low.startswith(f"{norm}_person"):
                                 self.script_target_name = ev_name
                                 self.script_target_id = int(ev_id_str)
                                 return
@@ -334,33 +350,33 @@ class NpcDetailDialog(QDialog):
             self.close()
 
     def abrir_script(self):
-        app = self.parent().window()
-        # Si tenemos un script canónico en Fomt_Events_Listname.csv y el método open_event en app
+        app = self.parent().window() if self.parent() else self.window()
+        lang = getattr(app, 'current_lang', 'es') if app else 'es'
+
+        # 1. Si tenemos un script canónico en Fomt_Events_Listname.csv y el método open_event en app
         if self.script_target_id is not None and hasattr(app, 'open_event'):
             app.open_event(self.script_target_id)
             self.close()
             return
 
+        # 2. Fallback por offset físico de personalidad
         ptr = getattr(self.npc, 'personality_ptr', 0)
         if ptr == 0:
-            QMessageBox.warning(self, "Error", "Este NPC no tiene un script de personalidad válido ni evento asociado.")
+            QMessageBox.warning(self, tr("err_title", lang), tr("npc_no_script_msg", lang))
             return
 
-        if hasattr(app, 'tabs'):
-            for i in range(app.tabs.count()):
-                widget = app.tabs.widget(i)
-                if hasattr(widget, 'load_rom_script'):
-                    app.tabs.setCurrentIndex(i)
-                    widget.load_rom_script(ptr)
-                    self.close()
-                    return
-
-            from Nucleos_Positronicos.Nucleo_de_Scripts.script_ide import ScriptIDEWidget
-            ide = ScriptIDEWidget(app.project, app)
-            ide.load_rom_script(ptr)
-            app.tabs.addTab(ide, f"Script: {self.script_target_name}")
-            app.tabs.setCurrentWidget(ide)
+        clean_off = ptr & 0x01FFFFFF
+        if hasattr(app, 'open_script_offset'):
+            app.open_script_offset(clean_off, f"Script: {self.script_target_name}")
             self.close()
+            return
+
+        from Nucleos_Positronicos.Nucleo_de_Scripts.script_ide import ScriptIDEWidget
+        ide = ScriptIDEWidget(app.project, app)
+        ide.load_rom_script(clean_off)
+        app.tabs.addTab(ide, f"Script: {self.script_target_name}")
+        app.tabs.setCurrentWidget(ide)
+        self.close()
 
     def abrir_teatro(self):
         app = self.parent().window()

@@ -236,6 +236,18 @@ class SuperLibrary:
                             self.map_map[name.strip()] = int(hex_val.strip(), 16)
                         except: pass
 
+        # Cargar nombres canónicos traducidos a map_map para alias y autocompletado multilingüe
+        try:
+            from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.fomt_map_names import CANONICAL_MAP_INFO
+            for mid, minfo in CANONICAL_MAP_INFO.items():
+                for k, v in minfo.items():
+                    if k.startswith("name_") and isinstance(v, str):
+                        clean_v = v.strip()
+                        if clean_v not in self.map_map:
+                            self.map_map[clean_v] = mid
+        except Exception:
+            pass
+
     def _load_animations(self):
         import csv
         mode = "mfomt" if self.is_mfomt else "fomt"
@@ -267,6 +279,10 @@ class SuperLibrary:
             with open(eventos_path, 'r', encoding='utf-8') as f:
                 try: self.custom_event_names = json.load(f)
                 except: pass
+
+        # Cargar nombres de eventos canonicos por defecto desde CSV
+        csv_filename = f"{prefix}Events_Listname.csv"
+        self.load_event_names_from_csv(csv_filename)
 
     def load_event_names_from_csv(self, filename):
         """Carga nombres de eventos desde un archivo CSV (Formato: Event_Name,ID)."""
@@ -439,30 +455,179 @@ class SuperLibrary:
         # En la ROM real buscaríamos la tabla maestra de animaciones.
         return [{"oam_id": anim_id, "delay": 8}] # Placeholder 1-frame
 
-    def get_baptized_name(self, event_id, script_content):
+    def get_translated_event_name(self, raw_name: str, lang: str = "es") -> str:
+        """Traduce el nombre técnico de un evento al idioma solicitado para visualización en la UI."""
+        if not raw_name:
+            return ""
+        lang_key = (lang or "es").lower()
+
+        # Nombres de eventos conocidos del motor FoMT
+        EVENT_TRANSLATIONS = {
+            "Golden_Lumber_Retribition": {
+                "es": "Retribución de Madera Dorada", "en": "Golden Lumber Retribution",
+                "jp": "黄金の資材の制裁", "de": "Goldholz-Vergeltung", "ru": "Возмездие за золотой лесоматериал",
+                "zh": "黄金木材惩罚", "pt": "Retribuição da Madeira Dourada", "hi": "गोल्डन लंबर प्रतिशोध"
+            },
+            "Mine_Descend_Level": {
+                "es": "Descenso de Nivel en Mina", "en": "Mine Level Descent",
+                "jp": "鉱山階層下降", "de": "Minen-Ebenenabstieg", "ru": "Спуск на этаж шахты",
+                "zh": "矿洞下楼", "pt": "Descida de Nível na Mina", "hi": "खदान स्तर अवरोहण"
+            },
+            "Sleep_SUper_Engine": {
+                "es": "Motor Nocturno (Dormir)", "en": "Sleep Engine (Bedtime)",
+                "jp": "就寝エンジン", "de": "Schlafroutine-Engine", "ru": "Ночной движок (Сон)",
+                "zh": "就寝引擎", "pt": "Motor Noturno (Dormir)", "hi": "नींद इंजन"
+            },
+            "Morning_Engine": {
+                "es": "Motor Matutino (Despertar)", "en": "Morning Engine (Wakeup)",
+                "jp": "朝のエンジン", "de": "Morgenroutine-Engine", "ru": "Утренний движок",
+                "zh": "早晨引擎", "pt": "Motor Matinal (Acordar)", "hi": "सुबह का इंजन"
+            },
+            "Global_Events_Engine": {
+                "es": "Motor de Eventos Globales", "en": "Global Events Engine",
+                "jp": "グローバルイベントエンジン", "de": "Globale Event-Engine", "ru": "Движок глобальных событий",
+                "zh": "全局事件引擎", "pt": "Motor de Eventos Globais", "hi": "वैश्विक इवेंट इंजन"
+            },
+            "Debug_Menu": {
+                "es": "Menú de Depuración (Debug)", "en": "Debug Menu",
+                "jp": "デバッグメニュー", "de": "Debug-Menü", "ru": "Меню отладки",
+                "zh": "调试菜单", "pt": "Menu de Depuração", "hi": "डीबग मेनू"
+            },
+            "Shopping_Channel_TV": {
+                "es": "Canal de Compras (TV)", "en": "Shopping Channel (TV)",
+                "jp": "ショッピングチャンネル (TV)", "de": "Shopping-Kanal (TV)", "ru": "Телемагазин",
+                "zh": "电视购物频道", "pt": "Canal de Compras (TV)", "hi": "शॉपिंग चैनल (TV)"
+            },
+            "Weather_TV": {
+                "es": "Pronóstico del Tiempo (TV)", "en": "Weather Forecast (TV)",
+                "jp": "天気予報 (TV)", "de": "Wetterbericht (TV)", "ru": "Прогноз погоды (ТВ)",
+                "zh": "天气预报 (TV)", "pt": "Previsão do Tempo (TV)", "hi": "मौसम पूर्वानुमान (TV)"
+            },
+            "Weather_Disasters_TV": {
+                "es": "Aviso de Desastres Meteorológicos (TV)", "en": "Weather Disaster Warnings (TV)",
+                "jp": "気象災害警報 (TV)", "de": "Katastrophenwarnung (TV)", "ru": "Предупреждения о бурях (ТВ)",
+                "zh": "气象灾害警报 (TV)", "pt": "Aviso de Desastres Meteorológicos (TV)", "hi": "मौसम आपदा चेतावनी (TV)"
+            }
+        }
+
+        if raw_name in EVENT_TRANSLATIONS:
+            trans = EVENT_TRANSLATIONS[raw_name]
+            return trans.get(lang_key, trans.get("en", raw_name))
+
+        # Rutinas de personalidad de aldeanos: [Name]_Personality
+        if "_Personality" in raw_name or "_Personaliti" in raw_name:
+            char_name = raw_name.replace("_Personality", "").replace("_Personaliti", "")
+            # Normalización de typos en nombres del juego original
+            char_fix = {
+                "Lilia": "Lillia", "CLiff": "Cliff", "Cheff": "Chef", "Loun": "Lou"
+            }.get(char_name, char_name)
+
+            if lang_key == "es":
+                return f"Personalidad de {char_fix}"
+            elif lang_key == "jp":
+                return f"{char_fix}の日常・性格"
+            elif lang_key == "de":
+                return f"{char_fix} Persönlichkeit"
+            elif lang_key == "ru":
+                return f"Личность {char_fix}"
+            elif lang_key == "zh":
+                return f"{char_fix}日常性格"
+            elif lang_key == "pt":
+                return f"Personalidade de {char_fix}"
+            elif lang_key == "hi":
+                return f"{char_fix} व्यक्तित्व"
+            else:
+                return f"{char_fix} Personality"
+
+        # Programas de televisión (_TV o _Tv)
+        if raw_name.endswith("_TV") or raw_name.endswith("_Tv") or "_TV" in raw_name:
+            clean_tv = raw_name.replace("_TV", "").replace("_Tv", "").replace("_", " ")
+            if lang_key == "es":
+                return f"Programa de TV: {clean_tv}"
+            elif lang_key == "jp":
+                return f"テレビ番組: {clean_tv}"
+            elif lang_key == "de":
+                return f"TV-Sendung: {clean_tv}"
+            elif lang_key == "ru":
+                return f"ТВ-программа: {clean_tv}"
+            elif lang_key == "zh":
+                return f"电视节目: {clean_tv}"
+            elif lang_key == "pt":
+                return f"Programa de TV: {clean_tv}"
+            elif lang_key == "hi":
+                return f"टीवी शो: {clean_tv}"
+            else:
+                return f"TV Show: {clean_tv}"
+
+        # Eventos no identificados
+        if raw_name.startswith("Unknow_Event_") or raw_name.startswith("Unknown_Event_"):
+            num_part = raw_name.split("_")[-1]
+            if lang_key == "es":
+                return f"Evento Desconocido {num_part}"
+            elif lang_key == "jp":
+                return f"未知のイベント {num_part}"
+            elif lang_key == "de":
+                return f"Unbekanntes Event {num_part}"
+            elif lang_key == "ru":
+                return f"Неизвестное событие {num_part}"
+            elif lang_key == "zh":
+                return f"未知事件 {num_part}"
+            elif lang_key == "pt":
+                return f"Evento Desconhecido {num_part}"
+            elif lang_key == "hi":
+                return f"अज्ञात इवेंट {num_part}"
+            else:
+                return f"Unknown Event {num_part}"
+
+        return raw_name.replace("_", " ")
+
+    def get_baptized_name(self, event_id, script_content=None, lang: str = "es"):
         """
-        Retorna el nombre del evento para la UI (Formato: ID - Nombre).
+        Retorna el nombre del evento para la UI (Formato: ID - Nombre) traducido según el idioma activo.
         """
         ev_key = str(event_id).strip()
         if ev_key in self.custom_event_names:
-            return f"{event_id:04d} - {self.custom_event_names[ev_key]}"
+            raw_name = self.custom_event_names[ev_key]
+            trans_name = self.get_translated_event_name(raw_name, lang=lang)
+            return f"{event_id:04d} - {trans_name}"
         
-        return f"{event_id:04d} - Script {event_id:04d}"
+        script_word = "Script"
+        if lang == "es": script_word = "Guión"
+        elif lang == "jp": script_word = "スクリプト"
+        elif lang == "de": script_word = "Skript"
+        elif lang == "ru": script_word = "Скрипт"
+        elif lang == "zh": script_word = "脚本"
+        return f"{event_id:04d} - {script_word} {event_id:04d}"
 
-    def get_event_name_hint(self, event_id):
+    def get_event_name_hint(self, event_id, lang: str = "es"):
         """
-        Retorna solo el nombre o un genérico (usado en el IDE y punteros).
+        Retorna solo el nombre o un genérico (usado en el IDE y punteros) en el idioma seleccionado.
         """
         ev_key = str(event_id).strip()
         if ev_key in self.custom_event_names:
-            return self.custom_event_names[ev_key]
-        return f"Unknown_Event_{event_id:04d}"
+            raw_name = self.custom_event_names[ev_key]
+            return self.get_translated_event_name(raw_name, lang=lang)
+        
+        prefix = "Unknown_Event_"
+        if lang == "es": prefix = "Evento_Desconocido_"
+        elif lang == "jp": prefix = "未知イベント_"
+        elif lang == "de": prefix = "Unbekanntes_Event_"
+        elif lang == "ru": prefix = "Неизвестное_событие_"
+        elif lang == "zh": prefix = "未知事件_"
+        return f"{prefix}{event_id:04d}"
 
-    def get_map_name_hint(self, map_id):
-        """Mapeo de nombres para los mapas (ID + Nombre personalizado)."""
+    def get_map_name_hint(self, map_id, lang: str = "es"):
+        """Mapeo de nombres para los mapas (ID + Nombre personalizado o canónico en el idioma activo)."""
         m_key = str(map_id)
         if m_key in self.custom_map_names:
             return f"[{map_id:03d}] {self.custom_map_names[m_key]}"
+        try:
+            from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.fomt_map_names import get_map_display_name
+            disp = get_map_display_name(map_id, include_season=False, lang=lang)
+            if disp and not disp.startswith("Mapa 0x") and not disp.startswith("Map 0x"):
+                return f"[{map_id:03d}] {disp}"
+        except Exception:
+            pass
         return f"[{map_id:03d}] Map {map_id:03d}"
 
     @property

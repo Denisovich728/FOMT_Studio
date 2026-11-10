@@ -410,6 +410,50 @@ SEASON_NAMES = {
     0x10: "Interior / Todo el año"
 }
 
+SEASON_NAMES_I18N = {
+    "es": {0x00: "Primavera", 0x04: "Verano", 0x08: "Otoño", 0x0C: "Invierno", 0x10: "Interior / Todo el año"},
+    "en": {0x00: "Spring", 0x04: "Summer", 0x08: "Autumn", 0x0C: "Winter", 0x10: "Indoor / All Year"},
+    "jp": {0x00: "春", 0x04: "夏", 0x08: "秋", 0x0C: "冬", 0x10: "室内 / 通年"},
+    "de": {0x00: "Frühling", 0x04: "Sommer", 0x08: "Herbst", 0x0C: "Winter", 0x10: "Innen / Ganzjährig"},
+    "ru": {0x00: "Весна", 0x04: "Лето", 0x08: "Осень", 0x0C: "Зима", 0x10: "Интерьер / Круглый год"},
+    "zh": {0x00: "春季", 0x04: "夏季", 0x08: "秋季", 0x0C: "冬季", 0x10: "室内 / 全年"},
+    "pt": {0x00: "Primavera", 0x04: "Verão", 0x08: "Outono", 0x0C: "Inverno", 0x10: "Interior / Ano todo"},
+    "hi": {0x00: "वसंत", 0x04: "गर्मी", 0x08: "शरद", 0x0C: "सर्दी", 0x10: "भीतर / पूरे वर्ष"}
+}
+
+OFF_MAP_I18N = {
+    "es": "Fuera de Mapa (Despawn / Limbo)",
+    "en": "Off-Map (Despawn / Limbo)",
+    "jp": "マップ外 (デスポーン / リンボ)",
+    "de": "Außerhalb der Karte (Despawn / Limbo)",
+    "ru": "Вне карты (Деспавн / Лимбо)",
+    "zh": "地图外 (消失 / 虚空)",
+    "pt": "Fora do Mapa (Despawn / Limbo)",
+    "hi": "मानचित्र से बाहर (डिसपॉन / अधर)"
+}
+
+MINE_FLOOR_I18N = {
+    "es": "Mina (Piso {floor})",
+    "en": "Mine (Floor {floor})",
+    "jp": "鉱山 (地下{floor}階)",
+    "de": "Mine (Ebene {floor})",
+    "ru": "Шахта (Этаж {floor})",
+    "zh": "矿洞 (第{floor}层)",
+    "pt": "Mina (Andar {floor})",
+    "hi": "खदान (तल {floor})"
+}
+
+MAP_GENERIC_I18N = {
+    "es": "Mapa 0x{base_id:02X}",
+    "en": "Map 0x{base_id:02X}",
+    "jp": "マップ 0x{base_id:02X}",
+    "de": "Karte 0x{base_id:02X}",
+    "ru": "Карта 0x{base_id:02X}",
+    "zh": "地图 0x{base_id:02X}",
+    "pt": "Mapa 0x{base_id:02X}",
+    "hi": "मानचित्र 0x{base_id:02X}"
+}
+
 
 def unpack_fomt_map_id(map_id: int) -> Tuple[int, int]:
     """
@@ -423,29 +467,35 @@ def unpack_fomt_map_id(map_id: int) -> Tuple[int, int]:
     return base_id, season_code
 
 
-def get_map_display_name(map_id: int, include_season: bool = False) -> str:
+def get_map_display_name(map_id: int, include_season: bool = False, lang: str = "es") -> str:
     """
-    Retorna el nombre formal, exacto y amigable para el usuario en español.
-    Ejemplo: "[07] Pueblo Sur" o "[15] Posada de Doug (P1)"
+    Retorna el nombre formal, exacto y amigable para el usuario según el idioma solicitado.
+    Ejemplo: "[07] Pueblo Sur" o "[07] South Side Town"
     """
     raw_id = int(map_id) & 0xFFFF
     base_id, season_code = unpack_fomt_map_id(map_id)
+    lang_key = lang.lower() if lang else "es"
 
     # Detección de estado Despawn / Fuera de Mapa (bit 9 o valor canónico 0x0234 / 0x0634)
     if (raw_id & 0x200) or (base_id == 0x34 and raw_id in (0x0234, 0x0634)):
-        return f"[{base_id:02X}] Fuera de Mapa (Despawn / Limbo)"
+        off_text = OFF_MAP_I18N.get(lang_key, OFF_MAP_I18N.get("en", OFF_MAP_I18N["es"]))
+        return f"[{base_id:02X}] {off_text}"
 
     info = CANONICAL_MAP_INFO.get(base_id)
     
     if info:
-        name = info["name_es"]
+        name = info.get(f"name_{lang_key}") or info.get("name_en") or info.get("name_es", f"Map 0x{base_id:02X}")
     elif 0x34 <= base_id <= 0x62:
-        name = f"Mina (Piso {base_id - 0x34 + 1})"
+        floor_num = base_id - 0x34 + 1
+        floor_tmpl = MINE_FLOOR_I18N.get(lang_key, MINE_FLOOR_I18N.get("en", MINE_FLOOR_I18N["es"]))
+        name = floor_tmpl.format(floor=floor_num)
     else:
-        name = f"Mapa 0x{base_id:02X}"
+        map_tmpl = MAP_GENERIC_I18N.get(lang_key, MAP_GENERIC_I18N.get("en", MAP_GENERIC_I18N["es"]))
+        name = map_tmpl.format(base_id=base_id)
 
-    if include_season and season_code != 0x10 and season_code in SEASON_NAMES:
-        return f"[{base_id:02X}] {name} ({SEASON_NAMES[season_code]})"
+    seasons_dict = SEASON_NAMES_I18N.get(lang_key, SEASON_NAMES_I18N.get("en", SEASON_NAMES_I18N["es"]))
+    if include_season and season_code != 0x10 and season_code in seasons_dict:
+        return f"[{base_id:02X}] {name} ({seasons_dict[season_code]})"
 
     return f"[{base_id:02X}] {name}"
 

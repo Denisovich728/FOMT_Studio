@@ -33,6 +33,7 @@ from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.world_graph import (
     DIR_DOWN, DIR_UP, DIR_LEFT, DIR_RIGHT, DIR_FACE
 )
 from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.macro_map_view import MacroMapView
+from Consola_de_Comando.i18n import tr
 from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.routine_codec import (
     RoutineCodec, NPCData, NPCSchedule, RoutineWaypoint, NPC_NAMES, NPC_COUNT
 )
@@ -149,7 +150,8 @@ class EditorRutinasNPCWidget(QWidget):
     def __init__(self, project=None, parent=None):
         super().__init__(parent)
         self.project = project
-        self.setWindowTitle(" Editor de Rutinas Diarias de NPCs & Orquestador de Rutas")
+        self.lang = getattr(parent, 'current_lang', 'es') if parent else 'es'
+        self.setWindowTitle(tr("rt_title", self.lang))
         self.resize(1380, 880)
 
         # Rutas de persistencia de topología
@@ -188,10 +190,10 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.setSpacing(8)
 
         # 1. Selector de Modo: Por NPC vs Por Mapa
-        mode_group = QGroupBox("Modo de Exploración y Orquestación")
+        mode_group = QGroupBox("Modo" if self.lang == "es" else "Mode")
         mode_layout = QHBoxLayout(mode_group)
-        self.rb_by_npc = QRadioButton(" Ver por Aldeano (NPC)")
-        self.rb_by_map = QRadioButton(" Ver por Mapa (Orquestador Global)")
+        self.rb_by_npc = QRadioButton(tr("rt_view_by_npc", self.lang))
+        self.rb_by_map = QRadioButton(tr("rt_view_by_map", self.lang))
         self.rb_by_npc.setChecked(True)
 
         self.btn_group_mode = QButtonGroup(self)
@@ -204,7 +206,7 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.addWidget(mode_group)
 
         # 2. Contenedor de Selectores (NPC / Mapa según el modo)
-        self.sel_group = QGroupBox("Filtro Activo")
+        self.sel_group = QGroupBox("Filtro" if self.lang == "es" else "Filter")
         self.sel_form = QFormLayout(self.sel_group)
 
         # Fila NPC
@@ -213,19 +215,20 @@ class EditorRutinasNPCWidget(QWidget):
             name = NPC_NAMES.get(nid, f"NPC #{nid}")
             self.combo_npc.addItem(f"[{nid:02d}] {name}", nid)
         self.combo_npc.currentIndexChanged.connect(self._on_npc_changed)
-        self.lbl_npc_row = QLabel("Aldeano:")
+        lang = self.lang
+        self.lbl_npc_row = QLabel(tr("col_npc", lang) + ":")
         self.sel_form.addRow(self.lbl_npc_row, self.combo_npc)
 
         # Fila Horario
         self.combo_schedule = QComboBox()
         self.combo_schedule.currentIndexChanged.connect(self._on_schedule_changed)
-        self.lbl_sched_row = QLabel("Horario:")
+        self.lbl_sched_row = QLabel(tr("rt_schedule", lang))
         self.sel_form.addRow(self.lbl_sched_row, self.combo_schedule)
 
         # Fila Mapa (para modo "Por Mapa")
         self.combo_filter_map = QComboBox()
         self.combo_filter_map.currentIndexChanged.connect(self._on_filter_map_changed)
-        self.lbl_map_row = QLabel("Mapa:")
+        self.lbl_map_row = QLabel(tr("col_map", lang) + ":")
         self.sel_form.addRow(self.lbl_map_row, self.combo_filter_map)
         self.lbl_map_row.hide()
         self.combo_filter_map.hide()
@@ -233,7 +236,7 @@ class EditorRutinasNPCWidget(QWidget):
         left_layout.addWidget(self.sel_group)
 
         # 2.1 Tarjeta Informativa de Condiciones de Activación
-        self.cond_group = QGroupBox("Condición de Activación del Horario")
+        self.cond_group = QGroupBox(tr("rt_cond_group", lang))
         self.cond_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -254,33 +257,200 @@ class EditorRutinasNPCWidget(QWidget):
         cond_layout.setContentsMargins(10, 6, 10, 8)
         cond_layout.setSpacing(3)
 
-        self.lbl_cond_badge = QLabel(" Clima: Soleado |  Días: Lunes a Sábado")
+        self.lbl_cond_badge = QLabel(f"{tr('rt_weather', lang)}: Soleado | {tr('rt_days', lang)}: Lun-Sáb")
         self.lbl_cond_badge.setStyleSheet("font-weight: bold; color: #58A6FF; font-size: 11px;")
 
-        self.lbl_cond_name = QLabel("Horario Principal")
+        self.lbl_cond_name = QLabel(tr("rt_main_schedule", lang))
         self.lbl_cond_name.setStyleSheet("font-size: 12px; font-weight: bold; color: #FFFFFF;")
 
-        self.lbl_cond_desc = QLabel("Condición de evaluación en ROM.")
+        self.lbl_cond_desc = QLabel(tr("rt_cond_eval_rom", lang))
         self.lbl_cond_desc.setWordWrap(True)
         self.lbl_cond_desc.setStyleSheet("color: #8B949E; font-size: 10px;")
 
-        self.lbl_cond_loc = QLabel(" Zona: Desconocida")
+        self.lbl_cond_loc = QLabel(f" {tr('rt_zone_unknown', lang)}")
         self.lbl_cond_loc.setStyleSheet("color: #3FB950; font-size: 10px; font-weight: bold;")
 
         cond_layout.addWidget(self.lbl_cond_badge)
         cond_layout.addWidget(self.lbl_cond_name)
         cond_layout.addWidget(self.lbl_cond_desc)
         cond_layout.addWidget(self.lbl_cond_loc)
+
+        # Boton para desplegar / ocultar panel de edicion interactiva
+        self.btn_toggle_cond_edit = QPushButton(tr("cond_toggle_edit", lang))
+        self.btn_toggle_cond_edit.setCheckable(True)
+        self.btn_toggle_cond_edit.setChecked(False)
+        self.btn_toggle_cond_edit.setStyleSheet("""
+            QPushButton {
+                background-color: #21262D;
+                color: #C9D1D9;
+                border: 1px solid #30363D;
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-size: 10px;
+                font-weight: bold;
+                margin-top: 4px;
+            }
+            QPushButton:hover {
+                background-color: #30363D;
+                color: #58A6FF;
+            }
+            QPushButton:checked {
+                background-color: #1F6FEB;
+                color: #FFFFFF;
+                border-color: #58A6FF;
+            }
+        """)
+        self.btn_toggle_cond_edit.toggled.connect(self._on_toggle_cond_edit)
+        cond_layout.addWidget(self.btn_toggle_cond_edit)
+
+        # Contenedor de edicion interactiva
+        self.cond_edit_container = QWidget()
+        self.cond_edit_container.hide()
+        edit_form = QFormLayout(self.cond_edit_container)
+        edit_form.setContentsMargins(0, 4, 0, 0)
+        edit_form.setSpacing(4)
+
+        # Clima
+        self.lbl_edit_weather = QLabel(tr("cond_edit_weather", lang) + ":")
+        self.lbl_edit_weather.setStyleSheet("color: #8B949E; font-size: 10px;")
+        self.edit_cond_weather = QComboBox()
+        self.edit_cond_weather.addItems([
+            "Soleado",
+            "Lluvia",
+            "Tormenta / Ventisca",
+            "Soleado / Nublado",
+            "Cualquiera",
+            "Condicional / Evento"
+        ])
+        edit_form.addRow(self.lbl_edit_weather, self.edit_cond_weather)
+
+        # Temporada
+        self.lbl_edit_season = QLabel(tr("cond_edit_season", lang) + ":")
+        self.lbl_edit_season.setStyleSheet("color: #8B949E; font-size: 10px;")
+        self.edit_cond_season = QComboBox()
+        self.edit_cond_season.addItem("Todo el Año / Interior (0x10)", 0x10)
+        self.edit_cond_season.addItem("Primavera (0x00)", 0x00)
+        self.edit_cond_season.addItem("Verano (0x04)", 0x04)
+        self.edit_cond_season.addItem("Otoño (0x08)", 0x08)
+        self.edit_cond_season.addItem("Invierno (0x0C)", 0x0C)
+        edit_form.addRow(self.lbl_edit_season, self.edit_cond_season)
+
+        # Dias
+        self.lbl_edit_days = QLabel(tr("cond_edit_days", lang) + ":")
+        self.lbl_edit_days.setStyleSheet("color: #8B949E; font-size: 10px;")
+        self.edit_cond_days = QComboBox()
+        self.edit_cond_days.setEditable(True)
+        self.edit_cond_days.addItems([
+            "Lunes a Sábado",
+            "Domingos",
+            "Martes",
+            "Cualquiera",
+            "Cualquier día",
+            "Días de festival",
+            "Cualquier día de mal tiempo",
+            "Días festivos o cita médica",
+            "Días ordinarios de casada",
+            "Días severos",
+            "Días designados"
+        ])
+        edit_form.addRow(self.lbl_edit_days, self.edit_cond_days)
+
+        # Hora Inicio
+        self.lbl_edit_time = QLabel(tr("cond_edit_time", lang) + ":")
+        self.lbl_edit_time.setStyleSheet("color: #8B949E; font-size: 10px;")
+        time_row = QHBoxLayout()
+        self.edit_cond_time = QSpinBox()
+        self.edit_cond_time.setRange(0, 1439)
+        self.edit_cond_time.setSingleStep(30)
+        self.edit_cond_time.setValue(360)
+        self.lbl_time_formatted = QLabel("06:00")
+        self.lbl_time_formatted.setStyleSheet("color: #58A6FF; font-weight: bold; min-width: 45px; font-size: 11px;")
+        def _update_time_label(val):
+            h = val // 60
+            m = val % 60
+            self.lbl_time_formatted.setText(f"{h:02d}:{m:02d}")
+        self.edit_cond_time.valueChanged.connect(_update_time_label)
+        time_row.addWidget(self.edit_cond_time, 1)
+        time_row.addWidget(self.lbl_time_formatted)
+        edit_form.addRow(self.lbl_edit_time, time_row)
+
+        # Zona / Ubicacion
+        self.lbl_edit_loc = QLabel(tr("cond_edit_location", lang) + ":")
+        self.lbl_edit_loc.setStyleSheet("color: #8B949E; font-size: 10px;")
+        self.edit_cond_loc = QComboBox()
+        self.edit_cond_loc.setEditable(True)
+        self.edit_cond_loc.addItems([
+            "Granja del Jugador",
+            "Gallinero de la Granja",
+            "Establo de la Granja",
+            "Pueblo Sur",
+            "Pueblo Norte",
+            "Plaza Rosa",
+            "Playa Mineral",
+            "Colina Madre",
+            "Interior",
+            "Zona de Festival",
+            "Mineral Town"
+        ])
+        edit_form.addRow(self.lbl_edit_loc, self.edit_cond_loc)
+
+        # Mapa de Rutinas
+        self.lbl_edit_map = QLabel(tr("cond_edit_map", lang) + ":")
+        self.lbl_edit_map.setStyleSheet("color: #8B949E; font-size: 10px;")
+        self.edit_cond_map = QComboBox()
+        for mid in sorted(CANONICAL_MAP_INFO.keys()):
+            self.edit_cond_map.addItem(get_map_display_name(mid, include_season=False, lang=lang), mid)
+        edit_form.addRow(self.lbl_edit_map, self.edit_cond_map)
+
+        # Botones de Accion
+        self.btn_apply_map_to_sched = QPushButton(tr("cond_apply_map", lang))
+        self.btn_apply_map_to_sched.setStyleSheet("""
+            QPushButton {
+                background-color: #238636;
+                color: white;
+                font-weight: bold;
+                border-radius: 4px;
+                padding: 4px;
+                font-size: 10px;
+            }
+            QPushButton:hover {
+                background-color: #2EA043;
+            }
+        """)
+        self.btn_apply_map_to_sched.clicked.connect(self._on_apply_map_to_schedule)
+
+        self.btn_save_cond = QPushButton(tr("cond_save_btn", lang))
+        self.btn_save_cond.setStyleSheet("""
+            QPushButton {
+                background-color: #1F6FEB;
+                color: white;
+                font-weight: bold;
+                border-radius: 4px;
+                padding: 4px;
+                font-size: 10px;
+            }
+            QPushButton:hover {
+                background-color: #388BFD;
+            }
+        """)
+        self.btn_save_cond.clicked.connect(self._on_save_schedule_conditions)
+
+        edit_form.addRow(self.btn_apply_map_to_sched)
+        edit_form.addRow(self.btn_save_cond)
+
+        cond_layout.addWidget(self.cond_edit_container)
         left_layout.addWidget(self.cond_group)
 
-        # 3. Tabla Orquestadora de Tramos A  B (Delays, Velocidades y Coordenadas)
-        self.tbl_group = QGroupBox("Orquestador de Coordenadas (Puntos A  B, Delays y Velocidades)")
+        # 3. Tabla Orquestadora de Tramos A -> B (Delays, Velocidades y Coordenadas)
+        self.tbl_group = QGroupBox(tr("rt_table_group", lang))
         tbl_layout = QVBoxLayout(self.tbl_group)
 
         self.table_segments = QTableWidget()
         self.table_segments.setColumnCount(9)
         self.table_segments.setHorizontalHeaderLabels([
-            "Hito", "Mapa", "NPC", "Punto A", "Punto B", "Distancia", "Velocidad", "Espera", "Hora"
+            tr("col_milestone", lang), tr("col_map", lang), tr("col_npc", lang),
+            tr("col_pt_a", lang), tr("col_pt_b", lang), tr("col_distance", lang),
+            tr("col_speed", lang), tr("col_wait", lang), tr("col_hour", lang)
         ])
         self.table_segments.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table_segments.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
@@ -292,11 +462,11 @@ class EditorRutinasNPCWidget(QWidget):
 
         # Botones de gestión de tramos
         btn_seg_layout = QHBoxLayout()
-        self.btn_add_step = QPushButton(" Añadir Hito")
+        self.btn_add_step = QPushButton(tr("rt_add_step", lang))
         self.btn_add_step.clicked.connect(self._on_add_waypoint)
-        self.btn_del_step = QPushButton(" Eliminar")
+        self.btn_del_step = QPushButton(tr("rt_del_step", lang))
         self.btn_del_step.clicked.connect(self._on_delete_waypoint)
-        self.btn_edit_step = QPushButton(" Editar Hito en Mapa")
+        self.btn_edit_step = QPushButton(tr("rt_edit_step_map", lang))
         self.btn_edit_step.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold;")
         self.btn_edit_step.clicked.connect(self._on_edit_step_clicked)
 
@@ -308,7 +478,7 @@ class EditorRutinasNPCWidget(QWidget):
 
         # 4. Botones de Inyección en ROM y Guardado
         rom_actions = QHBoxLayout()
-        self.btn_inject_rom = QPushButton(" Inyectar Rutina en ROM")
+        self.btn_inject_rom = QPushButton(tr("btn_inject_routine", lang))
         self.btn_inject_rom.setStyleSheet("background-color: #238636; color: white; font-weight: bold; padding: 7px;")
         self.btn_inject_rom.clicked.connect(self._on_inject_rom_clicked)
 
@@ -366,15 +536,15 @@ class EditorRutinasNPCWidget(QWidget):
         tab_route_layout.setSpacing(2)
 
         # Barra de herramientas del visor de rutas
-        route_toolbar = QToolBar("Herramientas de Visor de Rutas")
+        route_toolbar = QToolBar(tr("rt_toolbar_title", lang))
         route_toolbar.setStyleSheet("background-color: #161B22; border-bottom: 1px solid #30363D; padding: 4px;")
 
-        self.lbl_canvas_map_name = QLabel(" Mapa: Sin Cargar")
+        self.lbl_canvas_map_name = QLabel(f" {tr('rt_map_unloaded', lang)}")
         self.lbl_canvas_map_name.setStyleSheet("font-weight: bold; color: #58A6FF; padding: 2px 8px; font-size: 11px;")
         route_toolbar.addWidget(self.lbl_canvas_map_name)
 
-        self.act_open_in_map_editor = QAction(" Abrir en Map Editor", self)
-        self.act_open_in_map_editor.setToolTip("Abre este mapa en su propia pestaña dedicada del Editor de Mapas de FOMT Studio.")
+        self.act_open_in_map_editor = QAction(tr("rt_open_in_map_editor", lang), self)
+        self.act_open_in_map_editor.setToolTip(tr("rt_open_in_map_editor_tip", lang))
         self.act_open_in_map_editor.triggered.connect(self._on_open_in_map_editor_clicked)
         route_toolbar.addAction(self.act_open_in_map_editor)
 
@@ -388,7 +558,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.act_rc_zoom_out.triggered.connect(lambda: self.route_canvas.zoom_out())
         route_toolbar.addAction(self.act_rc_zoom_out)
 
-        self.act_rc_zoom_fit = QAction(" Ajustar", self)
+        self.act_rc_zoom_fit = QAction(tr("rt_zoom_fit", lang), self)
         self.act_rc_zoom_fit.triggered.connect(lambda: self.route_canvas.zoom_fit())
         route_toolbar.addAction(self.act_rc_zoom_fit)
 
@@ -398,19 +568,19 @@ class EditorRutinasNPCWidget(QWidget):
 
         route_toolbar.addSeparator()
 
-        self.act_rc_vectors = QAction("〰 Vectores", self)
+        self.act_rc_vectors = QAction(tr("rt_vectors", lang), self)
         self.act_rc_vectors.setCheckable(True)
         self.act_rc_vectors.setChecked(True)
         self.act_rc_vectors.toggled.connect(lambda chk: self.route_canvas.toggle_vectors(chk))
         route_toolbar.addAction(self.act_rc_vectors)
 
-        self.act_rc_labels = QAction(" Etiquetas", self)
+        self.act_rc_labels = QAction(tr("rt_labels", lang), self)
         self.act_rc_labels.setCheckable(True)
         self.act_rc_labels.setChecked(True)
         self.act_rc_labels.toggled.connect(lambda chk: self.route_canvas.toggle_labels(chk))
         route_toolbar.addAction(self.act_rc_labels)
 
-        self.act_rc_walkable = QAction(" Malla Caminable", self)
+        self.act_rc_walkable = QAction(tr("rt_walkable_mesh", lang), self)
         self.act_rc_walkable.setCheckable(True)
         self.act_rc_walkable.setChecked(False)
         self.act_rc_walkable.toggled.connect(lambda chk: self.route_canvas.toggle_walkable_grid(chk))
@@ -418,10 +588,10 @@ class EditorRutinasNPCWidget(QWidget):
 
         route_toolbar.addSeparator()
 
-        self.act_rc_inspector = QAction(" Inspector Flotante", self)
+        self.act_rc_inspector = QAction(tr("rt_inspector_panel", lang), self)
         self.act_rc_inspector.setCheckable(True)
         self.act_rc_inspector.setChecked(True)
-        self.act_rc_inspector.setToolTip("Muestra u oculta la tarjeta flotante de edición de coordenadas y parámetros.")
+        self.act_rc_inspector.setToolTip(tr("rt_inspector_panel_tip", lang))
         self.act_rc_inspector.toggled.connect(self._toggle_floating_inspector)
         route_toolbar.addAction(self.act_rc_inspector)
 
@@ -443,7 +613,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.route_canvas.on_view_resized = self._reposition_floating_inspector
         self._reposition_floating_inspector()
 
-        self.right_tabs.addTab(tab_route, " Editor de Rutas y Nodos")
+        self.right_tabs.addTab(tab_route, tr("rt_tab_routes", lang))
 
         # -------------------------------------------------------------
         # TAB 2: Macromapa Global de Mineral Town (Red A*)
@@ -454,19 +624,19 @@ class EditorRutinasNPCWidget(QWidget):
         tab_macro_layout.setSpacing(2)
 
         # Toolbar Macromapa
-        map_toolbar = QToolBar("Herramientas del Macromapa")
+        map_toolbar = QToolBar("Macromap" if lang != "es" else "Herramientas del Macromapa")
         map_toolbar.setStyleSheet("background-color: #161B22; border-bottom: 1px solid #30363D; padding: 4px;")
 
-        self.act_connect = QAction(" Conectar Warps", self)
+        self.act_connect = QAction(tr("rt_connect_warps", lang), self)
         self.act_connect.setCheckable(True)
         self.act_connect.triggered.connect(self._on_toggle_connect_mode)
         map_toolbar.addAction(self.act_connect)
 
-        self.act_save_topo = QAction(" Guardar Topología", self)
+        self.act_save_topo = QAction(tr("rt_save_topo", lang), self)
         self.act_save_topo.triggered.connect(self._on_save_topology)
         map_toolbar.addAction(self.act_save_topo)
 
-        self.act_reload_topo = QAction(" Recargar", self)
+        self.act_reload_topo = QAction(tr("rt_reload_topo", lang), self)
         self.act_reload_topo.triggered.connect(self._on_reload_topology)
         map_toolbar.addAction(self.act_reload_topo)
 
@@ -556,8 +726,9 @@ class EditorRutinasNPCWidget(QWidget):
             base_mid = mid & 0xFF
             npc_set = map_stats.get(base_mid, set())
             tramos = map_tramo_counts.get(base_mid, 0)
-            map_name = get_map_display_name(base_mid)
-            label = f"{map_name} ({len(npc_set)} NPCs, {tramos} tramos)"
+            map_name = get_map_display_name(base_mid, lang=self.lang)
+            tramo_word = tr("rt_waypoints_count", self.lang)
+            label = f"{map_name} ({len(npc_set)} NPCs, {tramos} {tramo_word})"
             self.combo_filter_map.addItem(label, base_mid)
 
         self.combo_filter_map.blockSignals(False)
@@ -573,7 +744,7 @@ class EditorRutinasNPCWidget(QWidget):
             self.lbl_map_row.hide()
             self.combo_filter_map.hide()
             self.cond_group.show()
-            self.status_bar.showMessage(" Modo: Por Aldeano (NPC) activo.")
+            self.status_bar.showMessage(tr("rt_mode_npc_status", self.lang))
             self._refresh_npc_segments()
         else:
             self.current_mode = "BY_MAP"
@@ -584,7 +755,7 @@ class EditorRutinasNPCWidget(QWidget):
             self.lbl_map_row.show()
             self.combo_filter_map.show()
             self.cond_group.hide()
-            self.status_bar.showMessage(" Modo: Por Mapa (Orquestador Global) activo.")
+            self.status_bar.showMessage(tr("rt_mode_map_status", self.lang))
             self._refresh_map_segments()
 
     def _on_npc_changed(self, index: int):
@@ -600,10 +771,12 @@ class EditorRutinasNPCWidget(QWidget):
                 raw_cond = getattr(sched, "condition_info", None) or get_npc_schedule_condition(self.current_npc.npc_id, idx, sched)
                 cond = ScheduleCondition.from_data(raw_cond)
                 icon = getattr(cond, "icon", "") or ""
-                label = f"#{idx}: {icon} {cond.name} [{cond.location_badge}] ({len(sched.waypoints)} hitos)"
+                badge = cond.get_localized_badge(self.lang)
+                w_label = tr("rt_waypoints_count", self.lang)
+                label = f"#{idx}: {icon} {cond.name} [{badge}] ({len(sched.waypoints)} {w_label})"
                 self.combo_schedule.addItem(label, idx)
             else:
-                self.combo_schedule.addItem(f"Horario #{idx} [NULL / Sin Datos]", idx)
+                self.combo_schedule.addItem(tr('rt_sched_null', self.lang).format(idx=idx), idx)
         self.combo_schedule.blockSignals(False)
 
         if self.combo_schedule.count() > 0:
@@ -633,26 +806,285 @@ class EditorRutinasNPCWidget(QWidget):
             cond = ScheduleCondition.from_data(raw_cond)
         self._update_condition_banner(cond)
 
+    def _on_toggle_cond_edit(self, checked: bool):
+        """Muestra u oculta el contenedor de edicion de condiciones y mapa."""
+        if hasattr(self, "cond_edit_container"):
+            self.cond_edit_container.setVisible(checked)
+
+    def _on_apply_map_to_schedule(self):
+        """Aplica el mapa y temporada seleccionados a todos los hitos del horario actual."""
+        if not self.current_schedule or not self.current_schedule.waypoints:
+            self.status_bar.showMessage(tr("rt_no_schedule_sel", self.lang), 3000)
+            return
+
+        base_mid = self.edit_cond_map.currentData()
+        if base_mid is None:
+            base_mid = 0
+        season_code = self.edit_cond_season.currentData()
+        if season_code is None:
+            season_code = 0x10
+
+        packed_map_id = (int(season_code) << 8) | (int(base_mid) & 0xFF)
+
+        for wp in self.current_schedule.waypoints:
+            wp.map_id = packed_map_id
+            wp.is_edited = True
+            wp.raw_bytes = None
+
+        self.is_edited = True
+        self.route_canvas.load_map_view(base_mid)
+        self.lbl_canvas_map_name.setText(f" {get_map_display_name(base_mid, lang=self.lang)}")
+        self._refresh_npc_segments()
+
+        map_name = get_map_display_name(base_mid, include_season=False, lang=self.lang)
+        self.status_bar.showMessage(
+            f"Mapa {map_name} aplicado a {len(self.current_schedule.waypoints)} hitos del horario.", 4000
+        )
+
+    def _on_save_schedule_conditions(self):
+        """Guarda las condiciones editadas (Dia, Hora, Lugar, Clima, Temporada) en el horario actual."""
+        if not self.current_schedule:
+            return
+
+        weather = self.edit_cond_weather.currentText()
+        days = self.edit_cond_days.currentText()
+        loc = self.edit_cond_loc.currentText()
+        season_code = self.edit_cond_season.currentData()
+        if season_code is None:
+            season_code = 0x10
+        base_mid = self.edit_cond_map.currentData()
+        if base_mid is None:
+            base_mid = 0
+        start_time = self.edit_cond_time.value()
+
+        if not hasattr(self.current_schedule, "condition_info") or not isinstance(self.current_schedule.condition_info, dict):
+            self.current_schedule.condition_info = {}
+
+        self.current_schedule.condition_info["weather"] = weather
+        self.current_schedule.condition_info["days"] = days
+        self.current_schedule.condition_info["location_badge"] = loc
+        self.current_schedule.condition_info["season_code"] = season_code
+        self.current_schedule.condition_info["base_map_id"] = base_mid
+
+        map_name = get_map_display_name(base_mid, include_season=False, lang=self.lang)
+        self.current_schedule.condition_info["short"] = f"{days} ({map_name})"
+        self.current_schedule.condition_info["name"] = f"Rutina: {days} - {weather}"
+        self.current_schedule.condition_info["detail"] = f"Activa en dias {days} con clima {weather} en {loc}."
+        self.current_schedule.label = f"Horario #{self.current_schedule.schedule_id}: {self.current_schedule.condition_info['short']}"
+
+        # Actualizar hora del primer waypoint si corresponde
+        if self.current_schedule.waypoints:
+            wp0 = self.current_schedule.waypoints[0]
+            wp0.time_val = start_time
+            wp0.is_edited = True
+            wp0.raw_bytes = None
+
+        self.is_edited = True
+
+        # Actualizar texto del combo de horarios
+        curr_idx = self.combo_schedule.currentIndex()
+        if curr_idx >= 0:
+            w_label = tr("rt_waypoints_count", self.lang)
+            new_combo_text = f"#{curr_idx}: {self.current_schedule.condition_info['name']} [{loc}] ({len(self.current_schedule.waypoints)} {w_label})"
+            self.combo_schedule.setItemText(curr_idx, new_combo_text)
+
+        # Actualizar banner informativo
+        cond = ScheduleCondition.from_data(self.current_schedule.condition_info)
+        self._update_condition_banner(cond)
+
+        # Refrescar tramos en la tabla
+        self._refresh_npc_segments()
+
+        self.status_bar.showMessage(tr("cond_saved_msg", self.lang), 4000)
+
     def _update_condition_banner(self, cond: Optional[ScheduleCondition]):
-        """Actualiza la tarjeta visual informativa de condiciones de activación."""
+        """Actualiza la tarjeta visual informativa de condiciones de activacion y sus campos de edicion."""
         if not cond:
-            self.lbl_cond_badge.setText(" Sin Horario Seleccionado")
-            self.lbl_cond_name.setText("Horario no disponible")
-            self.lbl_cond_desc.setText("Seleccione un aldeano y un horario válido para inspeccionar sus condiciones.")
-            self.lbl_cond_loc.setText(" Ubicación: N/A")
+            self.lbl_cond_badge.setText(f" {tr('rt_no_schedule_sel', self.lang)}")
+            self.lbl_cond_name.setText(tr('rt_sched_unavail', self.lang))
+            self.lbl_cond_desc.setText(tr('rt_cond_desc_default', self.lang))
+            self.lbl_cond_loc.setText(f" {tr('rt_loc_na', self.lang)}")
             return
 
         icon = getattr(cond, "icon", "") or ""
-        badge_text = f"{icon} Clima: {cond.weather}  |   Días: {cond.days}"
+        weather_text = cond.get_localized_weather(self.lang)
+        days_text = cond.get_localized_days(self.lang)
+        badge_text = f"{icon} {tr('rt_weather', self.lang)}: {weather_text}  |  {tr('rt_days', self.lang)}: {days_text}"
         if getattr(cond, "is_festival", False):
-            badge_text += "  |   Festival"
+            fest_label = "Festival" if self.lang != "es" else "Festival"
+            badge_text += f"  |  {fest_label}"
         if getattr(cond, "is_marriage", False):
-            badge_text += "  |   Matrimonio"
+            marr_label = "Married" if self.lang == "en" else "Matrimonio"
+            badge_text += f"  |  {marr_label}"
 
         self.lbl_cond_badge.setText(badge_text)
         self.lbl_cond_name.setText(cond.name)
         self.lbl_cond_desc.setText(cond.condition_desc)
-        self.lbl_cond_loc.setText(f" Zona Principal: {cond.location_badge}")
+        self.lbl_cond_loc.setText(f" {tr('rt_main_zone', self.lang)}: {cond.get_localized_badge(self.lang)}")
+
+        # Sincronizar controles del formulario de edicion
+        if hasattr(self, "edit_cond_weather"):
+            self.edit_cond_weather.blockSignals(True)
+            w_idx = self.edit_cond_weather.findText(cond.weather)
+            if w_idx >= 0:
+                self.edit_cond_weather.setCurrentIndex(w_idx)
+            self.edit_cond_weather.blockSignals(False)
+
+        if hasattr(self, "edit_cond_days"):
+            self.edit_cond_days.blockSignals(True)
+            d_idx = self.edit_cond_days.findText(cond.days)
+            if d_idx >= 0:
+                self.edit_cond_days.setCurrentIndex(d_idx)
+            else:
+                self.edit_cond_days.setEditText(cond.days)
+            self.edit_cond_days.blockSignals(False)
+
+        if hasattr(self, "edit_cond_loc"):
+            self.edit_cond_loc.blockSignals(True)
+            loc_val = getattr(cond, "location_badge", "Mineral Town")
+            l_idx = self.edit_cond_loc.findText(loc_val)
+            if l_idx >= 0:
+                self.edit_cond_loc.setCurrentIndex(l_idx)
+            else:
+                self.edit_cond_loc.setEditText(loc_val)
+            self.edit_cond_loc.blockSignals(False)
+
+        # Sincronizar mapa, temporada y hora inicial desde waypoints
+        if self.current_schedule and self.current_schedule.waypoints:
+            wp0 = self.current_schedule.waypoints[0]
+            b_mid, s_code = unpack_fomt_map_id(getattr(wp0, "map_id", 0))
+            t_val = getattr(wp0, "time_val", 360)
+
+            if hasattr(self, "edit_cond_season"):
+                self.edit_cond_season.blockSignals(True)
+                s_idx = self.edit_cond_season.findData(s_code)
+                if s_idx >= 0:
+                    self.edit_cond_season.setCurrentIndex(s_idx)
+                self.edit_cond_season.blockSignals(False)
+
+            if hasattr(self, "edit_cond_map"):
+                self.edit_cond_map.blockSignals(True)
+                m_idx = self.edit_cond_map.findData(b_mid)
+                if m_idx >= 0:
+                    self.edit_cond_map.setCurrentIndex(m_idx)
+                self.edit_cond_map.blockSignals(False)
+
+            if hasattr(self, "edit_cond_time"):
+                self.edit_cond_time.blockSignals(True)
+                self.edit_cond_time.setValue(t_val)
+                h = t_val // 60
+                m = t_val % 60
+                if hasattr(self, "lbl_time_formatted"):
+                    self.lbl_time_formatted.setText(f"{h:02d}:{m:02d}")
+                self.edit_cond_time.blockSignals(False)
+
+    def retranslate_ui(self, lang: str):
+        """Actualiza todos los textos e interfaces del editor al cambiar el idioma."""
+        self.lang = lang
+
+        # Grupo seleccion
+        if hasattr(self, "sel_group"):
+            self.sel_group.setTitle(tr("rt_sel_group", lang))
+        if hasattr(self, "lbl_npc_row"):
+            self.lbl_npc_row.setText(tr("rt_npc", lang))
+        if hasattr(self, "lbl_sched_row"):
+            self.lbl_sched_row.setText(tr("rt_schedule", lang))
+        if hasattr(self, "lbl_map_row"):
+            self.lbl_map_row.setText(tr("col_map", lang) + ":")
+
+        # Modos
+        if hasattr(self, "rb_by_npc"):
+            self.rb_by_npc.setText(tr("rt_mode_by_npc", lang))
+        if hasattr(self, "rb_by_map"):
+            self.rb_by_map.setText(tr("rt_mode_by_map", lang))
+
+        # Tarjeta condiciones
+        if hasattr(self, "cond_group"):
+            self.cond_group.setTitle(tr("rt_cond_group", lang))
+        if hasattr(self, "btn_toggle_cond_edit"):
+            self.btn_toggle_cond_edit.setText(tr("cond_toggle_edit", lang))
+
+        # Formulario de condiciones
+        if hasattr(self, "lbl_edit_weather"):
+            self.lbl_edit_weather.setText(tr("cond_edit_weather", lang) + ":")
+        if hasattr(self, "lbl_edit_season"):
+            self.lbl_edit_season.setText(tr("cond_edit_season", lang) + ":")
+        if hasattr(self, "lbl_edit_days"):
+            self.lbl_edit_days.setText(tr("cond_edit_days", lang) + ":")
+        if hasattr(self, "lbl_edit_time"):
+            self.lbl_edit_time.setText(tr("cond_edit_time", lang) + ":")
+        if hasattr(self, "lbl_edit_loc"):
+            self.lbl_edit_loc.setText(tr("cond_edit_location", lang) + ":")
+        if hasattr(self, "lbl_edit_map"):
+            self.lbl_edit_map.setText(tr("cond_edit_map", lang) + ":")
+        if hasattr(self, "btn_apply_map_to_sched"):
+            self.btn_apply_map_to_sched.setText(tr("cond_apply_map", lang))
+        if hasattr(self, "btn_save_cond"):
+            self.btn_save_cond.setText(tr("cond_save_btn", lang))
+
+        # Re-traducir items de edit_cond_map preservando seleccion
+        if hasattr(self, "edit_cond_map"):
+            cur_map = self.edit_cond_map.currentData()
+            self.edit_cond_map.blockSignals(True)
+            self.edit_cond_map.clear()
+            for mid in sorted(CANONICAL_MAP_INFO.keys()):
+                self.edit_cond_map.addItem(get_map_display_name(mid, include_season=False, lang=lang), mid)
+            if cur_map is not None:
+                idx = self.edit_cond_map.findData(cur_map)
+                if idx >= 0:
+                    self.edit_cond_map.setCurrentIndex(idx)
+            self.edit_cond_map.blockSignals(False)
+
+        # Re-traducir items de combo_seg_map (floating inspector) preservando seleccion
+        if hasattr(self, "combo_seg_map"):
+            cur_seg_map = self.combo_seg_map.currentData()
+            self.combo_seg_map.blockSignals(True)
+            self.combo_seg_map.clear()
+            for mid in sorted(CANONICAL_MAP_INFO.keys()):
+                self.combo_seg_map.addItem(get_map_display_name(mid, include_season=False, lang=lang), mid)
+            if cur_seg_map is not None:
+                idx = self.combo_seg_map.findData(cur_seg_map)
+                if idx >= 0:
+                    self.combo_seg_map.setCurrentIndex(idx)
+            self.combo_seg_map.blockSignals(False)
+
+        # Grupo tabla
+        if hasattr(self, "tbl_group"):
+            self.tbl_group.setTitle(tr("rt_table_group", lang))
+        if hasattr(self, "table_segments"):
+            self.table_segments.setHorizontalHeaderLabels([
+                tr("col_time", lang),
+                tr("col_tramo", lang),
+                tr("col_map", lang),
+                tr("col_from", lang),
+                tr("col_to", lang),
+                tr("col_dist", lang),
+                tr("col_speed", lang),
+                tr("col_wait", lang),
+                tr("col_path", lang)
+            ])
+
+        # Actualizar canvas
+        if hasattr(self, "route_canvas") and self.route_canvas:
+            self.route_canvas.update()
+
+        # Actualizar banner de condicion
+        if self.current_schedule:
+            raw_cond = getattr(self.current_schedule, "condition_info", None) or get_npc_schedule_condition(
+                self.current_npc.npc_id if self.current_npc else 0,
+                self.combo_schedule.currentIndex(),
+                self.current_schedule
+            )
+            cond = ScheduleCondition.from_data(raw_cond)
+            self._update_condition_banner(cond)
+        else:
+            self._update_condition_banner(None)
+
+        # Refrescar tramos
+        if self.current_mode == "BY_NPC":
+            self._refresh_npc_segments()
+        else:
+            self._refresh_map_segments()
 
     def _on_filter_map_changed(self, index: int):
         if self.current_mode == "BY_MAP":
@@ -804,7 +1236,7 @@ class EditorRutinasNPCWidget(QWidget):
 
         # Actualizar lienzo con el mapa seleccionado
         self.route_canvas.load_map_view(target_map_id)
-        self.lbl_canvas_map_name.setText(f" {get_map_display_name(target_map_id)}")
+        self.lbl_canvas_map_name.setText(f" {get_map_display_name(target_map_id, lang=self.lang)}")
         self.route_canvas.set_route_segments(segments)
 
     def _populate_table_with_segments(self, segments: List[dict]):
@@ -856,6 +1288,7 @@ class EditorRutinasNPCWidget(QWidget):
 
     def _build_floating_inspector_ui(self):
         """Construye los controles interactivos dentro de la tarjeta flotante sobre el mapa."""
+        lang = self.lang
         insp_layout = QVBoxLayout(self.floating_inspector)
         insp_layout.setContentsMargins(12, 10, 12, 10)
         insp_layout.setSpacing(6)
@@ -880,26 +1313,26 @@ class EditorRutinasNPCWidget(QWidget):
 
         # 1.1 Selector de Mapa del Hito
         row_map = QHBoxLayout()
-        lbl_map_tag = QLabel("Mapa:")
+        lbl_map_tag = QLabel(tr("rt_map_label", lang))
         lbl_map_tag.setStyleSheet("color: #58A6FF; font-weight: bold; font-size: 11px;")
         self.combo_seg_map = QComboBox()
         self.combo_seg_map.setStyleSheet("font-size: 11px; padding: 2px;")
-        for mid, minfo in sorted(CANONICAL_MAP_INFO.items()):
-            self.combo_seg_map.addItem(f"[{mid:02X}] {minfo['name_es']}", mid)
+        for mid in sorted(CANONICAL_MAP_INFO.keys()):
+            self.combo_seg_map.addItem(get_map_display_name(mid, include_season=False, lang=lang), mid)
         self.combo_seg_map.currentIndexChanged.connect(self._on_segment_map_changed)
         row_map.addWidget(lbl_map_tag)
         row_map.addWidget(self.combo_seg_map, 1)
         insp_layout.addLayout(row_map)
 
         # 2. Selector de asignación de clics en el lienzo
-        click_target_box = QGroupBox(" Clic en Mapa Asigna a:")
+        click_target_box = QGroupBox("Target" if lang != "es" else "Clic en Mapa Asigna a:")
         click_target_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         click_tgt_lay = QHBoxLayout(click_target_box)
         click_tgt_lay.setContentsMargins(8, 4, 8, 4)
-        self.rb_target_b = QRadioButton("Destino (B)")
-        self.rb_target_a = QRadioButton("Inicio (A)")
-        self.rb_target_inflection = QRadioButton("Inflexión (C)")
-        self.rb_target_inflection.setToolTip("Al hacer clic en el mapa, añade un punto de inflexión intermedio")
+        self.rb_target_b = QRadioButton("Destino (B)" if lang == "es" else "Destination (B)")
+        self.rb_target_a = QRadioButton("Inicio (A)" if lang == "es" else "Origin (A)")
+        self.rb_target_inflection = QRadioButton("Inflexión (C)" if lang == "es" else "Inflection (C)")
+        self.rb_target_inflection.setToolTip(tr("rt_target_inflection_tip", lang))
         self.rb_target_b.setChecked(True)
         click_tgt_lay.addWidget(self.rb_target_b)
         click_tgt_lay.addWidget(self.rb_target_a)
@@ -907,7 +1340,7 @@ class EditorRutinasNPCWidget(QWidget):
         insp_layout.addWidget(click_target_box)
 
         # 3. Coordenadas de Inicio (A) y Fin (B)
-        pts_box = QGroupBox(" Coordenadas de Ruta (AWSD)")
+        pts_box = QGroupBox(f" {tr('rt_coords_group', lang)}")
         pts_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         pts_lay = QVBoxLayout(pts_box)
         pts_lay.setContentsMargins(8, 6, 8, 6)
@@ -1002,14 +1435,15 @@ class EditorRutinasNPCWidget(QWidget):
         insp_layout.addWidget(inflection_box)
 
         # 4. Dinámica y Tiempo
-        time_box = QGroupBox("⏱ Tiempo, Espera & Vista")
+        lang = getattr(self, 'lang', 'es')
+        time_box = QGroupBox(tr("rt_time_wait_facing", lang))
         time_box.setStyleSheet("QGroupBox { font-size: 10px; color: #8B949E; border: 1px solid #30363D; border-radius: 4px; margin-top: 6px; padding-top: 6px; } QGroupBox::title { subcontrol-origin: margin; left: 8px; }")
         time_lay = QVBoxLayout(time_box)
         time_lay.setContentsMargins(8, 6, 8, 6)
         time_lay.setSpacing(4)
 
         row_t = QHBoxLayout()
-        row_t.addWidget(QLabel("Hora:"))
+        row_t.addWidget(QLabel(tr("lbl_hour", lang)))
         self.spin_hour = QSpinBox()
         self.spin_hour.setRange(0, 23)
         self.spin_hour.setSuffix("h")
@@ -1019,7 +1453,7 @@ class EditorRutinasNPCWidget(QWidget):
         self.spin_minute.setSuffix("m")
         row_t.addWidget(self.spin_hour)
         row_t.addWidget(self.spin_minute)
-        row_t.addWidget(QLabel("Espera:"))
+        row_t.addWidget(QLabel(tr("lbl_wait", lang)))
         self.spin_delay = QSpinBox()
         self.spin_delay.setRange(0, 720)
         self.spin_delay.setSingleStep(5)
@@ -1028,7 +1462,7 @@ class EditorRutinasNPCWidget(QWidget):
         time_lay.addLayout(row_t)
 
         row_v = QHBoxLayout()
-        row_v.addWidget(QLabel("Vista:"))
+        row_v.addWidget(QLabel(tr("lbl_facing", lang)))
         self.combo_dir = QComboBox()
         self.combo_dir.addItem("Abajo", DIR_DOWN)
         self.combo_dir.addItem("Arriba", DIR_UP)
@@ -1049,19 +1483,24 @@ class EditorRutinasNPCWidget(QWidget):
 
         # 5. Botones de acción rápida
         insp_btn_lay = QHBoxLayout()
-        self.btn_snap_tiles = QPushButton(" Centrar en Tiles")
-        self.btn_snap_tiles.setToolTip("Ajusta las coordenadas A y B directamente a los tiles transitables de la ROM.")
+        self.btn_snap_tiles = QPushButton(tr("btn_snap_tiles", lang))
+        self.btn_snap_tiles.setToolTip(tr("rt_snap_tiles_tip", lang))
         self.btn_snap_tiles.clicked.connect(self._on_snap_to_walkable_clicked)
 
-        self.btn_recalc_path = QPushButton(" Recalcular A*")
+        self.btn_stand_still = QPushButton(tr("btn_stand_still", lang))
+        self.btn_stand_still.setToolTip(tr("rt_stand_still_tip", lang))
+        self.btn_stand_still.clicked.connect(self._on_stand_still_clicked)
+
+        self.btn_recalc_path = QPushButton(tr("btn_recalc_path", lang))
         self.btn_recalc_path.setStyleSheet("background-color: #1F6FEB; color: white; font-weight: bold;")
         self.btn_recalc_path.clicked.connect(self._on_recalc_a_star_clicked)
 
-        self.btn_toggle_loop = QPushButton(" Modo Bucle")
-        self.btn_toggle_loop.setToolTip("Alterna el movimiento entre recorrido lineal A  B o bucle continuo cerrado (B = A).")
+        self.btn_toggle_loop = QPushButton(tr("btn_toggle_loop", lang))
+        self.btn_toggle_loop.setToolTip(tr("rt_toggle_loop_tip", lang))
         self.btn_toggle_loop.clicked.connect(self._on_toggle_loop_clicked)
 
         insp_btn_lay.addWidget(self.btn_snap_tiles)
+        insp_btn_lay.addWidget(self.btn_stand_still)
         insp_btn_lay.addWidget(self.btn_recalc_path)
         insp_btn_lay.addWidget(self.btn_toggle_loop)
         insp_layout.addLayout(insp_btn_lay)
@@ -1136,8 +1575,8 @@ class EditorRutinasNPCWidget(QWidget):
             return
 
         QMessageBox.information(
-            self, "Editor de Mapas",
-            f" Mapa: {get_map_display_name(base_id)} (Header ID: {header_id})."
+            self, tr("tab_map_editor", self.lang) if "tab_map_editor" in tr("tab_map_editor", self.lang) else "Map Editor",
+            f" {tr('rt_map_label', self.lang)} {get_map_display_name(base_id, lang=self.lang)} (Header ID: {header_id})."
         )
 
     def _on_segment_selected(self):
@@ -1257,7 +1696,7 @@ class EditorRutinasNPCWidget(QWidget):
         """Responde a clics sobre nodos del Macromapa para sincronizar el visor y filtro."""
         base_id, _ = unpack_fomt_map_id(map_id)
         self.route_canvas.load_map_view(base_id)
-        self.lbl_canvas_map_name.setText(f" {get_map_display_name(base_id)}")
+        self.lbl_canvas_map_name.setText(f" {get_map_display_name(base_id, lang=self.lang)}")
 
         if self.current_mode == "BY_MAP":
             idx = self.combo_filter_map.findData(base_id)
@@ -1650,6 +2089,46 @@ class EditorRutinasNPCWidget(QWidget):
             self._refresh_map_segments()
         self.table_segments.selectRow(row)
 
+    def _on_stand_still_clicked(self):
+        """Configura el tramo como estático (NPC quieto sin desplazamiento, num_points = 0)."""
+        rows = self.table_segments.selectionModel().selectedRows()
+        if not rows:
+            return
+        row = rows[0].row()
+        if row >= len(self.current_segments):
+            return
+
+        seg = self.current_segments[row]
+        wp = seg["wp_ref"]
+        ax, ay = wp.spawn_x, wp.spawn_y
+
+        wp.dest_x = ax
+        wp.dest_y = ay
+        wp.path_nodes = [(ax, ay)]
+        wp.is_edited = True
+        wp.raw_bytes = None
+        if hasattr(wp, 'node_delays'): wp.node_delays.clear()
+        if hasattr(wp, 'node_speeds'): wp.node_speeds.clear()
+        if hasattr(wp, 'node_facings'): wp.node_facings.clear()
+
+        self._updating_ui = True
+        self.spin_bx.setValue(ax)
+        self.spin_by.setValue(ay)
+        self.spin_bx.setEnabled(True)
+        self.spin_by.setEnabled(True)
+        self.rb_target_b.setEnabled(True)
+        self._updating_ui = False
+
+        seg["bx"] = ax
+        seg["by"] = ay
+        seg["path_nodes"] = list(wp.path_nodes)
+        seg["is_loop"] = False
+        seg["dist"] = 0
+
+        self._populate_inflection_combo(wp)
+        self._on_auto_path_change(force_recalc=False)
+        self.status_bar.showMessage(" Tramo configurado como ESTÁTICO (NPC quieto en sus coordenadas).", 3500)
+
     def _on_canvas_point_clicked(self, x: int, y: int):
         """Asigna la coordenada del clic a Inicio (A), Destino (B) o Inflexión (C) y auto-ajusta la malla de caminata."""
         rows = self.table_segments.selectionModel().selectedRows()
@@ -1948,7 +2427,7 @@ class EditorRutinasNPCWidget(QWidget):
 
     def _on_add_waypoint(self):
         if not self.current_schedule:
-            QMessageBox.warning(self, "Aviso", "Seleccione un horario activo.")
+            QMessageBox.warning(self, tr("rt_notice", self.lang), tr("rt_select_schedule_prompt", self.lang))
             return
 
         last_wp = self.current_schedule.waypoints[-1] if self.current_schedule.waypoints else None
@@ -1998,9 +2477,9 @@ class EditorRutinasNPCWidget(QWidget):
 
         ok, msg = RoutineCodec.reinject_npc_to_project(self.project, self.current_npc.npc_id, self.current_npc)
         if ok:
-            QMessageBox.information(self, "Éxito", msg)
+            QMessageBox.information(self, tr("rt_success", self.lang), msg)
         else:
-            QMessageBox.critical(self, "Error", msg)
+            QMessageBox.critical(self, tr("rt_error", self.lang), msg)
 
     def _on_export_json(self):
         if not self.current_npc:

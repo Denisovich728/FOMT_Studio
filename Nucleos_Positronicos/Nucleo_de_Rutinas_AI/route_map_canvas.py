@@ -25,6 +25,7 @@ from PyQt6.QtGui import (
     QWheelEvent, QMouseEvent, QResizeEvent
 )
 
+from Consola_de_Comando.i18n import tr
 from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.fomt_map_names import (
     get_map_display_name, get_map_header_id_for_event_map, unpack_fomt_map_id
 )
@@ -81,6 +82,7 @@ class RouteVectorOverlayItem(QGraphicsItem):
     def __init__(self, canvas_view: 'RouteMapCanvas'):
         super().__init__()
         self.canvas_view = canvas_view
+        self.canvas = canvas_view
         self.setZValue(10)
         self.segments: List[dict] = []
         self.highlight_id: Optional[str] = None
@@ -355,7 +357,8 @@ class RouteVectorOverlayItem(QGraphicsItem):
             if self.show_labels:
                 time_str = seg.get("time_str", "")
                 delay_str = seg.get("delay_str", "0m")
-                loop_tag = "  Bucle" if is_loop else ""
+                lang = getattr(self.canvas_view, 'get_lang', lambda: 'es')()
+                loop_tag = f"  [{tr('canvas_loop_tag', lang)}]" if is_loop else ""
                 tag_text = f"#{orig_idx+1}{loop_tag} {time_str} ({delay_str})"
 
                 lbl_w = 110 if is_loop else 90
@@ -624,6 +627,20 @@ class RouteMapCanvas(QGraphicsView):
 
         return None
 
+    def get_lang(self) -> str:
+        """Obtiene el idioma activo desde la jerarquía de widgets Qt."""
+        p = self
+        while p:
+            if hasattr(p, 'lang') and p.lang:
+                return str(p.lang).lower()
+            if hasattr(p, 'current_lang') and p.current_lang:
+                return str(p.current_lang).lower()
+            try:
+                p = p.parent()
+            except Exception:
+                break
+        return "es"
+
     def _generate_synthetic_map(self, base_id: int) -> QPixmap:
         """Genera un plano estético del mapa con colores y proporciones de Mineral Town."""
         is_large_outdoor = base_id in (0x00, 0x01, 0x02, 0x03, 0x05, 0x06, 0x07, 0x08)
@@ -659,7 +676,7 @@ class RouteMapCanvas(QGraphicsView):
 
         painter.setFont(QFont("Segoe UI", 16, QFont.Weight.Bold))
         painter.setPen(QColor(255, 255, 255, 40))
-        painter.drawText(QRectF(0, 0, w, h), Qt.AlignmentFlag.AlignCenter, get_map_display_name(base_id))
+        painter.drawText(QRectF(0, 0, w, h), Qt.AlignmentFlag.AlignCenter, get_map_display_name(base_id, lang=self.get_lang()))
 
         painter.end()
         return pix
@@ -851,26 +868,28 @@ class RouteMapCanvas(QGraphicsView):
             nodes = self.get_active_path_nodes()
             nx, ny = nodes[node_i]
             is_loop = (len(nodes) > 1 and nodes[0] == nodes[-1])
+            lang = self.get_lang()
             if node_i == 0:
                 if is_loop:
-                    self.setToolTip(f" [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
+                    self.setToolTip(tr("canvas_loop_node_tip", lang).format(nx, ny))
                 else:
-                    self.setToolTip(f" [Punto A (Inicio)]: ({nx}, {ny})\nArrastra para mover el inicio de la ruta")
+                    self.setToolTip(tr("canvas_start_node_tip", lang).format(nx, ny))
             elif node_i == len(nodes) - 1:
                 if is_loop:
-                    self.setToolTip(f" [Punto A/B (Bucle Continuo)]: ({nx}, {ny})\nArrastra para trasladar el circuito del bucle")
+                    self.setToolTip(tr("canvas_loop_node_tip", lang).format(nx, ny))
                 else:
-                    self.setToolTip(f" [Punto B (Destino)]: ({nx}, {ny})\nArrastra para mover el destino de la ruta")
+                    self.setToolTip(tr("canvas_end_node_tip", lang).format(nx, ny))
             else:
-                self.setToolTip(f" [Punto de Inflexión #{node_i}]: ({nx}, {ny})\nArrastra para centrar en la calle o Clic Derecho para opciones")
+                self.setToolTip(tr("canvas_inflection_node_tip", lang).format(node_i, nx, ny))
         else:
             seg_match = self.find_segment_at(sc_pos, threshold=8.0)
+            lang = self.get_lang()
             if seg_match is not None:
                 self.setCursor(Qt.CursorShape.CrossCursor)
-                self.setToolTip(f"➕ Trayectoria: ({cur_x}, {cur_y})\nDoble clic aquí para insertar un nuevo Punto de Inflexión")
+                self.setToolTip(tr("canvas_trajectory_tip", lang).format(cur_x, cur_y))
             else:
                 self.setCursor(Qt.CursorShape.ArrowCursor)
-                self.setToolTip(f"Coordenadas: ({cur_x}, {cur_y})")
+                self.setToolTip(tr("canvas_coords_tip", lang).format(cur_x, cur_y))
 
         if prev_hover != self._hovered_node_idx:
             self.overlay_item.update()
@@ -919,8 +938,9 @@ class RouteMapCanvas(QGraphicsView):
             "QMenu::item { padding: 5px 20px; border-radius: 3px; }"
             "QMenu::item:selected { background-color: #1F6FEB; color: white; }"
         )
-        act_snap = menu.addAction(f" Centrar Inflexión #{node_idx} en Calle/Tile")
-        act_del = menu.addAction(f"️ Eliminar Punto de Inflexión #{node_idx}")
+        lang = self.get_lang()
+        act_snap = menu.addAction(tr("canvas_snap_action", lang).format(node_idx))
+        act_del = menu.addAction(tr("canvas_del_action", lang).format(node_idx))
 
         pt = global_pt.toPoint() if hasattr(global_pt, "toPoint") else QPoint(int(global_pt.x()), int(global_pt.y()))
         action = menu.exec(pt)

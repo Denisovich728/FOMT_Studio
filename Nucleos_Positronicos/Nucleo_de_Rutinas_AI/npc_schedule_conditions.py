@@ -1024,6 +1024,91 @@ class ScheduleCondition:
     def condition_desc(self) -> str:
         return self.detail
 
+    def get_localized_weather(self, lang: str = "es") -> str:
+        lk = (lang or "es").lower()
+        WEATHER_MAP = {
+            "Soleado": {"es": "Soleado", "en": "Sunny", "jp": "晴れ", "de": "Sonnig", "ru": "Солнечно", "zh": "晴朗", "pt": "Ensolarado"},
+            "Soleado / Nublado": {"es": "Soleado / Nublado", "en": "Sunny / Overcast", "jp": "晴れ / 曇り", "de": "Sonnig / Bewölkt", "ru": "Солнечно / Облачно", "zh": "晴天 / 多云", "pt": "Ensolarado / Nublado"},
+            "Lluvia": {"es": "Lluvia", "en": "Rain", "jp": "雨", "de": "Regen", "ru": "Дождь", "zh": "雨天", "pt": "Chuva"},
+            "Tormenta / Ventisca": {"es": "Tormenta / Ventisca", "en": "Storm / Blizzard", "jp": "嵐 / 吹雪", "de": "Sturm / Schneesturm", "ru": "Буря / Метель", "zh": "风暴 / 暴雪", "pt": "Tempestade / Nevasca"},
+            "Cualquiera": {"es": "Cualquiera", "en": "Any Weather", "jp": "全天候", "de": "Beliebig", "ru": "Любая погода", "zh": "任何天气", "pt": "Qualquer Clima"},
+            "Cualquier clima": {"es": "Cualquier clima", "en": "Any Weather", "jp": "全天候", "de": "Beliebiges Wetter", "ru": "Любая погода", "zh": "任何天气", "pt": "Qualquer Clima"},
+            "Condicional / Evento": {"es": "Condicional / Evento", "en": "Conditional / Event", "jp": "条件付き / イベント", "de": "Bedingt / Event", "ru": "Условное / Событие", "zh": "条件触发 / 事件", "pt": "Condicional / Evento"}
+        }
+        entry = WEATHER_MAP.get(self.weather.strip())
+        if entry:
+            return entry.get(lk, entry.get("en", self.weather))
+        return self.weather
+
+    def get_localized_days(self, lang: str = "es") -> str:
+        lk = (lang or "es").lower()
+        DAYS_MAP = {
+            "Lunes a Sábado": {"es": "Lunes a Sábado", "en": "Monday to Saturday", "jp": "月曜〜土曜", "de": "Montag bis Samstag", "ru": "С понедельника по субботу", "zh": "周一至周六", "pt": "Segunda a Sábado"},
+            "Domingos": {"es": "Domingos", "en": "Sundays", "jp": "日曜日", "de": "Sonntags", "ru": "Воскресенья", "zh": "周日", "pt": "Domingos"},
+            "Martes": {"es": "Martes", "en": "Tuesday", "jp": "火曜日", "de": "Dienstag", "ru": "Вторник", "zh": "周二", "pt": "Terça-feira"},
+            "Cualquiera": {"es": "Cualquiera", "en": "Any Day", "jp": "毎日", "de": "Jeder Tag", "ru": "Любой день", "zh": "任意一天", "pt": "Qualquer Dia"},
+            "Cualquier día": {"es": "Cualquier día", "en": "Any Day", "jp": "毎日", "de": "Jeder Tag", "ru": "Любой день", "zh": "任意一天", "pt": "Qualquer Dia"},
+            "Cualquier día de mal tiempo": {"es": "Día de Mal Tiempo", "en": "Severe Weather Days", "jp": "悪天候の日", "de": "Schlechtwettertage", "ru": "Дни непогоды", "zh": "恶劣天气日", "pt": "Dias de Mau Tempo"},
+            "Días de festival": {"es": "Días de Festival", "en": "Festival Days", "jp": "祭りの日", "de": "Festtage", "ru": "Дни фестивалей", "zh": "节日活动日", "pt": "Dias de Festival"},
+            "Días festivos o cita médica": {"es": "Días Festivos o Cita Médica", "en": "Holidays or Clinic Days", "jp": "祝日または診察日", "de": "Feiertage oder Arzttermin", "ru": "Праздники или прием у врача", "zh": "节日或就诊日", "pt": "Feriados ou Consulta Médica"},
+            "Días ordinarios de casada": {"es": "Días Ordinarios de Casada", "en": "Married Daily Life", "jp": "結婚後の日常", "de": "Verheiratet (Alltag)", "ru": "Будни в браке", "zh": "已婚日常生活", "pt": "Dias Casada"},
+            "Días severos": {"es": "Días Severos", "en": "Severe Weather Days", "jp": "悪天候の日", "de": "Schlechtwettertage", "ru": "Дни шторма", "zh": "暴风雨雪日", "pt": "Dias Severos"},
+            "Días designados": {"es": "Días Designados", "en": "Designated Days", "jp": "指定日", "de": "Bestimmte Tage", "ru": "Назначенные дни", "zh": "指定日期", "pt": "Dias Designados"}
+        }
+        entry = DAYS_MAP.get(self.days.strip())
+        if entry:
+            return entry.get(lk, entry.get("en", self.days))
+        return self.days
+
+    def get_localized_badge(self, lang: str = "es") -> str:
+        lk = (lang or "es").lower()
+        BADGE_MAP = {
+            "Granja del Jugador": {"es": "Granja del Jugador", "en": "Player's Farm", "jp": "牧場", "de": "Spieler-Farm", "ru": "Ферма игрока", "zh": "主角农场", "pt": "Fazenda do Jogador"},
+            "Gallinero de la Granja": {"es": "Gallinero", "en": "Chicken Coop", "jp": "ニワトリ小屋", "de": "Hühnerstall", "ru": "Курятник", "zh": "鸡舍", "pt": "Galinheiro"},
+            "Establo de la Granja": {"es": "Establo de Animales", "en": "Animal Barn", "jp": "動物小屋", "de": "Tierscheune", "ru": "Стойло", "zh": "动物牛羊棚", "pt": "Estábulo"},
+            "Zona de Festival": {"es": "Zona de Festival", "en": "Festival Area", "jp": "お祭り広場", "de": "Festivalbereich", "ru": "Зона фестиваля", "zh": "活动场地", "pt": "Área de Festival"},
+            "Interior": {"es": "Interior", "en": "Indoors", "jp": "室内", "de": "Innenbereich", "ru": "Внутри", "zh": "室内", "pt": "Interior"},
+            "Mineral Town": {"es": "Mineral Town", "en": "Mineral Town", "jp": "ミネラルタウン", "de": "Mineralstadt", "ru": "Минеральный городок", "zh": "矿石镇", "pt": "Mineral Town"},
+            "Mostrador": {"es": "Mostrador", "en": "Shop Counter", "jp": "店カウンター", "de": "Ladentheke", "ru": "Прилавок", "zh": "商店柜台", "pt": "Balcão"},
+            "Habitaciones": {"es": "Habitaciones", "en": "Living Quarters", "jp": "居室", "de": "Wohnräume", "ru": "Жилые комнаты", "zh": "生活居室", "pt": "Quartos"},
+            "Tienda": {"es": "Tienda", "en": "Shop", "jp": "店", "de": "Laden", "ru": "Магазин", "zh": "商店", "pt": "Loja"},
+            "Pueblo Sur": {"es": "Pueblo Sur", "en": "South Side Town", "jp": "町（南）", "de": "Südliche Stadt", "ru": "Южная часть города", "zh": "城镇南部", "pt": "Cidade Sul"},
+            "Pueblo Norte": {"es": "Pueblo Norte", "en": "North Side Town", "jp": "町（北）", "de": "Nördliche Stadt", "ru": "Северная часть города", "zh": "城镇北部", "pt": "Cidade Norte"},
+            "Plaza Rosa": {"es": "Plaza Rosa", "en": "Rose Square", "jp": "ローズ広場", "de": "Rosenplatz", "ru": "Площадь Розы", "zh": "玫瑰广场", "pt": "Praça Rosa"},
+            "Playa Mineral": {"es": "Playa Mineral", "en": "Mineral Beach", "jp": "ミネラルビーチ", "de": "Mineralstrand", "ru": "Пляж Минерал", "zh": "矿石海滩", "pt": "Praia Mineral"},
+            "Colina Madre": {"es": "Colina Madre", "en": "Mother's Hill", "jp": "マザーズヒル", "de": "Mutterberg", "ru": "Материнский холм", "zh": "圣母山", "pt": "Colina Mãe"},
+            "Iglesia": {"es": "Iglesia", "en": "Church", "jp": "教会", "de": "Kirche", "ru": "Церковь", "zh": "教堂", "pt": "Igreja"},
+            "Clínica": {"es": "Clínica", "en": "Clinic", "jp": "病院", "de": "Klinik", "ru": "Больница", "zh": "诊所", "pt": "Clínica"},
+            "Biblioteca": {"es": "Biblioteca", "en": "Library", "jp": "図書館", "de": "Bibliothek", "ru": "Библиотека", "zh": "图书馆", "pt": "Biblioteca"},
+            "Supermercado": {"es": "Supermercado", "en": "Supermarket", "jp": "スーパーマーケット", "de": "Supermarkt", "ru": "Супермаркет", "zh": "杂货店", "pt": "Supermercado"},
+            "Herrería": {"es": "Herrería", "en": "Blacksmith", "jp": "鍛冶屋", "de": "Schmiede", "ru": "Кузница", "zh": "铁匠铺", "pt": "Ferraria"}
+        }
+        entry = BADGE_MAP.get(self.location_badge.strip())
+        if entry:
+            return entry.get(lk, entry.get("en", self.location_badge))
+        return self.location_badge
+
+    def get_localized_name(self, lang: str = "es") -> str:
+        lk = (lang or "es").lower()
+        if lk == "es":
+            return self.name
+        d = self.get_localized_days(lk)
+        w = self.get_localized_weather(lk)
+        b = self.get_localized_badge(lk)
+        if b and b != "Mineral Town":
+            return f"{d} - {w} ({b})"
+        return f"{d} - {w}"
+
+    def get_localized_desc(self, lang: str = "es") -> str:
+        lk = (lang or "es").lower()
+        if lk == "es" and self.condition_desc:
+            return self.condition_desc
+        d = self.get_localized_days(lk)
+        w = self.get_localized_weather(lk)
+        b = self.get_localized_badge(lk)
+        prefix = "Active on:" if lk == "en" else ("Aktiv am:" if lk == "de" else "Active:")
+        return f"{prefix} {d} | {w} | {b}"
+
     @classmethod
     def from_data(cls, data):
         if isinstance(data, cls):
