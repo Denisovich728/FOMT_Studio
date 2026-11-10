@@ -27,6 +27,7 @@ wheels/
 # GBA ROMs (Binaries)
 *.gba
 *.sav
+*.ips
 
 # IDE Settings
 .vscode/
@@ -35,6 +36,10 @@ wheels/
 # FoMT Studio Sessions
 Sessions/
 Session_*/
+Workspace/
+Workspace_*/
+Test_Event_Names/
+Test_Event_Names_*/
 
 # Temp / Scratch
 scratch/
@@ -45,6 +50,7 @@ temp_*.py
 *.fsp
 config.json
 .env
+.ico
 
 # Extracted portraits & temp files
 portraits_dump/
