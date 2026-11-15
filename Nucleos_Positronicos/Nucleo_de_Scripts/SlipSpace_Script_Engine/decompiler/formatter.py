@@ -53,11 +53,11 @@ class Formatter:
                 0x09: "{VALUE9}",
                 0x0C: "\\w", 
                 0x19: "{HORSE}",
-                0x22: '\"',
-                0x5C: "\\\\",
-                0xF0: "Á", 0xF1: "É", 0xF2: "Í", 0xF3: "Ó", 0xF4: "Ú",
-                0xF5: "á", 0xF6: "é", 0xF7: "í", 0xF8: "ó", 0xF9: "ú",
-                0xCB: "Ñ", 0xCC: "ñ"
+                0x22: r'\"',
+                0x5C: r"\\",
+                0xC4: "á", 0xC5: "é", 0xC6: "í", 0xC7: "ó", 0xC8: "ú", 0xC9: "ü", 0xCA: "ñ",
+                0xCB: "Á", 0xCC: "É", 0xCD: "Í", 0xCE: "Ó", 0xCF: "Ú", 0xD0: "Ü", 0xD1: "Ñ",
+                0xD2: "¿", 0xD3: "¡", 0xAD: "ç", 0xAE: "Ç",
             }
             
             res = '"'
@@ -171,6 +171,13 @@ class Formatter:
             for s in stmt.body: self.format_stmt(s)
             self.unindent()
             self.write_line(f"}} while ({self.format_expr(stmt.condition)});")
+
+        elif isinstance(stmt, StmtWhile):
+            self.write_line(f"while ({self.format_expr(stmt.condition)}) {{")
+            self.indent()
+            for s in stmt.body: self.format_stmt(s)
+            self.unindent()
+            self.write_line("}")
             
         elif isinstance(stmt, StmtFor):
             # Try to format head and tail inline if they are simple

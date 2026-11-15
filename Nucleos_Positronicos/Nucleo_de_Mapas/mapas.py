@@ -1304,9 +1304,12 @@ class MapParser:
         """Carga los assets del mapa desde la ROM."""
         return map_header.load_data(self.project.base_rom_data)
 
-    def find_free_space(self, size: int, start_offset: int = 0x800000) -> int:
+    def find_free_space(self, size: int, start_offset: int = 0) -> int:
+        if hasattr(self.project, 'allocate_free_space'):
+            return self.project.allocate_free_space(size)
+        min_off = start_offset or (0x9E0000 if getattr(self.project, 'is_mfomt', False) else 0x760000)
         search_bytes = b'\xFF' * size
-        idx = self.project.base_rom_data.find(search_bytes, start_offset)
+        idx = self.project.base_rom_data.find(search_bytes, min_off)
         if idx != -1:
             if idx % 4 != 0:
                 idx += 4 - (idx % 4)
@@ -1315,63 +1318,79 @@ class MapParser:
 
     def create_new_map(self, width: int, height: int) -> int:
         """
-        Crea un nuevo mapa repunteando toda la tabla maestra.
+        Crea un nuevo mapa repunteando toda la tabla maestra y reservando
+        capas LZ77 vacías válidas en espacio libre respetando el FSP.
         Devuelve el ID del nuevo mapa creado.
         """
         if self._table_offset is None or self._literal_pool_addr is None:
             raise Exception("No se encontró la tabla de mapas o el Literal Pool no está disponible para repuntear.")
-            
+
         rom = self.project.base_rom_data
         num_maps = len(self.maps)
-        
+
         # Tamaño de la tabla actual + 1 nueva entrada
         old_table_size = num_maps * self.STRIDE
         new_table_size = old_table_size + self.STRIDE
-        
-        # 1. Buscar espacio libre para la nueva tabla
+
+        # 1. Reservar espacio libre para capas vacías comprimidas (bg3, bg2, bg1, obj1=col, obj2=behavior_dict)
+        empty_tile_lz = compress_lz77(b'\x00' * (width * height * 2))
+        empty_col_lz = compress_lz77(b'\x00' * (width * height))
+        empty_dict_lz = compress_lz77(b'\x00' * 16)
+
+        p_bg3_off = self.find_free_space(len(empty_tile_lz))
+        self.project.write_patch(p_bg3_off, empty_tile_lz)
+        p_bg2_off = self.find_free_space(len(empty_tile_lz))
+        self.project.write_patch(p_bg2_off, empty_tile_lz)
+        p_bg1_off = self.find_free_space(len(empty_tile_lz))
+        self.project.write_patch(p_bg1_off, empty_tile_lz)
+        p_obj1_off = self.find_free_space(len(empty_col_lz))
+        self.project.write_patch(p_obj1_off, empty_col_lz)
+        p_obj2_off = self.find_free_space(len(empty_dict_lz))
+        self.project.write_patch(p_obj2_off, empty_dict_lz)
+
+        # 2. Reservar espacio libre para la nueva tabla maestra
         new_table_offset = self.find_free_space(new_table_size)
         if new_table_offset == -1:
-            new_table_offset = len(rom)
-            if new_table_offset % 4 != 0:
-                new_table_offset += 4 - (new_table_offset % 4)
-                
-        # 2. Copiar la tabla vieja al nuevo espacio
+            new_table_offset = (len(rom) + 3) & ~3
+
+        # 3. Copiar la tabla vieja y agregar la nueva entrada al nuevo espacio
         old_table_data = rom[self._table_offset : self._table_offset + old_table_size]
-        self.project.overwrite_rom_directly(new_table_offset, old_table_data)
-        
-        # 3. Crear la nueva entrada de mapa (vacía/referencias a mapa 0 para evitar crash)
         new_map_id = num_maps
-        base_map = self.maps[0] # Clonar assets básicos del mapa 0
+        base_map = self.maps[0]
         new_entry = struct.pack('<8I2HI',
             base_map.p_gfx,
             base_map.p_pal1,
             base_map.p_pal2,
-            0, # bg3
-            0, # bg2
-            0, # bg1
-            0, # obj1
-            0, # obj2
+            p_bg3_off | 0x08000000,
+            p_bg2_off | 0x08000000,
+            p_bg1_off | 0x08000000,
+            p_obj1_off | 0x08000000,
+            p_obj2_off | 0x08000000,
             width,
             height,
-            0  # attributes
+            0
         )
-        self.project.overwrite_rom_directly(new_table_offset + old_table_size, new_entry)
-        
-        # 4. Actualizar el Literal Pool
+        self.project.write_patch(new_table_offset, old_table_data + new_entry)
+
+        # 4. Actualizar el Literal Pool (seguro en FoMT y MFoMT)
         new_table_ptr = new_table_offset | 0x08000000
         ptr_data = struct.pack('<I', new_table_ptr)
-        
-        for pool_addr in self.LITERAL_POOLS_MAP_TABLE:
-            self.project.overwrite_rom_directly(pool_addr, ptr_data)
-            
-        # Optional: still update the one found dynamically if it wasn't in the list
-        if self._literal_pool_addr and self._literal_pool_addr not in self.LITERAL_POOLS_MAP_TABLE:
-            self.project.overwrite_rom_directly(self._literal_pool_addr, ptr_data)
-        
-        # Actualizar estado interno
+        is_mfomt = getattr(self.project, 'is_mfomt', False)
+        if not is_mfomt:
+            for pool_addr in self.LITERAL_POOLS_MAP_TABLE:
+                self.project.write_patch(pool_addr, ptr_data)
+        if self._literal_pool_addr and (is_mfomt or self._literal_pool_addr not in self.LITERAL_POOLS_MAP_TABLE):
+            self.project.write_patch(self._literal_pool_addr, ptr_data)
+
+        # Actualizar estado interno y guardar FSP
         self._table_offset = new_table_offset
+        if hasattr(self.project, 'save') and getattr(self.project, 'project_dir', None):
+            try:
+                self.project.save()
+            except Exception:
+                pass
+        self.scan_maps()
         print(f"Tabla de mapas repunteada a 0x{new_table_offset:X}. Nuevo mapa ID: {new_map_id}")
-        
         return new_map_id
 
     def save_map(self, map_index: int, renderer) -> bool:

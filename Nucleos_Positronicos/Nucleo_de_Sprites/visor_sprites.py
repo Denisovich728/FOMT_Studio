@@ -45,6 +45,40 @@ OAM_ARRAY_BASE    = 0x599E20
 ANIM_TABLE_BASE   = 0x58BA2C
 SCRIPT_BASE       = 0x663208
 
+# Tablas de paletas de 8 niveles para herramientas (32 bytes x 8 niveles: Base..Mítica)
+TOOL_TIER_PALETTES = {
+    "axe_hammer_hoe": (0x676F50, 0x6178E8),
+    "fishing_rod":    (0x677AB0, 0x6184A8),
+    "sickle":         (0x678FB0, 0x6199E8),
+    "watering_can":   (0x679570, 0x619FC8),
+}
+
+TOOL_TIERS = [
+    ("Base", 0),
+    ("Cobre", 1),
+    ("Plata", 2),
+    ("Oro", 3),
+    ("Mitrilo", 4),
+    ("Maldita", 6),
+    ("Bendita", 5),
+    ("Mítica", 7),
+]
+
+
+def detect_tool_key(anim_name: str, category: str = "") -> Optional[str]:
+    low = (anim_name or "").lower()
+    if any(k in low for k in ("axe", "hammer", "hoe", "hacha", "martillo", "azada")):
+        return "axe_hammer_hoe"
+    if any(k in low for k in ("fishing", "fishin", "caña", "cana", "pesca")):
+        return "fishing_rod"
+    if any(k in low for k in ("sickle", "hoz")):
+        return "sickle"
+    if any(k in low for k in ("watering_can", "watering can", "regadera")):
+        return "watering_can"
+    if "herramienta" in (category or "").lower() or "tool" in (category or "").lower():
+        return "axe_hammer_hoe"
+    return None
+
 OAM_DIMS = {
     (0, 0): (8, 8),   (0, 1): (16, 16), (0, 2): (32, 32), (0, 3): (64, 64),
     (1, 0): (16, 8),  (1, 1): (32, 8),  (1, 2): (32, 16), (1, 3): (64, 32),
@@ -81,6 +115,13 @@ def pil_to_qpixmap(pil_img: Optional[Image.Image], scale: int = 1) -> QPixmap:
 class SymphonySpriteEngine:
     def __init__(self, rom_data: bytes):
         self.rom = rom_data
+        self.is_mfomt = bool(rom_data and len(rom_data) >= 0xAC and b"HM MFOM USA\0" in rom_data[0xA0:0xAC])
+        self.SPRITE_TILES_BASE = 0x53AB8C if self.is_mfomt else SPRITE_TILES_BASE
+        self.SPRITE_PAL_BASE   = 0x602170 if self.is_mfomt else SPRITE_PAL_BASE
+        self.FRAME_ARRAY_BASE  = 0x52557C if self.is_mfomt else FRAME_ARRAY_BASE
+        self.OAM_ARRAY_BASE    = 0x5312F0 if self.is_mfomt else OAM_ARRAY_BASE
+        self.ANIM_TABLE_BASE   = 0x522C4C if self.is_mfomt else ANIM_TABLE_BASE
+        self.SCRIPT_BASE       = 0x6036B8 if self.is_mfomt else SCRIPT_BASE
         self._tile_cache: Dict[int, List[int]] = {}
         self._palette_cache: Dict[int, List[Tuple[int, int, int, int]]] = {}
 
@@ -88,8 +129,12 @@ class SymphonySpriteEngine:
         if pal_idx in self._palette_cache:
             return self._palette_cache[pal_idx]
 
+        pal = self.decode_palette_at(self.SPRITE_PAL_BASE + pal_idx * 32)
+        self._palette_cache[pal_idx] = pal
+        return pal
+
+    def decode_palette_at(self, off: int) -> List[Tuple[int, int, int, int]]:
         pal: List[Tuple[int, int, int, int]] = []
-        off = SPRITE_PAL_BASE + pal_idx * 32
         for i in range(16):
             if off + i * 2 + 2 <= len(self.rom):
                 c = struct.unpack_from('<H', self.rom, off + i * 2)[0]
@@ -98,15 +143,13 @@ class SymphonySpriteEngine:
                 pal.append((r, g, b, alpha))
             else:
                 pal.append((0, 0, 0, 0))
-
-        self._palette_cache[pal_idx] = pal
         return pal
 
     def decode_tile(self, tile_idx: int) -> List[int]:
         if tile_idx in self._tile_cache:
             return self._tile_cache[tile_idx]
 
-        off = SPRITE_TILES_BASE + tile_idx * 32
+        off = self.SPRITE_TILES_BASE + tile_idx * 32
         px: List[int] = []
         for y in range(8):
             for x in range(4):
@@ -120,8 +163,14 @@ class SymphonySpriteEngine:
         self._tile_cache[tile_idx] = px
         return px
 
-    def render_frame_with_meta(self, frame_idx: int) -> Tuple[Optional[Image.Image], int, int]:
-        frame_off = FRAME_ARRAY_BASE + frame_idx * 16
+    def render_frame_with_meta(
+        self,
+        frame_idx: int,
+        pal_bank_overrides: Optional[Dict[int, int]] = None,
+        canvas_size: Tuple[int, int] = (64, 64),
+        origin: Tuple[int, int] = (32, 48),
+    ) -> Tuple[Optional[Image.Image], int, int]:
+        frame_off = self.FRAME_ARRAY_BASE + frame_idx * 16
         if frame_off + 16 > len(self.rom):
             return None, 0, 0
 
@@ -134,12 +183,12 @@ class SymphonySpriteEngine:
         if oam_count == 0 or oam_count > 64:
             return None, pal_idx, 0
 
-        pal = self.decode_palette(pal_idx)
-        canvas = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
-        origin_x, origin_y = 32, 48
+        bank_pals: Dict[int, List[Tuple[int, int, int, int]]] = {}
+        canvas = Image.new('RGBA', canvas_size, (0, 0, 0, 0))
+        origin_x, origin_y = origin
 
         for p_i in range(oam_count):
-            part_off = OAM_ARRAY_BASE + (oam_offset + p_i) * 8
+            part_off = self.OAM_ARRAY_BASE + (oam_offset + p_i) * 8
             if part_off + 8 > len(self.rom):
                 continue
 
@@ -156,6 +205,14 @@ class SymphonySpriteEngine:
             h_flip = (attr1 >> 12) & 1
             v_flip = (attr1 >> 13) & 1
             tile_rel = attr2 & 0x3FF
+            pal_bank = (attr2 >> 12) & 0xF
+
+            if pal_bank not in bank_pals:
+                if pal_bank_overrides and pal_bank in pal_bank_overrides:
+                    bank_pals[pal_bank] = self.decode_palette_at(pal_bank_overrides[pal_bank])
+                else:
+                    bank_pals[pal_bank] = self.decode_palette(pal_idx + pal_bank)
+            pal = bank_pals[pal_bank]
 
             final_tile = gfx_off_tiles + tile_rel
             w, h = OAM_DIMS.get((shape, size), (8, 8))
@@ -185,18 +242,31 @@ class SymphonySpriteEngine:
 
         return canvas, pal_idx, oam_count
 
-    def render_animation_data(self, anim_id: int) -> Optional[Dict[str, Any]]:
-        anim_off = ANIM_TABLE_BASE + anim_id * 4
+    def render_animation_data(
+        self,
+        anim_id: int,
+        tool_key: Optional[str] = None,
+        tool_tier: int = 0,
+        canvas_size: Tuple[int, int] = (64, 64),
+        origin: Tuple[int, int] = (32, 48),
+    ) -> Optional[Dict[str, Any]]:
+        anim_off = self.ANIM_TABLE_BASE + anim_id * 4
         if anim_off + 4 > len(self.rom):
             return None
 
         val = struct.unpack_from('<I', self.rom, anim_off)[0]
         frame_count = val & 0xFFFF
         script_offset = val >> 16
-        script_off = SCRIPT_BASE + script_offset * 4
+        script_off = self.SCRIPT_BASE + script_offset * 4
 
         if script_off >= len(self.rom) or frame_count == 0 or frame_count > 128:
             return None
+
+        pal_bank_overrides: Optional[Dict[int, int]] = None
+        if tool_key and tool_key in TOOL_TIER_PALETTES:
+            f_base, m_base = TOOL_TIER_PALETTES[tool_key]
+            base_off = m_base if self.is_mfomt else f_base
+            pal_bank_overrides = {1: base_off + (tool_tier & 7) * 32}
 
         frames: List[Image.Image] = []
         durations: List[int] = []
@@ -210,7 +280,9 @@ class SymphonySpriteEngine:
             if script_off + i * 4 + 4 > len(self.rom):
                 break
             f_idx, wait_f = struct.unpack_from('<HH', self.rom, script_off + i * 4)
-            canvas, p_idx, oam_parts = self.render_frame_with_meta(f_idx)
+            canvas, p_idx, oam_parts = self.render_frame_with_meta(
+                f_idx, pal_bank_overrides=pal_bank_overrides, canvas_size=canvas_size, origin=origin
+            )
             if canvas:
                 frames.append(canvas)
                 dur = max(20, int(wait_f * 16.666))
@@ -241,7 +313,7 @@ class SymphonySpriteEngine:
         for idx, u_img in enumerate(unique_frames):
             strip.paste(u_img, (idx * 64, 0))
 
-        raw_pal = self.decode_palette(last_pal_idx)
+        raw_pal = self.decode_palette_at(pal_bank_overrides[1]) if pal_bank_overrides else self.decode_palette(last_pal_idx)
         palette_rgb = [(c[0], c[1], c[2]) for c in raw_pal]
 
         return {
@@ -809,6 +881,24 @@ class VisorSprites(QWidget):
             filter_box.addWidget(btn)
             self.filter_buttons[cat_key] = btn
 
+        self.lbl_tool_tier = QLabel("Nivel:")
+        self.lbl_tool_tier.setStyleSheet("color: #00BFFF; font-size: 11px; font-weight: bold;")
+        filter_box.addWidget(self.lbl_tool_tier)
+
+        self.combo_tool_tier = QComboBox()
+        self.combo_tool_tier.setMinimumWidth(95)
+        for label, tier_idx in TOOL_TIERS:
+            self.combo_tool_tier.addItem(label, tier_idx)
+        self.combo_tool_tier.setStyleSheet("""
+            QComboBox {
+                background: #14141E; color: #00BFFF;
+                border: 1px solid #2A2A38; border-radius: 4px;
+                padding: 4px 8px; font-size: 10px; font-weight: bold;
+            }
+        """)
+        self.combo_tool_tier.currentIndexChanged.connect(self._on_tool_tier_changed)
+        filter_box.addWidget(self.combo_tool_tier)
+
         self.lbl_count = QLabel("0 / 0")
         self.lbl_count.setStyleSheet("color: #777788; font-family: 'Consolas'; font-size: 11px;")
         filter_box.addWidget(self.lbl_count)
@@ -894,6 +984,14 @@ class VisorSprites(QWidget):
         self.btn_export_strip.clicked.connect(self._on_export_strip)
         action_bar.addWidget(self.btn_export_strip)
 
+        self.btn_export_pal = QPushButton("EXPORTAR PALETA")
+        self.btn_export_pal.setStyleSheet("""
+            QPushButton { background: #FF79C6; color: #000000; font-weight: bold; padding: 6px 14px; border-radius: 4px; font-size: 11px; }
+            QPushButton:hover { background: #FF99D6; }
+        """)
+        self.btn_export_pal.clicked.connect(self._on_export_palette)
+        action_bar.addWidget(self.btn_export_pal)
+
         action_bar.addStretch()
 
         self.btn_export_bulk = QPushButton("VOLCADO MASIVO...")
@@ -954,10 +1052,11 @@ class VisorSprites(QWidget):
     def _load_animations_database(self, mode: str):
         self._animations = []
 
-        # Buscar Fomt_Animations_Base.csv o Fomt_Animations.csv
-        csv_path = get_data_path(mode, "Fomt_Animations_Base.csv")
+        # Buscar Fomt_Animations_Base.csv o MFomt_Animations_Base.csv
+        prefix = "MFomt_" if mode == "mfomt" else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Animations_Base.csv")
         if not os.path.exists(csv_path):
-            csv_path = get_data_path(mode, "Fomt_Animations.csv")
+            csv_path = get_data_path(mode, f"{prefix}Animations.csv")
 
         # Fallback a directorio cilixes
         if not os.path.exists(csv_path):
@@ -1074,12 +1173,20 @@ class VisorSprites(QWidget):
         item = self._animations[global_idx]
         self._render_selected_animation(item)
 
+    def _on_tool_tier_changed(self, _idx: int):
+        row = self.anim_list.currentRow()
+        if 0 <= row < len(self._filtered_indices):
+            self._render_selected_animation(self._animations[self._filtered_indices[row]])
+
     def _render_selected_animation(self, item: Dict[str, Any]):
         if not self.engine:
             return
 
         anim_id = item["anim_id"]
-        data = self.engine.render_animation_data(anim_id)
+        tool_key = detect_tool_key(item["name"], item.get("category", ""))
+        tool_tier = self.combo_tool_tier.currentData() if hasattr(self, "combo_tool_tier") else 0
+        self.combo_tool_tier.setEnabled(tool_key is not None)
+        data = self.engine.render_animation_data(anim_id, tool_key=tool_key, tool_tier=tool_tier or 0)
 
         if not data:
             self.lbl_status.setText(f"Sin frames validos para 0x{anim_id:04X} ({item['name']}).")
@@ -1174,6 +1281,56 @@ class VisorSprites(QWidget):
             QMessageBox.information(self, "Exportacion Exitosa", f"Tira horizontal guardada en:\n{path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Fallo al guardar Tira:\n{e}")
+
+    def _get_current_safe_name(self) -> str:
+        row = self.anim_list.currentRow()
+        if row < 0 or row >= len(self._filtered_indices):
+            return "sprite"
+        item = self._animations[self._filtered_indices[row]]
+        return "".join(c if c not in '\\/:*?"<>|' else '_' for c in item["name"])
+
+    def _on_export_palette(self):
+        if not self._current_anim_data:
+            return
+        palette_rgb = self._current_anim_data.get("palette_rgb") or []
+        if not palette_rgb:
+            QMessageBox.warning(self, "Paleta", "No hay paleta disponible para este sprite.")
+            return
+        name = self._get_current_safe_name()
+        pal_idx = self._current_anim_data.get("pal_idx", 0)
+        path, selected_filter = QFileDialog.getSaveFileName(
+            self,
+            "Exportar Paleta de Sprite/NPC",
+            f"{name}_pal{pal_idx}.pal",
+            "JASC-PAL (*.pal);;Imagen Paleta PNG (*.png);;GIMP Palette (*.gpl)"
+        )
+        if not path:
+            return
+        try:
+            ext = os.path.splitext(path)[1].lower()
+            if ext == ".png":
+                from PIL import ImageDraw
+                sw = Image.new("RGB", (256, 32), (0, 0, 0))
+                dr = ImageDraw.Draw(sw)
+                for idx, col in enumerate(palette_rgb[:16]):
+                    r, g, b = col[0], col[1], col[2]
+                    dr.rectangle([idx * 16, 0, idx * 16 + 15, 31], fill=(r, g, b))
+                sw.save(path, "PNG")
+            elif ext == ".gpl":
+                lines = ["GIMP Palette", f"Name: {name} (Pal {pal_idx})", "Columns: 16", "#"]
+                for idx, col in enumerate(palette_rgb[:16]):
+                    lines.append(f"{col[0]:3d} {col[1]:3d} {col[2]:3d}\tColor {idx}")
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write("\n".join(lines) + "\n")
+            else:
+                lines = ["JASC-PAL", "0100", str(min(16, len(palette_rgb)))]
+                for col in palette_rgb[:16]:
+                    lines.append(f"{col[0]} {col[1]} {col[2]}")
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write("\n".join(lines) + "\n")
+            QMessageBox.information(self, "Paleta Exportada", f"Paleta guardada en:\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"No se pudo exportar la paleta:\n{e}")
 
     def _on_export_bulk(self):
         if not self.engine or not self._animations:

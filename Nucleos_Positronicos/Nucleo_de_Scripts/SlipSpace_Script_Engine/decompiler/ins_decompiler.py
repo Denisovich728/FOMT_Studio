@@ -143,7 +143,9 @@ class ASTOptimizer:
             elif isinstance(s, StmtSwitch):
                 for case in s.cases:
                     case.stmts = self._resolve_breaks(case.stmts, s.exit_label)
-            elif isinstance(s, StmtDoWhile):
+            elif isinstance(s, (StmtDoWhile, StmtWhile)):
+                s.body = self._resolve_breaks(s.body, exit_label)
+            elif isinstance(s, StmtFor):
                 s.body = self._resolve_breaks(s.body, exit_label)
             elif isinstance(s, StmtGoto) and exit_label:
                 # Heurística: es un break si apunta exactamente al final o más allá (salto de salida)
@@ -171,7 +173,9 @@ class ASTOptimizer:
             elif isinstance(s, StmtSwitch):
                 for case in s.cases:
                     case.stmts = self._remove_phantom_jumps(case.stmts, logical_next)
-            elif isinstance(s, StmtDoWhile):
+            elif isinstance(s, (StmtDoWhile, StmtWhile)):
+                s.body = self._remove_phantom_jumps(s.body, s)
+            elif isinstance(s, StmtFor):
                 s.body = self._remove_phantom_jumps(s.body, s)
 
             if isinstance(s, StmtGoto) and isinstance(logical_next, StmtLabel):
@@ -215,7 +219,7 @@ class ASTOptimizer:
                 elif isinstance(s, StmtSwitch):
                     for case in s.cases:
                         scan_list(case.stmts)
-                elif isinstance(s, StmtDoWhile):
+                elif isinstance(s, (StmtDoWhile, StmtWhile, StmtFor)):
                     scan_list(s.body)
                     
         scan_list(stmts)
@@ -245,6 +249,8 @@ class ASTOptimizer:
                 if s.exit_label: s.exit_label = remap_id(s.exit_label)
                 for case in s.cases:
                     for sub in case.stmts: visit(sub)
+            elif isinstance(s, (StmtDoWhile, StmtWhile, StmtFor)):
+                for sub in s.body: visit(sub)
 
         for s in stmts:
             visit(s)
@@ -264,6 +270,8 @@ class ASTOptimizer:
                 elif isinstance(s, StmtSwitch):
                     for case in s.cases:
                         find_used(case.stmts)
+                elif isinstance(s, (StmtDoWhile, StmtWhile, StmtFor)):
+                    find_used(s.body)
         find_used(stmts)
 
         # Fase B: Filtrado
@@ -657,6 +665,36 @@ class InsDecompiler:
                 else:
                     self.push_stmt(new_if_else)
                 return
+
+        # ── Patrón W: while (cond) { body } ──
+        # Stack: [..., TokenLabel(loop_lbl), <cond_expr>, TokenBeq(nxt_lbl), <body...>, TokenJump(loop_lbl)]
+        if len(stack) >= 4 and isinstance(s1, TokenJump):
+            loop_lbl_id = s1.jump_id
+            if self.jmp_refcount.get(loop_lbl_id, 0) == 1:
+                loop_idx = -1
+                for i in range(len(stack) - 4, -1, -1):
+                    if isinstance(stack[i], TokenLabel) and stack[i].jump_id == loop_lbl_id:
+                        if self.is_expr(stack[i + 1]) and isinstance(stack[i + 2], TokenBeq) and stack[i + 2].jump_id == label_jump_id:
+                            loop_idx = i
+                        break
+                if loop_idx != -1:
+                    cond_expr = self.token_to_expr(stack[loop_idx + 1])
+                    body_tokens = stack[loop_idx + 3 : -1]
+                    body_stmts = self._collect_body_stmts(body_tokens)
+                    def _replace_breaks(s_list):
+                        for idx, st in enumerate(s_list):
+                            if isinstance(st, StmtGoto) and st.jump_id == label_jump_id:
+                                s_list[idx] = StmtBreak()
+                            elif isinstance(st, StmtIf):
+                                _replace_breaks(st.stmts)
+                            elif isinstance(st, StmtIfElse):
+                                _replace_breaks(st.true_stmts)
+                                _replace_breaks(st.false_stmts)
+                    _replace_breaks(body_stmts)
+                    del self.state.stack[loop_idx:]
+                    self.push_stmt(StmtWhile(cond_expr, body_stmts))
+                    self.state.input.pop(0) # consume Label(nxt_lbl)
+                    return
 
         # ── Patrón 1: if simple ──
         if len(stack) >= 3:

@@ -22,9 +22,11 @@ from Nucleos_Positronicos.Nucleo_de_Rutinas_AI.npc_schedule_conditions import (
     get_schedule_condition_info
 )
 
-# Dirección base de la Master Table de NPCs en FoMT (32 punteros)
+# Dirección base de la Master Table de NPCs en FoMT (32 punteros) y MFoMT (33 punteros)
 MASTER_NPC_TABLE_ROM = 0x3D9A4
+MASTER_NPC_TABLE_ROM_MFOMT = 0x3DCA8
 NPC_COUNT = 32
+NPC_COUNT_MFOMT = 33
 
 # Mapeo canónico de nombres de NPCs de Mineral Town por ID (0..31)
 NPC_NAMES = {
@@ -393,11 +395,19 @@ class RoutineCodec:
     def off_to_gba(offset: int) -> int:
         return (offset & 0x01FFFFFF) | 0x08000000
 
+    @staticmethod
+    def get_table_info(rom_data: bytes) -> Tuple[int, int]:
+        """Devuelve (table_offset, npc_count) según sea FoMT o MFoMT."""
+        if rom_data and len(rom_data) >= 0xAC and b"HM MFOM USA\0" in rom_data[0xA0:0xAC]:
+            return MASTER_NPC_TABLE_ROM_MFOMT, NPC_COUNT_MFOMT
+        return MASTER_NPC_TABLE_ROM, NPC_COUNT
+
     @classmethod
     def decode_all(cls, rom_data: bytes) -> Dict[int, NPCData]:
-        """Decodifica los 32 NPCs desde el binario de la ROM."""
+        """Decodifica los NPCs desde el binario de la ROM (32 en FoMT, 33 en MFoMT)."""
+        _, count = cls.get_table_info(rom_data)
         result = {}
-        for npc_id in range(NPC_COUNT):
+        for npc_id in range(count):
             npc_obj = cls.decode_single_npc(rom_data, npc_id)
             if npc_obj:
                 result[npc_id] = npc_obj
@@ -406,11 +416,12 @@ class RoutineCodec:
     @classmethod
     def decode_single_npc(cls, rom_data: bytes, npc_id: int) -> Optional[NPCData]:
         """Decodifica un NPC específico desde la ROM respetando la estructura canónica."""
-        if not rom_data or len(rom_data) < MASTER_NPC_TABLE_ROM + (npc_id + 1) * 4:
+        table_off, _ = cls.get_table_info(rom_data)
+        if not rom_data or len(rom_data) < table_off + (npc_id + 1) * 4:
             return None
 
         # Puntero en Master Table
-        ptr_loc = MASTER_NPC_TABLE_ROM + npc_id * 4
+        ptr_loc = table_off + npc_id * 4
         npc_ptr = struct.unpack_from('<I', rom_data, ptr_loc)[0]
         npc_off = cls.gba_to_off(npc_ptr)
         if not npc_off or npc_off + 12 > len(rom_data):
@@ -699,10 +710,11 @@ class RoutineCodec:
     @classmethod
     def get_npc_original_span(cls, rom_data: bytes, npc_id: int) -> Tuple[Optional[int], int]:
         """Calcula el offset inicial y el tamaño en bytes que ocupa la rutina actual del NPC en la ROM."""
-        if not rom_data or len(rom_data) < MASTER_NPC_TABLE_ROM + (npc_id + 1) * 4:
+        table_off, _ = cls.get_table_info(rom_data)
+        if not rom_data or len(rom_data) < table_off + (npc_id + 1) * 4:
             return None, 0
 
-        p_master = struct.unpack_from('<I', rom_data, MASTER_NPC_TABLE_ROM + npc_id * 4)[0]
+        p_master = struct.unpack_from('<I', rom_data, table_off + npc_id * 4)[0]
         off_m = cls.gba_to_off(p_master)
         if not off_m or off_m + 12 > len(rom_data):
             return None, 0
@@ -781,8 +793,15 @@ class RoutineCodec:
             return False, "No hay una ROM cargada en el proyecto activo."
 
         try:
-            # 1. Medir espacio original del NPC
-            orig_off, orig_span = cls.get_npc_original_span(rom_bytes, npc_id)
+            is_mfomt = bool(getattr(project, "is_mfomt", False))
+            base_table_off = MASTER_NPC_TABLE_ROM_MFOMT if is_mfomt else MASTER_NPC_TABLE_ROM
+            base_count = NPC_COUNT_MFOMT if is_mfomt else NPC_COUNT
+
+            # 1. Medir espacio original del NPC (si es un NPC existente en la tabla)
+            if npc_id < base_count:
+                orig_off, orig_span = cls.get_npc_original_span(rom_bytes, npc_id)
+            else:
+                orig_off, orig_span = None, 0
 
             # 2. Medir tamaño requerido por la nueva rutina
             test_blob, _ = cls.compile_npc(npc_data, 0)
@@ -796,7 +815,11 @@ class RoutineCodec:
                 in_place = True
                 target_off = orig_off
             else:
-                target_off = cls.find_first_aligned_freespace(rom_bytes, required_len, align=4, start_search=0x700000)
+                if hasattr(project, "allocate_free_space"):
+                    target_off = project.allocate_free_space(required_len)
+                else:
+                    min_search = 0x9E0000 if is_mfomt else 0x760000
+                    target_off = cls.find_first_aligned_freespace(rom_bytes, required_len, align=4, start_search=min_search)
 
             # 4. Compilar con el offset definitivo (Master Struct queda en target_off + 0)
             compiled_blob, new_struct_ptr = cls.compile_npc(npc_data, target_off)
@@ -839,13 +862,39 @@ class RoutineCodec:
                     patched_count += 1
                     pos = idx + 4
 
-            # Asegurar la entrada en MASTER_NPC_TABLE_ROM
-            master_entry_off = MASTER_NPC_TABLE_ROM + npc_id * 4
+            # Asegurar la entrada en la Master Table de NPCs (repunteando la tabla si es un NPC nuevo >= base_count)
+            active_table_off = getattr(project, "_npc_master_table_off", base_table_off)
+            active_table_count = getattr(project, "_npc_master_table_count", base_count)
+            if npc_id >= active_table_count:
+                new_count = npc_id + 1
+                old_tbl_bytes = rom_bytes[active_table_off : active_table_off + active_table_count * 4]
+                pad_bytes = b'\x00' * ((new_count - active_table_count) * 4)
+                new_tbl_size = new_count * 4
+                if hasattr(project, "allocate_free_space"):
+                    new_tbl_off = project.allocate_free_space(new_tbl_size)
+                else:
+                    new_tbl_off = cls.find_first_aligned_freespace(rom_bytes, new_tbl_size, align=4, start_search=0x9E0000 if is_mfomt else 0x760000)
+                project.write_patch(new_tbl_off, old_tbl_bytes + pad_bytes)
+                old_tbl_ptr_bytes = struct.pack('<I', cls.off_to_gba(active_table_off))
+                new_tbl_ptr_bytes = struct.pack('<I', cls.off_to_gba(new_tbl_off))
+                pos = 0
+                while True:
+                    idx = rom_bytes.find(old_tbl_ptr_bytes, pos)
+                    if idx == -1:
+                        break
+                    project.write_patch(idx, new_tbl_ptr_bytes)
+                    pos = idx + 4
+                active_table_off = new_tbl_off
+                active_table_count = new_count
+                project._npc_master_table_off = new_tbl_off
+                project._npc_master_table_count = new_count
+
+            master_entry_off = active_table_off + npc_id * 4
             project.write_patch(master_entry_off, new_ptr_bytes)
 
             # 9. Actualizar puntero de freespace del proyecto si se usó freespace
-            if not in_place:
-                project.next_free_space = (target_off + blob_len + 15) & ~3
+            if not in_place and hasattr(project, "next_free_space"):
+                project.next_free_space = max(project.next_free_space, (target_off + blob_len + 15) & ~3)
 
             # 10. Persistir cambios en archivo de proyecto y en la ROM física
             if hasattr(project, "save"):
@@ -872,17 +921,17 @@ class RoutineCodec:
 
             if in_place:
                 msg = (
-                    f"✅ Rutina de {npc_data.name} inyectada IN-PLACE (sin repunteo)!\n"
-                    f"• Ubicación: 0x{target_off:06X} - 0x{target_off + blob_len:06X} ({blob_len} de {orig_span} bytes usados)\n"
-                    f"• Remanente ({orig_span - blob_len} bytes) rellenado con 0xFF\n"
-                    f"• Puntero Maestro: 0x{master_entry_off:06X} -> 0x{new_struct_ptr:08X}"
+                    f"Rutina de {npc_data.name} inyectada IN-PLACE (sin repunteo).\n"
+                    f"- Ubicación: 0x{target_off:06X} - 0x{target_off + blob_len:06X} ({blob_len} de {orig_span} bytes usados)\n"
+                    f"- Puntero Maestro: 0x{master_entry_off:06X} -> 0x{new_struct_ptr:08X}"
                 )
             else:
+                orig_desc = f"Stub de seguridad en 0x{orig_off:06X}." if orig_off is not None else f"Nuevo NPC registrado en tabla maestra 0x{master_entry_off:06X}."
                 msg = (
-                    f"✅ Rutina de {npc_data.name} REPUNTEADA exitosamente!\n"
-                    f"• Nuevo Bloque libre (0xFF): 0x{target_off:06X} - 0x{target_off + blob_len:06X} ({blob_len} bytes)\n"
-                    f"• Punteros actualizados en ROM ({patched_count} referencias repunteadas): -> 0x{new_struct_ptr:08X}\n"
-                    f"• Stub de seguridad en 0x{orig_off:06X} (eval_fn preservada) y resto ({orig_span - 12} bytes) liberado con 0xFF."
+                    f"Rutina de {npc_data.name} REPUNTEADA exitosamente.\n"
+                    f"- Nuevo Bloque libre (0xFF): 0x{target_off:06X} - 0x{target_off + blob_len:06X} ({blob_len} bytes)\n"
+                    f"- Punteros actualizados en ROM ({patched_count} referencias): -> 0x{new_struct_ptr:08X}\n"
+                    f"- {orig_desc}"
                 )
 
             return True, msg

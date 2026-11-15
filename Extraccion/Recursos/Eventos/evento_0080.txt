@@ -1,6 +1,0 @@
-// Script 80
-#include "Fomt_Lib.src"
-
-script 80 Event_0080 {
-    exit;
-}

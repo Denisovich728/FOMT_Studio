@@ -1,7 +1,0 @@
-// Script 980
-#include "Fomt_Lib.src"
-
-script 980 Event_0980 {
-    Execute_Script(0x3D6);
-    exit;
-}

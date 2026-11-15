@@ -85,10 +85,10 @@ class SuperLibrary:
     }
     
     MFOMT_CONSTANTS = {
-        "MASTER_TABLE_OFFSET": 0x1014BC,
-        "EVENT_LIMIT": 1416, 
+        "MASTER_TABLE_OFFSET": 0x1014C0,
+        "EVENT_LIMIT": 1415, 
         "ITEMS_LIMIT": 101,
-        "NPC_TABLE_OFFSET": 0x104260 + 0x2BD58,
+        "NPC_TABLE_OFFSET": 0x10CF3C,
         "NPC_LIMIT": 42,
         "GFoodInfo_OFFSET": 0x0813D8E8,
         "GToolInfo_OFFSET": 0x0813D3A8,
@@ -186,14 +186,12 @@ class SuperLibrary:
                     if t == 'PunterosScript':
                         base_offset = int(row['ofsetini'], 16)
                         end_offset = int(row['ofsetfin'], 16)
-                        delta = 0x2BD58 if self.is_mfomt else 0
-                        self.cfg["MASTER_TABLE_OFFSET"] = base_offset + delta
+                        self.cfg["MASTER_TABLE_OFFSET"] = base_offset
                         self.cfg["EVENT_LIMIT"] = ((end_offset - base_offset) // 4) + 1
                     elif t == 'npcs':
                         base_offset = int(row['ofsetini'], 16)
                         end_offset = int(row['ofsetfin'], 16)
-                        delta = 0x2BD58 if self.is_mfomt else 0
-                        self.cfg["NPC_TABLE_OFFSET"] = base_offset + delta
+                        self.cfg["NPC_TABLE_OFFSET"] = base_offset
                         # Cada entrada NPC ocupa 8 bytes (puntero + script/flags)
                         self.cfg["NPC_LIMIT"] = ((end_offset - base_offset + 1) // 8)
                     elif t == 'Herramientas':
@@ -288,8 +286,11 @@ class SuperLibrary:
         """Carga nombres de eventos desde un archivo CSV (Formato: Event_Name,ID)."""
         import csv
         mode = "mfomt" if self.is_mfomt else "fomt"
-        path = get_data_path(mode, filename)
-        if not os.path.exists(path):
+        if getattr(self, "project", None) and hasattr(self.project, "get_csv_path"):
+            path = self.project.get_csv_path(filename)
+        else:
+            path = get_data_path(mode, filename)
+        if not path or not os.path.exists(path):
             print(f"Alerta: No se encontró el archivo {filename} en {path}.")
             return False
             

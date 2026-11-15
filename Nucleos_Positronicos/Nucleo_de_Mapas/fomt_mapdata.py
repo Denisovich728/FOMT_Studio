@@ -129,6 +129,7 @@ def _render_tile(tile_indices: list, palette: list,
 # ─────────────────────────────────────────────────────────────────────────────
 
 ROM_BUILDINGS_TABLE = 0x10692C
+ROM_BUILDINGS_TABLE_MFOMT = 0x10F6F8
 
 CANONICAL_ROM_DEFAULTS = {
     'farmhouse': {'lv1': (26, 3), 'lv2': (18, 3), 'lv3': (10, 2)},
@@ -300,6 +301,8 @@ class FomtMapRenderer:
 
     def __init__(self, rom: bytes | bytearray):
         self.rom = bytearray(rom)
+        self.is_mfomt = len(self.rom) >= 0xAC and b"HM MFOM USA\0" in self.rom[0xA0:0xAC]
+        self.buildings_table = ROM_BUILDINGS_TABLE_MFOMT if self.is_mfomt else ROM_BUILDINGS_TABLE
         self.tiles: list = []          # list[list[int]] — 64 índices por tile
         self.palettes_1: list = []     # list[list[(R,G,B)]]
         self.palettes_2: list = []     # list[list[(R,G,B)]]
@@ -347,7 +350,7 @@ class FomtMapRenderer:
 
     def _sync_dynamic_positions_from_rom(self):
         """Lee las coordenadas canonicas reales grabadas en la ROM para reflejar cambios persistidos."""
-        if not self.rom or len(self.rom) < 0x108000:
+        if not self.rom or len(self.rom) < 0x108000 or self.is_mfomt:
             return
         try:
             if 'farmhouse' in BUILDING_ROM_ENTRIES:
@@ -644,7 +647,7 @@ class FomtMapRenderer:
         if not self.rom or entry_idx_or_desc is None:
             return
         if isinstance(entry_idx_or_desc, int) and entry_idx_or_desc < 100:
-            desc_off = ROM_BUILDINGS_TABLE + entry_idx_or_desc * 24
+            desc_off = self.buildings_table + entry_idx_or_desc * 24
         elif isinstance(entry_idx_or_desc, int):
             desc_off = entry_idx_or_desc
         else:
@@ -667,9 +670,9 @@ class FomtMapRenderer:
                             # 0x03FF y 0xFFFF corresponden a tiles transparentes en GBA FoMT
                             if t_val != 0x03FF and t_val != 0xFFFF:
                                 p_idx = (t_val >> 12) & 0xF
-                                # Para el mueble de cocina (0x106B54), omitir en BG2 los tiles vacios (0x235..0x24C)
+                                # Para el mueble de cocina (entry 23 / 0x106B54), omitir en BG2 los tiles vacios (0x235..0x24C)
                                 # que corresponden a ranuras no inicializadas en el overlay sin sobreescribir la base.
-                                if desc_off == 0x106B54 and ptr == p_bg2 and (t_val & 0x3FF) in range(0x235, 0x24D):
+                                if (desc_off == 0x106B54 or entry_idx_or_desc == 23) and ptr == p_bg2 and (t_val & 0x3FF) in range(0x235, 0x24D):
                                     continue
                                 nx = map_x + x
                                 ny = map_y + y
@@ -860,10 +863,10 @@ class FomtMapRenderer:
                 if map_id == 43:
                     bd_choice = house_cfg.get('bathroom_door', 'closed') # 'closed', 'open', 'none'
                     if bd_choice in ('closed', 'open'):
-                        bd_desc = 0x106C14 if bd_choice == 'closed' else 0x106BFC
+                        bd_entry = 31 if bd_choice == 'closed' else 30
                         def_pos = defaults.get('bathroom_door', {'x': 1, 'y': 2})
                         dx, dy = positions.get('bathroom_door', (def_pos['x'], def_pos['y']))
-                        self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bd_desc, dx, dy, active_col, active_dict)
+                        self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, bd_entry, dx, dy, active_col, active_dict)
 
                 # 9. Comedor / Alfombra (Mapas 42 y 43) - Estampado en array_bg3 (suelo) para que la mesa no se tape
                 if map_id in (42, 43) and house_cfg.get('carpet_dining', True):
@@ -892,18 +895,18 @@ class FomtMapRenderer:
                 if dyn_cfg.get('mayo_maker', True):
                     m_info = MAKER_ROM_ENTRIES['mayo_maker']
                     mx, my = positions.get('mayo_maker', (m_info['x'], m_info['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['desc_off'], mx, my, active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
 
             elif map_id in (38, 39):
                 # Establo (Barn 1 y 2) - Maquina de Lana y Maquina de Queso
                 if dyn_cfg.get('yarn_maker', True):
                     m_info = MAKER_ROM_ENTRIES['yarn_maker']
                     mx, my = positions.get('yarn_maker', (m_info['x'], m_info['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['desc_off'], mx, my, active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
                 if dyn_cfg.get('cheese_maker', True):
                     m_info = MAKER_ROM_ENTRIES['cheese_maker']
                     mx, my = positions.get('cheese_maker', (m_info['x'], m_info['y']))
-                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['desc_off'], mx, my, active_col, active_dict)
+                    self._stamp_rom_structure(array_bg3, array_bg2, array_bg1, m_info['entry'], mx, my, active_col, active_dict)
 
             elif map_id in (8, 9) and dyn_cfg.get('beach_cottage', True):
                 # Villa de la Playa
@@ -967,7 +970,7 @@ class FomtMapRenderer:
                 if not hasattr(self, '_icon_engine') or self._icon_engine is None:
                     try:
                         from Nucleos_Positronicos.Nucleo_de_Items.objetos import ItemIconEngine
-                        self._icon_engine = ItemIconEngine(self.rom)
+                        self._icon_engine = ItemIconEngine(self.rom, is_mfomt=self.is_mfomt)
                     except Exception:
                         self._icon_engine = None
 
@@ -1035,7 +1038,22 @@ class FomtMapRenderer:
                         r, g, b, a = 0, 150, 255, 90
 
                     if a > 0:
-                        draw.rectangle([col*8, row*8, col*8+7, row*8+7], fill=(r, g, b, a), outline=(r, g, b, 200))
+                        x0, y0 = col * 8, row * 8
+                        x1, y1 = x0 + 7, y0 + 7
+                        draw.rectangle([x0, y0, x1, y1], fill=(r, g, b, a))
+                        border_color = (r, g, b, 220)
+                        top_val = active_col[(row - 1) * w + col] if row > 0 and (row - 1) * w + col < len(active_col) else -1
+                        bot_val = active_col[(row + 1) * w + col] if row + 1 < h and (row + 1) * w + col < len(active_col) else -1
+                        left_val = active_col[row * w + (col - 1)] if col > 0 and row * w + (col - 1) < len(active_col) else -1
+                        right_val = active_col[row * w + (col + 1)] if col + 1 < w and row * w + (col + 1) < len(active_col) else -1
+                        if top_val != val:
+                            draw.line([(x0, y0), (x1, y0)], fill=border_color, width=1)
+                        if bot_val != val:
+                            draw.line([(x0, y1), (x1, y1)], fill=border_color, width=1)
+                        if left_val != val:
+                            draw.line([(x0, y0), (x0, y1)], fill=border_color, width=1)
+                        if right_val != val:
+                            draw.line([(x1, y0), (x1, y1)], fill=border_color, width=1)
 
             img.paste(overlay, (0, 0), overlay)
 

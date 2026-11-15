@@ -260,17 +260,38 @@ class Parser:
             self.next_token()
             block = self.parse_stmt_block()
             self.expect(TokenType.KW_WHILE)
+            has_paren = self.match(TokenType.LPAREN)
             cond = self.parse_expr()
+            if has_paren:
+                self.expect(TokenType.RPAREN)
             self.match(TokenType.SEMICOLON)
             return StmtDoWhile(cond, block)
 
+        elif t.type == TokenType.KW_WHILE:
+            self.next_token()
+            has_paren = self.match(TokenType.LPAREN)
+            cond = self.parse_expr()
+            if has_paren:
+                self.expect(TokenType.RPAREN)
+            block = self.parse_stmt_block()
+            return StmtWhile(cond, block)
+
         elif t.type == TokenType.KW_FOR:
             self.next_token()
+            has_paren = self.match(TokenType.LPAREN)
             head = self.parse_stmt()
             self.match(TokenType.SEMICOLON)   # head puede haber consumido ya el ';'
             cond = self.parse_expr()
             self.expect(TokenType.SEMICOLON)
-            tail = self.parse_stmt()
+            if (has_paren and self.peek().type == TokenType.RPAREN) or (
+                not has_paren and self.peek().type == TokenType.LCURLY
+            ):
+                tail = StmtEmpty()
+            else:
+                tail = self.parse_stmt()
+                self.match(TokenType.SEMICOLON)
+            if has_paren:
+                self.expect(TokenType.RPAREN)
             body = self.parse_stmt_block()
             return StmtFor(cond, head, tail, body)
 

@@ -1,83 +1,83 @@
 Event_Name,ID
-Unknow_Event_1,1
-Unknow_Event_2,2
-Unknow_Event_3,3
+Animal is pregnant Info,1
+Animal sickness gone Info,2
+Nothing happened Info,3
 Unknow_Event_4,4
-Unknow_Event_5,5
-Unknow_Event_6,6
-Unknow_Event_7,7
-Unknow_Event_8,8
-Unknow_Event_9,9
-Unknow_Event_10,10
-Unknow_Event_11,11
-Unknow_Event_12,12
-Unknow_Event_13,13
+Barley Foal Event 1,5
+Barley Horse Event,6
+Barley Foal Event 2,7
+Animal condition Info 1,8
+Animal brushing,9
+Inn's Cat interaction,10
+Barley's Cows,11
+Barley's Dog Hannah,12
+Animal condition Info 2,13
 Unknow_Event_14,14
 Unknow_Event_15,15
-Unknow_Event_16,16
-Unknow_Event_17,17
-Unknow_Event_18,18
-Unknow_Event_19,19
-Unknow_Event_20,20
-Unknow_Event_21,21
-Unknow_Event_22,22
-Unknow_Event_23,23
-Unknow_Event_24,24
-Unknow_Event_25,25
-Unknow_Event_26,26
-Unknow_Event_27,27
-Unknow_Event_28,28
-Unknow_Event_29,29
-Unknow_Event_30,30
-Unknow_Event_31,31
-Unknow_Event_32,32
-Unknow_Event_33,33
-Unknow_Event_34,34
-Unknow_Event_35,35
-Unknow_Event_36,36
-Unknow_Event_37,37
-Unknow_Event_38,38
-Unknow_Event_39,39
-Unknow_Event_40,40
-Unknow_Event_41,41
-Unknow_Event_42,42
-Unknow_Event_43,43
-Unknow_Event_44,44
-Unknow_Event_45,45
-Unknow_Event_46,46
-Unknow_Event_47,47
-Unknow_Event_48,48
-Unknow_Event_49,49
-Unknow_Event_50,50
-Unknow_Event_51,51
-Unknow_Event_52,52
-Unknow_Event_53,53
-Unknow_Event_54,54
-Unknow_Event_55,55
-Unknow_Event_56,56
-Unknow_Event_57,57
-Unknow_Event_58,58
-Unknow_Event_59,59
-Unknow_Event_60,60
-Unknow_Event_61,61
-Unknow_Event_62,62
-Unknow_Event_63,63
-Unknow_Event_64,64
-Unknow_Event_65,65
-Unknow_Event_66,66
-Unknow_Event_67,67
-Unknow_Event_68,68
-Unknow_Event_69,69
-Unknow_Event_70,70
-Unknow_Event_71,71
-Unknow_Event_72,72
-Unknow_Event_73,73
-Unknow_Event_74,74
-Unknow_Event_75,75
-Unknow_Event_76,76
-Unknow_Event_77,77
-Unknow_Event_78,78
-Unknow_Event_79,79
+Karen Heart Event Black - Dialogue,16
+Karen Heart Event Black - Jeff,17
+Karen Heart Event Black - Karen,18
+Karen Heart Event Black - Sasha,19
+Karen Heart Event Purple - Dialogue,20
+Karen Heart Event Purple - Jeff,21
+Karen Heart Event Purple - Karen,22
+Karen Heart Event Purple - Sasha,23
+Karen Heart Event Blue - Dialogue,24
+Karen Heart Event Blue - Jeff,25
+Karen Heart Event Blue - Karen,26
+Karen Heart Event Blue - Sasha,27
+Karen Heart Event Blue - Duke,28
+Karen Heart Event Yellow - Dialogue,29
+Karen Heart Event Yellow - Jeff,30
+Karen Heart Event Yellow - Karen,31
+Karen Heart Event Yellow - Sasha,32
+Karen Marriage Proposal,33
+Karen Wedding,34
+Karen Player Nickname,35
+Popuri Heart Event Black,36
+Popuri Heart Event Purple,37
+Popuri Heart Event Blue,38
+Popuri Heart Event Yellow - Dialogue,39
+Popuri Heart Event Yellow - Rick,40
+Popuri Heart Event Yellow - Popuri,41
+Popuri Heart Event Yellow - Lillia,42
+Popuri Marriage Proposal,43
+Popuri Wedding,44
+Popuri Player Nickname,45
+Ann Heart Event Black - Dialogue,46
+Ann Heart Event Black - Doug,47
+Ann Heart Event Black - Ann,48
+Ann Heart Event Purple - Dialogue,49
+Ann Heart Event Purple - Ann,50
+Ann Heart Event Blue,51
+Ann Heart Event Yellow - Dialogue,52
+Ann Heart Event Yellow - Doug,53
+Ann Marriage Proposal,54
+Ann Wedding,55
+Ann Player Nickname,56
+Mary Heart Event Black - Dialogue,57
+Mary Heart Event Black - Mary,58
+Mary Heart Event Purple - Dialogue,59
+Mary Heart Event Purple – Mary,60
+Mary Heart Event Blue,61
+Mary Heart Event Yellow,62
+Mary Marriage Proposal,63
+Mary Wedding,64
+Mary Player Nickname,65
+Elli Heart Event Black - Dialogue,66
+Elli Heart Event Black - Doctor,67
+Elli Heart Event Black - Elli,68
+Elli Heart Event Purple - Dialogue,69
+Elli Heart Event Purple - Doctor,70
+Elli Heart Event Purple - Elli,71
+Elli Heart Event Blue - Dialogue,72
+Elli Heart Event Blue - Ellen,73
+Elli Heart Event Blue - Elli,74
+Elli Heart Event Blue - Stu,75
+Elli Heart Event Yellow,76
+Elli Marriage Proposal,77
+Elli Wedding,78
+Elli Player Nickname,79
 Unknow_Event_80,80
 Unknow_Event_81,81
 Unknow_Event_82,82
@@ -735,104 +735,104 @@ Unknow_Event_733,733
 Unknow_Event_734,734
 Unknow_Event_735,735
 Unknow_Event_736,736
-Unknow_Event_737,737
-Unknow_Event_738,738
-Unknow_Event_739,739
-Unknow_Event_740,740
-Unknow_Event_741,741
-Unknow_Event_742,742
-Unknow_Event_743,743
-Unknow_Event_744,744
-Unknow_Event_745,745
-Unknow_Event_746,746
-Unknow_Event_747,747
-Unknow_Event_748,748
-Unknow_Event_749,749
-Unknow_Event_750,750
-Unknow_Event_751,751
-Unknow_Event_752,752
-Unknow_Event_753,753
-Unknow_Event_754,754
-Unknow_Event_755,755
-Unknow_Event_756,756
-Unknow_Event_757,757
-Unknow_Event_758,758
-Unknow_Event_759,759
-Unknow_Event_760,760
-Unknow_Event_761,761
-Unknow_Event_762,762
-Unknow_Event_763,763
-Unknow_Event_764,764
-Unknow_Event_765,765
-Unknow_Event_766,766
-Unknow_Event_767,767
-Unknow_Event_768,768
-Unknow_Event_769,769
-Unknow_Event_770,770
-Unknow_Event_771,771
-Unknow_Event_772,772
-Unknow_Event_773,773
-Unknow_Event_774,774
-Unknow_Event_775,775
-Unknow_Event_776,776
-Unknow_Event_777,777
-Unknow_Event_778,778
-Unknow_Event_779,779
-Unknow_Event_780,780
-Unknow_Event_781,781
-Unknow_Event_782,782
-Unknow_Event_783,783
-Unknow_Event_784,784
-Unknow_Event_785,785
-Unknow_Event_786,786
-Unknow_Event_787,787
-Unknow_Event_788,788
-Unknow_Event_789,789
-Unknow_Event_790,790
-Unknow_Event_791,791
-Unknow_Event_792,792
-Unknow_Event_793,793
-Unknow_Event_794,794
-Unknow_Event_795,795
-Unknow_Event_796,796
-Unknow_Event_797,797
-Unknow_Event_798,798
-Unknow_Event_799,799
-Unknow_Event_800,800
-Unknow_Event_801,801
-Unknow_Event_802,802
-Unknow_Event_803,803
-Unknow_Event_804,804
-Unknow_Event_805,805
-Unknow_Event_806,806
-Unknow_Event_807,807
-Unknow_Event_808,808
-Unknow_Event_809,809
-Unknow_Event_810,810
-Unknow_Event_811,811
-Unknow_Event_812,812
-Unknow_Event_813,813
-Unknow_Event_814,814
-Unknow_Event_815,815
-Unknow_Event_816,816
-Unknow_Event_817,817
-Unknow_Event_818,818
-Golden_Lumber_Retribition,819
-Unknow_Event_820,820
-Unknow_Event_821,821
-Unknow_Event_822,822
-Unknow_Event_823,823
-Unknow_Event_824,824
-Unknow_Event_825,825
-Unknow_Event_826,826
-Unknow_Event_827,827
-Unknow_Event_828,828
-Unknow_Event_829,829
-Unknow_Event_830,830
-Unknow_Event_831,831
-Unknow_Event_832,832
-Unknow_Event_833,833
-Unknow_Event_834,834
+Tutorial & Zack Introduction,737
+Thomas' Request Part 1,738
+Thomas' Request Part 2,739
+Harris' Confession Part 1,740
+Harris' Confession Part 2,741
+Ellen's White Flower Part 1 - Dialogue,742
+Ellen's White Flower Part 1 - Ellen,743
+Ellen's White Flower Part 2,744
+Elli's Grandpa - Dialogue,745
+Elli's Grandpa - Ellen,746
+Elli's Grandpa - Elli,747
+Elli's Grandpa - Stu,748
+Ellen knits a sock,749
+Stu wants to play,750
+Jeff's Paintings - Dialogue,751
+Jeff's Paintings - Sasha,752
+Jeff gives no more credit - Dialogue,753
+Jeff gives no more credit - Jeff,754
+Jeff gives no more credit - Sasha,755
+Manna's Daughter Aja - Dialogue,756
+Manna's Daughter Aja - Sasha,757
+Manna's Daughter Aja - Anna,758
+Manna's Daughter Aja - Manna,759
+Sasha's great Husband - Dialogue,760
+Sasha's great Husband - Lillia,761
+Sasha's great Husband - Sasha,762
+Duke & Karen Contest,763
+Won's Golden Service - Dialogue,764
+Won's Golden Service - Zack,765
+Won's Golden Service - Won,766
+Doctor's Parents - Dialogue,767
+Doctor's Parents - Doctor,768
+Doctor's Mistake - Dialogue,769
+Doctor's Mistake - Doctor,770
+Doctor's Mistake - Jeff,771
+Doctor's Mistake - Elli,772
+Elli studies Event - Dialogue,773
+Elli studies Event - Doctor,774
+Elli studies Event - Elli,775
+Stu got a Cold,776
+Carter hears a voice - Dialogue,777
+Carter hears a voice - Carter,778
+Carter's Mushrooms - Event,779
+Carter's Mushrooms - Sneakout,780
+Cliff's Collapse,781
+Cliff's Photo,782
+Cliff leaves Town,783
+Doug's Wife Death Anniversary - Event,784
+Doug's Wife Death Anniversary - Doug,785
+Doug & Duke Fight - Dialogue,786
+Doug & Duke Fight - Doug,787
+Doug & Duke Fight - Ann,788
+Doug & Duke Fight - Thomas,789
+Doug & Duke Fight - Duke,790
+Doug & Duke Fight - Harris,791
+Doug's Birthday Present - Dialogue,792
+Doug's Birthday Present - Doug,793
+Argument Cliff & Ann,794
+Seaside Shack Event,795
+Kai Introduction,796
+Summer begins - Kai arrives,797
+Summer ends - Kai leaves,798
+Depressed Gotz,799
+Motivated Gotz,800
+Harris visits Gotz - Dialogue,801
+Harris visits Gotz - Harris,802
+Harris visits Gotz - Gotz,803
+Zack visits Poultry Farm - Dialogue,804
+Zack visits Poultry Farm - Lillia,805
+Fishing Rod Event - Dialogue,806
+Fishing Rod Event - Zack,807
+Fishing Rod Event - Won,808
+Fished all kinds of Fish Event,809
+Won Introduction,810
+Rare Apples Purchase Event,811
+Vase Purchase Event,812
+Van Introduction,813
+Lou Introduction,814
+Harvest Sprites Tea Party Event,815
+All Goddess Jewels Event,816
+Kappa in Lake Event,817
+All Kappa Jewels Event,818
+Golden Lumber Retribution,819
+All Jewels of Truth Event,820
+Shooting Star Event,821
+"H.G. Info - pedometercount 10,000",822
+"H.G. Info - pedometercount 100,000",823
+"H.G. Info - pedometercount 1,000,000",824
+"H.G. Info - pedometercount 10,000,000",825
+"H.G. Info - pedometercount 100,000,000",826
+"H.G. Info - pedometercount 1,000,000,000",827
+"H.G. Info - have 10,000 shipped",828
+"H.G. Info - have 100,000 shipped",829
+"H.G. Info - have 1,000,000 shipped",830
+"H.G. Info - have 10,000,000 shipped",831
+"H.G. Info - have 100,000,000 shipped",832
+"H.G. Info - have 1,000,000,000 shipped",833
+H.G. Info - all Items shipped,834
 Unknow_Event_835,835
 Unknow_Event_836,836
 Unknow_Event_837,837
@@ -840,155 +840,155 @@ Unknow_Event_838,838
 Unknow_Event_839,839
 Unknow_Event_840,840
 Unknow_Event_841,841
-Unknow_Event_842,842
-Unknow_Event_843,843
-Unknow_Event_844,844
-Unknow_Event_845,845
-Unknow_Event_846,846
-Unknow_Event_847,847
-Unknow_Event_848,848
-Unknow_Event_849,849
-Unknow_Event_850,850
-Unknow_Event_851,851
-Unknow_Event_852,852
-Unknow_Event_853,853
-Unknow_Event_854,854
-Unknow_Event_855,855
-Unknow_Event_856,856
-Unknow_Event_857,857
-Unknow_Event_858,858
-Unknow_Event_859,859
-Unknow_Event_860,860
-Unknow_Event_861,861
-Unknow_Event_862,862
-Unknow_Event_863,863
-Unknow_Event_864,864
-Unknow_Event_865,865
-Unknow_Event_866,866
-Unknow_Event_867,867
+H.G. Info - reached B100,842
+H.G. Info - reached B200,843
+H.G. Info - reached lowest Mine Floor,844
+H.G. Info - All Items Spring Mine,845
+H.G. Info - All Items Lake Mine,846
+H.G. Marriage Proposal,847
+H.G. Wedding,848
+Marriage Anniversary - H.G. - Event,849
+Marriage Anniversary - H.G. - Child,850
+Marriage Anniversary - H.G. - Full Hands,851
+50th Aniiversary - H.G.,852
+Child's Birthday - H.G. - Placement,853
+Child's Birthday - H.G. - Child,854
+Child's Birthday - H.G. - Event,855
+Wife's Birthday - H.G. - Placement,856
+Wife's Birthday - H.G. - Child,857
+Wife's Birthday - H.G.- Event,858
+Player Anniversary - H.G. - Placement,859
+Player Anniversary - H.G. - Child,860
+Player Anniversary - H.G. - Event,861
+Wife is pregnant - H.G.,862
+Child is born - Wife H.G.,863
+Child is standing - H.G. - Event,864
+Child is standing - H.G. - Child,865
+Child got hurt - H.G.,866
+Your New Farm Event,867
 Unknow_Event_868,868
 Unknow_Event_869,869
 Unknow_Event_870,870
 Unknow_Event_871,871
 Unknow_Event_872,872
-Unknow_Event_873,873
-Unknow_Event_874,874
-Unknow_Event_875,875
-Unknow_Event_876,876
-Unknow_Event_877,877
-Unknow_Event_878,878
-Unknow_Event_879,879
-Unknow_Event_880,880
-Unknow_Event_881,881
-Unknow_Event_882,882
-Unknow_Event_883,883
-Unknow_Event_884,884
-Unknow_Event_885,885
-Unknow_Event_886,886
-Unknow_Event_887,887
-Unknow_Event_888,888
-Unknow_Event_889,889
-Unknow_Event_890,890
-Unknow_Event_891,891
-Unknow_Event_892,892
-Unknow_Event_893,893
-Unknow_Event_894,894
-Unknow_Event_895,895
-Unknow_Event_896,896
-Unknow_Event_897,897
-Unknow_Event_898,898
-Unknow_Event_899,899
-Unknow_Event_900,900
-Unknow_Event_901,901
-Unknow_Event_902,902
-Unknow_Event_903,903
-Unknow_Event_904,904
-Unknow_Event_905,905
-Unknow_Event_906,906
-Unknow_Event_907,907
-Unknow_Event_908,908
-Unknow_Event_909,909
-Unknow_Event_910,910
-Unknow_Event_911,911
-Unknow_Event_912,912
-Unknow_Event_913,913
-Unknow_Event_914,914
-Unknow_Event_915,915
-Unknow_Event_916,916
-Unknow_Event_917,917
-Unknow_Event_918,918
-Unknow_Event_919,919
-Unknow_Event_920,920
-Unknow_Event_921,921
-Unknow_Event_922,922
-Unknow_Event_923,923
-Unknow_Event_924,924
-Unknow_Event_925,925
-Unknow_Event_926,926
-Unknow_Event_927,927
-Unknow_Event_928,928
-Unknow_Event_929,929
-Unknow_Event_930,930
-Unknow_Event_931,931
-Unknow_Event_932,932
-Unknow_Event_933,933
-Unknow_Event_934,934
-Unknow_Event_935,935
-Unknow_Event_936,936
-Unknow_Event_937,937
-Unknow_Event_938,938
-Unknow_Event_939,939
-Unknow_Event_940,940
-Unknow_Event_941,941
-Unknow_Event_942,942
-Unknow_Event_943,943
-Unknow_Event_944,944
-Unknow_Event_945,945
-Unknow_Event_946,946
-Unknow_Event_947,947
-Unknow_Event_948,948
-Unknow_Event_949,949
-Unknow_Event_950,950
-Unknow_Event_951,951
-Unknow_Event_952,952
-Unknow_Event_953,953
-Unknow_Event_954,954
-Unknow_Event_955,955
-Unknow_Event_956,956
-Unknow_Event_957,957
-Unknow_Event_958,958
-Unknow_Event_959,959
-Unknow_Event_960,960
-Unknow_Event_961,961
-Unknow_Event_962,962
-Unknow_Event_963,963
+Karen & Rick Rival Event Black,873
+Karen & Rick Rival Event Blue,874
+Karen & Rick Rival Event Green,875
+Karen & Rick Rival Event Orange,876
+Karen & Rick Rival Wedding - Invitation Rick,877
+Karen & Rick Rival Wedding - Invitation,878
+Karen & Rick Rival Wedding - Invitation Carter,879
+Karen & Rick Rival Wedding - Rick,880
+Karen & Rick Rival Wedding - Lillia,881
+Karen & Rick Rival Wedding - Jeff,882
+Karen & Rick Rival Wedding - Karen,883
+Karen & Rick Rival Wedding - Sasha,884
+Karen & Rick Rival Wedding - Event Complete,885
+Popuri & Kai Rival Event Black - Dialogue,886
+Popuri & Kai Rival Event Black - Popuri,887
+Popuri & Kai Rival Event Black - Kai,888
+Popuri & Kai Rival Event Blue - Dialogue,889
+Popuri & Kai Rival Event Blue - Kai,890
+Popuri & Kai Rival Event Green - Dialogue,891
+Popuri & Kai Rival Event Green - Popuri,892
+Popuri & Kai Rival Event Green - Kai,893
+Popuri & Kai Rival Event Orange - Dialogue,894
+Popuri & Kai Rival Event Orange - Rick,895
+Popuri & Kai Rival Event Orange - Popuri,896
+Popuri & Kai Rival Event Orange - Lillia,897
+Popuri & Kai Rival Wedding - Invitation Kai,898
+Popuri & Kai Rival Wedding - Invitation Carter,899
+Popuri & Kai Rival Wedding - Rick,900
+Popuri & Kai Rival Wedding - Popuri,901
+Popuri & Kai Rival Wedding - Lillia (Default Dev Mistake),902
+Popuri & Kai Rival Wedding - Karen,903
+Popuri & Kai Rival Wedding - Event Complete,904
+Popuri & Kai Rival Wedding - Kai,905
+Ann & Cliff Rival Event Black - Dialogue,906
+Ann & Cliff Rival Event Black - Cliff,907
+Ann & Cliff Rival Event Blue - Dialogue,908
+Ann & Cliff Rival Event Blue - Cliff,909
+Ann & Cliff Rival Event Blue - Carter,910
+Ann & Cliff Rival Event Green - Dialogue,911
+Ann & Cliff Rival Event Green - Cliff,912
+Ann & Cliff Rival Event Green - Doug,913
+Ann & Cliff Rival Event Green - Ann,914
+Ann & Cliff Rival Event Orange - Dialogue,915
+Ann & Cliff Rival Event Orange - Cliff,916
+Ann & Cliff Rival Event Orange - Duke,917
+Ann & Cliff Rival Wedding - Invitation Cliff,918
+Ann & Cliff Rival Wedding - Invitation Carter,919
+Ann & Cliff Rival Wedding - Cliff,920
+Ann & Cliff Rival Wedding - Doug,921
+Ann & Cliff Rival Wedding - Ann,922
+Ann & Cliff Rival Wedding - Duke,923
+Ann & Cliff Rival Wedding - Manna,924
+Ann & Cliff Rival Wedding - Event Complete,925
+Mary & Gray Rival Event Black - Dialogue,926
+Mary & Gray Rival Event Black - Gray,927
+Mary & Gray Rival Event Black - Saibara,928
+Mary & Gray Rival Event Blue - Dialogue,929
+Mary & Gray Rival Event Blue - Mary,930
+Mary & Gray Rival Event Blue - Gray,931
+Mary & Gray Rival Event Green,932
+Mary & Gray Rival Event Orange - Dialogue,933
+Mary & Gray Rival Event Orange - Mary,934
+Mary & Gray Rival Event Orange - Gray,935
+Mary & Gray Rival Wedding - Invitation Gray,936
+Mary & Gray Rival Wedding - Invitation Carter,937
+Mary & Gray Rival Wedding - Basil,938
+Mary & Gray Rival Wedding - Mary,939
+Mary & Gray Rival Wedding - Anna,940
+Mary & Gray Rival Wedding - Event Complete,941
+Mary & Gray Rival Wedding - Gray,942
+Mary & Gray Rival Wedding - Saibara,943
+Elli & Doctor Rival Event Black - Dialogue,944
+Elli & Doctor Rival Event Black - Doctor,945
+Elli & Doctor Rival Event Black - Elli,946
+Elli & Doctor Rival Event Blue - Dialogue,947
+Elli & Doctor Rival Event Blue - Ellen,948
+Elli & Doctor Rival Event Blue - Stu,949
+Elli & Doctor Rival Event Green - Dialogue,950
+Elli & Doctor Rival Event Green - Doctor,951
+Elli & Doctor Rival Event Green - Elli,952
+Elli & Doctor Rival Event Orange - Dialogue,953
+Elli & Doctor Rival Event Orange - Doctor,954
+Elli & Doctor Rival Event Orange - Elli,955
+Elli & Doctor Rival Wedding - Invitation Doctor,956
+Elli & Doctor Rival Wedding - Invitation Carter,957
+Elli & Doctor Rival Wedding - Doctor,958
+Elli & Doctor Rival Wedding - Ellen,959
+Elli & Doctor Rival Wedding - Elli,960
+Elli & Doctor Rival Wedding - Stu,961
+Elli & Doctor Rival Wedding - Harris,962
+Elli & Doctor Rival Wedding - Event Complete,963
 Unknow_Event_964,964
 Unknow_Event_965,965
 Unknow_Event_966,966
 Unknow_Event_967,967
 Unknow_Event_968,968
-Unknow_Event_969,969
-Unknow_Event_970,970
-Unknow_Event_971,971
-Unknow_Event_972,972
-Unknow_Event_973,973
+Huge Stone Info,969
+Large Stone Info,970
+Stone Info,971
+Stump info,972
+Full Basket Info,973
 Unknow_Event_974,974
 Unknow_Event_975,975
-Unknow_Event_976,976
+Fishing Info,976
 Unknow_Event_977,977
 Mine_Descend_Level,978
-Unknow_Event_979,979
+Leave Mine Option,979
 Unknow_Event_980,980
 Unknow_Event_981,981
 Sleep_SUper_Engine,982
 Morning_Engine,983
-Unknow_Event_984,984
-Unknow_Event_985,985
-Unknow_Event_986,986
-Unknow_Event_987,987
+Baby Chicken born,984
+Animal Death,985
+Oversleep & Lifting Tool Curse Info,986
+Zack gets Shipment Dialogue,987
 Unknow_Event_988,988
 Unknow_Event_989,989
-Unknow_Event_990,990
+Lifting Tool Curse Info,990
 Global_Events_Engine,991
 Rick_Personality,992
 Popuri_Personality,993
@@ -1051,279 +1051,279 @@ Announcements_TV,1049
 Math_Lotery_TV,1050
 Shopping_Channel_TV,1051
 New_Year_Show_TV,1052
-Star_Lily_TV,1053
-St._Emerald_Academy_TV,1054
-Mine_Research_Group_TV,1055
-Weather_TV,1056
-Weather_Disasters_TV,1057
-Unknow_Event_1058,1058
-Unknow_Event_1059,1059
-Unknow_Event_1060,1060
-Unknow_Event_1061,1061
+TV Show: Star Lily - Script,1053
+TV Show: Star Lily - Episodes,1054
+TV Show: St. Emerald Academy,1055
+TV Show: Mine Resourch Group,1056
+TV Show: Weather Forecast,1057
+TV Show: Weather Disaster Warnings,1058
+TV Show: Weather Forecast,1059
+Tutorial Animals - Cows,1060
+Tutorial Animals - Chicken,1061
 Unknow_Event_1062,1062
-Unknow_Event_1063,1063
+Tutorial Crops,1063
 Unknow_Event_1064,1064
-Unknow_Event_1065,1065
-Unknow_Event_1066,1066
-Unknow_Event_1067,1067
-Unknow_Event_1068,1068
-Unknow_Event_1069,1069
-Unknow_Event_1070,1070
-Unknow_Event_1071,1071
-Unknow_Event_1072,1072
-Unknow_Event_1073,1073
-Unknow_Event_1074,1074
-Unknow_Event_1075,1075
-Unknow_Event_1076,1076
-Unknow_Event_1077,1077
-Unknow_Event_1078,1078
-Unknow_Event_1079,1079
-Unknow_Event_1080,1080
-Unknow_Event_1081,1081
-Unknow_Event_1082,1082
-Unknow_Event_1083,1083
-Unknow_Event_1084,1084
-Unknow_Event_1085,1085
-Unknow_Event_1086,1086
-Unknow_Event_1087,1087
-Unknow_Event_1088,1088
-Unknow_Event_1089,1089
-Unknow_Event_1090,1090
-Unknow_Event_1091,1091
-Unknow_Event_1092,1092
-Unknow_Event_1093,1093
-Unknow_Event_1094,1094
-Unknow_Event_1095,1095
-Unknow_Event_1096,1096
-Unknow_Event_1097,1097
-Unknow_Event_1098,1098
-Unknow_Event_1099,1099
-Unknow_Event_1100,1100
-Unknow_Event_1101,1101
-Unknow_Event_1102,1102
-Unknow_Event_1103,1103
-Unknow_Event_1104,1104
-Unknow_Event_1105,1105
-Unknow_Event_1106,1106
-Unknow_Event_1107,1107
-Unknow_Event_1108,1108
-Unknow_Event_1109,1109
-Unknow_Event_1110,1110
-Unknow_Event_1111,1111
-Unknow_Event_1112,1112
-Unknow_Event_1113,1113
-Unknow_Event_1114,1114
-Unknow_Event_1115,1115
-Unknow_Event_1116,1116
-Unknow_Event_1117,1117
-Unknow_Event_1118,1118
-Unknow_Event_1119,1119
-Unknow_Event_1120,1120
-Unknow_Event_1121,1121
-Unknow_Event_1122,1122
-Unknow_Event_1123,1123
-Unknow_Event_1124,1124
-Unknow_Event_1125,1125
-Unknow_Event_1126,1126
-Unknow_Event_1127,1127
-Unknow_Event_1128,1128
-Unknow_Event_1129,1129
-Unknow_Event_1130,1130
-Unknow_Event_1131,1131
-Unknow_Event_1132,1132
-Unknow_Event_1133,1133
-Unknow_Event_1134,1134
-Unknow_Event_1135,1135
-Unknow_Event_1136,1136
-Unknow_Event_1137,1137
-Unknow_Event_1138,1138
-Unknow_Event_1139,1139
-Unknow_Event_1140,1140
-Unknow_Event_1141,1141
-Unknow_Event_1142,1142
-Unknow_Event_1143,1143
-Unknow_Event_1144,1144
-Unknow_Event_1145,1145
-Unknow_Event_1146,1146
-Unknow_Event_1147,1147
-Unknow_Event_1148,1148
-Unknow_Event_1149,1149
-Unknow_Event_1150,1150
-Unknow_Event_1151,1151
-Unknow_Event_1152,1152
-Unknow_Event_1153,1153
-Unknow_Event_1154,1154
-Unknow_Event_1155,1155
-Unknow_Event_1156,1156
-Unknow_Event_1157,1157
-Unknow_Event_1158,1158
-Unknow_Event_1159,1159
-Unknow_Event_1160,1160
-Unknow_Event_1161,1161
-Unknow_Event_1162,1162
-Unknow_Event_1163,1163
-Unknow_Event_1164,1164
-Unknow_Event_1165,1165
-Unknow_Event_1166,1166
-Unknow_Event_1167,1167
-Unknow_Event_1168,1168
-Unknow_Event_1169,1169
-Unknow_Event_1170,1170
-Unknow_Event_1171,1171
-Unknow_Event_1172,1172
-Unknow_Event_1173,1173
-Unknow_Event_1174,1174
-Unknow_Event_1175,1175
-Unknow_Event_1176,1176
-Unknow_Event_1177,1177
-Unknow_Event_1178,1178
-Unknow_Event_1179,1179
-Unknow_Event_1180,1180
-Unknow_Event_1181,1181
-Unknow_Event_1182,1182
-Unknow_Event_1183,1183
-Unknow_Event_1184,1184
-Unknow_Event_1185,1185
-Unknow_Event_1186,1186
-Unknow_Event_1187,1187
-Unknow_Event_1188,1188
+New Years Day - NPC Placement,1065
+New Years Day - Event Done,1066
+New Years Day - Zack,1067
+New Years Day - Doug,1068
+New Years Day - Ann,1069
+New Years Day - Thomas,1070
+New Years Day - Elli,1071
+New Years Day - Stu,1072
+New Years Day - Duke,1073
+New Years Day - Manna,1074
+New Years Day - Carter,1075
+New Years Day - Saibara,1076
+New Years Day - Gotz,1077
+New Years Day - May,1078
+Horse Race Spring - Enrollment,1079
+Horse Race Spring - NPC Placement,1080
+Horse Race Spring - Thomas Event,1081
+Horse Race Spring - Thomas Exchange after Race,1082
+Horse Race Spring - Rick,1083
+Horse Race Spring - Popuri,1084
+Horse Race Spring - Zack,1085
+Horse Race Spring - Jeff,1086
+Horse Race Spring - Karen,1087
+Horse Race Spring - Sasha,1088
+Horse Race Spring - Doug,1089
+Horse Race Spring - Ann,1090
+Horse Race Spring - Thomas,1091
+Horse Race Spring - Duke,1092
+Horse Race Spring - Manna,1093
+Horse Race Spring - Harris,1094
+Horse Race Spring - Saibara,1095
+Horse Race Spring - May,1096
+Horse Race Spring - Barley,1097
+Horse Race Spring - Event Complete,1098
+Cooking Festival - Announcement,1099
+Cooking Festival - NPC Placement before Event,1100
+Cooking Festival - Rick before Event,1101
+Cooking Festival - Lillia before Event,1102
+Cooking Festival - Zack before Event,1103
+Cooking Festival - Doctor before Event,1104
+Cooking Festival - Gourmet Theme Announcement,1105
+Cooking Festival - Karen before Event,1106
+Cooking Festival - Sasha before Event,1107
+Cooking Festival - Doug before Event,1108
+Cooking Festival - Ann before Event,1109
+Cooking Festival - Thomas before Event,1110
+Cooking Festival - Manna before Event,1111
+Cooking Festival - Carter before Event,1112
+Cooking Festival - Gotz before Event,1113
+Cooking Festival - NPC Placement before Results,1114
+Cooking Festival - Rick before Results,1115
+Cooking Festival - Lillia before Results,1116
+Cooking Festival - Zack before Results,1117
+Cooking Festival - Doctor before Results,1118
+Cooking Festival - Gourmet before Results,1119
+Cooking Festival - Karen before Results,1120
+Cooking Festival - Sasha before Results,1121
+Cooking Festival - Doug before Results,1122
+Cooking Festival - Ann before Results,1123
+Cooking Festival - Thomas before Results,1124
+Cooking Festival - Manna before Results,1125
+Cooking Festival - Carter before Results,1126
+Cooking Festival - Gotz before Results,1127
+Cooking Festival - Gourmet in Action,1128
+Cooking Festival - Event Complete,1129
+Beach Day - Announcement,1130
+Beach Day - NPC Placement,1131
+Beach Day - Popuri before Event,1132
+Beach Day - Jeff before Event,1133
+Beach Day - Sasha before Event,1134
+Beach Day - Thomas before Event,1135
+Beach Day - Kai before Event,1136
+Beach Day - Zack before Event,1137
+Beach Day - Event Complete,1138
+Beach Day - Popuri after Results,1139
+Beach Day - Jeff after Results,1140
+Beach Day - Sasha after Results,1141
+Beach Day - Thomas after Results,1142
+Beach Day - Kai after Results,1143
+Beach Day - Zack after Results,1144
+Beach Day - WIN,1145
+Chicken Festival - Enrollment,1146
+Chicken Festival - Rick before Event,1147
+Chicken Festival - Popuri before Event,1148
+Chicken Festival - Doug before Event,1149
+Chicken Festival - Thomas before Event,1150
+Chicken Festival - Duke before Event,1151
+Chicken Festival - Saibara before Event,1152
+Chicken Festival - Barley before Event,1153
+Chicken Festival - Rick after Results,1154
+Chicken Festival - Popuri after Results,1155
+Chicken Festival - Doug after Results,1156
+Chicken Festival - Thomas after Results,1157
+Chicken Festival - Duke after Results,1158
+Chicken Festival - Saibara after Results,1159
+Chicken Festival - Barley after Results,1160
+Chicken Festival - NPC Placement,1161
+Chicken Festival - Event Complete,1162
+Chicken Festival - WIN,1163
+Cow Festival - Enrollment,1164
+Cow Festival - NPC Placement,1165
+Cow Festival - Rick before Event,1166
+Cow Festival - Popuri before Event,1167
+Cow Festival - Doctor before Event,1168
+Cow Festival - Basil before Event,1169
+Cow Festival - Mary before Event,1170
+Cow Festival - Thomas before Event,1171
+Cow Festival - Elli before Event,1172
+Cow Festival - Stu before Event,1173
+Cow Festival - Carter before Event,1174
+Cow Festival - May before Event,1175
+Cow Festival - Barley before Event,1176
+Cow Festival - Event Complete,1177
+Cow Festival - Rick after Results,1178
+Cow Festival - Popuri after Results,1179
+Cow Festival - Doctor after Results,1180
+Cow Festival - Basil after Results,1181
+Cow Festival - Mary after Results,1182
+Cow Festival - Thomas after Results,1183
+Cow Festival - Elli after Results,1184
+Cow Festival - Stu after Results,1185
+Cow Festival - Carter after Results,1186
+Cow Festival - May after Results,1187
+Cow Festival - Barley after Results,1188
 Unknow_Event_1189,1189
-Unknow_Event_1190,1190
-Unknow_Event_1191,1191
-Unknow_Event_1192,1192
-Unknow_Event_1193,1193
-Unknow_Event_1194,1194
-Unknow_Event_1195,1195
-Unknow_Event_1196,1196
-Unknow_Event_1197,1197
-Unknow_Event_1198,1198
-Unknow_Event_1199,1199
-Unknow_Event_1200,1200
-Unknow_Event_1201,1201
-Unknow_Event_1202,1202
-Unknow_Event_1203,1203
-Unknow_Event_1204,1204
-Unknow_Event_1205,1205
-Unknow_Event_1206,1206
-Unknow_Event_1207,1207
-Unknow_Event_1208,1208
-Unknow_Event_1209,1209
-Unknow_Event_1210,1210
-Unknow_Event_1211,1211
-Unknow_Event_1212,1212
-Unknow_Event_1213,1213
-Unknow_Event_1214,1214
-Unknow_Event_1215,1215
-Unknow_Event_1216,1216
-Unknow_Event_1217,1217
-Unknow_Event_1218,1218
-Unknow_Event_1219,1219
-Unknow_Event_1220,1220
-Unknow_Event_1221,1221
-Unknow_Event_1222,1222
-Unknow_Event_1223,1223
-Unknow_Event_1224,1224
-Unknow_Event_1225,1225
-Unknow_Event_1226,1226
-Unknow_Event_1227,1227
-Unknow_Event_1228,1228
-Unknow_Event_1229,1229
-Unknow_Event_1230,1230
-Unknow_Event_1231,1231
-Unknow_Event_1232,1232
-Unknow_Event_1233,1233
-Unknow_Event_1234,1234
-Unknow_Event_1235,1235
-Unknow_Event_1236,1236
-Unknow_Event_1237,1237
-Unknow_Event_1238,1238
-Unknow_Event_1239,1239
-Unknow_Event_1240,1240
-Unknow_Event_1241,1241
-Unknow_Event_1242,1242
-Unknow_Event_1243,1243
-Unknow_Event_1244,1244
-Unknow_Event_1245,1245
-Unknow_Event_1246,1246
-Unknow_Event_1247,1247
-Unknow_Event_1248,1248
-Unknow_Event_1249,1249
-Unknow_Event_1250,1250
-Unknow_Event_1251,1251
-Unknow_Event_1252,1252
-Unknow_Event_1253,1253
-Unknow_Event_1254,1254
-Unknow_Event_1255,1255
-Unknow_Event_1256,1256
-Unknow_Event_1257,1257
+Cow Festival - WIN,1190
+Fireworks - NPC Placement,1191
+Fireworks - Event Complete,1192
+Fireworks - Rick,1193
+Fireworks - Popuri,1194
+Fireworks - Cliff,1195
+Fireworks - Doctor,1196
+Fireworks - Karen,1197
+Fireworks - Ann,1198
+Fireworks - Mary,1199
+Fireworks - Elli,1200
+Fireworks - Kai,1201
+Fireworks - Gray,1202
+Music Festival - Enrollment,1203
+Music Festival - Outside,1204
+Music Festival - NPC Placement,1205
+Music Festival - Jeff,1206
+Music Festival - Karen,1207
+Music Festival - Sasha,1208
+Music Festival - Ann,1209
+Music Festival - Mary,1210
+Music Festival - Elli,1211
+Music Festival - Stu,1212
+Music Festival - Carter,1213
+Music Festival - May,1214
+Music Festival - Event Complete,1215
+Harvest Festival - Announcement,1216
+Harvest Festival - NPC Placement,1217
+Harvest Festival - Event Complete,1218
+Harvest Festival - Karen after Results,1219
+Harvest Festival - Sasha after Results,1220
+Harvest Festival - Doug after Results,1221
+Harvest Festival - Ann after Results,1222
+Harvest Festival - Mary after Results,1223
+Harvest Festival - Anna after Results,1224
+Harvest Festival - Thomas after Results,1225
+Harvest Festival - Elli after Results,1226
+Harvest Festival - Manna after Results,1227
+Harvest Festival - Carter after Results,1228
+Harvest Festival - Gotz after Results,1229
+Harvest Festival - Karen before Event,1230
+Harvest Festival - Sasha before Event,1231
+Harvest Festival - Doug before Event,1232
+Harvest Festival - Ann before Event,1233
+Harvest Festival - Mary before Event,1234
+Harvest Festival - Anna before Event,1235
+Harvest Festival - Thomas before Event,1236
+Harvest Festival - Elli before Event,1237
+Harvest Festival - Manna before Event,1238
+Harvest Festival - Carter before Event,1239
+Harvest Festival - Gotz before Event,1240
+Harvest Festival - Eating,1241
+Moon Viewing - Variables,1242
+Moon Viewing - Dialogues 1,1243
+Moon Viewing - Dialogues 2,1244
+Horse Race Fall - Enrollment,1245
+Horse Race Fall - NPC Placement,1246
+Horse Race Fall - Thomas Event,1247
+Horse Race Fall - Thomas Exchange after Race,1248
+Horse Race Fall - Rick,1249
+Horse Race Fall - Lillia,1250
+Horse Race Fall - Zack,1251
+Horse Race Fall - Doctor,1252
+Horse Race Fall - Doug,1253
+Horse Race Fall - Mary,1254
+Horse Race Fall - Thomas,1255
+Horse Race Fall - Elli,1256
+Horse Race Fall - Duke,1257
 Unknow_Event_1258,1258
-Unknow_Event_1259,1259
-Unknow_Event_1260,1260
-Unknow_Event_1261,1261
-Unknow_Event_1262,1262
-Unknow_Event_1263,1263
-Unknow_Event_1264,1264
-Unknow_Event_1265,1265
-Unknow_Event_1266,1266
-Unknow_Event_1267,1267
-Unknow_Event_1268,1268
-Unknow_Event_1269,1269
-Unknow_Event_1270,1270
-Unknow_Event_1271,1271
-Unknow_Event_1272,1272
-Unknow_Event_1273,1273
-Unknow_Event_1274,1274
-Unknow_Event_1275,1275
-Unknow_Event_1276,1276
-Unknow_Event_1277,1277
-Unknow_Event_1278,1278
-Unknow_Event_1279,1279
-Unknow_Event_1280,1280
-Unknow_Event_1281,1281
-Unknow_Event_1282,1282
-Unknow_Event_1283,1283
-Unknow_Event_1284,1284
-Unknow_Event_1285,1285
-Unknow_Event_1286,1286
-Unknow_Event_1287,1287
+Horse Race Fall - Carter,1259
+Horse Race Fall - Gray,1260
+Horse Race Fall - Saibara,1261
+Horse Race Fall - Gotz,1262
+Horse Race Fall - Barley,1263
+Horse Race Fall - Event Complete,1264
+Sheep Festival - Enrollment,1265
+Sheep Festival - NPC Placement,1266
+Sheep Festival - Rick before Event,1267
+Sheep Festival - Jeff before Event,1268
+Sheep Festival - Karen before Event,1269
+Sheep Festival - Anna before Event,1270
+Sheep Festival - Thomas before Event,1271
+Sheep Festival - Harris before Event,1272
+Sheep Festival - Gray before Event,1273
+Sheep Festival - Gotz before Event,1274
+Sheep Festival - May before Event,1275
+Sheep Festival - Barley before Event,1276
+Sheep Festival - Event Complete,1277
+Sheep Festival - Rick after Results,1278
+Sheep Festival - Jeff after Results,1279
+Sheep Festival - Karen after Results,1280
+Sheep Festival - Anna after Results,1281
+Sheep Festival - Thomas after Results,1282
+Sheep Festival - Harris after Results,1283
+Sheep Festival - Gray after Results,1284
+Sheep Festival - Gotz after Results,1285
+Sheep Festival - May after Results,1286
+Sheep Festival - Barley after Results,1287
 Unknow_Event_1288,1288
-Unknow_Event_1289,1289
-Unknow_Event_1290,1290
-Unknow_Event_1291,1291
-Unknow_Event_1292,1292
-Unknow_Event_1293,1293
-Unknow_Event_1294,1294
-Unknow_Event_1295,1295
-Unknow_Event_1296,1296
-Unknow_Event_1297,1297
-Unknow_Event_1298,1298
-Unknow_Event_1299,1299
+Sheep Festival - WIN,1289
+Pumpkin Festival - May,1290
+Pumpkin Festival - Stu,1291
+Pumpkin Festival - Popuri,1292
+Pumpkin Festival - Wife,1293
+Valentine's Day Winter - Popuri,1294
+Valentine's Day Winter - Ann,1295
+Valentine's Day Winter - Elli,1296
+Valentine's Day Winter - Karen,1297
+Valentine's Day Winter - Mary,1298
+Valentine's Day Winter - Wife,1299
 Unknow_Event_1300,1300
-Unknow_Event_1301,1301
-Unknow_Event_1302,1302
-Unknow_Event_1303,1303
-Unknow_Event_1304,1304
-Unknow_Event_1305,1305
-Unknow_Event_1306,1306
-Unknow_Event_1307,1307
-Unknow_Event_1308,1308
-Unknow_Event_1309,1309
-Unknow_Event_1310,1310
-Unknow_Event_1311,1311
-Unknow_Event_1312,1312
-Unknow_Event_1313,1313
-Unknow_Event_1314,1314
-Unknow_Event_1315,1315
-Unknow_Event_1316,1316
-Unknow_Event_1317,1317
-Unknow_Event_1318,1318
-Unknow_Event_1319,1319
-Unknow_Event_1320,1320
-Unknow_Event_1321,1321
-Unknow_Event_1322,1322
-Unknow_Event_1323,1323
-Unknow_Event_1324,1324
-Unknow_Event_1325,1325
-Unknow_Event_1326,1326
+Starry Night Festival - Popuri,1301
+Starry Night Festival - Ann,1302
+Starry Night Festival - Elli,1303
+Starry Night Festival - Karen,1304
+Starry Night Festival - Mary,1305
+Starry Night Festival - Wife,1306
+Stocking Festival,1307
+New Years Eve - Rose Square - NPC Placement,1308
+New Years Eve - Rose Square - Thomas,1309
+New Years Eve - Rose Square - Jeff,1310
+New Years Eve - Rose Square - Sasha,1311
+New Years Eve - Rose Square - Ann,1312
+New Years Eve - Rose Square - Event Complete,1313
+New Years Eve - Rose Square - Duke,1314
+New Years Eve - Rose Square - Manna,1315
+New Years Eve - Rose Square - Carter,1316
+New Years Eve - Rose Square - Gotz,1317
+New Years Eve  Mother's Hill (Peak) - NPC Placement,1318
+New Years Eve  Mother's Hill (Peak) - Event Complete,1319
+New Years Eve  Mother's Hill (Peak) - Cliff,1320
+New Years Eve  Mother's Hill (Peak) - Doug,1321
+New Years Eve  Mother's Hill (Peak) - Basil,1322
+New Years Eve  Mother's Hill (Peak) - Mary,1323
+New Years Eve  Mother's Hill (Peak) - Anna,1324
+New Years Eve  Mother's Hill (Peak) - Gray,1325
+New Years Eve  Mother's Hill (Peak) - Saibara,1326
 Unknow_Event_1327,1327
 Unknow_Event_1328,1328

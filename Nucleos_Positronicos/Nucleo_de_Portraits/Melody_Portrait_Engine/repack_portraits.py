@@ -39,7 +39,9 @@ def _load_tables(rom):
     Devuelve (counts, ptrs, tables, header_addr, is_buggy_payload).
     tables = [t1, t2, t3, t4, t5, t6, t7]
     """
-    header_addr = struct.unpack('<I', rom[0xadc7c:0xadc7c+4])[0] - 0x08000000
+    is_mfomt = len(rom) >= 0xAC and b"HM MFOM USA\0" in rom[0xA0:0xAC]
+    pool_off = 0xB2EC8 if is_mfomt else 0xadc7c
+    header_addr = struct.unpack('<I', rom[pool_off:pool_off+4])[0] - 0x08000000
     counts = []
     ptrs   = []
     r1     = header_addr

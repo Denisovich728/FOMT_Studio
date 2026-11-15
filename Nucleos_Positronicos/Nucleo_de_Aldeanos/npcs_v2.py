@@ -10,8 +10,7 @@ class NpcParser:
         self.project = project
         self.npcs = []
         is_mfomt = getattr(self.project, 'is_mfomt', False)
-        delta = 0 if not is_mfomt else 0x2BD58
-        self.npc_table_off = 0x104260 + delta 
+        self.npc_table_off = 0x10CF3C if is_mfomt else 0x104260
         
         # BANCO DE RETRATOS (Fijado por ID 80 en 0x556CBC)
         self.portrait_base = 0x556CBC

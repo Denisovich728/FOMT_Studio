@@ -292,44 +292,94 @@ class MemoryManager:
     def relocate_master_event_table(self, new_capacity: int):
         """
         Reubica la tabla maestra de eventos a un nuevo espacio libre.
-        Copia los punteros existentes y actualiza el puntero del motor (0x03F89C en FoMT).
+        Copia los punteros existentes y actualiza los punteros del motor
+        (0x03F89C en FoMT; 0x3FA88, 0xE8254, 0xE8A68 en MFoMT).
         Retorna el nuevo offset y un mensaje de estado.
         """
-        if self.proyecto.is_mfomt:
-            return None, "Reubicación de tabla no soportada aún para MFoMT (falta puntero del motor)."
-            
-        engine_ptr_offset = 0x03F89C
+        engine_ptr_offsets = [0x3FA88, 0xE8254, 0xE8A68] if self.proyecto.is_mfomt else [0x03F89C]
         old_table_offset = self.proyecto.super_lib.table_offset
         old_limit = self.proyecto.super_lib.event_limit
-        
+
         if new_capacity <= old_limit:
             return None, f"La nueva capacidad ({new_capacity}) debe ser mayor que la actual ({old_limit})."
-            
+
         new_size = new_capacity * 4
-        new_offset = self._find_free_space(new_size)
-        
-        if new_offset == 0:
+        if hasattr(self.proyecto, 'allocate_free_space'):
+            new_offset = self.proyecto.allocate_free_space(new_size)
+        else:
+            new_offset = self._find_free_space(new_size)
+
+        if not new_offset:
             return None, "No se encontró espacio libre suficiente en la ROM para reubicar la tabla."
-            
+
         # 1. Copiar la tabla antigua al nuevo espacio
         old_table_data = self.proyecto.read_rom(old_table_offset, old_limit * 4)
-        
+
         # Rellenar el resto de la nueva tabla con 0x00000000 (punteros nulos)
         padding_size = (new_capacity - old_limit) * 4
         new_table_data = old_table_data + (b'\x00' * padding_size)
-        
+
         self.proyecto.write_patch(new_offset, new_table_data)
-        
-        # 2. Actualizar el puntero del motor para que use la nueva tabla
-        # Aplicamos la lógica de la Base Fantasma: New_Ghost_Base = New_Free_Space - 4
+
+        # 2. Actualizar los punteros del motor para que usen la nueva tabla (Base Fantasma: New - 4)
         ghost_base = new_offset - 4
-        self.repoint_with_alignment(engine_ptr_offset, ghost_base)
-        
+        for ptr_off in engine_ptr_offsets:
+            self.repoint_with_alignment(ptr_off, ghost_base)
+
         # 3. Limpiar la tabla antigua (0xFF) para recuperar el espacio
         self.proyecto.write_patch(old_table_offset, b'\xFF' * (old_limit * 4))
-        
+
         # 4. Actualizar estado de SuperLibrary
         self.proyecto.super_lib.cfg["MASTER_TABLE_OFFSET"] = new_offset
         self.proyecto.super_lib.cfg["EVENT_LIMIT"] = new_capacity
-        
+
         return new_offset, f"Tabla de Eventos reubicada a 0x{new_offset:06X}. Límite expandido de {old_limit} a {new_capacity} eventos."
+
+    def create_new_event(self, event_name: str = "New Event"):
+        """
+        Crea un nuevo evento al final de la tabla maestra (last_id + 1):
+        reubica/expande la tabla de eventos, reserva espacio libre en FSP,
+        escribe un script mínimo válido (End_Script) y registra el nombre en SuperLibrary/CSV.
+        Retorna (new_event_id, stub_offset, msg).
+        """
+        if not getattr(self.proyecto, 'super_lib', None):
+            return None, None, "SuperLibrary no está inicializada."
+
+        import struct
+        old_limit = int(self.proyecto.super_lib.event_limit)
+        new_event_id = old_limit + 1
+        new_table_offset, msg = self.relocate_master_event_table(new_event_id)
+        if not new_table_offset:
+            return None, None, msg
+
+        stub_data = None
+        if getattr(self.proyecto, 'event_parser', None):
+            try:
+                stub_data = self.proyecto.event_parser.compile_text_to_bytecode("End_Script()")
+            except Exception:
+                stub_data = None
+        if not stub_data:
+            # RIFF minimal válido con chunk SCR vacío (4 bytes End_Script = 0x00000000)
+            stub_data = b'RIFF' + struct.pack('<I', 16) + b'SCR ' + struct.pack('<I', 4) + b'\x00\x00\x00\x00'
+
+        if hasattr(self.proyecto, 'allocate_free_space'):
+            stub_offset = self.proyecto.allocate_free_space(len(stub_data))
+        else:
+            stub_offset = self._find_free_space(len(stub_data))
+        if not stub_offset:
+            return None, None, "No se encontró espacio libre para el nuevo script."
+
+        self.proyecto.write_patch(stub_offset, stub_data)
+        ptr_loc = new_table_offset + ((new_event_id - 1) * 4)
+        self.proyecto.write_patch(ptr_loc, struct.pack('<I', stub_offset | 0x08000000))
+
+        if getattr(self.proyecto, 'event_parser', None):
+            self.proyecto.event_parser.scanned_sizes[new_event_id] = len(stub_data)
+        self.proyecto.super_lib.custom_event_names[str(new_event_id)] = event_name
+        if getattr(self.proyecto, 'project_dir', None) and hasattr(self.proyecto, 'update_event_name_in_csv'):
+            try:
+                self.proyecto.update_event_name_in_csv(new_event_id, event_name)
+            except Exception:
+                pass
+
+        return new_event_id, stub_offset, f"Evento #{new_event_id} ('{event_name}') creado en 0x{stub_offset:06X}. {msg}"

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QLabel, QScrollArea,
     QPushButton, QSpinBox, QMessageBox, QSplitter, QProgressBar, QCheckBox,
     QComboBox, QFormLayout, QTabWidget, QLineEdit, QDialog, QGroupBox,
-    QGridLayout, QDialogButtonBox
+    QGridLayout, QDialogButtonBox, QCompleter
 )
 from PyQt6.QtGui import QPixmap, QImage, QShortcut, QKeySequence
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
@@ -159,20 +159,43 @@ class MapResizeDialog(QDialog):
         return self.cmb_direction.currentIndex() == 1
 
 class TriggerEditorDialog(QDialog):
-    def __init__(self, behavior_id, flags, script_id, parent=None):
+    def __init__(self, behavior_id, flags, script_id, event_names=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle(f"Editar Trigger (ID 0x{behavior_id:02X})")
         self.setModal(True)
-        self.resize(300, 150)
+        self.resize(440, 210)
         
         layout = QVBoxLayout(self)
         
         self.chk_solid = QCheckBox("Sólido (Bloquea el paso)")
         self.chk_solid.setChecked(bool(flags & 1))
         
+        real_script_id = script_id // 2
         self.spin_script = QSpinBox()
         self.spin_script.setRange(0, 65535)
-        self.spin_script.setValue(script_id // 2)
+        self.spin_script.setValue(real_script_id)
+
+        self.cmb_event = QComboBox()
+        self.cmb_event.setEditable(True)
+        self.cmb_event.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        if self.cmb_event.completer():
+            self.cmb_event.completer().setFilterMode(Qt.MatchFlag.MatchContains)
+            self.cmb_event.completer().setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        self.cmb_event.addItem("0x0000 (0) - Sin Evento", 0)
+        if event_names:
+            for eid in sorted(event_names.keys()):
+                if eid == 0:
+                    continue
+                self.cmb_event.addItem(f"0x{eid:04X} ({eid}) - {event_names[eid]}", eid)
+        idx_match = self.cmb_event.findData(real_script_id)
+        if idx_match >= 0:
+            self.cmb_event.setCurrentIndex(idx_match)
+        else:
+            self.cmb_event.setEditText(f"0x{real_script_id:04X} ({real_script_id})")
+
+        self._syncing_event = False
+        self.cmb_event.currentIndexChanged.connect(self._on_event_combo_changed)
+        self.spin_script.valueChanged.connect(self._on_script_spin_changed)
         
         self.txt_flags = QLineEdit()
         self.txt_flags.setText(hex(flags))
@@ -181,6 +204,7 @@ class TriggerEditorDialog(QDialog):
         form = QFormLayout()
         form.addRow("Flags Crudos (Hex):", self.txt_flags)
         form.addRow("¿Sólido?:", self.chk_solid)
+        form.addRow("Evento / Script:", self.cmb_event)
         form.addRow("Script ID (Real):", self.spin_script)
         
         layout.addLayout(form)
@@ -195,6 +219,24 @@ class TriggerEditorDialog(QDialog):
         btn_layout.addWidget(btn_cancel)
         
         layout.addLayout(btn_layout)
+
+    def _on_event_combo_changed(self, idx):
+        if self._syncing_event or idx < 0:
+            return
+        eid = self.cmb_event.itemData(idx)
+        if eid is not None:
+            self._syncing_event = True
+            self.spin_script.setValue(int(eid))
+            self._syncing_event = False
+
+    def _on_script_spin_changed(self, val):
+        if self._syncing_event:
+            return
+        self._syncing_event = True
+        idx = self.cmb_event.findData(val)
+        if idx >= 0:
+            self.cmb_event.setCurrentIndex(idx)
+        self._syncing_event = False
         
     def get_data(self):
         try:
@@ -380,9 +422,14 @@ class VisorMapas(QWidget):
         self.cmb_col_brush.setVisible(False)
         self.lbl_col_brush = QLabel("Pincel Colisión:")
         self.lbl_col_brush.setVisible(False)
+        self.chk_col_edit_trigger = QCheckBox("Editar Trigger al Click")
+        self.chk_col_edit_trigger.setChecked(True)
+        self.chk_col_edit_trigger.setVisible(False)
+        self.chk_col_edit_trigger.setToolTip("Si está activo, hacer click sobre un bloque de trigger abre el selector de evento; desactívalo para pintar colisiones.")
         
         tools_row2.addWidget(self.lbl_col_brush)
         tools_row2.addWidget(self.cmb_col_brush)
+        tools_row2.addWidget(self.chk_col_edit_trigger)
         
         # Zoom controls
         zoom_layout = QHBoxLayout()
@@ -743,6 +790,8 @@ class VisorMapas(QWidget):
         is_dyn_layer = (index == 5)
         self.lbl_col_brush.setVisible(is_col)
         self.cmb_col_brush.setVisible(is_col)
+        if hasattr(self, 'chk_col_edit_trigger'):
+            self.chk_col_edit_trigger.setVisible(is_col)
         if hasattr(self, 'widget_dyn_editor'):
             self.widget_dyn_editor.setVisible(is_dyn_layer)
             if is_dyn_layer:
@@ -1207,6 +1256,14 @@ class VisorMapas(QWidget):
         cell_x = px // 8
         cell_y = py // 8
         self.selected_cell = (cell_x, cell_y)
+
+        if (
+            self.tabs_edit_mode.currentIndex() == 4
+            and getattr(self, 'chk_col_edit_trigger', None) is not None
+            and self.chk_col_edit_trigger.isChecked()
+        ):
+            if self._open_trigger_editor_at(cell_x, cell_y, silent_empty=True):
+                return
         
         if not self._save_state_pending:
             self._push_undo_state()
@@ -1292,28 +1349,44 @@ class VisorMapas(QWidget):
             return
 
         if tab_idx != 4: return
-        
+        self._open_trigger_editor_at(cell_x, cell_y, silent_empty=False)
+
+    def _open_trigger_editor_at(self, cell_x, cell_y, silent_empty=False):
+        w = self.renderer.width
+        h = self.renderer.height
+        if not (0 <= cell_x < w and 0 <= cell_y < h):
+            return False
+        idx = cell_y * w + cell_x
         if not self.renderer.collision_map or idx >= len(self.renderer.collision_map):
-            return
-            
+            return False
+
         val = self.renderer.collision_map[idx]
         if val == 0:
-            QMessageBox.information(self, "Trigger Info", "Esta celda es terreno caminable normal (00). No es un Trigger.")
-            return
-            
+            if not silent_empty:
+                QMessageBox.information(self, "Trigger Info", "Esta celda es terreno caminable normal (00). No es un Trigger.")
+            return False
+
         trigger_info = self.renderer.get_trigger(cell_x, cell_y, val)
         if not trigger_info:
-            QMessageBox.information(self, "Trigger Info", "Esta celda tiene asignada una colisión, pero no se encontró un Evento de Script en estas coordenadas.")
-            return
-            
+            if not silent_empty:
+                QMessageBox.information(self, "Trigger Info", "Esta celda tiene asignada una colisión, pero no se encontró un Evento de Script en estas coordenadas.")
+            return False
+
         flags, script_id, rom_addr = trigger_info
-        
-        dlg = TriggerEditorDialog(val, flags, script_id, self)
+        super_lib = getattr(self.project, 'super_lib', None)
+        event_names = None
+        if super_lib and getattr(super_lib, 'custom_event_names', None):
+            event_names = {int(k): v for k, v in super_lib.custom_event_names.items() if str(k).isdigit()}
+        dlg = TriggerEditorDialog(val, flags, script_id, event_names=event_names, parent=self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
             new_flags, new_script = dlg.get_data()
             self.renderer.set_trigger(val, rom_addr, new_flags, new_script)
             self.project.base_rom_data = bytearray(self.renderer.rom)
-            self.lbl_info.setText(f"Trigger {val:02X} actualizado: Script {new_script}, Flags {new_flags:04X}")
+            real_eid = new_script // 2
+            ev_label = event_names.get(real_eid, f"Script {real_eid}") if event_names else f"Script {real_eid}"
+            self.lbl_info.setText(f"Trigger {val:02X} actualizado: {ev_label} (ID {real_eid}), Flags {new_flags:04X}")
+            self._re_render_map_only()
+        return True
 
     def _on_behavior_changed(self, val):
         pass # Remove behavior sync since we removed the inspector info panel

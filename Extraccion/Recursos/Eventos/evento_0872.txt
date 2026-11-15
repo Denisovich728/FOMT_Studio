@@ -1,6 +1,0 @@
-// Script 872
-#include "Fomt_Lib.src"
-
-script 872 Event_0872 {
-    exit;
-}

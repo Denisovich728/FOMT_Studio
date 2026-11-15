@@ -125,7 +125,7 @@ class StringDecorateVisitor:
             self.visit_expr(stmt.condition)
             self.visit_stmt(stmt.tail)
             self.visit_stmts(stmt.body)
-        elif isinstance(stmt, StmtDoWhile):
+        elif isinstance(stmt, (StmtDoWhile, StmtWhile)):
             self.visit_expr(stmt.condition)
             self.visit_stmts(stmt.body)
         elif isinstance(stmt, StmtSwitch):

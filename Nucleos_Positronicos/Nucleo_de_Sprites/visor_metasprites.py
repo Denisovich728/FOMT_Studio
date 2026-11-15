@@ -335,7 +335,9 @@ class VisorMetasprites(QWidget):
 
     def _load_csv(self):
         self.list_portraits.clear()
-        csv_path = get_data_path("fomt", "Fomt_Portraits.csv")
+        mode = "mfomt" if (self.project and getattr(self.project, "is_mfomt", False)) else "fomt"
+        prefix = "MFomt_" if mode == "mfomt" else "Fomt_"
+        csv_path = get_data_path(mode, f"{prefix}Portraits.csv")
         if os.path.exists(csv_path):
             with open(csv_path, 'r', encoding='utf-8') as f:
                 reader = csv.reader(f)
@@ -576,7 +578,9 @@ class VisorMetasprites(QWidget):
                         f.write(current_rom)
                     rom_path = "temp_rom.gba"
                         
-                csv_path = get_data_path("fomt", "Fomt_Portraits.csv")
+                mode = "mfomt" if (self.project and getattr(self.project, "is_mfomt", False)) else "fomt"
+                prefix = "MFomt_" if mode == "mfomt" else "Fomt_"
+                csv_path = get_data_path(mode, f"{prefix}Portraits.csv")
                 out_dir = os.path.join(os.getcwd(), "portraits_dump")
                 
                 dp.dump_all(rom_path, csv_path, out_dir)

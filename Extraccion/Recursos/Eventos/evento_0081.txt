@@ -1,6 +1,0 @@
-// Script 81
-#include "Fomt_Lib.src"
-
-script 81 Event_0081 {
-    exit;
-}

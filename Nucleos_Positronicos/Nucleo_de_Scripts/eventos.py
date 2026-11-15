@@ -179,12 +179,13 @@ class FoMTEventParser:
 
                         decorate_stmts_with_characters(stmts, char_map, candidate_map, portrait_map_inv, map_map_inv, emote_map, anim_map, known_callables, decorate_coords=dec_cfg.get("coords", True))
 
-            # Decorar flags desde flags.csv
+            # Decorar flags desde flags.csv (priorizando CSV local del proyecto si existe)
             if dec_cfg.get("flags", True):
                 mode = "mfomt" if self.project.is_mfomt else "fomt"
                 prefix = "MFomt_" if self.project.is_mfomt else "Fomt_"
-                flag_path = get_data_path(mode, f"{prefix}Flags.csv")
-                if os.path.exists(flag_path):
+                flag_filename = f"{prefix}Flags.csv"
+                flag_path = self.project.get_csv_path(flag_filename) if hasattr(self.project, "get_csv_path") else get_data_path(mode, flag_filename)
+                if flag_path and os.path.exists(flag_path):
                     with open(flag_path, 'r', encoding='utf-8') as f:
                         import csv
                         reader = csv.DictReader(f)
@@ -349,7 +350,8 @@ class FoMTEventParser:
         anim_map_inv = self.super_lib.anim_map
         
         flag_map_inv = {}
-        flags_path = get_data_path(mode, f"{prefix}Flags.csv")
+        flags_filename = f"{prefix}Flags.csv"
+        flags_path = self.project.get_csv_path(flags_filename) if hasattr(self.project, "get_csv_path") else get_data_path(mode, flags_filename)
         if os.path.exists(flags_path):
             with open(flags_path, 'r', encoding='utf-8') as f:
                 import csv

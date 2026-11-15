@@ -693,6 +693,14 @@ class ScriptIDEWidget(QWidget):
         toolbar = QHBoxLayout()
         self.lbl_title = QLabel(f"<h3>{tr('ide_title', lang)}</h3>")
         
+        self.btn_new_event = QPushButton("+ Nuevo Evento")
+        self.btn_new_event.setStyleSheet("background-color: #2ea44f; color: white; font-weight: bold; padding: 5px 12px;")
+        self.btn_new_event.clicked.connect(self.on_new_event_clicked)
+
+        self.btn_flags = QPushButton(tr("ide_btn_flags", lang))
+        self.btn_flags.setStyleSheet("background-color: #0969da; color: white; font-weight: bold; padding: 5px 15px;")
+        self.btn_flags.clicked.connect(self._open_memory_extend_dialog)
+
         self.btn_compile = QPushButton(tr('btn_compile_script', lang))
         self.btn_compile.setStyleSheet("background-color: #d32f2f; color: white; font-weight: bold; padding: 5px 15px;")
         self.btn_compile.clicked.connect(self.on_compile_clicked)
@@ -708,6 +716,8 @@ class ScriptIDEWidget(QWidget):
         
         toolbar.addWidget(self.lbl_title)
         toolbar.addStretch()
+        toolbar.addWidget(self.btn_new_event)
+        toolbar.addWidget(self.btn_flags)
         toolbar.addWidget(self.btn_ai)
         toolbar.addWidget(self.btn_compile)
         layout.addLayout(toolbar)
@@ -1011,6 +1021,27 @@ class ScriptIDEWidget(QWidget):
             self.editor.setPlainText(code)
         except Exception as e:
             self.editor.setPlainText(f"// [Error descompilando evento {event_id}]: {e}")
+
+    def on_new_event_clicked(self):
+        from PyQt6.QtWidgets import QMessageBox
+        if not self.project or not getattr(self.project, 'memory', None):
+            return
+        new_eid, stub_off, msg = self.project.memory.create_new_event("New Event")
+        if new_eid is None:
+            QMessageBox.warning(self, "Nuevo Evento", f"No se pudo crear el evento:\n{msg}")
+            return
+        main_win = self.window()
+        if hasattr(main_win, 'append_new_event_to_tree'):
+            main_win.append_new_event_to_tree(new_eid)
+        self.load_event(new_eid)
+        QMessageBox.information(self, "Nuevo Evento Creado", msg)
+
+    def _open_memory_extend_dialog(self):
+        if not self.project:
+            return
+        from Nucleos_Positronicos.Nucleo_de_Scripts.memory_extend_engine import MemoryExtendDialog
+        dlg = MemoryExtendDialog(self, self.project)
+        dlg.exec()
 
     def load_rom_script(self, offset):
         """Carga y descompila un script desde un offset arbitrario (usado por Mapas y NPCs)."""

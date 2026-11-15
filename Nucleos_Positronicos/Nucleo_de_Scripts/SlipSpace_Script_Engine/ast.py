@@ -97,6 +97,8 @@ class StmtFor(Stmt): condition: Expr; head: Stmt; tail: Stmt; body: List[Stmt]
 @dataclass
 class StmtDoWhile(Stmt): condition: Expr; body: List[Stmt]
 @dataclass
+class StmtWhile(Stmt): condition: Expr; body: List[Stmt]
+@dataclass
 class StmtSwitch(Stmt): condition: Expr; cases: List['SwitchCase']; switch_id: SwitchId; exit_label: Optional[JumpId] = None
 class StmtExit(Stmt): pass
 class StmtBreak(Stmt): pass

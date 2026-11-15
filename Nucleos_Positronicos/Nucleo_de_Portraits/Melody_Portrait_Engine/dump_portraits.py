@@ -45,7 +45,8 @@ def get_bundle_headers(rom):
     signature = bytes.fromhex('70B5464640B48EB080460D1C202052F7C9FC061C0D496846')
     idx = rom.find(signature)
     
-    header_addr = 0x0052D984 # Default to vanilla if not found
+    is_mfomt = len(rom) >= 0xAC and b"HM MFOM USA\0" in rom[0xA0:0xAC]
+    header_addr = 0x004C4A44 if is_mfomt else 0x0052D984 # Default to vanilla if not found
     
     if idx != -1:
         # La instrucción ldr r1, [pc, #0x34] está en idx + 0x14

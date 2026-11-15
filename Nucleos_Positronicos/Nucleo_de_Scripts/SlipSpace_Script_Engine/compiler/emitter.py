@@ -169,7 +169,7 @@ class Emitter:
             elif isinstance(s, StmtIfElse):
                 self._reserve_messages(s.true_stmts)
                 self._reserve_messages(s.false_stmts)
-            elif isinstance(s, (StmtFor, StmtDoWhile)):
+            elif isinstance(s, (StmtFor, StmtDoWhile, StmtWhile)):
                 self._reserve_messages(s.body)
             elif isinstance(s, StmtSwitch):
                 for sc in s.cases:
@@ -495,9 +495,25 @@ class Emitter:
             elif isinstance(s, StmtFor):
                 for_scope = BlockScope(parent=scope, var_frame=scope.next_id())
                 loop_lbl, tail_lbl, body_lbl, nxt_lbl = [self.new_label() for _ in range(4)]
-                self.stmts(for_scope, [s.head]); self.emit(Label(loop_lbl)); self.expr(for_scope, s.condition); self.emit(Bne(body_lbl)); self.emit(Jmp(nxt_lbl)); self.emit(Label(tail_lbl)); self.stmts(for_scope, [s.tail]); self.emit(Jmp(loop_lbl)); self.emit(Label(body_lbl)); self.break_targets.append(nxt_lbl); self.stmts(for_scope, s.body); self.break_targets.pop(); self.emit(Jmp(tail_lbl)); self.emit(Label(nxt_lbl))
+                if isinstance(s.head, StmtVars):
+                    for name, exp in s.head.vars:
+                        vid = for_scope.define_var(name)
+                        if exp: self.assign(for_scope, vid, exp, AssignOperation.NONE)
+                else:
+                    self.stmts(for_scope, [s.head])
+                self.emit(Label(loop_lbl)); self.expr(for_scope, s.condition); self.emit(Bne(body_lbl)); self.emit(Jmp(nxt_lbl)); self.emit(Label(tail_lbl)); self.stmts(for_scope, [s.tail]); self.emit(Jmp(loop_lbl)); self.emit(Label(body_lbl)); self.break_targets.append(nxt_lbl); self.stmts(for_scope, s.body); self.break_targets.pop(); self.emit(Jmp(tail_lbl)); self.emit(Label(nxt_lbl))
             elif isinstance(s, StmtDoWhile):
                 loop_lbl, nxt_lbl = self.new_label(), self.new_label(); self.emit(Label(loop_lbl)); self.break_targets.append(nxt_lbl); self.stmts(scope, s.body); self.break_targets.pop(); self.expr(scope, s.condition); self.emit(Bne(loop_lbl)); self.emit(Label(nxt_lbl))
+            elif isinstance(s, StmtWhile):
+                loop_lbl, nxt_lbl = self.new_label(), self.new_label()
+                self.emit(Label(loop_lbl))
+                self.expr(scope, s.condition)
+                self.emit(Beq(nxt_lbl))
+                self.break_targets.append(nxt_lbl)
+                self.stmts(scope, s.body)
+                self.break_targets.pop()
+                self.emit(Jmp(loop_lbl))
+                self.emit(Label(nxt_lbl))
             elif isinstance(s, StmtSwitch):
                 self._emit_switch(scope, s)
             elif isinstance(s, StmtExit): self.emit(Exit())
@@ -536,8 +552,7 @@ def compile_script(stmts: List[Stmt], const_scope: ConstScope, strict: bool = Fa
         for s in stmt_list:
             if isinstance(s, StmtIf): alloc_switches(s.stmts)
             elif isinstance(s, StmtIfElse): alloc_switches(s.true_stmts); alloc_switches(s.false_stmts)
-            elif isinstance(s, StmtFor): alloc_switches(s.body)
-            elif isinstance(s, StmtDoWhile): alloc_switches(s.body)
+            elif isinstance(s, (StmtFor, StmtDoWhile, StmtWhile)): alloc_switches(s.body)
             elif isinstance(s, StmtSwitch):
                 s.switch_id = SwitchId(sid_alloc); sid_alloc += 1
                 for sc in s.cases: alloc_switches(sc.stmts)

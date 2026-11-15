@@ -40,8 +40,12 @@ class ItemIconEngine:
     ARR5_OFF = 0x676DD0
     ARR7_OFF = 0x679898
 
-    def __init__(self, rom_data: bytes):
+    MFOMT_ARRAYS = (0x607DE0, 0x6085C4, 0x60A8E4, 0x617768, 0x61A2F0)
+
+    def __init__(self, rom_data: bytes, is_mfomt: bool = False):
         self.rom = rom_data
+        if is_mfomt:
+            self.ARR1_OFF, self.ARR2_OFF, self.ARR4_OFF, self.ARR5_OFF, self.ARR7_OFF = self.MFOMT_ARRAYS
         self._cache_pil: Dict[Tuple[int, int], Image.Image] = {}
         self._cache_pixmap: Dict[Tuple[int, int], QPixmap] = {}
 
@@ -415,7 +419,7 @@ class ItemParser:
         from Banco_de_Datos.parche_splash import require_rom_signature
         require_rom_signature(project, auto_sign=True, module_name='ItemParser')
         if project and project.base_rom_data:
-            self.icon_engine = ItemIconEngine(project.base_rom_data)
+            self.icon_engine = ItemIconEngine(project.base_rom_data, is_mfomt=getattr(project, 'is_mfomt', False))
 
         self.scan_items()
 
@@ -424,12 +428,20 @@ class ItemParser:
         if not self.project:
             return self.items
 
+        cfg = getattr(getattr(self.project, 'super_lib', None), 'cfg', {}) or {}
+        t_cfg = cfg.get("TOOLS_TABLE", (0, 0))
+        f_cfg = cfg.get("FOODS_TABLE", (0, 0))
+        m_cfg = cfg.get("MISC_TABLE", (0, 0))
+        tools_off = t_cfg[0] if t_cfg and t_cfg[0] > 0 else self.TOOLS_OFFSET
+        foods_off = f_cfg[0] if f_cfg and f_cfg[0] > 0 else self.FOODS_OFFSET
+        misc_off  = m_cfg[0] if m_cfg and m_cfg[0] > 0 else self.MISC_OFFSET
+
         # Cargar tabla suplementaria si existe
         master_info = self._load_master_table()
 
         # 1. Herramientas (80 items, 12 bytes stride)
         for i in range(80):
-            off = self.TOOLS_OFFSET + i * 12
+            off = tools_off + i * 12
             item = ToolItem(self, i, off, "Herramienta")
             item.global_id = i
             item.read_stats()
@@ -438,7 +450,7 @@ class ItemParser:
 
         # 2. Comidas y Cultivos (170 items, 16 bytes stride)
         for i in range(170):
-            off = self.FOODS_OFFSET + i * 16
+            off = foods_off + i * 16
             item = FoodItem(self, i, off, "Consumible/Comida")
             item.global_id = 80 + i
             item.read_stats()
@@ -447,7 +459,7 @@ class ItemParser:
 
         # 3. Minerales y Varios (94 items, 12 bytes stride)
         for i in range(94):
-            off = self.MISC_OFFSET + i * 12
+            off = misc_off + i * 12
             item = MiscItem(self, i, off, "Artículo")
             item.global_id = 250 + i
             item.read_stats()

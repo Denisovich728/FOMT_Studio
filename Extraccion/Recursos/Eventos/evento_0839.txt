@@ -1,7 +1,0 @@
-// Script 839
-#include "Fomt_Lib.src"
-
-script 839 Event_0839 {
-    exit;
-    exit;
-}

@@ -1,7 +1,0 @@
-// Script 836
-#include "Fomt_Lib.src"
-
-script 836 Event_0836 {
-    exit;
-    exit;
-}

@@ -83,7 +83,11 @@ class FoMTProject:
                 raise ValueError(f"La ROM no es compatible. Header detectado: {header_16.hex().upper()}")
             
         self.super_lib = SuperLibrary(self.is_mfomt)
+        self.super_lib.project = self
         self.memory = MemoryManager(self)
+        
+        # Asegurar copia local de tablas CSV (eventos y flags) en la carpeta del proyecto
+        self.ensure_project_csvs()
         
         # Aplicar parches existentes (si estamos cargando un .fsp)
         for offset, data in self.patches.items():
@@ -128,15 +132,20 @@ class FoMTProject:
 
     def open_rom_session(self, rom_path):
         """
-        Crea un proyecto de sesión automático al abrir una ROM.
-        Evita bloqueos de archivo y organiza las ediciones por fecha.
-        Ruta resuelta dinámicamente mediante get_sessions_dir().
+        Crea un proyecto de sesión aislado al abrir una ROM.
+        Resetea el estado en memoria para evitar arrastrar parches de sesiones previas.
         """
         import datetime
         from Banco_de_Datos.Utilidades.rutas import get_sessions_dir
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # Carpeta de sesión dinámica
+        # Aislamiento estricto: limpiar cualquier parche o buffer de memoria previo
+        self.patches = {}
+        self.next_free_space = 0x75C254
+        self.base_rom_data = None
+        if hasattr(self, 'virtual_rom'):
+            del self.virtual_rom
+        
         docs_dir = get_sessions_dir()
         proj_name = f"Session_{timestamp}"
         proj_dir = os.path.join(docs_dir, proj_name)
@@ -200,7 +209,7 @@ class FoMTProject:
         self.save()
 
     def _resolve_base_rom_path(self):
-        """Resuelve dinámicamente la ruta a la ROM base sin fallar por rutas absolutas obsoletas o sesiones borradas."""
+        """Resuelve dinámicamente la ruta a la ROM base sin reutilizar carpetas Session_* contaminadas."""
         candidates = []
         if getattr(self, 'base_rom_path', None):
             candidates.append(self.base_rom_path)
@@ -217,45 +226,22 @@ class FoMTProject:
             candidates.append(os.path.join(self.project_dir, "source.gba"))
             if getattr(self, 'name', None):
                 candidates.append(os.path.join(self.project_dir, f"{self.name}.gba"))
-            try:
-                if os.path.isdir(self.project_dir):
-                    for f in os.listdir(self.project_dir):
-                        if f.lower().endswith(".gba"):
-                            candidates.append(os.path.join(self.project_dir, f))
-            except Exception:
-                pass
 
         try:
-            from Banco_de_Datos.Utilidades.rutas import get_sessions_dir, get_default_workspace_dir
-            sess_dir = get_sessions_dir()
+            from Banco_de_Datos.Utilidades.rutas import get_default_workspace_dir
             ws_dir = get_default_workspace_dir()
-            
             if getattr(self, 'name', None):
-                candidates.append(os.path.join(sess_dir, self.name, "source.gba"))
                 candidates.append(os.path.join(ws_dir, self.name, "source.gba"))
-            
             candidates.append(os.path.join(ws_dir, "source.gba"))
             candidates.append(os.path.join(ws_dir, "fomt.gba"))
             candidates.append(os.path.join(ws_dir, "mfomt.gba"))
-            
-            # Buscar en sesiones recientes (de más nueva a más vieja) que tengan una source.gba válida
-            if os.path.isdir(sess_dir):
-                subdirs = sorted(
-                    [os.path.join(sess_dir, d) for d in os.listdir(sess_dir) if d.startswith("Session_")],
-                    key=lambda p: os.path.getmtime(p) if os.path.exists(p) else 0,
-                    reverse=True
-                )
-                for s in subdirs[:15]:
-                    cand = os.path.join(s, "source.gba")
-                    if os.path.isfile(cand):
-                        candidates.append(cand)
         except Exception:
             pass
 
-        # Buscar en entorno local y directorios de laboratorio
+        # Buscar únicamente ROMs limpias en entorno local y directorios de laboratorio (nunca otras sesiones)
         for root in [os.getcwd(), r"J:\Laboratorio", r"J:\Laboratorio\FOMT_Studio", r"J:\Laboratorio\FOMT-MATCH-ENGINE"]:
             if os.path.isdir(root):
-                candidates.append(os.path.join(root, "source.gba"))
+                candidates.append(os.path.join(root, "FOMT_Virgen.gba"))
                 candidates.append(os.path.join(root, "fomt virgen.gba"))
                 candidates.append(os.path.join(root, "MFOMT VIRGEN.gba"))
                 candidates.append(os.path.join(root, "fomt.gba"))
@@ -316,7 +302,12 @@ class FoMTProject:
         
         saved_patches = data.get("patches", {})
         self.patches = {int(k): bytes.fromhex(v) for k,v in saved_patches.items()}
-        self.next_free_space = data.get("next_free_space", 0x75C244)
+        default_fs = 0x9E0000 if self.is_mfomt else 0x760000
+        self.next_free_space = data.get("next_free_space", default_fs)
+        if self.is_mfomt and self.next_free_space < 0x9E0000:
+            self.next_free_space = 0x9E0000
+        elif not self.is_mfomt and self.next_free_space < 0x760000:
+            self.next_free_space = 0x760000
         
         if not os.path.exists(self.base_rom_path) or not os.path.isfile(self.base_rom_path):
             resolved = self._resolve_base_rom_path()
@@ -383,7 +374,6 @@ class FoMTProject:
         if not is_rom_signed(self):
             inyectar_splash_y_firmar(self)
         assert_rom_signed(self, "ROM Export/Save")
-        from Banco_de_Datos.parche_splash import assert_rom_signed
         assert_rom_signed(self, 'save_rom')
         """
         Escribe directamente todos los cambios acumulados en el archivo físico ROM base (o target_path).
@@ -418,7 +408,6 @@ class FoMTProject:
         if not is_rom_signed(self):
             inyectar_splash_y_firmar(self)
         assert_rom_signed(self, "ROM Export/Save")
-        from Banco_de_Datos.parche_splash import assert_rom_signed
         assert_rom_signed(self, 'compile_to_rom')
         """Aplica todos los parches virtuales a la ROM base y exporta un archivo GBA."""
         export_path = os.path.abspath(export_path)
@@ -461,7 +450,6 @@ class FoMTProject:
         if not is_rom_signed(self):
             inyectar_splash_y_firmar(self)
         assert_rom_signed(self, "ROM Export/Save")
-        from Banco_de_Datos.parche_splash import assert_rom_signed
         assert_rom_signed(self, 'export_ips')
         """Exporta los parches acumulados en el formato estándar IPS."""
         import struct
@@ -524,13 +512,50 @@ class FoMTProject:
 
     def allocate_free_space(self, size):
         """
-        Asigna un bloque de memoria alineado a 4 bytes.
-        Retorna el offset de inicio alineado.
+        Reserva 'size' bytes alineados a 4 bytes en espacio libre real (0xFF) de la ROM,
+        respetando los limites de FoMT (>=0x760000) y MFoMT (>=0x9E0000), evitando sellos
+        SHA/splash y bloques ya reservados en self.patches, y actualizando next_free_space.
         """
-        # Asegurar que el inicio esté alineado a 4 bytes (multiplo de 4)
-        start_offset = (self.next_free_space + 3) & ~3
-        # El puntero del proyecto se mueve al final del bloque asignado, también alineado
-        self.next_free_space = start_offset + ((size + 3) & ~3)
+        aligned_size = (max(1, int(size)) + 3) & ~3
+        min_free = 0x9E0000 if self.is_mfomt else 0x760000
+        seal_start = 0xFFE000 if self.is_mfomt else 0x7FE000
+        seal_end = 0x1000000 if self.is_mfomt else 0x800000
+
+        cursor = max(self.next_free_space, min_free)
+        cursor = (cursor + 3) & ~3
+
+        rom = self.base_rom_data
+        if rom:
+            rom_len = len(rom)
+            patch_ranges = [(p_off, p_off + len(p_data)) for p_off, p_data in self.patches.items() if p_data]
+            needle = b'\xFF' * aligned_size
+            search_pos = cursor
+            while search_pos + aligned_size <= rom_len:
+                idx = rom.find(needle, search_pos)
+                if idx == -1:
+                    break
+                cand = (idx + 3) & ~3
+                if cand != idx:
+                    search_pos = cand
+                    continue
+                cand_end = cand + aligned_size
+                if cand < seal_end and cand_end > seal_start:
+                    search_pos = (seal_end + 3) & ~3
+                    continue
+                conflict_end = None
+                for p_s, p_e in patch_ranges:
+                    if cand < p_e and cand_end > p_s:
+                        conflict_end = p_e if conflict_end is None else max(conflict_end, p_e)
+                if conflict_end is not None:
+                    search_pos = (conflict_end + 3) & ~3
+                    continue
+                self.next_free_space = cand_end
+                return cand
+
+        start_offset = cursor
+        if start_offset < seal_end and start_offset + aligned_size > seal_start:
+            start_offset = seal_end
+        self.next_free_space = start_offset + aligned_size
         return start_offset
 
     def overwrite_rom_directly(self, offset: int, data: bytes):
@@ -572,3 +597,135 @@ class FoMTProject:
             self.virtual_rom[offset : offset + len(data_bytes)] = data_bytes
             
         print(f"Direct Overwrite: 0x{offset:08X} -> {len(data_bytes)} bytes escritos en la ROM base.")
+
+    # =========================================================================
+    # Gestión de Tablas CSV Locales por Carpeta de Proyecto (.fsp workspace)
+    # =========================================================================
+    def ensure_project_csvs(self):
+        """
+        Realiza un dump inicial de las tablas CSV base (Eventos y Flags) dentro de
+        la carpeta del proyecto junto al .fsp si aún no existen, aislando el proyecto
+        para ediciones largas y preservando el historial de nombres personalizados.
+        """
+        if not self.project_dir or not os.path.isdir(self.project_dir):
+            return
+
+        from Banco_de_Datos.Utilidades.rutas import get_data_path
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+
+        for fname in (f"{prefix}Events_Listname.csv", f"{prefix}Flags.csv"):
+            local_csv = os.path.join(self.project_dir, fname)
+            if not os.path.isfile(local_csv):
+                orig_csv = get_data_path(mode, fname)
+                if orig_csv and os.path.isfile(orig_csv):
+                    try:
+                        with open(orig_csv, "rb") as f_in:
+                            content = f_in.read()
+                        with open(local_csv, "wb") as f_out:
+                            f_out.write(content)
+                    except Exception as e:
+                        print(f"[Proyecto] Aviso al copiar {fname} al proyecto: {e}")
+
+    def get_csv_path(self, filename: str) -> str:
+        """
+        Prioriza el archivo CSV local de la carpeta del proyecto (.fsp workspace).
+        Si no existe localmente, hace fallback al archivo canónico en Banco_de_Datos.
+        """
+        if self.project_dir and os.path.isdir(self.project_dir):
+            local_csv = os.path.join(self.project_dir, filename)
+            if os.path.isfile(local_csv):
+                return local_csv
+
+        from Banco_de_Datos.Utilidades.rutas import get_data_path
+        mode = "mfomt" if self.is_mfomt else "fomt"
+        return get_data_path(mode, filename)
+
+    def update_event_name_in_csv(self, event_id: int, new_name: str) -> bool:
+        """
+        Renombra o registra un evento en el CSV local del proyecto y actualiza super_lib en caliente.
+        """
+        import csv
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        fname = f"{prefix}Events_Listname.csv"
+        self.ensure_project_csvs()
+        csv_path = self.get_csv_path(fname)
+        if not csv_path:
+            return False
+
+        rows = []
+        fieldnames = ["Event_Name", "ID"]
+        found = False
+        id_str = str(event_id).strip()
+
+        if os.path.isfile(csv_path):
+            with open(csv_path, "r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f)
+                if reader.fieldnames:
+                    fieldnames = list(reader.fieldnames)
+                for row in reader:
+                    if str(row.get("ID", "")).strip() == id_str:
+                        row["Event_Name"] = new_name.strip()
+                        found = True
+                    rows.append(row)
+
+        if not found:
+            rows.append({"Event_Name": new_name.strip(), "ID": id_str})
+
+        with open(csv_path, "w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        if hasattr(self, "super_lib") and self.super_lib:
+            self.super_lib.custom_event_names[id_str] = new_name.strip()
+
+        return True
+
+    def update_flag_in_csv(self, flag_id: int, flag_name: str, type_value: str = "bool") -> bool:
+        """
+        Renombra o registra una flag en el CSV local de flags del proyecto.
+        """
+        import csv
+        prefix = "MFomt_" if self.is_mfomt else "Fomt_"
+        fname = f"{prefix}Flags.csv"
+        self.ensure_project_csvs()
+        csv_path = self.get_csv_path(fname)
+        if not csv_path:
+            return False
+
+        rows = []
+        fieldnames = ["flag_id", "Flag_name", "type_value"]
+        found = False
+        hex_id = f"0x{flag_id:04X}"
+
+        if os.path.isfile(csv_path):
+            with open(csv_path, "r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f)
+                if reader.fieldnames:
+                    fieldnames = list(reader.fieldnames)
+                for row in reader:
+                    raw_fid = (row.get("flag_id") or "").strip()
+                    try:
+                        parsed_id = int(raw_fid, 16) if raw_fid.lower().startswith("0x") else int(raw_fid)
+                    except Exception:
+                        parsed_id = None
+                    if parsed_id == flag_id:
+                        row["Flag_name"] = flag_name.strip()
+                        if "type_value" in fieldnames:
+                            row["type_value"] = type_value
+                        found = True
+                    rows.append(row)
+
+        if not found:
+            new_row = {"flag_id": hex_id, "Flag_name": flag_name.strip()}
+            if "type_value" in fieldnames:
+                new_row["type_value"] = type_value
+            rows.append(new_row)
+
+        with open(csv_path, "w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        return True

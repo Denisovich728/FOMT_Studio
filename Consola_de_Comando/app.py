@@ -554,6 +554,14 @@ class FoMTStudioApp(QMainWindow):
         m_patch.addAction(tr("patch_stairs", lang), self._apply_stairs_patch)
         m_patch.addAction(tr("patch_teleport", lang), self._apply_teleport_stone_patch)
 
+        menu_more.addSeparator()
+
+        # --- Apartado de Herramientas ---
+        m_tools = menu_more.addMenu(tr("cat_tools", lang))
+        m_tools.addAction(tr("patch_flags_expand", lang), self._open_memory_extend_dialog)
+        m_tools.addAction(tr("menu_save_editor", lang), self.open_save_editor)
+        m_tools.addAction(tr("menu_shop_editor", lang), self.open_shop_editor)
+
         btn_more.setMenu(menu_more)
         self.toolbar.addWidget(btn_more)
 
@@ -602,6 +610,11 @@ class FoMTStudioApp(QMainWindow):
         
 
         
+        tools_menu = menubar.addMenu(tr("cat_tools", lang))
+        tools_menu.addAction(tr("patch_flags_expand", lang), self._open_memory_extend_dialog)
+        tools_menu.addAction(tr("menu_save_editor", lang), self.open_save_editor)
+        tools_menu.addAction(tr("menu_shop_editor", lang), self.open_shop_editor)
+
         help_menu = menubar.addMenu(tr("menu_help", lang))
         shortcuts_action = QAction(tr("tab_help", lang), self)
         shortcuts_action.triggered.connect(self._on_action_help)
@@ -1459,6 +1472,35 @@ class FoMTStudioApp(QMainWindow):
         else:
             self.status.showMessage(f"No se pudo encontrar el script: {ref}", 3000)
 
+    def append_new_event_to_tree(self, event_id: int):
+        """Agrega un evento recién creado al árbol de eventos y actualiza el contador."""
+        if not self.cat_events_item or not getattr(self.project, 'super_lib', None):
+            return
+        ev_count = self.project.event_parser.get_event_count()
+        self.cat_events_item.setText(f"{tr('cat_events', self.current_lang)} ({ev_count})")
+        ev_item = QStandardItem(self.project.super_lib.get_baptized_name(event_id, "", lang=self.current_lang))
+        ev_item.setData("EVENT", Qt.ItemDataRole.UserRole + 1)
+        ev_item.setData(event_id, Qt.ItemDataRole.UserRole)
+        self.cat_events_item.appendRow(ev_item)
+        self.tree_view.expand(self.cat_events_item.index())
+        self.tree_view.setCurrentIndex(ev_item.index())
+
+    def open_save_editor(self):
+        """Abre el editor de partidas (.sav) para FoMT y MFoMT."""
+        from Consola_de_Comando.save_editor_dialog import SaveEditorDialog
+        dlg = SaveEditorDialog(self.project, self)
+        dlg.exec()
+
+    def open_shop_editor(self):
+        """Abre el editor de tiendas nativas (ítems y precios) para FoMT y MFoMT."""
+        if not self.project or not getattr(self.project, "base_rom_data", None):
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, "Editor de Tiendas", "Carga primero una ROM o proyecto.")
+            return
+        from Nucleos_Positronicos.Nucleo_de_Tiendas.editor_tiendas import ShopEditorDialog
+        dlg = ShopEditorDialog(self.project, self)
+        dlg.exec()
+
     def _close_tab(self, index):
         widget = self.tabs.widget(index)
         if widget:
@@ -1752,12 +1794,26 @@ class FoMTStudioApp(QMainWindow):
         if item_type == "EVENT":
             menu = QMenu(self)
             act_ide = menu.addAction(tr("menu_open_ide", self.current_lang))
+            act_rename = menu.addAction("Renombrar Evento..." if self.current_lang == "es" else "Rename Event...")
             # act_theater = menu.addAction("Abrir en Teatro de Eventos (Visual)")
             chosen = menu.exec(self.tree_view.viewport().mapToGlobal(pos))
             if chosen == act_ide:
                 self.open_event(val)
-            elif chosen == act_theater:
-                self.open_event_theater(val)
+            elif chosen == act_rename:
+                from PyQt6.QtWidgets import QInputDialog
+                curr_name = ""
+                if self.project and hasattr(self.project, "super_lib"):
+                    curr_name = self.project.super_lib.custom_event_names.get(str(val), "")
+                title = "Renombrar Evento" if self.current_lang == "es" else "Rename Event"
+                prompt = f"Nuevo nombre para Evento #{val}:" if self.current_lang == "es" else f"New name for Event #{val}:"
+                new_name, ok = QInputDialog.getText(self, title, prompt, text=curr_name)
+                if ok and new_name.strip() and self.project:
+                    clean_name = new_name.strip()
+                    if self.project.update_event_name_in_csv(val, clean_name):
+                        item.setText(self.project.super_lib.get_baptized_name(val, "", lang=self.current_lang))
+                        self.status.showMessage(f"Evento #{val} renombrado a '{clean_name}'.")
+            # elif chosen == act_theater:
+            #     self.open_event_theater(val)
 
     def open_event_theater(self, event_id=None):
         """Teatro de Eventos desconectado temporalmente por directiva del usuario."""
@@ -1786,4 +1842,13 @@ class FoMTStudioApp(QMainWindow):
             QMessageBox.information(self, "Éxito", "¡El parche de la Piedra de Teletransporte (Año 1) se ha aplicado con éxito!")
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
+
+    def _open_memory_extend_dialog(self):
+        if not self.project:
+            QMessageBox.warning(self, tr("tab_notice", self.current_lang), tr("msg_must_load_rom", self.current_lang))
+            return
+        from Nucleos_Positronicos.Nucleo_de_Scripts.memory_extend_engine import MemoryExtendDialog
+        dlg = MemoryExtendDialog(self, self.project)
+        dlg.exec()
+
 
